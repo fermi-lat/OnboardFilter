@@ -961,6 +961,7 @@ int FilterAlg::projectionLoop(int prjcnt,int tile,int face,ITkrGeometrySvc *tkrG
       zdist = fabs(acdCenter.z() - acdCoord.z());
       
       //see if the row was hit by this projection
+      getTileBoundaries(tile, face, view, lesserBoundary, greaterBoundary);
       rowhit = false;
       if (m_useGleamTileGeometry){
         if ((face == 0x1) || (face == 0x3)){

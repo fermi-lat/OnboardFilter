@@ -265,6 +265,10 @@ StatusCode OnboardFilter::execute()
       TDS_variables.yCnt[counter]=0;
       //memset(&TDS_variables.prjs[counter],0,sizeof(TDS_variables.prjs[counter]));
       memset(&TDS_variables.prjs,0,sizeof(TDS_variables.prjs));
+      for(int layerCounter=0;layerCounter<36;layerCounter++){
+	TDS_variables.hits[counter].layers[layerCounter].cnt=0;
+	TDS_variables.hits[counter].layers[layerCounter].beg=NULL;
+      }
     }
     MsgStream log(msgSvc(),name());
     OnboardFilterTds::TowerHits *hits = new OnboardFilterTds::TowerHits;
@@ -490,7 +494,9 @@ void OnboardFilter::storeHits(OnboardFilterTds::TowerHits *hits){
     for(int layerCounter=0;layerCounter<36;layerCounter++){
       hitRecords[counter].cnt[layerCounter]=TDS_variables.hits[counter].layers[layerCounter].cnt;
       hitRecords[counter].beg[layerCounter]=new short int[hitRecords[counter].cnt[layerCounter]];
-      memcpy(hitRecords[counter].beg[layerCounter],TDS_variables.hits[counter].layers[layerCounter].beg,hitRecords[counter].cnt[layerCounter]*sizeof(short int));
+      if(hitRecords[counter].cnt[layerCounter]>0){
+	memcpy(hitRecords[counter].beg[layerCounter],TDS_variables.hits[counter].layers[layerCounter].beg,hitRecords[counter].cnt[layerCounter]*sizeof(short int));
+      }
     }
   }
   hits->set(hitRecords);
@@ -498,6 +504,9 @@ void OnboardFilter::storeHits(OnboardFilterTds::TowerHits *hits){
     for(int layerCounter=0;layerCounter<36;layerCounter++){
       if(hitRecords[counter].beg[layerCounter]){
 	delete[] hitRecords[counter].beg[layerCounter];
+	if(TDS_variables.hits[counter].layers[layerCounter].beg!=NULL){
+	  free(TDS_variables.hits[counter].layers[layerCounter].beg);
+	}
       }
     }
   }
