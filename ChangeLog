@@ -1,5 +1,14 @@
 ------------------------------------------------------------
 User: golpa  Tue Aug 10 08:28:22 PDT 2004
+OnboardFilter/src
+
+Modified Files:
+	tmr.c.vx-ppc-gcc tmr.c.xx-x86-gcc tmr.h 
+Log Message:
+Removed printf statement that was too verbose
+    *
+------------------------------------------------------------
+User: golpa  Tue Aug 10 08:28:22 PDT 2004
 OnboardFilter/doc
 
 Modified Files:
