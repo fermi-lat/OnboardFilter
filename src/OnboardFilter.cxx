@@ -47,8 +47,8 @@
 #include "GlastSvc/GlastDetSvc/IGlastDetSvc.h"
 
 #include "Event/TopLevel/EventModel.h"
-#include "Event/Filter/Ebf.h"
-#include "Event/Filter/FilterStatus.h"
+#include "EbfWriter/Ebf.h"
+#include "OnboardFilter/FilterStatus.h"
 
 #include "ntupleWriterSvc/INTupleWriterSvc.h"
 
@@ -270,7 +270,7 @@ StatusCode OnboardFilter::execute()
     }
     DFC_latRecordInit (dfcEvt);
 
-    SmartDataPtr<Event::Ebf> ebfData(eventSvc(),EventModel::Filter::Ebf);
+    SmartDataPtr<EbfWriterTds::Ebf> ebfData(eventSvc(),EventModel::Filter::Ebf);
     if(!ebfData){
       return StatusCode::FAILURE;
     }
@@ -282,7 +282,7 @@ StatusCode OnboardFilter::execute()
     size  = EBF_esizeGleam  (ebf);
     evt   = EBF_edataGleam  (ebf);
     nevts = countEvts       (evt, size);
-    
+
     /* If number of events not specified, use all */
     to_process = ctl->to_process;
     if (to_process < 0) to_process = nevts;
