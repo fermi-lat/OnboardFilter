@@ -26,8 +26,6 @@ namespace OnboardFilterTds{
     FilterStatus();
     FilterStatus(const unsigned int code,const int energy=0);
     virtual ~FilterStatus();
-//    static const CLID& classID() { return CLID_FilterStatus; }
-//    virtual const CLID& clID() { return classID(); }
     
     ///Set the statuscode of the filter
     void set(const unsigned int code);
