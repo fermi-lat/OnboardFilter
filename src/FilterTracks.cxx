@@ -206,7 +206,7 @@ StatusCode FilterTracks::execute(){
     }
     else{
       status->setSeparation(-1);
-      log<<MSG::INFO <<"Unable to obtain McParticleCol from TDS"<<endreq;
+      log<<MSG::DEBUG <<"Unable to obtain McParticleCol from TDS"<<endreq;
     }
   }
   else{
