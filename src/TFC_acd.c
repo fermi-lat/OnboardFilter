@@ -6,7 +6,7 @@
 
 \verbatim
 
- CVS $Id$
+ CVS $Id: TFC_acd.c,v 1.3 2004/07/12 17:37:44 golpa Exp $
 \endverbatim
 
                                                                          */
