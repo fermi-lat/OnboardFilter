@@ -387,12 +387,13 @@ StatusCode OnboardFilter::execute()
         DFC_filterComplete (dfcCtl, result, dfcEvt, evt, size);
         
         status = result->status;
-	newStatus->set(status);
-	newStatus->setCalEnergy(result->energy);
+        newStatus->set(status);
+        newStatus->setCalEnergy(result->energy);
         newStatus->setTcids(TDS_variables.tcids);
         newStatus->setAcdMap(TDS_variables.acd_xz,TDS_variables.acd_yz,TDS_variables.acd_xy);
         newStatus->setAcdStatus(TDS_variables.acdStatus);
         newStatus->setLayers(TDS_layers);
+		log<< MSG::INFO << "FilterStatus Code: "<<(unsigned int)status<<" : "<<convertBase(status)<<endreq;
         if (ctl->list && (result->status & DFC_M_STATUS_VETOES) == 0)
         {
             printf ("0000 %8d %8d\n", getMCsequence (evt, size), idx);
