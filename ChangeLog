@@ -1,5 +1,16 @@
 ------------------------------------------------------------
 User: dnwren  Mon Aug 16 10:59:59 PDT 2004
+OnboardFilter/src
+
+Modified Files:
+	FilterTracks.cxx 
+Log Message:
+Added a new track selection algorithm.  Changed computeAngles to accept parameters.
+
+
+    *
+------------------------------------------------------------
+User: dnwren  Mon Aug 16 10:59:59 PDT 2004
 OnboardFilter/OnboardFilter
 
 Modified Files:
