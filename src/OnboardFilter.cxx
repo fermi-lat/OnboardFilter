@@ -4,7 +4,7 @@
  * @author JJRussell - russell@slac.stanford.edu
  * @author David Wren - dnwren@milkyway.gsfc.nasa.gov
  * @author Navid Golpayegani - golpa@milkyway.gsfc.nasa.gov
- * $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/OnboardFilter.cxx,v 1.18 2003/08/22 19:42:33 golpa Exp $
+ * $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/OnboardFilter.cxx,v 1.19 2003/08/22 21:00:45 golpa Exp $
  */
    
 #include <stdlib.h>
@@ -132,7 +132,7 @@ private:
      *           the y projections
      */
     void computeAngles(std::vector<double> x,std::vector <double> y,
-		       std::vector<double> xz,std::vector<double> yz,
+		       std::vector<double> xz,std::vector<double> yz,std::vector<double> z,
 		       double &phi,double &phi_rad, double &theta,double &theta_rad);
   
     /**
@@ -141,7 +141,7 @@ private:
      * @param theata_rad The Theta angle obtained by computeAngles() in radians
      * @param phi_rad The phi angle obtained by computeAngles() in radians
      */
-    void computeLength(std::vector<double> z, double theta_rad, double phi_rad,
+    void computeLength(std::vector<double> x, std::vector<double> y, std::vector<double> z, double theta_rad, double phi_rad,
                        double &length, std::vector<double> &endPoint);
     /**
      * Compute the extensions to the tracks
@@ -535,8 +535,8 @@ StatusCode OnboardFilter::computeCoordinates(OnboardFilterTds::FilterStatus *sta
 	  double phi,phi_rad;
 	  double theta,theta_rad;
 	  double length;
-	  computeAngles(x,y,xz,yz,phi,phi_rad,theta,theta_rad);
-	  computeLength(zAvg,theta_rad,phi_rad,length,pointHigh);
+	  computeAngles(x,y,xz,yz,zAvg,phi,phi_rad,theta,theta_rad);
+	  computeLength(x,y,zAvg,theta_rad,phi_rad,length,pointHigh);
 	  computeExtension(x,y,zAvg,phi_rad,theta_rad, extendedLow, extendedHigh);
 	  //Add track to TDS
 	  OnboardFilterTds::track newTrack;
@@ -549,6 +549,14 @@ StatusCode OnboardFilter::computeCoordinates(OnboardFilterTds::FilterStatus *sta
 	  newTrack.exLowCoord=extendedLow;
 	  newTrack.exHighCoord=extendedHigh;
 	  status->setTrack(newTrack);
+	  x.clear();
+	  y.clear();
+	  xz.clear();
+	  yz.clear();
+	  zAvg.clear();
+	  pointHigh.clear();
+	  extendedLow.clear();
+	  extendedHigh.clear();
 	}
       }
     }
@@ -602,7 +610,7 @@ StatusCode OnboardFilter::computeCoordinates(OnboardFilterTds::FilterStatus *sta
 }
 
 void OnboardFilter::computeAngles(std::vector<double> x,std::vector<double> y,
-				  std::vector<double> xz,std::vector<double> yz,
+				  std::vector<double> xz,std::vector<double> yz,std::vector<double> z,
                                   double &phi,double &phi_rad,double &theta,
                                   double &theta_rad){
   const double pi = 3.14159265358979323846;
@@ -610,6 +618,8 @@ void OnboardFilter::computeAngles(std::vector<double> x,std::vector<double> y,
   double x_v = xz[0]-xz[1];
   double y_h = y[1]-y[0];
   double y_v = yz[0]-yz[1];
+  double z_v = z[0]-z[1];
+  double t_h_ave = 1;
   if(x_v== 0 && y_v==0){
     phi_rad=0;
     theta_rad=0;
@@ -625,15 +635,34 @@ void OnboardFilter::computeAngles(std::vector<double> x,std::vector<double> y,
 	theta_rad=pi/2-atan(x_v/x_h);
       }
       else{
-	if((x_h>0) && (y_h>0))
+	if((x_h>0) && (y_h>0)){
 	  phi_rad=atan(y_h/x_h);
-	else{
-	  if((x_h<0) && (y_h>0))
-	    phi_rad=pi/2-atan(y_h/x_h);
-	  else
-	    phi_rad=3*pi/2-atan(y_h/x_h);
+	  t_h_ave=((x_h/cos(phi_rad)) + (y_h/sin(phi_rad)))/2;
+	  theta_rad = pi - atan(t_h_ave/z_v);
 	}
-	theta_rad=pi/2 - atan(x_v/(x_h/cos(phi_rad)));
+	else{
+	  if((x_h<0) && (y_h>0)){
+	    phi_rad=pi/2-atan(y_h/x_h);
+	    t_h_ave = ( x_h/cos(phi_rad - pi/2) + y_h/sin(phi_rad - pi/2) )/2;
+	    theta_rad = pi - atan(t_h_ave/z_v);
+	  }
+	  else{
+	    if((x_h<0) && (y_h<0)){
+	      phi_rad=3*pi/2 - atan(x_h/y_h);
+	      t_h_ave = ( (-x_h/sin(3*pi/2 - phi_rad)) + (-y_h/cos(3*pi/2 - phi_rad)) )/2;
+	      theta_rad = pi - atan(t_h_ave/z_v);
+	    }
+	    else{
+	      if ((x_h>0) && (y_h<0)){
+		phi_rad=2*pi-atan(-y_h/x_h);
+		t_h_ave = ((x_h/cos(2*pi-phi_rad)) + (-y_h/sin(2*pi-phi_rad)))/2;
+		theta_rad = pi - atan(t_h_ave/z_v);
+	      }
+	      else
+		phi_rad=3*pi/2-atan(y_h/x_h);
+	    }
+	  }
+	}
       }
     }
   }
@@ -641,11 +670,11 @@ void OnboardFilter::computeAngles(std::vector<double> x,std::vector<double> y,
   phi=phi_rad*180/pi;
 }
 
-void OnboardFilter::computeLength(std::vector<double> z,double theta_rad,double phi_rad,
+void OnboardFilter::computeLength(std::vector<double> x,std::vector<double> y, std::vector<double> z,double theta_rad,double phi_rad,
 				  double &length, std::vector<double> &endPoint){
   const double pi = 3.14159265358979323846;
-  double t_v=z[2]-z[0];
-  double t_h = t_v/tan(pi/2 - theta_rad);
+  double t_v=z[0]-z[2];
+  double t_h = t_v*tan(pi - theta_rad);
   length=sqrt(t_v*t_v+t_h*t_h);
   endPoint.push_back(t_h*cos(phi_rad));
   endPoint.push_back(t_h*sin(phi_rad));
@@ -658,11 +687,11 @@ void OnboardFilter::computeExtension(std::vector<double> x,std::vector<double> y
  				     std::vector<double> &extendHigh){
   const double pi = 3.14159265358979323846;
   const double length=1000;
-  extendLow.push_back(length*sin(theta_rad)*cos(phi_rad)+x[0]);
-  extendLow.push_back(length*sin(theta_rad)*sin(phi_rad)+y[0]);
-  extendLow.push_back(length*cos(theta_rad)+z[0]);
+  extendLow.push_back(length*sin(pi-theta_rad)*cos(pi+phi_rad) + x[0]);
+  extendLow.push_back(length*sin(pi-theta_rad)*sin(pi+phi_rad) + y[0]);
+  extendLow.push_back(length*cos(pi-theta_rad) + z[0]);
 
-  extendHigh.push_back(length*sin(theta_rad+pi/2)*cos(phi_rad)+x[2]);
-  extendHigh.push_back(length*sin(theta_rad+pi/2)*sin(phi_rad)+y[2]);
-  extendHigh.push_back(length*cos(theta_rad+pi/2)+z[2]);
+  extendHigh.push_back(length*sin(theta_rad)*cos(phi_rad)+x[2]);
+  extendHigh.push_back(length*sin(theta_rad)*sin(phi_rad)+y[2]);
+  extendHigh.push_back(length*cos(theta_rad)+z[2]);
 }
