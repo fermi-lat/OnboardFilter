@@ -1,4 +1,14 @@
 ------------------------------------------------------------
+User: burnett  Thu Aug 28 21:26:43 PDT 2003
+OnboardFilter/src
+
+Modified Files:
+	OnboardFilter.cxx 
+Log Message:
+make event ouput DEBUG;
+add logic to veto events by terminating the current sequence, with control by an integer property that is a mask.
+    *
+------------------------------------------------------------
 User: golpa  Thu Aug 28 16:00:52 PDT 2003
 OnboardFilter/cmt
 
