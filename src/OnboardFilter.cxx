@@ -277,7 +277,7 @@ StatusCode OnboardFilter::execute()
     }
     DFC_latRecordInit (dfcEvt);
 
-    SmartDataPtr<EbfWriterTds::Ebf> ebfData(eventSvc(),EventModel::Filter::Ebf);
+    SmartDataPtr<EbfWriterTds::Ebf> ebfData(eventSvc(),EbfWriterTds::Path);
     if(!ebfData){
       return StatusCode::FAILURE;
     }

@@ -1,5 +1,5 @@
 package OnboardFilter
-version v0
+version v0r0
 
 use Event		*
 use EbfWriter		*
@@ -14,13 +14,11 @@ apply_pattern library_Llinkopts library="OnboardFilterTds"
 
 macro_append cflags "" \
    Linux "-DGLEAM"\
-   Win32 "/D "GLEAM"\
-   VC7   "/D "GLEAM"
+   Win32 "/D "GLEAM"
 
 macro_append cppflags "" \
    Linux "-DGLEAM"\
-   Win32 "/D "GLEAM"\
-   VC7   "/D "GLEAM"
+   Win32 "/D "GLEAM"
 
 library OnboardFilterTds -no_share FilterStatus.cxx
 
