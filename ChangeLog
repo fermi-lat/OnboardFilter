@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: golpa  Mon Jul 12 12:47:17 PDT 2004
+OnboardFilter/OnboardFilter
+
+Modified Files:
+	FilterAlg.h FilterAlgTds.h FilterDisplay.h FilterTracks.h 
+Log Message:
+Removed windows characters
+    *
+------------------------------------------------------------
 User: golpa  Mon Jul 12 12:47:14 PDT 2004
 OnboardFilter/DFC
 
