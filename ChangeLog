@@ -1,5 +1,14 @@
 ------------------------------------------------------------
 User: golpa  Thu Aug 21 12:21:34 PDT 2003
+OnboardFilter/cmt
+
+Modified Files:
+	requirements 
+Log Message:
+Added code to store projections and display tracks
+    *
+------------------------------------------------------------
+User: golpa  Thu Aug 21 12:21:34 PDT 2003
 OnboardFilter/OnboardFilter
 
 Modified Files:
