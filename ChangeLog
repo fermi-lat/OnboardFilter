@@ -1,4 +1,42 @@
 ------------------------------------------------------------
+User: golpa  Mon Jul 12 10:37:46 PDT 2004
+OnboardFilter/src
+
+Modified Files:
+	AFC_latRecordPrint.c AFC_latUnpack.c AFC_remapDef.h 
+	AFC_splash.c AFC_splash.h AFC_splashMap.h AFC_splashMap1x1.c 
+	AFC_splashMapBld.h ATF_filter.h ATF_shadowedTowers.h 
+	ATF_shadowedTowers2x2.c ATF_shadowedTowersCtl.h BTD.c BTE.c 
+	BTE_display.c CFC_constants.c CFC_constantsPrint.c 
+	CFC_latEnergySum.c CFC_latRawRecordPrint.c CFC_latRawUnpack.c 
+	CFC_latRecordPrint.c CFC_latThreshold.c CFC_latUnpack.c 
+	CFC_ratioCheck.h CFC_towerPrint.c CFC_towerRawRecordPrint.c 
+	CFC_towerRawUnpack.c CFC_towerRecordPrint.c CFC_towerSum.c 
+	CFC_towerUnpack.c DFC_ctl.c DFC_ctlAfc.c DFC_ctlAfcDef.h 
+	DFC_ctlAtf.c DFC_ctlAtfDef.h DFC_ctlCfc.c DFC_ctlCfcDef.h 
+	DFC_ctlDef.h DFC_ctlTfc.c DFC_ctlTfcDef.h DFC_display.c 
+	DFC_filter.c DFC_latUnpack.c DFC_resultsDef.h DFC_statistics.c 
+	EBF_directory.c EBF_directoryPrint.c EBF_fileIn-Gleam.c 
+	EBF_fileOut.c EBF_swap.c EBF_swap.h FilterDisplay.cxx 
+	FilterStatus.cxx FilterTracks.cxx OnboardFilter.cxx TFC_acd.c 
+	TFC_acd.h TFC_geometryDef.h TFC_geometryPrint.c 
+	TFC_geometryStd.c TFC_geometryStd.h TFC_latRecordPrint.c 
+	TFC_latUnpack.c TFC_projectionDef.h TFC_projectionPrint.c 
+	TFC_projectionTowerFind.c TFC_skirt.c TFC_skirt.h 
+	TFC_stripToLen.h TFC_towerGeometryDef.h TFC_trigger.h 
+	TFC_triggerFill.c TFC_triggerForm.h TFC_triggerSortedForm.h 
+	ffs.h tmr.c tmr.c.sx-xxx-xxx tmr.c.vx-ppc-gcc tmr.c.xx-x86-gcc 
+	tmr.c.xx-xxx-xxx tmr.h tmr.h.sx-xxx-xxx tmr.h.xx-ppc-gcc 
+	tmr.h.xx-x86-gcc tmr.h.xx-xxx-xxx 
+Removed Files:
+	AFC_splashVeto.ph AFC_splashVeto.pp DFC_results.c 
+	EBF_fileIn.phsav EBF_gltPrint.c TFC_latUnpack.c-branch 
+	TFC_towerFilter.ph TFC_towerFilter.pp dfc.cidc dfcprint.cidc 
+	ebf.cidc filter.cidc mainpage.h windowsCompat.h 
+Log Message:
+New version of Filter from JJ
+    *
+------------------------------------------------------------
 User: golpa  Mon Jul 12 10:22:23 PDT 2004
 OnboardFilter/OnboardFilter
 
