@@ -1,4 +1,14 @@
 ------------------------------------------------------------
+User: golpa  Mon Jul 12 10:18:30 PDT 2004
+OnboardFilter/DFC
+
+Added Files:
+	ABD.h ABE.h AWD.h AWE.h BTREE.h DFC_evt.h EBF_gem.h 
+	EBF_gemPrint.h EDM.h HEAP.h HUFF.h TFC_geoIds.h TFC_geos.h 
+Log Message:
+Forgot to add these files
+    *
+------------------------------------------------------------
 User: golpa  Mon Jul 12 10:15:50 PDT 2004
 OnboardFilter/DFC
 
