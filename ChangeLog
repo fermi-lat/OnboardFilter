@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: golpa  Mon Aug  2 18:04:46 PDT 2004
+OnboardFilter/OnboardFilter
+
+Modified Files:
+	FilterAlgTds.h FilterStatus.h 
+Log Message:
+Fixed some tabbing issues
+    *
+------------------------------------------------------------
 User: dnwren  Mon Aug  2 12:57:46 PDT 2004
 OnboardFilter/src
 
