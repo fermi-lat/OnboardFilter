@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: burnett  Sun Aug 17 15:40:39 PDT 2003
+OnboardFilter/OnboardFilter
+
+Modified Files:
+	FilterStatus.h 
+Log Message:
+more inlines; tagging v0r1p1
+    *
+------------------------------------------------------------
 User: burnett  Sun Aug 17 11:44:31 PDT 2003
 OnboardFilter/src
 
