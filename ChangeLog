@@ -1,4 +1,15 @@
 ------------------------------------------------------------
+User: golpa  Wed Jul  9 08:35:07 PDT 2003
+OnboardFilter/cmt
+
+Modified Files:
+	cleanup.csh cleanup.sh requirements setup.csh setup.sh 
+Log Message:
+
+Renamed package to OnboardFilter
+
+    *
+------------------------------------------------------------
 User: golpa  Mon Jul  7 09:50:49 PDT 2003
 OnlineFilter
 
