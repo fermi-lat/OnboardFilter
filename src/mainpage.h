@@ -9,6 +9,9 @@
  * @section jobOptions jobOptions
  * @include jobOptions.txt
  * <hr>
+ * @section notes release.notes
+ * release.notes
+ * <hr>
  * @section requirements requirements
  * @include requirements
  */
