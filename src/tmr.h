@@ -45,11 +45,11 @@ CVS $Id
     end     = TMR_GET();
     elapsed = end - beg;
   
-    printf ("Begin   Time: " TMR_FORMAT "tickss\n", beg);
-    printf ("End     Time: " TMR_FORMAT "ticks\n", end);
-    printf ("Elasped Time: " TMR_FORMAT "tickss\n", elapsed);
-    printf ("Elasped Time: " TMR_FORMAT "ticks\n",
-                             TMR_TO_NSECS (elapsed);
+    //printf ("Begin   Time: " TMR_FORMAT "tickss\n", beg);
+    //printf ("End     Time: " TMR_FORMAT "ticks\n", end);
+    //printf ("Elasped Time: " TMR_FORMAT "tickss\n", elapsed);
+    //printf ("Elasped Time: " TMR_FORMAT "ticks\n",
+    //                         TMR_TO_NSECS (elapsed);
   \endcode
                                                                           */
 /*----------------------------------------------------------------------- */
