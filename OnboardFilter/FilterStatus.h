@@ -193,7 +193,12 @@ namespace OnboardFilterTds{
       for(int counter=0;counter<16;counter++){
 	m_acdStatus[counter]=0;
 	m_layers[counter]=0;
+	m_prjs[counter].xy[0]=0;
+	m_prjs[counter].xy[1]=0;
+	m_prjs[counter].curCnt=0;
       }
+      m_seperation=-1;
+      m_tracks.clear();
     }
 
     inline FilterStatus::~FilterStatus(){
