@@ -2,14 +2,16 @@
  * @file release.notes
  * @brief Package OnboardFilter
  * @verbatim
+ * v0r2p2 26-Aug-2003   NG : Removed unecessary output
+ * v0r2p1 25-Aug-2003   NG : Fixed problem causing Geometry errors
  * v0r2   25-Aug-2003   NG : Projections and tracks now stored in TDS.
- * v0r1p1 17-Aug-2003   THB:had to inline everything
+ * v0r1p1 17-Aug-2003   THB: had to inline everything
  * v0r1   17-Aug-2003   THB: made constructors, all set methods private; others all inlined  
- * v0r0p1 16-Aug-2003     Cleaned up requirements file. Ready to add to GR
- * v0r0p0 12-Aug-2003     Clean up code for Code review
- * v0r0   19-Jul-2003     Stores more information in TDS
- *        09-Jul-2003     Renamed package
- * v0     07-Jul-2003     Initial Import
+ * v0r0p1 16-Aug-2003   NG : Cleaned up requirements file. Ready to add to GR
+ * v0r0p0 12-Aug-2003   NG : Clean up code for Code review
+ * v0r0   19-Jul-2003   NG : Stores more information in TDS
+ *        09-Jul-2003   NG : Renamed package
+ * v0     07-Jul-2003   NG : Initial Import
  * @endverbatim
  */
  
