@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: golpa  Fri Aug  1 09:24:03 PDT 2003
+OnboardFilter/cmt
+
+Modified Files:
+	requirements 
+Log Message:
+Fixed windows compile problem
+    *
+------------------------------------------------------------
 User: golpa  Tue Jul 22 12:17:26 PDT 2003
 OnboardFilter/src
 
