@@ -1,4 +1,14 @@
 ------------------------------------------------------------
+User: golpa  Thu Aug 21 12:36:07 PDT 2003
+OnboardFilter/src
+
+Added Files:
+	FilterExtendedDisplay.cxx FilterExtendedDisplay.h 
+	FilterTrackDisplay.cxx FilterTrackDisplay.h 
+Log Message:
+New classes to handle displaying
+    *
+------------------------------------------------------------
 User: golpa  Thu Aug 21 12:35:13 PDT 2003
 OnboardFilter/cmt
 
