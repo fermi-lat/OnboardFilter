@@ -5,7 +5,7 @@
    \author JJRussell - russell@slac.stanford.edu
 
 \verbatim
-   CVS $Id: DFC_filter.c,v 1.13 2004/07/12 19:47:23 golpa Exp $
+   CVS $Id: DFC_filter.c,v 1.14 2004/07/20 03:04:05 golpa Exp $
 \endverbatim
 
                                                                           */
@@ -889,7 +889,10 @@ int DFC_filter (struct _DFC_results    *results,
    int               acd_z;
    int               energy;
    int              calHiLo;
-
+#ifdef GLEAM
+	       int counter=0;
+	       int layers=0;
+#endif
 
    /* Note the starting time, this is used to time the code */
    results->beg = TMR_GET();
@@ -1216,8 +1219,6 @@ int DFC_filter (struct _DFC_results    *results,
                TFC_latUnpack      (&dfe->dlr.tkr, &dfe->dlr.dir, cids);
 
 #ifdef GLEAM
-	       int counter=0;
-	       int layers=0;
 	       for(counter=0;counter<16;counter++){
 		 memcpy(TDS_variables.hits[counter].lcnt,dfe->dlr.tkr.twr[counter].lcnt,2);
 		 memcpy(TDS_variables.hits[counter].layerMaps,dfe->dlr.tkr.twr[counter].layerMaps,2*sizeof(int));
