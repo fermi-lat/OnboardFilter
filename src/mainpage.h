@@ -60,7 +60,7 @@
  * @section Properties Properties
  * @param OnboardFilter.passThrough
  *  Parameter to disable/enable "Pass through mode" of the filter
- *  default value 0
+ *  default value 1 (enabled)
  * @param OnboardFilter.mask
  * <hr>
  * @section jobOptions jobOptions

@@ -2,6 +2,7 @@
  * @file release.notes
  * @brief Package OnboardFilter
  * @verbatim
+ * v0r3p2 03-Sep-2003   NG : Added option to disable pass through mode
  * v0r3p1 29-Aug-2003   NG : Removed track computation from the code
  * v0r3   29-Aug-2003   THB: allow it to actually filter, with a mask for control
  *        28-Aug-2003   NG : Improved math for computing angular seperation
