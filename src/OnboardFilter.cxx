@@ -1102,8 +1102,8 @@ void OnboardFilter::resultsPrint (TMR_tick                       beg,
 			  unsigned int               options)
 {
    unsigned int      eticks=0;
-   TMR_usecs_nsecs  elapsed=0;  /* Total elapsed time                       */
-   TMR_usecs_nsecs nelapsed=0;  /* Normalized (by event count) elapsed time */
+   TMR_usecs_nsecs  elapsed;  /* Total elapsed time                       */
+   TMR_usecs_nsecs nelapsed;  /* Normalized (by event count) elapsed time */
 
 
    /* Print the results summary */    
