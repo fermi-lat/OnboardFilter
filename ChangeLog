@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: golpa  Thu Aug 21 12:21:34 PDT 2003
+OnboardFilter/DFC
+
+Modified Files:
+	DFC_filter.h 
+Log Message:
+Added code to store projections and display tracks
+    *
+------------------------------------------------------------
 User: burnett  Mon Aug 18 21:14:36 PDT 2003
 OnboardFilter/src
 
