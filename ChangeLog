@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: golpa  Fri Jul 23 08:58:14 PDT 2004
+OnboardFilter/doc
+
+Modified Files:
+	release.notes 
+Log Message:
+Added David's code to write hits. And fixed CshLib problem.Tagging v1r1p0
+    *
+------------------------------------------------------------
 User: golpa  Fri Jul 23 08:58:13 PDT 2004
 OnboardFilter/cmt
 
