@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: golpa  Mon Jul 19 20:04:04 PDT 2004
+OnboardFilter/OnboardFilter
+
+Modified Files:
+	FilterStatus.h 
+Log Message:
+Added hits to TDS
+    *
+------------------------------------------------------------
 User: golpa  Mon Jul 19 20:04:01 PDT 2004
 OnboardFilter/DFC
 
