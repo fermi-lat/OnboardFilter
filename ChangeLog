@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: golpa  Sat Aug 16 11:37:53 PDT 2003
+OnboardFilter/src
+
+Modified Files:
+	DFC_filter.c OnboardFilter.cxx 
+Log Message:
+fixed compile errors
+    *
+------------------------------------------------------------
 User: golpa  Sat Aug 16 11:37:52 PDT 2003
 OnboardFilter/OnboardFilter
 
