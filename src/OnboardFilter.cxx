@@ -4,7 +4,7 @@
  * @author JJRussell - russell@slac.stanford.edu
  * @author David Wren - dnwren@milkyway.gsfc.nasa.gov
  * @author Navid Golpayegani - golpa@milkyway.gsfc.nasa.gov
- * $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/OnboardFilter.cxx,v 1.32 2003/09/09 16:55:15 burnett Exp $
+ * $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/OnboardFilter.cxx,v 1.33 2003/09/09 18:48:23 golpa Exp $
  */
    
 #include <stdlib.h>
@@ -48,13 +48,6 @@
 #include "EbfWriter/Ebf.h"
 #include "OnboardFilter/FilterStatus.h"
 
-//Gui display
-#include "gui/DisplayControl.h"
-#include "GuiSvc/IGuiSvc.h"
-#include "gui/GuiMgr.h"
-#include "FilterTrackDisplay.h"
-#include "FilterExtendedDisplay.h"
-
 #include <string.h>
 #ifdef   __linux
 #include <getopt.h>
@@ -87,6 +80,24 @@ typedef struct _Ctl
 }
 Ctl;
 
+
+#define DFC_M_STATUS_TKR_LT_2_ELO        0x8000
+#define DFC_M_STATUS_TKR_SKIRT           0x10000
+#define DFC_M_STATUS_TKR_EQ_0            0x20000
+#define DFC_M_STATUS_TKR_ROW2            0x40000
+#define DFC_M_STATUS_TKR_ROW01           0x80000
+#define DFC_M_STATUS_TKR_TOP             0x100000
+#define DFC_M_STATUS_ZBOTTOM             0x200000
+#define DFC_M_STATUS_EL0_ETOT_90         0x400000
+#define DFC_M_STATUS_EL0_ETOT_01         0x800000
+#define DFC_M_STATUS_SIDE                0x1000000
+#define DFC_M_STATUS_TOP                 0x2000000
+#define DFC_M_STATUS_SPLASH_1            0x4000000
+#define DFC_M_STATUS_E350_FILTER_TILE    0x8000000
+#define DFC_M_STATUS_E0_TILE             0x10000000
+#define DFC_M_STATUS_SPLASH_0            0x20000000
+#define DFC_M_STATUS_NOCALLO_FILTER_TILE 0x40000000
+#define DFC_M_STATUS_VETOED              0x80000000
 
 class OnboardFilter:public Algorithm{
 public:
@@ -126,14 +137,37 @@ private:
     IntegerProperty m_mask; // mask for setting filter to reject
     int  m_rejected;
     int m_passThrough;
+    int m_vetoBits[17];  //array to count # of times each veto bit was set
 };
 
 static const AlgFactory<OnboardFilter>  Factory;
 const IAlgFactory& OnboardFilterFactory = Factory;
 
 StatusCode OnboardFilter::finalize(){
-      MsgStream log(msgSvc(),name());
-      log  << MSG::INFO << "Rejected " << m_rejected << " triggers " << endreq;
+    MsgStream log(msgSvc(),name());
+    log  << MSG::INFO << "Rejected " << m_rejected << " triggers using mask 0x" << std::hex << m_mask << std::dec << endreq;
+    log << MSG::INFO;
+    if(log.isActive()){
+      log.stream() << "Veto Bit Summary" << std::endl << setw(35) << "Trigger Name" << setw(10) << "Count" << std::endl;
+      log.stream() << setw(35) << "DFC_M_STATUS_TKR_LT_2_ELO" << setw(10) << m_vetoBits[0] << std::endl;
+      log.stream() << setw(35) << "DFC_M_STATUS_TKR_SKIRT" << setw(10) << m_vetoBits[1] << std::endl;
+      log.stream() << setw(35) << "DFC_M_STATUS_TKR_EQ_0" << setw(10) << m_vetoBits[2] << std::endl;
+      log.stream() << setw(35) << "DFC_M_STATUS_TKR_ROW2" << setw(10) << m_vetoBits[3] << std::endl;
+      log.stream() << setw(35) << "DFC_M_STATUS_TKR_ROW01" << setw(10) << m_vetoBits[4] << std::endl;
+      log.stream() << setw(35) << "DFC_M_STATUS_TKR_TOP" << setw(10) << m_vetoBits[5] << std::endl;
+      log.stream() << setw(35) << "DFC_M_STATUS_ZBOTTOM" << setw(10) << m_vetoBits[6] << std::endl;
+      log.stream() << setw(35) << "DFC_M_STATUS_EL0_ETOT_90" << setw(10) << m_vetoBits[7] << std::endl;
+      log.stream() << setw(35) << "DFC_M_STATUS_EL0_ETOT_01" << setw(10) << m_vetoBits[8] << std::endl;
+      log.stream() << setw(35) << "DFC_M_STATUS_SIDE" << setw(10) << m_vetoBits[9] << std::endl;
+      log.stream() << setw(35) << "DFC_M_STATUS_TOP" << setw(10) << m_vetoBits[10] << std::endl;
+      log.stream() << setw(35) << "DFC_M_STATUS_SPLASH_1" << setw(10) << m_vetoBits[11] << std::endl;
+      log.stream() << setw(35) << "DFC_M_STATUS_E350_FILTER_TILE" << setw(10) << m_vetoBits[12] << std::endl;
+      log.stream() << setw(35) << "DFC_M_STATUS_E0_TILE" << setw(10) << m_vetoBits[13] << std::endl;
+      log.stream() << setw(35) << "DFC_M_STATUS_SPLASH_0" << setw(10) << m_vetoBits[14] << std::endl;
+      log.stream() << setw(35) << "DFC_M_STATUS_NOCALLO_FILTER_TILE" << setw(10) << m_vetoBits[15] << std::endl;
+      log.stream() << setw(35) << "DFC_M_STATUS_VETOED" << setw(10) << m_vetoBits[16] << std::endl;
+    }
+    log << endreq;
   return StatusCode::SUCCESS;
 }
 
@@ -163,20 +197,8 @@ StatusCode OnboardFilter::initialize()
   m_ctl_buf.esummary=0;
   m_ctl_buf.geometry=0;
   m_ctl    = &m_ctl_buf;
-  //Set up GUI display
-  /*
-    IGuiSvc *guiSvc;
-    if(!service("GuiSvc",guiSvc).isFailure()){
-    gui::DisplayControl& display = guiSvc->guiMgr()->display();
-    gui::DisplayControl::DisplaySubMenu& fltrmenu = display.subMenu("OnboardFilter");
-    //Add Display Objects Here
-    fltrmenu.add(new FilterTrackDisplay(eventSvc()),"Tracks");
-    fltrmenu.add(new FilterExtendedDisplay(eventSvc()),"Extended Tracks");
-    }
-    else{
-    log<<MSG::WARNING<<"No GuiSvc. Not displaying tracks"<<endreq;
-    }
-  */
+  for(int counter=0;counter<17;counter++)
+    m_vetoBits[counter]=0;
   return StatusCode::SUCCESS;
 }
 
@@ -360,6 +382,40 @@ StatusCode OnboardFilter::execute()
             this->setFilterPassed(false);
             m_rejected++; // count the number rejected
         }
+        if(status & DFC_M_STATUS_TKR_LT_2_ELO)
+            m_vetoBits[0]++;
+        if(status & DFC_M_STATUS_TKR_SKIRT)
+            m_vetoBits[1]++;
+        if(status & DFC_M_STATUS_TKR_EQ_0)
+            m_vetoBits[2]++;
+        if(status & DFC_M_STATUS_TKR_ROW2)
+            m_vetoBits[3]++;
+        if(status & DFC_M_STATUS_TKR_ROW01)
+            m_vetoBits[4]++;
+        if(status & DFC_M_STATUS_TKR_TOP)
+            m_vetoBits[5]++;
+        if(status & DFC_M_STATUS_ZBOTTOM)
+            m_vetoBits[6]++;
+        if(status & DFC_M_STATUS_EL0_ETOT_90)
+            m_vetoBits[7]++;
+        if(status & DFC_M_STATUS_EL0_ETOT_01)
+            m_vetoBits[8]++;
+        if(status & DFC_M_STATUS_SIDE)
+            m_vetoBits[9]++;
+        if(status & DFC_M_STATUS_TOP)
+            m_vetoBits[10]++;
+        if(status & DFC_M_STATUS_SPLASH_1)
+            m_vetoBits[11]++;
+        if(status & DFC_M_STATUS_E350_FILTER_TILE)
+            m_vetoBits[12]++;
+        if(status &  DFC_M_STATUS_E0_TILE)
+            m_vetoBits[13]++;
+        if(status & DFC_M_STATUS_SPLASH_0)
+            m_vetoBits[14]++;
+        if(status & DFC_M_STATUS_NOCALLO_FILTER_TILE)
+            m_vetoBits[15]++;
+        if(status & DFC_M_STATUS_VETOED)
+            m_vetoBits[16]++;
         newStatus->set(status);
         newStatus->setCalEnergy(result->energy);
         newStatus->setTcids(TDS_variables.tcids);
