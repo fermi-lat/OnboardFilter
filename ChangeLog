@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: golpa  Tue Aug 10 08:28:22 PDT 2004
+OnboardFilter/cmt
+
+Modified Files:
+	requirements 
+Log Message:
+Removed printf statement that was too verbose
+    *
+------------------------------------------------------------
 User: golpa  Mon Aug  2 18:06:55 PDT 2004
 OnboardFilter/cmt
 
