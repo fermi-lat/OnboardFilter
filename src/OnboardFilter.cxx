@@ -4,7 +4,7 @@
  * @author JJRussell - russell@slac.stanford.edu
  * @author David Wren - dnwren@milkyway.gsfc.nasa.gov
  * @author Navid Golpayegani - golpa@milkyway.gsfc.nasa.gov
- * $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/OnboardFilter.cxx,v 1.24 2003/08/26 20:45:37 golpa Exp $
+ * $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/OnboardFilter.cxx,v 1.25 2003/08/28 22:58:13 golpa Exp $
  */
    
 #include <stdlib.h>
@@ -40,6 +40,7 @@
 #include "GaudiKernel/AlgFactory.h"
 #include "GaudiKernel/IDataProviderSvc.h"
 #include "GaudiKernel/SmartDataPtr.h"
+#include "GaudiKernel/Property.h"
 #include "GlastSvc/GlastDetSvc/IGlastDetSvc.h"
 
 #include "Event/TopLevel/EventModel.h"
@@ -161,22 +162,31 @@ private:
     //Structures that control the Behaviour of the Filter Code
     Ctl m_ctl_buf;
     Ctl *m_ctl;
+
+   IntegerProperty m_mask; // mask for setting filter to reject
+   int  m_rejected;
 };
 
 static const AlgFactory<OnboardFilter>  Factory;
 const IAlgFactory& OnboardFilterFactory = Factory;
 
 StatusCode OnboardFilter::finalize(){
+      MsgStream log(msgSvc(),name());
+      log  << MSG::INFO << "Rejected " << m_rejected << " triggers " << endreq;
   return StatusCode::SUCCESS;
 }
 
 OnboardFilter::OnboardFilter(const std::string& name, ISvcLocator* pSvcLocator)
-             :Algorithm(name, pSvcLocator){
+:Algorithm(name, pSvcLocator), m_rejected(0){
+
+    declareProperty("mask"     ,  m_mask=0xffffffff); // trigger mask: select bits for rejection
 }
 
 StatusCode OnboardFilter::initialize()
 {
   MsgStream log(msgSvc(),name());
+  setProperties();
+
   log<< MSG::INFO << "Initializing Filter Settings"<<endreq;
   //Set up default values for the control structure
   m_ctl_buf.ifile="test.ebf";
@@ -380,6 +390,12 @@ StatusCode OnboardFilter::execute()
         DFC_filterComplete (dfcCtl, result, dfcEvt, evt, size);
         
         status = result->status;
+
+        //use the status word to set the filter
+        if( m_mask!=0 && (m_mask& (status>>15)) !=0 ){
+            this->setFilterPassed(false);
+            m_rejected++; // count the number rejected
+        }
         newStatus->set(status);
         newStatus->setCalEnergy(result->energy);
         newStatus->setTcids(TDS_variables.tcids);
@@ -402,7 +418,7 @@ StatusCode OnboardFilter::execute()
 	  newStatus->setProjection(counter,prjs);
         }
         newStatus->setLayers(TDS_layers);
-        log << MSG::INFO;
+        log << MSG::DEBUG;
         if(log.isActive()) { 
             log.stream()<< "FilterStatus Code: "
                 << std::setbase(16) << (unsigned int)status<<" : "
@@ -634,7 +650,7 @@ StatusCode OnboardFilter::computeCoordinates(OnboardFilterTds::FilterStatus *sta
   }
   else{
     status->setSeperation(-1);
-    log<<MSG::INFO<<"No tracks found"<<endreq;
+    log<<MSG::DEBUG<<"No tracks found"<<endreq;
   }
   return StatusCode::SUCCESS;
 }
