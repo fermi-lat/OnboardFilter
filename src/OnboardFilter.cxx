@@ -1,18 +1,12 @@
-/* ---------------------------------------------------------------------- *//*!
+/**
+ * @class OnboardFilter
+ * @brief Driver program to test filtering code
+ * @author JJRussell - russell@slac.stanford.edu
+ * @author David Wren - dnwren@milkyway.gsfc.nasa.gov
+ * @author Navid Golpayegani - golpa@milkyway.gsfc.nasa.gov
+ * $Header$
+ */
    
-   \file  filter.c
-   \brief Driver program to test filtering code
-   \author JJRussell - russell@slac.stanford.edu
-   
-\verbatim
-
-  CVS $Id
-\endverbatim
-    
-                                                                          */
-/* ---------------------------------------------------------------------- */
-
-
 #include <stdlib.h>
 #include <stdio.h>
 #include <errno.h>
@@ -58,63 +52,28 @@
 #include <getopt.h>
 #endif
 
-/* --------------------------------------------------------------------- *//*!
-
-   \def    _ADVANCE(_ptr, _nbytes)
-   \brief   Advances \a _ptr by \a _nbytes. The return value is always
-            recast to the type of \a _ptr.
-   \param   _ptr    The pointer to advance
-   \param   _nbytes The number of nbytes to advance \a _ptr by.
-   \return  The advanced pointer, recast to the type of \a _ptr.
-                                                                         */
-/* --------------------------------------------------------------------- */
-#define _ADVANCE(_ptr, _nbytes) \
-         (typeof (_ptr))((unsigned char *)(_ptr) + (_nbytes))
-/* --------------------------------------------------------------------- */
-
-
-
-/* ---------------------------------------------------------------------- *//*!
-
-  \def    _DBG(statement)
-  \brief  Simple macro to drop the specified statement into the code. This
-          macro will only drop the statement if DEBUG is defined, otherwise
-          this macro is a NOOP.
-                                                                          */
-/* ---------------------------------------------------------------------- */  
+/**
+ * Simple macro to drop the specified statement into the code. This
+ * macro will only drop the statement if DEBUG is defined, otherwise
+ * this macro is a NOOP.
+ */
 #ifdef DEBUG
 #include <stdio.h>
 #define _DBG(statement) statement
 #else
 #define _DBG(statement)
 #endif
-/* ---------------------------------------------------------------------- */
 
-
-
-//#include "tmr.h"
-
-/* ---------------------------------------------------------------------- *//*!
-  \var   TFC_GeometryStd
-  \brief Data structure defining the standard geometry used in the
-         filtering process.
-                                                                          */
-/* ---------------------------------------------------------------------- */
+/**
+ * Data structure defining the standard geometry used in the filtering process.
+ */
 struct _TFC_geometry;
 extern const struct _TFC_geometry TFC_GeometryStd;
-/* ---------------------------------------------------------------------- */
-
-   
     
-/* ---------------------------------------------------------------------- *//*!
-  \struct _Ctl
-  \brief   Collections all the control parameters together. These are
-           essentially the interpretted command line options.
-                                                                          *//*!
-  \typedef Ctl
-  \brief   Typedef for struct _Ctl
-                                                                          */
-/* ---------------------------------------------------------------------- */
+/**
+ * Collection of all the control parameters together. These are
+ * essentially the interpretted command line options.
+ */
 typedef struct _Ctl
 {
     const char  *ifile;  /*!< The name of the input file (Evt Bld  format)*/
@@ -130,33 +89,40 @@ typedef struct _Ctl
     int       geometry;  /*!< Print the detector geometry                 */
 }
 Ctl;
-/* ---------------------------------------------------------------------- */
 
 
 class OnboardFilter:public Algorithm{
 public:
-  OnboardFilter(const std::string& name, ISvcLocator* pSvcLocator);
+    OnboardFilter(const std::string& name, ISvcLocator* pSvcLocator);
 
-  //static void print_ctl (const Ctl *ctl);
-  int countEvts  (const unsigned int *evts, int size);
-  /* ---------------------------------------------------------------------- *//*!
-   \fn          int getMCsequence (const unsigned int *evt, int esize)
-   \brief       Retrieves the GLEAM Monte Carlo Event Sequence Number
-   \param   evt Pointer to the event
-   \param esize The event size
-   \return      The GLEAM Monte Carlo Event Sequence Number.
-                                                                            */
-  /* ---------------------------------------------------------------------- */
-  static inline int getMCsequence (const unsigned int *evt, int esize){
-    return evt[0x10];
-  }
-  StatusCode initialize();
-  StatusCode execute();
-  StatusCode finalize();
+	/**
+     * @brief Count number of events stored in control structure
+     * @param evts  Pointer to the list of events.
+     * @param size  Total size, in bytes of the list of events.
+     * @return      The number of events in the event list.
+     */
+    int countEvts  (const unsigned int *evts, int size);
+    /**
+     * Retrieves the GLEAM Monte Carlo Event Sequence Number
+     * @param   evt Pointer to the event
+     * @param esize The event size
+     * @return      The GLEAM Monte Carlo Event Sequence Number.
+     */
+    static inline int getMCsequence (const unsigned int *evt, int esize){
+        return evt[0x10];
+    }
+    StatusCode initialize();
+    StatusCode execute();
+    StatusCode finalize();
 private:
-  std::string convertBase(unsigned int number);
-  Ctl ctl_buf;
-  Ctl *ctl;
+	/**
+	 * Converts an integer into Binary representation
+	 * @param number The number to represent in Binary
+	 * @return A string represent the number in Binary
+	 */
+    std::string convertBase(unsigned int number);
+    Ctl m_ctl_buf;
+    Ctl *m_ctl;
 };
 
 static const AlgFactory<OnboardFilter>  Factory;
@@ -166,26 +132,15 @@ StatusCode OnboardFilter::finalize(){
   return StatusCode::SUCCESS;
 }
 
-OnboardFilter::OnboardFilter(const std::string& name, ISvcLocator* pSvcLocator):Algorithm(name, pSvcLocator){
+OnboardFilter::OnboardFilter(const std::string& name, ISvcLocator* pSvcLocator)
+             :Algorithm(name, pSvcLocator){
 }
 
-/* ---------------------------------------------------------------------- *//*!
-
-  \fn      main (int argc, char **argv)
-  \brief   Entry point for filter
-  \param argc Standard argument count.
-  \param argv Standard vector of command line parameter strings.
-  \retval     0, if successful
-             -1, if the file does not exist or some other internal error.
-
-   The usage of this routine is self-documenting. Simply type filter
-   with no parameters for its usage.
-                                                                          */
-/* ---------------------------------------------------------------------- */  
 StatusCode OnboardFilter::initialize()
 {
   MsgStream log(msgSvc(),name());
   log<< MSG::INFO << "Initializing Filter Settings"<<endreq;
+  //Set up default values for the control structure
   ctl_buf.ifile="test.ebf";
   ctl_buf.ofile=NULL;
   ctl_buf.data=NULL;
@@ -198,6 +153,7 @@ StatusCode OnboardFilter::initialize()
   ctl_buf.esummary=0;
   ctl_buf.geometry=0;
   ctl    = &ctl_buf;
+  //Initialize variables that will temporarily store data to be put in TDS
   for(int counter=0;counter<16;counter++)
     TDS_layers[counter]=0;
   TDS_variables.tcids=0;
@@ -207,19 +163,6 @@ StatusCode OnboardFilter::initialize()
   TDS_variables.acdStatus=0;
   return StatusCode::SUCCESS;
 }
-/* ---------------------------------------------------------------------- */
-
-
-   
-
-/* ---------------------------------------------------------------------- *//*!
-
-   \fn         int doFilter (const Ctl *ctl)
-   \brief      Common routine to do the filtering
-   \param ctl  The control parameters, assumed to be already filled in
-   \return     Status
-                                                                          */
-/* ---------------------------------------------------------------------- */
 
 StatusCode OnboardFilter::execute()
 {
@@ -249,13 +192,16 @@ StatusCode OnboardFilter::execute()
     const struct _DFC_ctlCfc *cfc;
     
     MsgStream log(msgSvc(),name());
-    OnboardFilterTds::FilterStatus *newStatus=new OnboardFilterTds::FilterStatus;
+	//Initialize the TDS object
+    OnboardFilterTds::FilterStatus *newStatus=
+        new OnboardFilterTds::FilterStatus;
     eventSvc()->registerObject("/Event/Filter/FilterStatus",newStatus);
 	
 	log << MSG::INFO << "Processing Event"<<endreq;
     /* Initialize the time base */
     TMR_initialize ();
 	
+	//Initialize the control structures
 	dfcSize = DFC_ctlSizeof ();
     dfcCtl  = (struct _DFC_ctl *)malloc (dfcSize);
 	
@@ -278,6 +224,7 @@ StatusCode OnboardFilter::execute()
     DFC_latRecordInit (dfcEvt);
 	SmartDataPtr<EbfWriterTds::Ebf> ebfData(eventSvc(),"/Event/Filter/Ebf");
 	
+	//Retrieve event from TDS and store into control structures
 	if(!ebfData){
       return StatusCode::FAILURE;
     }
@@ -322,8 +269,7 @@ StatusCode OnboardFilter::execute()
     {
         int esize = *evt;
         size -= esize;
-        //evt   = _ADVANCE (evt, esize);
-	evt = (const unsigned int *)((char *)(evt)+esize);
+        evt = (const unsigned int *)((char *)(evt)+esize);
     }
     
 	
@@ -365,8 +311,7 @@ StatusCode OnboardFilter::execute()
             _DBG (printf("GLASTSIM EVENT = %9d (%9d) NOT REJECTED (%8.8x)\n",
                     getMCsequence(evt), idx, status));
         
-        //evt     = _ADVANCE (evt, esize);
-	evt = (const unsigned int *)((char *)(evt)+esize);
+        evt = (const unsigned int *)((char *)(evt)+esize);
         result  = (struct _DFC_results *)((unsigned char *)result
                                                          + resultsSize);
     }
@@ -390,20 +335,19 @@ StatusCode OnboardFilter::execute()
         newStatus->set(status);
         newStatus->setCalEnergy(result->energy);
         newStatus->setTcids(TDS_variables.tcids);
-        newStatus->setAcdMap(TDS_variables.acd_xz,TDS_variables.acd_yz,TDS_variables.acd_xy);
+        newStatus->setAcdMap(TDS_variables.acd_xz,TDS_variables.acd_yz,
+			TDS_variables.acd_xy);
         newStatus->setAcdStatus(TDS_variables.acdStatus);
         newStatus->setLayers(TDS_layers);
-		log<< MSG::INFO << "FilterStatus Code: "<<(unsigned int)status<<" : "<<convertBase(status)<<endreq;
+		log<< MSG::INFO << "FilterStatus Code: "<<(unsigned int)status<<" : "
+			<<convertBase(status)<<endreq;
         if (ctl->list && (result->status & DFC_M_STATUS_VETOES) == 0)
         {
             printf ("0000 %8d %8d\n", getMCsequence (evt, size), idx);
         }
 
-        //result  = _ADVANCE (result, resultsSize);
-	result = (struct _DFC_results   *)((char *)(result)+resultsSize);
-        //evt     = _ADVANCE (evt, size);
-	evt = (const unsigned int *)((char *)(evt)+size);
-        
+        result = (struct _DFC_results   *)((char *)(result)+resultsSize);
+        evt = (const unsigned int *)((char *)(evt)+size);
     }
     
     
@@ -429,50 +373,7 @@ StatusCode OnboardFilter::execute()
     free(dfcEvt);
     return StatusCode::SUCCESS;
 }
-/* ---------------------------------------------------------------------- */
 
-
-
-   
-/* ---------------------------------------------------------------------- *//*!
-
-  \fn        void print_ctl (const Ctl *ctl)
-  \brief     Prints the contents of the print control context.
-  \param ctl Pointer to the print control context block.
-                                                                          */
-/* ---------------------------------------------------------------------- */
-/*
-  static void OnboardFilter::print_ctl (const Ctl *ctl)
-  {
-  printf ("Input  file: %s\n",  ctl->ifile);
-  
-  if (ctl->to_process < 0) printf ("Processing : All\n");
-  else                     printf ("Processing : %d\n", ctl->to_process);
-  
-  
-  if (ctl->to_skip   == 0) printf ("Skipping   : None\n");
-  else                     printf ("Skipping   : %d\n", ctl->to_skip);
-  
-  
-  if (ctl->to_print  == 0) printf ("Printing   : None\n");
-  else                     printf ("Printing   : %d\n", ctl->to_print);
-  
-  
-  }
-*/
-/* ---------------------------------------------------------------------- */
-
-
-
-
-/* ---------------------------------------------------------------------- *//*!
-
-  \fn          int countEvts (const unsigned int *evts, int size)
-  \param evts  Pointer to the list of events.
-  \param size  Total size, in bytes of the list of events.
-  \return      The number of events in the event list.
-                                                                          */
-/* ---------------------------------------------------------------------- */  
 int OnboardFilter::countEvts (const unsigned int *evts, int size)
 {
     int nevts = 0;
@@ -483,31 +384,30 @@ int OnboardFilter::countEvts (const unsigned int *evts, int size)
         size     -= esize;
         nevts    += 1;
         
-        //evts = _ADVANCE (evts, esize);
-	evts = (const unsigned int *)((char *)(evts)+esize);
+        evts = (const unsigned int *)((char *)(evts)+esize);
     }
     
     return nevts;
 }
-/* ---------------------------------------------------------------------- */
+
 
 std::string OnboardFilter::convertBase(unsigned int number){
-  std::string output;
-  int count=1;
-  do{
-    if(number%2)
-      output = "1" + output;
-    else
-      output = "0" + output;
-    number/=2;
-    if(!(count%4))
-      output = " " + output;
-    count++;
-  }while(number);
-  for(int counter=count;counter<=32;counter++){
-    output = "0" + output;
-    if(!(counter%4))
-      output = " " + output;
-  }
-  return output;
+    std::string output;
+    int count=1;
+    do{
+        if(number%2)
+            output = "1" + output;
+        else
+            output = "0" + output;
+        number/=2;
+        if(!(count%4))
+            output = " " + output;
+        count++;
+    }while(number);
+    for(int counter=count;counter<=32;counter++){
+        output = "0" + output;
+        if(!(counter%4))
+            output = " " + output;
+    }
+    return output;
 }
