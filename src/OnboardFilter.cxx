@@ -4,7 +4,7 @@
  * @author JJRussell - russell@slac.stanford.edu
  * @author David Wren - dnwren@milkyway.gsfc.nasa.gov
  * @author Navid Golpayegani - golpa@milkyway.gsfc.nasa.gov
- * $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/OnboardFilter.cxx,v 1.27 2003/08/29 16:39:27 golpa Exp $
+ * $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/OnboardFilter.cxx,v 1.28 2003/09/03 17:23:43 golpa Exp $
  */
    
 #include <stdlib.h>
@@ -514,36 +514,37 @@ StatusCode OnboardFilter::computeCoordinates(OnboardFilterTds::FilterStatus *sta
     const OnboardFilterTds::projections *prjs=status->getProjection(tower);
     HepPoint3D point;
     std::vector<double> x;
-    std::vector<double> y;
-    std::vector<double> xz;
-    std::vector<double> yz;
-    std::vector<double> zAvg;
-    std::vector<double> pointHigh;
-    std::vector<double> extendedLow;
-    std::vector<double> extendedHigh;
+    x.push_back(0);
+    x.push_back(0);
+    x.push_back(0);
+    std::vector<double> y=x;
+    std::vector<double> xz=x;
+    std::vector<double> yz=x;
+    std::vector<double> zAvg=x;
+    std::vector<double> pointHigh=x;
+    std::vector<double> extendedLow=x;
+    std::vector<double> extendedHigh=x;
     if(prjs->xy[0]>0 && prjs->xy[1]>0){
       //Loop over the x projections
       for(int xprj=0;xprj<prjs->xy[0];xprj++){
 	//Get x,z coordinates for hits 0 and 1
 	log << MSG::DEBUG << "Obtaining X and XZ for hits 0 and 1" << endreq;
 	point=tkrGeoSvc->getStripPosition(tower,prjs->prjs[xprj].max,0,prjs->prjs[xprj].hits[0]);
-	x.push_back(point.x());
-	xz.push_back(point.z());
+	x[0]=point.x();
+	xz[0]=point.z();
 	point=tkrGeoSvc->getStripPosition(tower, prjs->prjs[xprj].max-1, 0, prjs->prjs[xprj].hits[1]);
-	x.push_back(point.x());
-	xz.push_back(point.z());
+	x[1]=point.x();
+	xz[1]=point.z();
 	//Loop over the y projections
 	for(int yprj=prjs->xy[1];yprj<prjs->xy[1]+prjs->xy[0];yprj++){
-	  y.clear();
-	  yz.clear();
 	  if(prjs->prjs[xprj].max==prjs->prjs[yprj].max){
 	    log << MSG::DEBUG << "Obtaining Y and YZ for hits 0 and 1" << endreq;
 	    point=tkrGeoSvc->getStripPosition(tower,prjs->prjs[yprj].max,1,prjs->prjs[yprj].hits[0]);
-	    y.push_back(point.y());
-	    yz.push_back(point.z());
+	    y[0]=point.y();
+	    yz[0]=point.z();
 	    point=tkrGeoSvc->getStripPosition(tower,prjs->prjs[yprj].max-1,1,prjs->prjs[yprj].hits[1]);
-	    y.push_back(point.y());
-	    yz.push_back(point.z());
+	    y[1]=point.y();
+	    yz[1]=point.z();
 	    unsigned char maxhits;
 	    if(prjs->prjs[xprj].nhits<prjs->prjs[yprj].nhits)
 	      maxhits=prjs->prjs[xprj].nhits;
@@ -551,13 +552,13 @@ StatusCode OnboardFilter::computeCoordinates(OnboardFilterTds::FilterStatus *sta
 	      maxhits=prjs->prjs[yprj].nhits;
 	    log << MSG::DEBUG << "Obtaining X,Y,XZ,YZ for max hits"<<endreq;
 	    point=tkrGeoSvc->getStripPosition(tower,prjs->prjs[xprj].max-(maxhits-1),0,prjs->prjs[xprj].hits[maxhits-1]);
-	    x.push_back(point.x());
-	    xz.push_back(point.z());
+	    x[2]=point.x();
+	    xz[2]=point.z();
 	    point=tkrGeoSvc->getStripPosition(tower,prjs->prjs[yprj].max-(maxhits-1),1,prjs->prjs[yprj].hits[maxhits-1]);
-	    y.push_back(point.y());
-	    yz.push_back(point.z());
+	    y[2]=point.y();
+	    yz[2]=point.z();
 	    for(int counter=0;counter<3;counter++)
-	      zAvg.push_back((xz[counter]+yz[counter])/2);
+	      zAvg[counter]=(xz[counter]+yz[counter])/2;
 	    double phi,phi_rad;
 	    double theta,theta_rad;
 	    double length;
@@ -566,20 +567,16 @@ StatusCode OnboardFilter::computeCoordinates(OnboardFilterTds::FilterStatus *sta
 	    computeExtension(x,y,zAvg,phi_rad,theta_rad, extendedLow, extendedHigh);
 	    //Add track to TDS
 	    OnboardFilterTds::track newTrack;
-	    newTrack.phi_rad=phi_rad;
-	    newTrack.theta_rad=theta_rad;
+            newTrack.phi_rad=phi_rad;
+            newTrack.theta_rad=theta_rad;
 	    newTrack.lowCoord.push_back(x[0]);
 	    newTrack.lowCoord.push_back(y[0]);
 	    newTrack.lowCoord.push_back(zAvg[0]);
 	    newTrack.highCoord=pointHigh;
 	    newTrack.exLowCoord=extendedLow;
 	    newTrack.exHighCoord=extendedHigh;
+            newTrack.length=length;
 	    status->setTrack(newTrack);
-	    x.clear();
-	    y.clear();
-	    xz.clear();
-	    yz.clear();
-	    zAvg.clear();
 	    pointHigh.clear();
 	    extendedLow.clear();
 	    extendedHigh.clear();
@@ -598,6 +595,7 @@ StatusCode OnboardFilter::computeCoordinates(OnboardFilterTds::FilterStatus *sta
 	currMax=counter;
       }
     }
+    log<<MSG::INFO<<"Using track "<<currMax<<" out of "<<tracks.size()<<endreq;
     //Obtain McZDir, McXDir, McYDir (copied from McValsTools.cxx)
     SmartDataPtr<Event::McParticleCol> pMcParticle(eventSvc(), EventModel::MC::McParticleCol);
     if(pMcParticle){
@@ -641,6 +639,8 @@ StatusCode OnboardFilter::computeCoordinates(OnboardFilterTds::FilterStatus *sta
       double xone=sin(theta_rad_mc)*cos(phi_rad_mc);
       double yone=sin(theta_rad_mc)*sin(phi_rad_mc);
       double zone=cos(theta_rad_mc);
+      if(tracks[currMax].length);
+      if(tracks[currMax].theta_rad);
       double xtwo=sin(tracks[currMax].theta_rad)*cos(tracks[currMax].phi_rad);
       double ytwo=sin(tracks[currMax].theta_rad)*sin(tracks[currMax].phi_rad);
       double ztwo=cos(tracks[currMax].theta_rad);
@@ -727,9 +727,9 @@ void OnboardFilter::computeLength(std::vector<double> x,std::vector<double> y, s
   double t_v=z[0]-z[2];
   double t_h = t_v*tan(pi - theta_rad);
   length=sqrt(t_v*t_v+t_h*t_h);
-  endPoint.push_back(t_h*cos(phi_rad) + x[0]);
-  endPoint.push_back(t_h*sin(phi_rad) + y[0]);
-  endPoint.push_back(z[2]);
+  endPoint[0]=t_h*cos(phi_rad) + x[0];
+  endPoint[1]=t_h*sin(phi_rad) + y[0];
+  endPoint[2]=z[2];
 }
 
 void OnboardFilter::computeExtension(std::vector<double> x,std::vector<double> y,
@@ -738,11 +738,11 @@ void OnboardFilter::computeExtension(std::vector<double> x,std::vector<double> y
  				     std::vector<double> &extendHigh){
   const double pi = 3.14159265358979323846;
   const double length=1000;
-  extendLow.push_back(length*sin(pi-theta_rad)*cos(pi+phi_rad) + x[0]);
-  extendLow.push_back(length*sin(pi-theta_rad)*sin(pi+phi_rad) + y[0]);
-  extendLow.push_back(length*cos(pi-theta_rad) + z[0]);
+  extendLow[0]=length*sin(pi-theta_rad)*cos(pi+phi_rad) + x[0];
+  extendLow[1]=length*sin(pi-theta_rad)*sin(pi+phi_rad) + y[0];
+  extendLow[2]=length*cos(pi-theta_rad) + z[0];
 
-  extendHigh.push_back(length*sin(theta_rad)*cos(phi_rad)+x[2]);
-  extendHigh.push_back(length*sin(theta_rad)*sin(phi_rad)+y[2]);
-  extendHigh.push_back(length*cos(theta_rad)+z[2]);
+  extendHigh[0]=length*sin(theta_rad)*cos(phi_rad)+x[2];
+  extendHigh[1]=length*sin(theta_rad)*sin(phi_rad)+y[2];
+  extendHigh[2]=length*cos(theta_rad)+z[2];
 }
