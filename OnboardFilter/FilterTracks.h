@@ -3,7 +3,7 @@
  * @brief Algorithm to compute tracks from the Filter's projections
  * @author Navid Golpayeagani - golpa@milkyway.gsfc.nasa.gov
  * @author David Wren - dnwren@milkyway.gsfc.nasa.gov
- * $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/OnboardFilter/FilterTracks.h,v 1.4 2004/07/12 19:47:16 golpa Exp $
+ * $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/OnboardFilter/FilterTracks.h,v 1.5 2004/07/23 15:58:10 golpa Exp $
  */
 
 #ifndef _FILTER_TRACKS_H_
@@ -29,65 +29,65 @@
 #include <string>
 #include <vector>
 #include <fstream>
+#include <cmath>
 
 class FilterTracks : public Algorithm{
-public:
-    FilterTracks(const std::string &name, ISvcLocator *pSvcLocator);
-    StatusCode initialize();
-    StatusCode execute();
-    StatusCode finalize();
-
-private:
-    /**
-     * Compute Angles for a given track
-     */
-    void computeAngles();
-    /**
-     * Compute the Length of a track
-     */
-    void computeLength();
-    /**
-     * Compute the extensions to the tracks
-     */
-    void computeExtension();
-
-    /**
-     * Find out the position of a strip after converting Filter's strip
-     * numbering into numbering consistent with getStripPosition()
-     */
-    HepPoint3D findStripPosition(ITkrGeometrySvc *tkrGeoSvc, int tower, 
-                                 int layer, int view, double stripId);
-
-    /**
-	 * Compute the multiple scattering angles
-	 */
-	StatusCode MultipleScattering();
-    /**
-	 * Write out the OnboardFilter hits
-	 */
-	StatusCode WriteHits();
-
-    std::vector<double> m_x;
-    std::vector<double> m_y;
-    std::vector<double> m_xz;
-    std::vector<double> m_yz;
-    std::vector<double> m_zAvg;
-    std::vector<double> m_extendLow;
-    std::vector<double> m_extendHigh;
-    std::vector<double> m_pointHigh;
-    double m_phi, m_phi_rad;
-    double m_theta, m_theta_rad;
-    double m_length;
-    double m_pi;
-
-	int m_usenumhits;
-	int m_writehits;
-	int m_scattering;
-
-	std::ofstream m_outfile;
-	
-	//StringProperty m_hitsfilename;
-	//const char *m_hitsfilename;
+ public:
+  FilterTracks(const std::string &name, ISvcLocator *pSvcLocator);
+  StatusCode initialize();
+  StatusCode execute();
+  StatusCode finalize();
+  
+ private:
+  /**
+   * Compute Angles for a given track
+   */
+  void computeAngles();
+  /**
+   * Compute the Length of a track
+   */
+  void computeLength();
+  /**
+   * Compute the extensions to the tracks
+   */
+  void computeExtension();
+  
+  /**
+   * Find out the position of a strip after converting Filter's strip
+   * numbering into numbering consistent with getStripPosition()
+   */
+  HepPoint3D findStripPosition(ITkrGeometrySvc *tkrGeoSvc, int tower, 
+                               int layer, int view, double stripId);
+  
+  /**
+   * Compute the multiple scattering angles
+   */
+  StatusCode MultipleScattering();
+  /**
+   * Write out the OnboardFilter hits
+   */
+  StatusCode WriteHits();
+  
+  std::vector<double> m_x;
+  std::vector<double> m_y;
+  std::vector<double> m_xz;
+  std::vector<double> m_yz;
+  std::vector<double> m_zAvg;
+  std::vector<double> m_extendLow;
+  std::vector<double> m_extendHigh;
+  std::vector<double> m_pointHigh;
+  double m_phi, m_phi_rad;
+  double m_theta, m_theta_rad;
+  double m_length;
+  
+  int m_usenumhits;
+  int m_writehits;
+  int m_scattering;
+  
+  std::ofstream m_outfile;
+  
+  //StringProperty m_hitsfilename;
+  //const char *m_hitsfilename;
 };
 
 #endif
