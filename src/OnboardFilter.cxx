@@ -4,7 +4,7 @@
  * @author JJRussell - russell@slac.stanford.edu
  * @author David Wren - dnwren@milkyway.gsfc.nasa.gov
  * @author Navid Golpayegani - golpa@milkyway.gsfc.nasa.gov
- * $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/OnboardFilter.cxx,v 1.11 2003/08/16 18:37:52 golpa Exp $
+ * $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/OnboardFilter.cxx,v 1.12 2003/08/16 20:14:14 golpa Exp $
  */
    
 #include <stdlib.h>
@@ -194,7 +194,6 @@ StatusCode OnboardFilter::execute()
 	//Initialize the control structures
 	dfcSize = DFC_ctlSizeof ();
     dfcCtl  = (struct _DFC_ctl *)malloc (dfcSize);
-	
     if (dfcCtl == NULL)
     {
         printf ("Cannot allocate %8.8x(%d) bytes for control structure\n",
@@ -204,7 +203,8 @@ StatusCode OnboardFilter::execute()
     DFC_ctlInit (dfcCtl);
 	
     dfcSize  = DFC_latRecordSizeof ();
-    dfcEvt   = (struct _DFC_latRecord *)malloc (dfcSize);
+    //dfcEvt   = (struct _DFC_latRecord *)malloc (dfcSize);
+    dfcEvt = new _DFC_latRecord;
     if (dfcEvt == NULL)
     {
         printf ("Cannot allocate %8.8x(%d) bytes for DFC unpack record\n",
@@ -245,7 +245,8 @@ StatusCode OnboardFilter::execute()
 	
     /* Allocate the memory for the results vector */
     resultsSize     = DFC_resultsSizeof ();
-    results         = (struct _DFC_results *)malloc (resultsSize * evtCnt);
+    //results         = (struct _DFC_results *)malloc (resultsSize * evtCnt);
+    results = new _DFC_results[evtCnt];
     if (results == NULL)
     {
         printf ("Cannot allocate %d bytes for % d result vectors\n",
@@ -354,9 +355,9 @@ StatusCode OnboardFilter::execute()
     
 
     EBF_free (ebf);
-    free(results);
+    delete[] results;
     free(dfcCtl);
-    free(dfcEvt);
+    delete dfcEvt;
     return StatusCode::SUCCESS;
 }
 
