@@ -4,7 +4,7 @@
  * @author JJRussell - russell@slac.stanford.edu
  * @author David Wren - dnwren@milkyway.gsfc.nasa.gov
  * @author Navid Golpayegani - golpa@milkyway.gsfc.nasa.gov
- * $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/OnboardFilter.cxx,v 1.25 2003/08/28 22:58:13 golpa Exp $
+ * $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/OnboardFilter.cxx,v 1.26 2003/08/29 04:26:43 burnett Exp $
  */
    
 #include <stdlib.h>
@@ -202,17 +202,19 @@ StatusCode OnboardFilter::initialize()
   m_ctl_buf.geometry=0;
   m_ctl    = &m_ctl_buf;
   //Set up GUI display
-  IGuiSvc *guiSvc;
-  if(!service("GuiSvc",guiSvc).isFailure()){
+  /*
+    IGuiSvc *guiSvc;
+    if(!service("GuiSvc",guiSvc).isFailure()){
     gui::DisplayControl& display = guiSvc->guiMgr()->display();
     gui::DisplayControl::DisplaySubMenu& fltrmenu = display.subMenu("OnboardFilter");
     //Add Display Objects Here
     fltrmenu.add(new FilterTrackDisplay(eventSvc()),"Tracks");
     fltrmenu.add(new FilterExtendedDisplay(eventSvc()),"Extended Tracks");
-  }
-  else{
+    }
+    else{
     log<<MSG::WARNING<<"No GuiSvc. Not displaying tracks"<<endreq;
-  }
+    }
+  */
   return StatusCode::SUCCESS;
 }
 
@@ -455,7 +457,8 @@ StatusCode OnboardFilter::execute()
     delete[] results;
     free(dfcCtl);
     delete dfcEvt;
-    return computeCoordinates(newStatus);
+    //    return computeCoordinates(newStatus);
+    return StatusCode::SUCCESS;
 }
 
 int OnboardFilter::countEvts (const unsigned int *evts, int size)
