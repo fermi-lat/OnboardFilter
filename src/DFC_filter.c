@@ -1,5 +1,5 @@
 /*------------------------------------------------------------------------
-| CVS $Id: DFC_filter.c,v 1.4 2003/08/16 18:37:52 golpa Exp $
+| CVS $Id: DFC_filter.c,v 1.5 2003/08/19 04:14:36 burnett Exp $
 +-------------------------------------------------------------------------*/
 
 
@@ -1516,7 +1516,9 @@ static unsigned int latFilter  (TFC_latRecord *tlr,
                                          ttr->layerMaps[0],
                                          ttr->layerMaps[1]);
        //_DBG (TFC_projectionsPrint (&prjs, tower));
-
+#ifdef GLEAM
+       memcpy(&(TDS_variables.prjs[tower]),&prjs,sizeof(prjs));
+#endif
        
        /* If have any projections, try matching with ACD tile */
        if (tkrStatus)
