@@ -1,7 +1,7 @@
 package OnboardFilter
 
-version v1r1p4
-# $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/cmt/requirements,v 1.37 2004/08/25 16:05:57 golpa Exp $
+version v1r1p5
+# $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/cmt/requirements,v 1.38 2004/11/01 20:29:29 golpa Exp $
 
 author Navid Golpayegani <golpa@milkyway.gsfc.nasa.gov>
 
@@ -28,22 +28,6 @@ macro_prepend includes "-I ../src -I ../DFC  " WIN32 " /I ..\src  /I ..\DFC "
 macro_prepend includes "-I ../src " WIN32 " /I ..\src  "
 
 library OnboardFilter $(headers) *.cxx *.c Dll/*.cxx
-
-# use this only for the test. TODO: make it cleaner
 apply_pattern package_Cshlibflags
-private
-use TkrRecon       * -no_auto_imports
-use FluxSvc        * -no_auto_imports
-use TkrDigi        * -no_auto_imports
-use AcdDigi        * -no_auto_imports
-use CalDigi        * -no_auto_imports
-use Trigger        * -no_auto_imports
-use CalUtil        * -no_auto_imports
-use CalRecon       * -no_auto_imports
-use AcdRecon       * -no_auto_imports
-use RootIo         * -no_auto_imports
-
-public
-
-apply_pattern package_test
-set TESTJOBOPTIONS ${ONBOARDFILTERROOT}/src/test/jobOptions.txt
+# use this only for the test. TODO: make it cleaner
+# no unit test for now --THB
