@@ -27,6 +27,7 @@ StatusCode FilterTracks::finalize(){
 
 StatusCode FilterTracks::execute(){
     MsgStream log(msgSvc(),name());
+    log<<MSG::DEBUG<<"execute()"<<endreq;
     ITkrGeometrySvc *tkrGeoSvc=NULL;
     if(service("TkrGeometrySvc",tkrGeoSvc,true).isFailure()){
       log<<MSG::ERROR<<"Couldn't set up TkrGeometrySvc!"<<endreq;
@@ -46,11 +47,11 @@ StatusCode FilterTracks::execute(){
             //Loop over the x projections
             for(int xprj=0;xprj<prjs->xy[0];xprj++){
                 log<<MSG::DEBUG<<"Obtaining X and XZ for hits 0 and 1"<<endreq;
-                point=tkrGeoSvc->getStripPosition(tower,prjs->prjs[xprj].max,0,
+                point=findStripPosition(tkrGeoSvc,tower,prjs->prjs[xprj].max,0,
                                                   prjs->prjs[xprj].hits[0]);
                 m_x[0]=point.x();
                 m_xz[0]=point.z();
-                point=tkrGeoSvc->getStripPosition(tower,prjs->prjs[xprj].max-1,0,
+                point=findStripPosition(tkrGeoSvc,tower,prjs->prjs[xprj].max-1,0,
                                                   prjs->prjs[xprj].hits[1]);
                 m_x[1]=point.x();
                 m_xz[1]=point.z();
@@ -59,11 +60,11 @@ StatusCode FilterTracks::execute(){
                     if(prjs->prjs[xprj].max==prjs->prjs[yprj].max){
                         log<<MSG::DEBUG<<"Obtaining Y and YZ for hits 0 and 1"
                            << endreq;
-                        point=tkrGeoSvc->getStripPosition(tower,prjs->prjs[yprj].max,
+                        point=findStripPosition(tkrGeoSvc,tower,prjs->prjs[yprj].max,
                                                           1,prjs->prjs[yprj].hits[0]);
                         m_y[0]=point.y();
                         m_yz[0]=point.z();
-                        point=tkrGeoSvc->getStripPosition(tower,prjs->prjs[yprj].max-1,
+                        point=findStripPosition(tkrGeoSvc,tower,prjs->prjs[yprj].max-1,
                                                           1,prjs->prjs[yprj].hits[1]);
                         m_y[1]=point.y();
                         m_yz[1]=point.z();
@@ -73,11 +74,11 @@ StatusCode FilterTracks::execute(){
                         else
                             maxhits=prjs->prjs[yprj].nhits;
                         log << MSG::DEBUG << "Obtaining X,Y,XZ,YZ for max hits"<<endreq;
-                        point=tkrGeoSvc->getStripPosition(tower,prjs->prjs[xprj].max-(maxhits-1),
+                        point=findStripPosition(tkrGeoSvc,tower,prjs->prjs[xprj].max-(maxhits-1),
                                                           0,prjs->prjs[xprj].hits[maxhits-1]);
                         m_x[2]=point.x();
                         m_xz[2]=point.z();
-                        point=tkrGeoSvc->getStripPosition(tower,prjs->prjs[yprj].max-(maxhits-1),
+                        point=findStripPosition(tkrGeoSvc,tower,prjs->prjs[yprj].max-(maxhits-1),
                                                           1,prjs->prjs[yprj].hits[maxhits-1]);
                         m_y[2]=point.y();
                         m_yz[2]=point.z();
@@ -106,6 +107,7 @@ StatusCode FilterTracks::execute(){
     std::vector<OnboardFilterTds::track> tracks=status->getTracks();
     double maxLength=0;
     unsigned int currMax;
+    log<<MSG::DEBUG<<"Processing "<<tracks.size()<<" tracks"<<endreq;
     if(tracks.size()>0){
         for(unsigned int counter=0;counter<tracks.size();counter++){
             if(tracks[counter].length>maxLength){
@@ -257,4 +259,52 @@ void FilterTracks::computeExtension(){
     m_extendHigh[0]=length*sin(m_theta_rad)*cos(m_phi_rad)+m_x[2];
     m_extendHigh[1]=length*sin(m_theta_rad)*sin(m_phi_rad)+m_y[2];
     m_extendHigh[2]=length*cos(m_theta_rad)+m_zAvg[2];
+}
+
+HepPoint3D FilterTracks::findStripPosition(ITkrGeometrySvc *tkrGeoSvc,int tower, 
+                                           int layer, int view, double stripId){
+  //stripId is in first ladder
+  if(stripId<384)
+    return tkrGeoSvc->getStripPosition(tower,layer,view,stripId);
+
+  //stripId is in second ladder
+  if(stripId>392 && stripId<777)
+    return tkrGeoSvc->getStripPosition(tower,layer,view,stripId-9);
+
+  //stripId is in third ladder
+  if(stripId>786 && stripId<1171)
+    return tkrGeoSvc->getStripPosition(tower,layer,view,stripId-9-10);
+
+  //stripId is in fourth ladder
+  if(stripId>1179)
+    return tkrGeoSvc->getStripPosition(tower,layer,view,stripId-9-10-9);
+
+  //stripId is in a gap. We need to compute the position manually
+  int below;
+  int numstrips;
+  //stripId is in first gap
+  if(stripId>383 && stripId<393){
+    below=383;
+    numstrips=10;
+  }
+  //stripId is in second gap
+  if(stripId>776 && stripId<787){
+    below=776;
+    numstrips=11;
+  }
+  //stripId is in third gap
+  if(stripId>1170 && stripId<1180){
+    below=1170;
+    numstrips=10;
+  }
+  HepPoint3D pointBelow=tkrGeoSvc->getStripPosition(tower,layer,view,below);
+  HepPoint3D pointAbove=tkrGeoSvc->getStripPosition(tower,layer,view,below+1);
+  HepPoint3D incPoint=pointAbove-pointBelow;
+  incPoint/=numstrips;
+  for(int counter=below;counter<stripId;counter++)
+    pointBelow+=incPoint;
+  std::cout<<"Above: "<<pointAbove.x()<<" "<<pointAbove.y()<<" "<<pointAbove.z()<<endl;
+  std::cout<<"Below: "<<pointBelow.x()<<" "<<pointBelow.y()<<" "<<pointBelow.z()<<endl;
+  std::cout<<"Real : "<<incPoint.x()<<" "<<incPoint.y()<<" "<<incPoint.z()<<endl;
+  return pointBelow;
 }

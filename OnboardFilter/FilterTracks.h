@@ -3,7 +3,7 @@
  * @brief Algorithm to compute tracks from the Filter's projections
  * @author Navid Golpayeagani - golpa@milkyway.gsfc.nasa.gov
  * @author David Wren - dnwren@milkyway.gsfc.nasa.gov
- * $Header$
+ * $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/OnboardFilter/FilterTracks.h,v 1.1 2003/09/05 00:45:22 golpa Exp $
  */
 
 #ifndef _FILTER_TRACKS_H_
@@ -45,6 +45,13 @@ private:
      * Compute the extensions to the tracks
      */
     void computeExtension();
+
+    /**
+     * Find out the position of a strip after converting Filter's strip
+     * numbering into numbering consistent with getStripPosition()
+     */
+    HepPoint3D findStripPosition(ITkrGeometrySvc *tkrGeoSvc, int tower, 
+                                 int layer, int view, double stripId);
 
     std::vector<double> m_x;
     std::vector<double> m_y;
