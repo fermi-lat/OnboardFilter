@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: golpa  Fri Sep  5 07:36:09 PDT 2003
+OnboardFilter/src
+
+Modified Files:
+	FilterTracks.cxx 
+Log Message:
+Small math changes
+    *
+------------------------------------------------------------
 User: golpa  Thu Sep  4 17:45:22 PDT 2003
 OnboardFilter/src/Dll
 
