@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: golpa  Sat Jul 19 16:08:05 PDT 2003
+OnboardFilter/OnboardFilter
+
+Modified Files:
+	FilterStatus.h 
+Log Message:
+Added TDS path and fixed windows compatibility bug
+    *
+------------------------------------------------------------
 User: golpa  Fri Jul 18 13:22:37 PDT 2003
 OnboardFilter/OnboardFilter
 
