@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: golpa  Mon Jul 12 12:47:19 PDT 2004
+OnboardFilter/cmt
+
+Modified Files:
+	Makefile 
+Log Message:
+Removed windows characters
+    *
+------------------------------------------------------------
 User: golpa  Mon Jul 12 12:47:17 PDT 2004
 OnboardFilter/OnboardFilter
 
