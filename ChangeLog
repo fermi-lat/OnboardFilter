@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: golpa  Thu Aug 28 15:58:13 PDT 2003
+OnboardFilter/src
+
+Modified Files:
+	OnboardFilter.cxx 
+Log Message:
+Fixed math for Angular seperation
+    *
+------------------------------------------------------------
 User: golpa  Wed Aug 27 08:56:47 PDT 2003
 OnboardFilter/doc
 
