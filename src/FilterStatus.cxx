@@ -9,26 +9,42 @@ FilterStatus::FilterStatus(){
     m_acd_xy=0;
     m_acd_xz=0;
     m_acd_yz=0;
-    m_acdStatus=0;
-    for(int counter=0;counter<16;counter++)
+	for(int counter=0;counter<16;counter++){
+		m_acdStatus[counter]=0;
         m_layers[counter]=0;
+	}
 }
 
 FilterStatus::FilterStatus(const unsigned int code, const int energy,
 						   const int ids, const int xz, const int yz,
-						   const int xy, const int acdstatus,
-						   const int *layerCode){
+						   const int xy, const int *acdstatus,
+						   const int *layerCode,
+						   const TFC_projections *projections){
     m_status=code;
     m_calEnergy=energy;
     m_tcids=ids;
     m_acd_xz=xz;
     m_acd_xy=xy;
     m_acd_yz=yz;
-    m_acdStatus=acdstatus;
-    if(m_layers!=NULL){
+	for(int counter=0;counter<16;counter++){
+		m_acdStatus[counter]=0;
+        m_layers[counter]=0;
+	}
+	if(acdstatus!=NULL){
+		for(int counter=0;counter<16;counter++)
+			m_acdStatus[counter]=acdstatus[counter];
+	}
+    if(layerCode!=NULL){
         for(int counter=0;counter<16;counter++)
             m_layers[counter]=layerCode[counter];
     }
+	if(projections!=NULL){
+		for(int counter=0;counter<16;counter++){
+			for(int trackCounter=0;trackCounter<projections[counter].curCnt;trackCounter++){
+				m_prjs[counter].push_back(projections[counter].prjs[trackCounter]);
+			}
+		}
+	}
 }
 
 FilterStatus::~FilterStatus(){
@@ -36,18 +52,6 @@ FilterStatus::~FilterStatus(){
 
 void FilterStatus::set(const unsigned int code){
     m_status=code;
-}
-
-unsigned int FilterStatus::get() const{
-    return m_status;
-}
-
-unsigned int FilterStatus::getLow() const{
-    return m_status & 0x7FFF;
-}
-
-unsigned int FilterStatus::getHigh() const{
-    return m_status>>15;
 }
 
 void FilterStatus::setCalEnergy(const int energy){
@@ -79,12 +83,13 @@ void FilterStatus::getAcdMap(int &xz, int &yz, int &xy) const {
 }
 
 
-void FilterStatus::setAcdStatus(const int status){
-    m_acdStatus=status;
+void FilterStatus::setAcdStatus(const int tower, const int status){
+	if(tower<16)
+        m_acdStatus[tower]=status;
 }
 
-int FilterStatus::getAcdStatus() const {
-    return m_acdStatus;
+void FilterStatus::getAcdStatus(int *copy) const {
+    memcpy(copy,m_acdStatus,sizeof(m_acdStatus)*16);
 }
 
 void FilterStatus::setLayers(const int *layerCode){
@@ -94,6 +99,18 @@ void FilterStatus::setLayers(const int *layerCode){
 
 int * FilterStatus::getLayers(){
     return m_layers;
+}
+
+void FilterStatus::setProjection(const int tower,const TFC_projections prjs){
+	if(tower<16){
+	    m_prjs[tower].clear();
+	    for(int counter=0;counter<prjs.curCnt;counter++)
+		    m_prjs[tower].push_back(prjs.prjs[counter]);
+	}
+}
+
+std::vector<TFC_projection> FilterStatus::getProjection(const int tower){
+	return m_prjs[tower];
 }
 
 inline std::ostream& FilterStatus::fillStream(std::ostream &s) const{

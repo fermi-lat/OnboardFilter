@@ -7,8 +7,6 @@ apply_pattern packageShr
 apply_pattern package_include
 apply_pattern package_header
 
-apply_pattern library_Llinkopts library="OnboardFilterTds"
-
 private
 
 macro OnboardFilter_cppflags "" \
@@ -18,12 +16,20 @@ macro OnboardFilter_cppflags "" \
 macro OnboardFilter_cflags $(OnboardFilter_cppflags)
 
 macro headers "" WIN32 "*.h"
-library OnboardFilterTds -no_share FilterStatus.cxx
 
 library OnboardFilter $(headers) *.cxx *.c Dll/*.cxx
 
 private
 apply_pattern package_Cshlibflags
+use TkrRecon       *
+use FluxSvc        *
+use TkrDigi        *
+use AcdDigi        *
+use CalDigi        *
+use Trigger        *
+use CalUtil        *
+use CalRecon       *
+use AcdRecon       *
 
 public
 
