@@ -4,7 +4,7 @@
  * @author JJRussell - russell@slac.stanford.edu
  * @author David Wren - dnwren@milkyway.gsfc.nasa.gov
  * @author Navid Golpayegani - golpa@milkyway.gsfc.nasa.gov
- * $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/OnboardFilter.cxx,v 1.16 2003/08/21 20:44:04 golpa Exp $
+ * $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/OnboardFilter.cxx,v 1.17 2003/08/21 21:11:51 golpa Exp $
  */
    
 #include <stdlib.h>
@@ -394,6 +394,7 @@ StatusCode OnboardFilter::execute()
 	    prjs.prjs[prjCounter].layers=TDS_variables.prjs[counter].prjs[prjCounter].layers;
             prjs.prjs[prjCounter].min=TDS_variables.prjs[counter].prjs[prjCounter].min;
             prjs.prjs[prjCounter].max=TDS_variables.prjs[counter].prjs[prjCounter].max;
+            prjs.prjs[prjCounter].nhits=TDS_variables.prjs[counter].prjs[prjCounter].nhits;
 	    for(int hitCounter=0;hitCounter<18;hitCounter++)
 	      prjs.prjs[prjCounter].hits[hitCounter]=TDS_variables.prjs[counter].prjs[prjCounter].hits[hitCounter];
 	  }
@@ -504,18 +505,18 @@ StatusCode OnboardFilter::computeCoordinates(OnboardFilterTds::FilterStatus *sta
       point=tkrGeoSvc->getStripPosition(tower,prjs->prjs[xprj].max,0,prjs->prjs[xprj].hits[0]);
       x.push_back(point.x());
       xz.push_back(point.z());
-      point=tkrGeoSvc->getStripPosition(tower, prjs->prjs[xprj].max, 0, prjs->prjs[xprj].hits[1]);
+      point=tkrGeoSvc->getStripPosition(tower, prjs->prjs[xprj].max-1, 0, prjs->prjs[xprj].hits[1]);
       x.push_back(point.x());
       xz.push_back(point.z());
       //Loop over the y projections
-      for(int yprj=prjs->xy[1];yprj<prjs->xy[1]+prjs->xy[2];yprj++){
+      for(int yprj=prjs->xy[1];yprj<prjs->xy[1]+prjs->xy[0];yprj++){
 	y.clear();
 	yz.clear();
 	if(prjs->prjs[xprj].max==prjs->prjs[yprj].max){
 	  point=tkrGeoSvc->getStripPosition(tower,prjs->prjs[yprj].max,1,prjs->prjs[yprj].hits[0]);
 	  y.push_back(point.y());
 	  yz.push_back(point.z());
-	  point=tkrGeoSvc->getStripPosition(tower,prjs->prjs[yprj].max,1,prjs->prjs[yprj].hits[1]);
+	  point=tkrGeoSvc->getStripPosition(tower,prjs->prjs[yprj].max-1,1,prjs->prjs[yprj].hits[1]);
 	  y.push_back(point.y());
 	  yz.push_back(point.z());
 	  unsigned char maxhits;
@@ -523,10 +524,10 @@ StatusCode OnboardFilter::computeCoordinates(OnboardFilterTds::FilterStatus *sta
 	    maxhits=prjs->prjs[xprj].nhits;
 	  else
 	    maxhits=prjs->prjs[yprj].nhits;
-	  point=tkrGeoSvc->getStripPosition(tower,prjs->prjs[xprj].max,0,prjs->prjs[xprj].hits[maxhits]);
+	  point=tkrGeoSvc->getStripPosition(tower,prjs->prjs[xprj].max-maxhits,0,prjs->prjs[xprj].hits[maxhits]);
 	  x.push_back(point.x());
 	  xz.push_back(point.z());
-	  point=tkrGeoSvc->getStripPosition(tower,prjs->prjs[yprj].max,1,prjs->prjs[yprj].hits[maxhits]);
+	  point=tkrGeoSvc->getStripPosition(tower,prjs->prjs[yprj].max-maxhits,1,prjs->prjs[yprj].hits[maxhits]);
 	  y.push_back(point.y());
 	  yz.push_back(point.z());
 	  for(int counter=0;counter<3;counter++)
@@ -537,7 +538,6 @@ StatusCode OnboardFilter::computeCoordinates(OnboardFilterTds::FilterStatus *sta
 	  computeAngles(x,y,xz,yz,phi,phi_rad,theta,theta_rad);
 	  computeLength(zAvg,theta_rad,phi_rad,length,pointHigh);
 	  computeExtension(x,y,zAvg,phi_rad,theta_rad, extendedLow, extendedHigh);
-	  //Draw here
 	  //Add track to TDS
 	  OnboardFilterTds::track newTrack;
 	  newTrack.phi_rad=phi_rad;
