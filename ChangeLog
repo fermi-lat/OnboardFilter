@@ -1,5 +1,20 @@
 ------------------------------------------------------------
 User: golpa  Wed Jul  9 08:35:07 PDT 2003
+OnboardFilter/src
+
+Modified Files:
+	mainpage.h 
+Added Files:
+	OnboardFilter.cxx 
+Removed Files:
+	filter.cxx 
+Log Message:
+
+Renamed package to OnboardFilter
+
+    *
+------------------------------------------------------------
+User: golpa  Wed Jul  9 08:35:07 PDT 2003
 OnboardFilter/cmt
 
 Modified Files:
