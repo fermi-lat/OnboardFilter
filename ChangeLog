@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: burnett  Sun Jan 30 10:20:30 PST 2005
+OnboardFilter/src
+
+Modified Files:
+	OnboardFilter.cxx 
+Log Message:
+fix some warnings, especially uninitialized vars that were being used.
+    *
+------------------------------------------------------------
 User: golpa  Mon Nov  1 12:29:29 PST 2004
 OnboardFilter/cmt
 
