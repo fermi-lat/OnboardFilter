@@ -2,6 +2,7 @@
  * @file release.notes
  * @brief Package OnboardFilter
  * @verbatim
+ * v0r6p1 02-Oct-2003   NG : All towers now used for finding tracks
  * v0r6   10-Sep-2003   NG : Fixed passThrough mode, made Track display seperate alg, added veto summary
  * v0r5p0 09-Sep-2003   NG : Fixed passThrough mode and windows GUI display
  * v0r5   09-Sep-2003   THB: make default mask zero, for no filter
