@@ -10,7 +10,6 @@ FilterTracks::FilterTracks(const std::string& name, ISvcLocator* pSvcLocator)
   declareProperty("WriteHits",      m_writehits = 0);
   declareProperty("Scattering",     m_scattering = 0);
   //declareProperty("HitsFile", m_hitsfilename="hits.txt");
-  
 }
 
 StatusCode FilterTracks::initialize(){
@@ -21,7 +20,6 @@ StatusCode FilterTracks::initialize(){
   m_x.push_back(0);
   m_y=m_xz=m_yz=m_zAvg=m_pointHigh=
     m_extendHigh=m_extendLow=m_x;
-  m_pi = 3.14159265358979323846;
   
   if (m_writehits){
     //create the file and the stream here
@@ -132,8 +130,8 @@ StatusCode FilterTracks::execute(){
           }
         }
       }
-      startPrj+=prjs->curCnt[tower];//I moved this 06/14/04 - DW
     }
+    startPrj+=prjs->curCnt[tower];//I moved this 06/14/04 - DW
   }
   std::vector<OnboardFilterTds::track> tracks=status->getTracks();
   double maxLength=0;
@@ -142,102 +140,76 @@ StatusCode FilterTracks::execute(){
   log<<MSG::DEBUG<<"Processing "<<tracks.size()<<" tracks"<<endreq;
   if(tracks.size()>0){
     for(unsigned int counter=0;counter<tracks.size();counter++){//currently using the track that is the
-      if(tracks[counter].length>maxLength){                   //longest, not the track with the most
-        maxLength=tracks[counter].length;                   //hits.  Usually, these will be the same,
-        currMax=counter;                                    //but it is possible to have a long track
-      }                                                       //at a shallow angle with only 3 hits,
+      if(tracks[counter].length>maxLength){                     //longest, not the track with the most
+	maxLength=tracks[counter].length;                       //hits.  Usually, these will be the same,
+	currMax=counter;                                        //but it is possible to have a long track
+      }                                                         //at a shallow angle with only 3 hits,
     }                                                           //and a short track with more than this.
     for(unsigned int counter2=0;counter2<tracks.size();counter2++){//This is an alternative method to picking
-      if(tracks[counter2].numhits>maxnumhits){                   //the track to use.  This one picks out
-        maxnumhits=tracks[counter2].numhits;                   //the track that has the most hits, not
-        currMaxHits=counter2;                                  //the longest track
+      if(tracks[counter2].numhits>maxnumhits){                     //the track to use.  This one picks out
+	maxnumhits=tracks[counter2].numhits;                       //the track that has the most hits, not
+	currMaxHits=counter2;                                      //the longest track
       }
     }
     if (m_usenumhits){      //if the jobOptions say to use the number of hits to pick out the track
       currMax=currMaxHits;//this is executed and currMax is replaced with a different track selector
     }
-    std::vector<OnboardFilterTds::track> tracks=status->getTracks();
-    double maxLength=0;
-    int   maxnumhits=0;
-    unsigned int currMax,currMaxHits;
-    log<<MSG::DEBUG<<"Processing "<<tracks.size()<<" tracks"<<endreq;
-    if(tracks.size()>0){
-      for(unsigned int counter=0;counter<tracks.size();counter++){//currently using the track that is the
-        if(tracks[counter].length>maxLength){                   //longest, not the track with the most
-          maxLength=tracks[counter].length;                   //hits.  Usually, these will be the same,
-          currMax=counter;                                    //but it is possible to have a long track
-        }                                                       //at a shallow angle with only 3 hits,
-      }                                                           //and a short track with more than this.
-      for(unsigned int counter2=0;counter2<tracks.size();counter2++){//This is an alternative method to picking
-        if(tracks[counter2].numhits>maxnumhits){                   //the track to use.  This one picks out
-          maxnumhits=tracks[counter2].numhits;                   //the track that has the most hits, not
-          currMaxHits=counter2;                                  //the longest track
-        }
+    log<<MSG::DEBUG<<"Using track "<<currMax<<" out of "<<tracks.size()<<endreq;
+    //Obtain McZDir, McXDir, McYDir (copied from McValsTools.cxx)
+    SmartDataPtr<Event::McParticleCol> pMcParticle(eventSvc(),EventModel::MC::McParticleCol);
+    if(pMcParticle){
+      Event::McParticleCol::const_iterator pMCTrack1 = pMcParticle->begin();
+      HepLorentzVector Mc_p0 = (*pMCTrack1)->initialFourMomentum();
+      Vector Mc_t0 = Vector(Mc_p0.x(),Mc_p0.y(), Mc_p0.z()).unit();
+      double MC_xdir,MC_ydir,MC_zdir;
+      MC_xdir   = Mc_t0.x();
+      MC_ydir   = Mc_t0.y();
+      MC_zdir   = Mc_t0.z();
+      //Convert MC dir into theta and phi
+      double phi_rad_mc=0;
+      double theta_rad_mc=acos(-MC_zdir);
+      if(MC_zdir < 0)
+	theta_rad_mc=M_PI - acos(-MC_zdir);
+      double x_cord=-MC_xdir;
+      double y_cord=-MC_ydir;
+      if(y_cord==0)
+	phi_rad_mc=M_PI/2;
+      if ((x_cord>0)&&(y_cord>0)){
+	phi_rad_mc = atan(y_cord/x_cord);
+	if(MC_zdir<0)
+	  phi_rad_mc = 3*M_PI/2 - atan(x_cord/y_cord);
       }
-      if (m_usenumhits){      //if the jobOptions say to use the number of hits to pick out the track
-        currMax=currMaxHits;//this is executed and currMax is replaced with a different track selector
+      if ((x_cord<0)&&(y_cord<0)){
+	phi_rad_mc = 3*M_PI/2 - atan(x_cord/y_cord);
+	if(MC_zdir<0)
+	  phi_rad_mc = atan(y_cord/x_cord);
       }
-      log<<MSG::DEBUG<<"Using track "<<currMax<<" out of "<<tracks.size()<<endreq;
-      //Obtain McZDir, McXDir, McYDir (copied from McValsTools.cxx)
-      SmartDataPtr<Event::McParticleCol> pMcParticle(eventSvc(),EventModel::MC::McParticleCol);
-      if(pMcParticle){
-        Event::McParticleCol::const_iterator pMCTrack1 = pMcParticle->begin();
-        HepLorentzVector Mc_p0 = (*pMCTrack1)->initialFourMomentum();
-        Vector Mc_t0 = Vector(Mc_p0.x(),Mc_p0.y(), Mc_p0.z()).unit();
-        double MC_xdir,MC_ydir,MC_zdir;
-        MC_xdir   = Mc_t0.x();
-        MC_ydir   = Mc_t0.y();
-        MC_zdir   = Mc_t0.z();
-        //Convert MC dir into theta and phi
-        double phi_rad_mc=0;
-        double theta_rad_mc=acos(-MC_zdir);
-        if(MC_zdir < 0)
-          theta_rad_mc=m_pi - acos(-MC_zdir);
-        double x_cord=-MC_xdir;
-        double y_cord=-MC_ydir;
-        if(y_cord==0)
-          phi_rad_mc=m_pi/2;
-        if ((x_cord>0)&&(y_cord>0)){
-          phi_rad_mc = atan(y_cord/x_cord);
-          if(MC_zdir<0)
-            phi_rad_mc = 3*m_pi/2 - atan(x_cord/y_cord);
-        }
-        if ((x_cord<0)&&(y_cord<0)){
-          phi_rad_mc = 3*m_pi/2 - atan(x_cord/y_cord);
-          if(MC_zdir<0)
-            phi_rad_mc = atan(y_cord/x_cord);
-        }
-        if ((x_cord>0)&&(y_cord<0)){
-          phi_rad_mc = 2*m_pi-atan(-y_cord/x_cord);
-          if(MC_zdir<0)
-            phi_rad_mc=m_pi/2 - atan(x_cord/y_cord);
-        }
-        if ((x_cord<0)&&(y_cord>0)){
-          phi_rad_mc = m_pi/2 - atan(y_cord/(-x_cord));
-          if(MC_zdir<0)
-            phi_rad_mc = 2*m_pi-atan(-y_cord/x_cord);
-        }
-        //Compute angular separation
-        double xone=sin(theta_rad_mc)*cos(phi_rad_mc);
-        double yone=sin(theta_rad_mc)*sin(phi_rad_mc);
-        double zone=cos(theta_rad_mc);
-        double xtwo=sin(tracks[currMax].theta_rad)*cos(tracks[currMax].phi_rad);
-        double ytwo=sin(tracks[currMax].theta_rad)*sin(tracks[currMax].phi_rad);
-        double ztwo=cos(tracks[currMax].theta_rad);
-        double dot_product=xone*xtwo+yone*ytwo+zone*ztwo;
-        double separation_rad=acos(dot_product);
-        //if (separation_rad > m_pi/2.)
-        //      separation_rad = m_pi - separation_rad; //we always assume that events come from "above"
-        status->setSeparation(separation_rad*180/m_pi);
+      if ((x_cord>0)&&(y_cord<0)){
+	phi_rad_mc = 2*M_PI-atan(-y_cord/x_cord);
+	if(MC_zdir<0)
+	  phi_rad_mc=M_PI/2 - atan(x_cord/y_cord);
       }
-      else{
-        log<<MSG::ERROR <<"Unable to obtain McParticleCol from TDS"<<endreq;
-        return StatusCode::FAILURE;
+      if ((x_cord<0)&&(y_cord>0)){
+	phi_rad_mc = M_PI/2 - atan(y_cord/(-x_cord));
+	if(MC_zdir<0)
+	  phi_rad_mc = 2*M_PI-atan(-y_cord/x_cord);
       }
+      //Compute angular separation
+      double xone=sin(theta_rad_mc)*cos(phi_rad_mc);
+      double yone=sin(theta_rad_mc)*sin(phi_rad_mc);
+      double zone=cos(theta_rad_mc);
+      double xtwo=sin(tracks[currMax].theta_rad)*cos(tracks[currMax].phi_rad);
+      double ytwo=sin(tracks[currMax].theta_rad)*sin(tracks[currMax].phi_rad);
+      double ztwo=cos(tracks[currMax].theta_rad);
+      double dot_product=xone*xtwo+yone*ytwo+zone*ztwo;
+      double separation_rad=acos(dot_product);
+      //if (separation_rad > M_PI/2.)
+      //      separation_rad = M_PI - separation_rad; //we always assume that events come from "above"
+      status->setSeparation(separation_rad*180/M_PI);
     }
     else{
-      log<<MSG::ERROR <<"Unable to obtain McParticleCol from TDS"<<endreq;
-      return StatusCode::FAILURE;
+      status->setSeparation(-1);
+      log<<MSG::INFO <<"Unable to obtain McParticleCol from TDS"<<endreq;
     }
   }
   else{
@@ -269,59 +241,59 @@ void FilterTracks::computeAngles(){
   }
   else{
     if(x_h ==0){
-      m_theta_rad=m_pi/2-atan(y_v/y_h);
+      m_theta_rad=M_PI/2-atan(y_v/y_h);
       if(y_h>0)
-        m_phi_rad=m_pi/2;
+        m_phi_rad=M_PI/2;
       else
-        m_phi_rad=3*m_pi/2;
+        m_phi_rad=3*M_PI/2;
     }
     else{
       if(y_h==0){
-        m_theta_rad=m_pi/2-atan(x_v/x_h);
+        m_theta_rad=M_PI/2-atan(x_v/x_h);
         if(x_h>0)
           m_phi_rad=0;
         else
-          m_phi_rad=m_pi;
+          m_phi_rad=M_PI;
       }
       else{
         if((x_h>0) && (y_h>0)){
           m_phi_rad=atan(y_h/x_h);
           t_h_ave=((x_h/cos(m_phi_rad)) + (y_h/sin(m_phi_rad)))/2;
-          m_theta_rad = m_pi - atan(t_h_ave/z_v);
+          m_theta_rad = M_PI - atan(t_h_ave/z_v);
         }
         else{
           if((x_h<0) && (y_h>0)){
-            m_phi_rad=m_pi/2-atan(x_h/y_h);
-            t_h_ave = ( -x_h/sin(m_phi_rad - m_pi/2) + y_h/cos(m_phi_rad - m_pi/2) )/2;
-            m_theta_rad = m_pi - atan(t_h_ave/z_v);
+            m_phi_rad=M_PI/2-atan(x_h/y_h);
+            t_h_ave = ( -x_h/sin(m_phi_rad - M_PI/2) + y_h/cos(m_phi_rad - M_PI/2) )/2;
+            m_theta_rad = M_PI - atan(t_h_ave/z_v);
           }
           else{
             if((x_h<0) && (y_h<0)){
-              m_phi_rad=3*m_pi/2 - atan(x_h/y_h);
-              t_h_ave = ( (-x_h/sin(3*m_pi/2 - m_phi_rad)) + (-y_h/cos(3*m_pi/2 - m_phi_rad)) )/2;
-              m_theta_rad = m_pi - atan(t_h_ave/z_v);
+              m_phi_rad=3*M_PI/2 - atan(x_h/y_h);
+              t_h_ave = ( (-x_h/sin(3*M_PI/2 - m_phi_rad)) + (-y_h/cos(3*M_PI/2 - m_phi_rad)) )/2;
+              m_theta_rad = M_PI - atan(t_h_ave/z_v);
             }
             else{
               if ((x_h>0) && (y_h<0)){
-                m_phi_rad=2*m_pi-atan(-y_h/x_h);
-                t_h_ave = ((x_h/cos(2*m_pi-m_phi_rad)) + (-y_h/sin(2*m_pi-m_phi_rad)))/2;
-                m_theta_rad = m_pi - atan(t_h_ave/z_v);
+                m_phi_rad=2*M_PI-atan(-y_h/x_h);
+                t_h_ave = ((x_h/cos(2*M_PI-m_phi_rad)) + (-y_h/sin(2*M_PI-m_phi_rad)))/2;
+                m_theta_rad = M_PI - atan(t_h_ave/z_v);
               }
               else
-                m_phi_rad=3*m_pi/2-atan(y_h/x_h);
+                m_phi_rad=3*M_PI/2-atan(y_h/x_h);
             }
           }
         }
       }
     }
   }
-  m_theta=m_theta_rad*180/m_pi;
-  m_phi=m_phi_rad*180/m_pi;
+  m_theta=m_theta_rad*180/M_PI;
+  m_phi=m_phi_rad*180/M_PI;
 }
 
 void FilterTracks::computeLength(){
   double t_v=m_zAvg[0]-m_zAvg[2];
-  double t_h = t_v*tan(m_pi - m_theta_rad);
+  double t_h = t_v*tan(M_PI - m_theta_rad);
   m_length=sqrt(t_v*t_v+t_h*t_h);
   m_pointHigh[0]=t_h*cos(m_phi_rad) + m_x[0];
   m_pointHigh[1]=t_h*sin(m_phi_rad) + m_y[0];
@@ -330,9 +302,9 @@ void FilterTracks::computeLength(){
 
 void FilterTracks::computeExtension(){
   const double length=1000;
-  m_extendLow[0]=length*sin(m_pi-m_theta_rad)*cos(m_pi+m_phi_rad) + m_x[0];
-  m_extendLow[1]=length*sin(m_pi-m_theta_rad)*sin(m_pi+m_phi_rad) + m_y[0];
-  m_extendLow[2]=length*cos(m_pi-m_theta_rad) + m_zAvg[0];
+  m_extendLow[0]=length*sin(M_PI-m_theta_rad)*cos(M_PI+m_phi_rad) + m_x[0];
+  m_extendLow[1]=length*sin(M_PI-m_theta_rad)*sin(M_PI+m_phi_rad) + m_y[0];
+  m_extendLow[2]=length*cos(M_PI-m_theta_rad) + m_zAvg[0];
   
   m_extendHigh[0]=length*sin(m_theta_rad)*cos(m_phi_rad)+m_x[2];
   m_extendHigh[1]=length*sin(m_theta_rad)*sin(m_phi_rad)+m_y[2];
