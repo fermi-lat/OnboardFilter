@@ -4,7 +4,7 @@
  * @author JJRussell - russell@slac.stanford.edu
  * @author David Wren - dnwren@milkyway.gsfc.nasa.gov
  * @author Navid Golpayegani - golpa@milkyway.gsfc.nasa.gov
- * $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/OnboardFilter.cxx,v 1.33 2003/09/09 18:48:23 golpa Exp $
+ * $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/OnboardFilter.cxx,v 1.34 2003/09/10 17:22:51 golpa Exp $
  */
    
 #include <stdlib.h>
@@ -144,6 +144,7 @@ static const AlgFactory<OnboardFilter>  Factory;
 const IAlgFactory& OnboardFilterFactory = Factory;
 
 StatusCode OnboardFilter::finalize(){
+    using namespace std;
     MsgStream log(msgSvc(),name());
     log  << MSG::INFO << "Rejected " << m_rejected << " triggers using mask 0x" << std::hex << m_mask << std::dec << endreq;
     log << MSG::INFO;
@@ -382,39 +383,39 @@ StatusCode OnboardFilter::execute()
             this->setFilterPassed(false);
             m_rejected++; // count the number rejected
         }
-        if(status & DFC_M_STATUS_TKR_LT_2_ELO)
+        if((status & DFC_M_STATUS_TKR_LT_2_ELO)!=0)
             m_vetoBits[0]++;
-        if(status & DFC_M_STATUS_TKR_SKIRT)
+        if((status & DFC_M_STATUS_TKR_SKIRT)!=0)
             m_vetoBits[1]++;
-        if(status & DFC_M_STATUS_TKR_EQ_0)
+        if((status & DFC_M_STATUS_TKR_EQ_0)!=0)
             m_vetoBits[2]++;
-        if(status & DFC_M_STATUS_TKR_ROW2)
+        if((status & DFC_M_STATUS_TKR_ROW2)!=0)
             m_vetoBits[3]++;
-        if(status & DFC_M_STATUS_TKR_ROW01)
+        if((status & DFC_M_STATUS_TKR_ROW01)!=0)
             m_vetoBits[4]++;
-        if(status & DFC_M_STATUS_TKR_TOP)
+        if((status & DFC_M_STATUS_TKR_TOP)!=0)
             m_vetoBits[5]++;
-        if(status & DFC_M_STATUS_ZBOTTOM)
+        if((status & DFC_M_STATUS_ZBOTTOM)!=0)
             m_vetoBits[6]++;
-        if(status & DFC_M_STATUS_EL0_ETOT_90)
+        if((status & DFC_M_STATUS_EL0_ETOT_90)!=0)
             m_vetoBits[7]++;
-        if(status & DFC_M_STATUS_EL0_ETOT_01)
+        if((status & DFC_M_STATUS_EL0_ETOT_01)!=0)
             m_vetoBits[8]++;
-        if(status & DFC_M_STATUS_SIDE)
+        if((status & DFC_M_STATUS_SIDE)!=0)
             m_vetoBits[9]++;
-        if(status & DFC_M_STATUS_TOP)
+        if((status & DFC_M_STATUS_TOP)!=0)
             m_vetoBits[10]++;
-        if(status & DFC_M_STATUS_SPLASH_1)
+        if((status & DFC_M_STATUS_SPLASH_1)!=0)
             m_vetoBits[11]++;
-        if(status & DFC_M_STATUS_E350_FILTER_TILE)
+        if((status & DFC_M_STATUS_E350_FILTER_TILE)!=0)
             m_vetoBits[12]++;
-        if(status &  DFC_M_STATUS_E0_TILE)
+        if((status &  DFC_M_STATUS_E0_TILE)!=0)
             m_vetoBits[13]++;
-        if(status & DFC_M_STATUS_SPLASH_0)
+        if((status & DFC_M_STATUS_SPLASH_0)!=0)
             m_vetoBits[14]++;
-        if(status & DFC_M_STATUS_NOCALLO_FILTER_TILE)
+        if((status & DFC_M_STATUS_NOCALLO_FILTER_TILE)!=0)
             m_vetoBits[15]++;
-        if(status & DFC_M_STATUS_VETOED)
+        if((status & DFC_M_STATUS_VETOED)!=0)
             m_vetoBits[16]++;
         newStatus->set(status);
         newStatus->setCalEnergy(result->energy);
