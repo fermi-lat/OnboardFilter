@@ -2,6 +2,7 @@
  * @file release.notes
  * @brief Package OnboardFilter
  * @verbatim
+ * v1r0p0 16-Jul-2004   NG : Minor fixes
  * v1r0   16-Jul-2004   NG : New version of Filter from JJ
  * v0r7p0 22-Mar-2004   NG : Added Author field to requirements file
  * v0r7   09-Feb-2004   NG : Changes of filter logic and increase in track finding tolerance
