@@ -1,5 +1,16 @@
 ------------------------------------------------------------
 User: burnett  Sun Aug 17 15:40:41 PDT 2003
+OnboardFilter/src
+
+Modified Files:
+	FilterStatus.cxx 
+Added Files:
+	.cvsignore 
+Log Message:
+more inlines; tagging v0r1p1
+    *
+------------------------------------------------------------
+User: burnett  Sun Aug 17 15:40:41 PDT 2003
 OnboardFilter/doc
 
 Modified Files:
