@@ -1,6 +1,6 @@
 package OnboardFilter
-version v0r5
-# $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/cmt/requirements,v 1.22 2003/09/08 18:06:18 burnett Exp $
+version v0r5p0
+# $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/cmt/requirements,v 1.23 2003/09/09 16:56:33 burnett Exp $
 use EbfWriter           *
 use TkrUtil             *
 use GuiSvc              *
