@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: golpa  Mon Aug 18 08:44:10 PDT 2003
+OnboardFilter/src
+
+Modified Files:
+	OnboardFilter.cxx 
+Log Message:
+changed 2 of the 3 malloc()s to news
+    *
+------------------------------------------------------------
 User: burnett  Sun Aug 17 15:40:41 PDT 2003
 OnboardFilter/src
 
