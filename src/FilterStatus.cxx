@@ -1,7 +1,6 @@
 #include "OnboardFilter/FilterStatus.h"
 
 using namespace OnboardFilterTds;
-
 FilterStatus::FilterStatus(){
     m_status=0;
     m_calEnergy=0;
@@ -14,7 +13,6 @@ FilterStatus::FilterStatus(){
         m_layers[counter]=0;
 	}
 }
-
 FilterStatus::FilterStatus(const unsigned int code, const int energy,
 						   const int ids, const int xz, const int yz,
 						   const int xy, const int *acdstatus,
@@ -58,17 +56,11 @@ void FilterStatus::setCalEnergy(const int energy){
     m_calEnergy=energy;
 }
 
-int FilterStatus::getCalEnergy() const{
-    return m_calEnergy;
-}
 
 void FilterStatus::setTcids(const int ids){
     m_tcids=ids;
 }
 
-int FilterStatus::getTcids()const{
-    return m_tcids;
-}
 
 void FilterStatus::setAcdMap(const int xz, const int yz, const int xy){
     m_acd_xz=xz;
@@ -76,11 +68,6 @@ void FilterStatus::setAcdMap(const int xz, const int yz, const int xy){
     m_acd_xy=xy;
 }
 
-void FilterStatus::getAcdMap(int &xz, int &yz, int &xy) const {
-    xz=m_acd_xz;
-    yz=m_acd_yz;
-    xy=m_acd_xy;
-}
 
 
 void FilterStatus::setAcdStatus(const int tower, const int status){
@@ -88,18 +75,12 @@ void FilterStatus::setAcdStatus(const int tower, const int status){
         m_acdStatus[tower]=status;
 }
 
-void FilterStatus::getAcdStatus(int *copy) const {
-    memcpy(copy,m_acdStatus,sizeof(m_acdStatus)*16);
-}
 
 void FilterStatus::setLayers(const int *layerCode){
     for(int counter=0;counter<16;counter++)
         m_layers[counter]=layerCode[counter];
 }
 
-int * FilterStatus::getLayers(){
-    return m_layers;
-}
 
 void FilterStatus::setProjection(const int tower,const TFC_projections prjs){
 	if(tower<16){
@@ -109,11 +90,8 @@ void FilterStatus::setProjection(const int tower,const TFC_projections prjs){
 	}
 }
 
-std::vector<TFC_projection> FilterStatus::getProjection(const int tower){
-	return m_prjs[tower];
-}
 
-inline std::ostream& FilterStatus::fillStream(std::ostream &s) const{
+ std::ostream& FilterStatus::fillStream(std::ostream &s) const{
     s<<"Filter Return Code: "<<m_status<<std::endl;
     s<<"Filter code for Energy in CAL: "<<m_calEnergy<<std::endl;
     return s;
