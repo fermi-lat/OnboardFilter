@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: golpa  Tue Jul 15 12:52:47 PDT 2003
+OnboardFilter/OnboardFilter
+
+Added Files:
+	FilterStatus.h 
+Log Message:
+Added code to store the Filter StatusCode in TDS
+    *
+------------------------------------------------------------
 User: golpa  Tue Jul 15 12:43:30 PDT 2003
 OnboardFilter/OnboardFilter
 
