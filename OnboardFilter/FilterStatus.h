@@ -193,6 +193,9 @@ namespace OnboardFilterTds{
     void setXY(const int xy00[16], const int xy11[16], const int xy22[16], const int xy33[16]);
     void setTmsk(int tmsk);
     //****TEMP
+    void setHoughSep(const double houghsep);
+    void setHighLayer(const double highestlayer);
+
     void setSeparation2(const double sep2);
     void setXlongest(const double x_report);
     void setYlongest(const double y_report);
@@ -210,6 +213,9 @@ namespace OnboardFilterTds{
     void setYangleL(const double yangleL);
     void setXlongestB(const double xlongestB);
     void setYlongestB(const double ylongestB);
+
+    double getHoughSep() const;
+    double getHighLayer() const;
 
     double getSeparation2() const;
     double getXlongest() const;
@@ -269,6 +275,9 @@ namespace OnboardFilterTds{
     double m_xslopetower; double m_yslopetower;
     double m_xangleL;    double m_yangleL;
     double m_xlongestB;  double m_ylongestB;
+    double m_highestlayer;
+
+    double m_houghsep;
     //****TEMP
 
   };
@@ -448,6 +457,20 @@ namespace OnboardFilterTds{
     m_tmsk=tmsk;
   }
   //****TEMP
+  inline void FilterStatus::setHoughSep(const double houghsep){
+      m_houghsep=houghsep;
+  }
+  inline double FilterStatus::getHoughSep() const{
+      return m_houghsep;
+  }
+
+  inline void FilterStatus::setHighLayer(const double highestlayer){
+      m_highestlayer=highestlayer;
+  }
+  inline double FilterStatus::getHighLayer() const{
+      return m_highestlayer;
+  }
+
   inline void FilterStatus::setSeparation2(const double sep2){
     m_separation2=sep2;
   }
