@@ -1,6 +1,6 @@
 package OnboardFilter
 version v0r6p2
-# $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/cmt/requirements,v 1.26 2003/10/02 19:19:33 golpa Exp $
+# $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/cmt/requirements,v 1.27 2003/10/03 19:23:03 golpa Exp $
 use EbfWriter           *
 use TkrUtil             *
 use GuiSvc              *
@@ -18,6 +18,8 @@ macro OnboardFilter_cppflags "" \
 macro OnboardFilter_cflags $(OnboardFilter_cppflags)
 
 macro headers "" WIN32 "*.h"
+
+macro_prepend includes "-I ../src " WIN32 " /I ..\src  "
 
 library OnboardFilter $(headers) *.cxx *.c Dll/*.cxx
 
