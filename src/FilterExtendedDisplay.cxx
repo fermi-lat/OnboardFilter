@@ -15,8 +15,12 @@ void FilterExtendedDisplay::update(){
       set_line_style(DOTTED_LINE);
       moveTo(tracks[counter].exLowCoord[0],tracks[counter].exLowCoord[1],
 	     tracks[counter].exLowCoord[2]);
-      lineTo(tracks[counter].exHighCoord[0],tracks[counter].exHighCoord[1],
+      lineTo(tracks[counter].lowCoord[0],tracks[counter].lowCoord[1],
+	     tracks[counter].lowCoord[2]);
+      moveTo(tracks[counter].exHighCoord[0],tracks[counter].exHighCoord[1],
 	     tracks[counter].exHighCoord[2]);
+      lineTo(tracks[counter].highCoord[0],tracks[counter].highCoord[1],
+	     tracks[counter].highCoord[2]);
     }
   }
 }
