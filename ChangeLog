@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: golpa  Thu Aug 21 14:11:51 PDT 2003
+OnboardFilter/src
+
+Modified Files:
+	OnboardFilter.cxx 
+Log Message:
+tracks are now actually computed
+    *
+------------------------------------------------------------
 User: golpa  Thu Aug 21 13:44:04 PDT 2003
 OnboardFilter/src
 
