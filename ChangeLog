@@ -1,5 +1,14 @@
 ------------------------------------------------------------
 User: golpa  Fri Aug 15 15:01:55 PDT 2003
+OnboardFilter/OnboardFilter
+
+Modified Files:
+	FilterStatus.h 
+Log Message:
+removed static library for TDS
+    *
+------------------------------------------------------------
+User: golpa  Fri Aug 15 15:01:55 PDT 2003
 OnboardFilter/cmt
 
 Modified Files:
