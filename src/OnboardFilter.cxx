@@ -4,7 +4,7 @@
  * @author JJRussell - russell@slac.stanford.edu
  * @author David Wren - dnwren@milkyway.gsfc.nasa.gov
  * @author Navid Golpayegani - golpa@milkyway.gsfc.nasa.gov
- * $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/OnboardFilter.cxx,v 1.22 2003/08/26 15:01:28 golpa Exp $
+ * $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/OnboardFilter.cxx,v 1.23 2003/08/26 20:00:56 golpa Exp $
  */
    
 #include <stdlib.h>
@@ -660,7 +660,7 @@ void OnboardFilter::computeAngles(std::vector<double> x,std::vector<double> y,
 	else{
 	  if((x_h<0) && (y_h>0)){
 	    phi_rad=pi/2-atan(x_h/y_h);
-	    t_h_ave = ( x_h/cos(phi_rad - pi/2) + y_h/sin(phi_rad - pi/2) )/2;
+	    t_h_ave = ( -x_h/sin(phi_rad - pi/2) + y_h/cos(phi_rad - pi/2) )/2;
 	    theta_rad = pi - atan(t_h_ave/z_v);
 	  }
 	  else{
