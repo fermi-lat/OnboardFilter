@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: golpa  Thu Aug 21 13:44:04 PDT 2003
+OnboardFilter/OnboardFilter
+
+Modified Files:
+	FilterStatus.h 
+Log Message:
+Windows compile issues fixed
+    *
+------------------------------------------------------------
 User: golpa  Thu Aug 21 13:42:54 PDT 2003
 OnboardFilter/cmt
 
