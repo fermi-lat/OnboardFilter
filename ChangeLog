@@ -1,5 +1,14 @@
 ------------------------------------------------------------
 User: golpa  Thu Sep  4 12:57:15 PDT 2003
+OnboardFilter/src
+
+Modified Files:
+	OnboardFilter.cxx 
+Log Message:
+Fixed random crash bug
+    *
+------------------------------------------------------------
+User: golpa  Thu Sep  4 12:57:15 PDT 2003
 OnboardFilter/OnboardFilter
 
 Modified Files:
