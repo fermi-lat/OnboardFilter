@@ -4,7 +4,7 @@
  * @author JJRussell - russell@slac.stanford.edu
  * @author David Wren - dnwren@milkyway.gsfc.nasa.gov
  * @author Navid Golpayegani - golpa@milkyway.gsfc.nasa.gov
- * $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/OnboardFilter.cxx,v 1.26 2003/08/29 04:26:43 burnett Exp $
+ * $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/OnboardFilter.cxx,v 1.27 2003/08/29 16:39:27 golpa Exp $
  */
    
 #include <stdlib.h>
@@ -163,8 +163,9 @@ private:
     Ctl m_ctl_buf;
     Ctl *m_ctl;
 
-   IntegerProperty m_mask; // mask for setting filter to reject
-   int  m_rejected;
+    IntegerProperty m_mask; // mask for setting filter to reject
+    int  m_rejected;
+    int m_passThrough;
 };
 
 static const AlgFactory<OnboardFilter>  Factory;
@@ -180,6 +181,7 @@ OnboardFilter::OnboardFilter(const std::string& name, ISvcLocator* pSvcLocator)
 :Algorithm(name, pSvcLocator), m_rejected(0){
 
     declareProperty("mask"     ,  m_mask=0xffffffff); // trigger mask: select bits for rejection
+    declareProperty("PassThrough", m_passThrough=0);
 }
 
 StatusCode OnboardFilter::initialize()
@@ -258,16 +260,16 @@ StatusCode OnboardFilter::execute()
     }
 
     MsgStream log(msgSvc(),name());
-	//Initialize the TDS object
+    //Initialize the TDS object
     OnboardFilterTds::FilterStatus *newStatus=
         new OnboardFilterTds::FilterStatus;
     eventSvc()->registerObject("/Event/Filter/FilterStatus",newStatus);
-	
+
     /* Initialize the time base */
     TMR_initialize ();
 	
-	//Initialize the control structures
-	dfcSize = DFC_ctlSizeof ();
+    //Initialize the control structures
+    dfcSize = DFC_ctlSizeof ();
     dfcCtl  = (struct _DFC_ctl *)malloc (dfcSize);
     if (dfcCtl == NULL)
     {
@@ -276,7 +278,7 @@ StatusCode OnboardFilter::execute()
         return StatusCode::FAILURE;
     }
     DFC_ctlInit (dfcCtl);
-	
+
     dfcSize  = DFC_latRecordSizeof ();
     //dfcEvt   = (struct _DFC_latRecord *)malloc (dfcSize);
     dfcEvt = new _DFC_latRecord;
@@ -287,13 +289,13 @@ StatusCode OnboardFilter::execute()
         return StatusCode::FAILURE;
     }
     DFC_latRecordInit (dfcEvt);
-	SmartDataPtr<EbfWriterTds::Ebf> ebfData(eventSvc(),"/Event/Filter/Ebf");
-	
-	//Retrieve event from TDS and store into control structures
-	if(!ebfData){
-      return StatusCode::FAILURE;
+    SmartDataPtr<EbfWriterTds::Ebf> ebfData(eventSvc(),"/Event/Filter/Ebf");
+
+    //Retrieve event from TDS and store into control structures
+    if(!ebfData){
+        return StatusCode::FAILURE;
     }
-	unsigned int length;
+    unsigned int length;
     char *data=ebfData->get(length);
     ebf   = EBF_openGleam   (length);
     iss   = EBF_readGleam   (ebf,(unsigned int *)data);
@@ -301,7 +303,7 @@ StatusCode OnboardFilter::execute()
     size  = EBF_esizeGleam  (ebf);
     evt   = EBF_edataGleam  (ebf);
     nevts = countEvts       (evt, size);
-	
+
     /* If number of events not specified, use all */
     to_process = m_ctl->to_process;
     if (to_process < 0) to_process = nevts;
@@ -317,7 +319,7 @@ StatusCode OnboardFilter::execute()
     if (nprint > nevts) nprint = nevts;
     evtCnt = nevts - nskip;
 
-	
+
     /* Allocate the memory for the results vector */
     resultsSize     = DFC_resultsSizeof ();
     //results         = (struct _DFC_results *)malloc (resultsSize * evtCnt);
@@ -338,7 +340,7 @@ StatusCode OnboardFilter::execute()
         evt = (const unsigned int *)((char *)(evt)+esize);
     }
     
-	
+
     begevt          = evt;
     result          = results;
     cfc             = DFC_ctlCfcLocate (dfcCtl);
@@ -379,7 +381,7 @@ StatusCode OnboardFilter::execute()
     elapsed    = TMR_DELTA_IN_NSECS (beg, end);
 
     
-	
+
     /* Ensure that the energy status is filled in */
     evt    = begevt;
     result = results;
@@ -402,29 +404,29 @@ StatusCode OnboardFilter::execute()
         newStatus->setCalEnergy(result->energy);
         newStatus->setTcids(TDS_variables.tcids);
         newStatus->setAcdMap(TDS_variables.acd_xz,TDS_variables.acd_yz,
-			TDS_variables.acd_xy);
+                             TDS_variables.acd_xy);
         for(int counter=0;counter<16;counter++){
-          newStatus->setAcdStatus(counter,TDS_variables.acdStatus[counter]);
-	  OnboardFilterTds::projections prjs;
-	  prjs.curCnt=TDS_variables.prjs[counter].curCnt;
-	  prjs.xy[0]=TDS_variables.prjs[counter].xy[0];
-	  prjs.xy[1]=TDS_variables.prjs[counter].xy[1];
-	  for(int prjCounter=0;prjCounter<prjs.curCnt;prjCounter++){
-	    prjs.prjs[prjCounter].layers=TDS_variables.prjs[counter].prjs[prjCounter].layers;
-            prjs.prjs[prjCounter].min=TDS_variables.prjs[counter].prjs[prjCounter].min;
-            prjs.prjs[prjCounter].max=TDS_variables.prjs[counter].prjs[prjCounter].max;
-            prjs.prjs[prjCounter].nhits=TDS_variables.prjs[counter].prjs[prjCounter].nhits;
-	    for(int hitCounter=0;hitCounter<18;hitCounter++)
-	      prjs.prjs[prjCounter].hits[hitCounter]=TDS_variables.prjs[counter].prjs[prjCounter].hits[hitCounter];
-	  }
-	  newStatus->setProjection(counter,prjs);
+            newStatus->setAcdStatus(counter,TDS_variables.acdStatus[counter]);
+            OnboardFilterTds::projections prjs;
+            prjs.curCnt=TDS_variables.prjs[counter].curCnt;
+            prjs.xy[0]=TDS_variables.prjs[counter].xy[0];
+            prjs.xy[1]=TDS_variables.prjs[counter].xy[1];
+            for(int prjCounter=0;prjCounter<prjs.curCnt;prjCounter++){
+                prjs.prjs[prjCounter].layers=TDS_variables.prjs[counter].prjs[prjCounter].layers;
+                prjs.prjs[prjCounter].min=TDS_variables.prjs[counter].prjs[prjCounter].min;
+                prjs.prjs[prjCounter].max=TDS_variables.prjs[counter].prjs[prjCounter].max;
+                prjs.prjs[prjCounter].nhits=TDS_variables.prjs[counter].prjs[prjCounter].nhits;
+	        for(int hitCounter=0;hitCounter<18;hitCounter++)
+                    prjs.prjs[prjCounter].hits[hitCounter]=TDS_variables.prjs[counter].prjs[prjCounter].hits[hitCounter];
+            }
+            newStatus->setProjection(counter,prjs);
         }
         newStatus->setLayers(TDS_layers);
         log << MSG::DEBUG;
         if(log.isActive()) { 
             log.stream()<< "FilterStatus Code: "
-                << std::setbase(16) << (unsigned int)status<<" : "
-                << convertBase(status);
+                        << std::setbase(16) << (unsigned int)status<<" : "
+                        << convertBase(status);
             if (m_ctl->list && (result->status & DFC_M_STATUS_VETOES) == 0)
             {
                 //TODO: write this to the stream instead
@@ -444,7 +446,7 @@ StatusCode OnboardFilter::execute()
             elapsed,
             nprocessed,
             elapsed/(nprocessed ? nprocessed : 1));
-        
+   
     if (m_ctl->quiet == 0)
     {
         DFC_statisticsAccumulate (&statistics, results, evtCnt);
@@ -457,7 +459,7 @@ StatusCode OnboardFilter::execute()
     delete[] results;
     free(dfcCtl);
     delete dfcEvt;
-    //    return computeCoordinates(newStatus);
+    //return computeCoordinates(newStatus);
     return StatusCode::SUCCESS;
 }
 
@@ -720,7 +722,7 @@ void OnboardFilter::computeAngles(std::vector<double> x,std::vector<double> y,
 }
 
 void OnboardFilter::computeLength(std::vector<double> x,std::vector<double> y, std::vector<double> z,double theta_rad,double phi_rad,
-				  double &length, std::vector<double> &endPoint){
+                                  double &length, std::vector<double> &endPoint){
   const double pi = 3.14159265358979323846;
   double t_v=z[0]-z[2];
   double t_h = t_v*tan(pi - theta_rad);

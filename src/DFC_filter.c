@@ -1,5 +1,5 @@
 /*------------------------------------------------------------------------
-| CVS $Id: DFC_filter.c,v 1.5 2003/08/19 04:14:36 burnett Exp $
+| CVS $Id: DFC_filter.c,v 1.6 2003/08/21 19:21:34 golpa Exp $
 +-------------------------------------------------------------------------*/
 
 
@@ -724,10 +724,14 @@ static int evaluateCal1 (const EBF_directory               *dir,
            status |= CFC__ratioCheck (clr->layerEnergy[0],   energy,
                                       10,  DFC_M_STATUS_EL0_ETOT_01,
                                       900, DFC_M_STATUS_EL0_ETOT_90);
+#ifdef GLEAM
+           if (isVetoed (status) && passThrough!=0)
+#else
            if (isVetoed (status))
+#endif
            {
                _DBG (printf ("REJECT on ratio\n"));
-               //return status;
+               return status;
            }
        }
        
@@ -1056,11 +1060,15 @@ int DFC_filter (struct _DFC_ctl         *dfc,
        {
            /* Little energy and struck tiles... */
            status = status | DFC_M_STATUS_NOCALLO_FILTER_TILE;
+#ifdef GLEAM
+           if (isVetoed (status) && passThrough!=0)
+#else
            if (isVetoed (status))
+#endif
            {
                results->energy = -1;
                results->cal0   = TMR_GET();
-               //return results->status = status | DFC_M_STATUS_VETOED;
+               return results->status = status | DFC_M_STATUS_VETOED;
            }
        }
    }
@@ -1075,12 +1083,15 @@ int DFC_filter (struct _DFC_ctl         *dfc,
            status |= AFC_splash (&dfc->afc.splashMap, acd_xy, acd_xz, acd_yz)
                    << DFC_V_STATUS_SPLASH_0;
        
-
+#ifdef GLEAM
+       if (isVetoed (status) && passThrough!=0)
+#else
        if (isVetoed (status))
+#endif
        {
            results->energy = -1;
            results->cal0   = TMR_GET();
-           //return results->status = status | DFC_M_STATUS_VETOED;
+           return results->status = status | DFC_M_STATUS_VETOED;
        }
    }
    
@@ -1112,12 +1123,15 @@ int DFC_filter (struct _DFC_ctl         *dfc,
                              acd_xy,
                              acd_xz,
                              acd_yz) | DFC_M_STATUS_ACD;
-   
+#ifdef GLEAM   
+       if (isVetoed (status) && passThrough!=0)
+#else
        if (isVetoed (status))
+#endif
        {
            results->status = status |= DFC_M_STATUS_VETOED;
            results->acd    = TMR_GET ();
-           //return status;
+           return status;
        }
 
        results->acd = TMR_GET();
@@ -1171,13 +1185,17 @@ int DFC_filter (struct _DFC_ctl         *dfc,
                               acd_xz,
                               acd_yz,
                               tkr_trg);
-   
+#ifdef GLEAM   
+       if ((isVetoed (status) ||
+           isVetoed (status |= evaluateZbottom (&dlr->dir, energy))) && passThrough!=0)
+#else
        if (isVetoed (status) ||
-           isVetoed (status |= evaluateZbottom (&dlr->dir, energy)))
+	   isVetoed (status |= evaluateZbottom (&dlr->dir, energy)))
+#endif
        {
            results->status = status |= DFC_M_STATUS_VETOED;
            results->atf    = TMR_GET();
-           //return status;
+           return status;
        }
 
        
@@ -1204,11 +1222,15 @@ int DFC_filter (struct _DFC_ctl         *dfc,
        //CFC_latUnpack (&dlr->cal, dfc->cfc.constants, &dlr->dir);
        status |= evaluateCal1 (&dlr->dir, &dlr->cal) |  DFC_M_STATUS_CAL1;
 
+#ifdef GLEAM
+       if (isVetoed (status) && passThrough!=0)
+#else
        if (isVetoed (status))
+#endif
        {
            results->status = status |= DFC_M_STATUS_VETOED;
            results->cal1   = TMR_GET ();
-           //return status;
+           return status;
        }
 
        results->cal1 = TMR_GET ();       
