@@ -189,13 +189,19 @@ void FilterTracks::computeAngles(){
     }
     else{
         if(x_h ==0){
-            m_phi_rad=m_pi/2;
-            m_theta_rad=m_pi/2-atan(y_v/y_h);;
+            m_theta_rad=m_pi/2-atan(y_v/y_h);
+            if(y_h>0)
+                 m_phi_rad=m_pi/2;
+            else
+                 m_phi_rad=3*m_pi/2;
         }
         else{
             if(y_h==0){
-                m_phi_rad=0;
                 m_theta_rad=m_pi/2-atan(x_v/x_h);
+                if(x_h>0)
+                    m_phi_rad=0;
+                else
+                    m_phi_rad=m_pi;
             }
             else{
                 if((x_h>0) && (y_h>0)){
