@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: golpa  Mon Aug  2 18:04:48 PDT 2004
+OnboardFilter/src
+
+Modified Files:
+	FilterAlg.cxx FilterTracks.cxx 
+Log Message:
+Fixed some tabbing issues
+    *
+------------------------------------------------------------
 User: golpa  Mon Aug  2 18:04:46 PDT 2004
 OnboardFilter/OnboardFilter
 
