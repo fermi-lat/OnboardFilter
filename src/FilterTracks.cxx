@@ -55,7 +55,7 @@ StatusCode FilterTracks::execute(){
                 m_x[1]=point.x();
                 m_xz[1]=point.z();
                 //Loop over the y projections
-                for(int yprj=prjs->xy[1];yprj<prjs->xy[1]+prjs->xy[0];yprj++){
+                for(int yprj=prjs->xy[0];yprj<prjs->xy[1]+prjs->xy[0];yprj++){
                     if(prjs->prjs[xprj].max==prjs->prjs[yprj].max){
                         log<<MSG::DEBUG<<"Obtaining Y and YZ for hits 0 and 1"
                            << endreq;
