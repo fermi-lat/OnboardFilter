@@ -10,6 +10,8 @@ FilterTracks::FilterTracks(const std::string& name, ISvcLocator* pSvcLocator)
 	declareProperty("WriteHits",      m_writehits = 0);
 	declareProperty("Scattering",     m_scattering = 0);
 	declareProperty("TrackSelect",    m_trackselect = 1);
+    declareProperty("Hough",          m_hough = 0);
+    declareProperty("Zenith",         m_zenith = 0);
 
 }
 
@@ -66,7 +68,7 @@ StatusCode FilterTracks::execute(){
     HepPoint3D point;
     if(prjs->xy[tower][0]>0 && prjs->xy[tower][1]>0){
       //Loop over the x projections
-      for(int xprj=startPrj;xprj<prjs->xy[tower][0];xprj++){
+      for(int xprj=startPrj;xprj<startPrj+prjs->xy[tower][0];xprj++){
 
         log<<MSG::DEBUG<<"Obtaining X and XZ for hits 0 and 1"<<endreq;
         point=findStripPosition(tkrGeoSvc,tower,prjs->prjs[xprj].max,0,
@@ -107,7 +109,7 @@ StatusCode FilterTracks::execute(){
             m_yz[2]=point.z();
             for(int counter=0;counter<3;counter++)
               m_zAvg[counter]=(m_xz[counter]+m_yz[counter])/2;
-            computeAngles(m_x[1]-m_x[0], m_xz[0]-m_xz[1], m_y[1]-m_y[0], 
+            computeAngles(m_x[1]-m_x[0], m_xz[0]-m_xz[1], m_y[1]-m_y[0],
 						  m_yz[0]-m_yz[1], m_zAvg[0]-m_zAvg[1]);
             computeLength();
             computeExtension();
@@ -155,62 +157,34 @@ StatusCode FilterTracks::execute(){
     //Obtain McZDir, McXDir, McYDir (copied from McValsTools.cxx)
     SmartDataPtr<Event::McParticleCol> pMcParticle(eventSvc(),EventModel::MC::McParticleCol);
     if(pMcParticle){
-      Event::McParticleCol::const_iterator pMCTrack1 = pMcParticle->begin();
-      HepLorentzVector Mc_p0 = (*pMCTrack1)->initialFourMomentum();
-      Vector Mc_t0 = Vector(Mc_p0.x(),Mc_p0.y(), Mc_p0.z()).unit();
-      double MC_xdir,MC_ydir,MC_zdir;
-      MC_xdir   = Mc_t0.x();
-      MC_ydir   = Mc_t0.y();
-      MC_zdir   = Mc_t0.z();
-      //Convert MC dir into theta and phi
-      double phi_rad_mc=0;
-      double theta_rad_mc=acos(-MC_zdir);
-      if(MC_zdir < 0)
-	  theta_rad_mc=M_PI - acos(-MC_zdir);
-      double x_cord=-MC_xdir;
-      double y_cord=-MC_ydir;
-      if(y_cord==0)
-	      phi_rad_mc=M_PI/2;
-      if ((x_cord>0)&&(y_cord>0)){
-	      phi_rad_mc = atan(y_cord/x_cord);
-	      if(MC_zdir<0)
-	          phi_rad_mc = 3*M_PI/2 - atan(x_cord/y_cord);
-      }
-      if ((x_cord<0)&&(y_cord<0)){
-	      phi_rad_mc = 3*M_PI/2 - atan(x_cord/y_cord);
-	      if(MC_zdir<0)
-	          phi_rad_mc = atan(y_cord/x_cord);
-      }
-      if ((x_cord>0)&&(y_cord<0)){
-	      phi_rad_mc = 2*M_PI-atan(-y_cord/x_cord);
-	      if(MC_zdir<0)
-	          phi_rad_mc=M_PI/2 - atan(x_cord/y_cord);
-      }
-      if ((x_cord<0)&&(y_cord>0)){
-	      phi_rad_mc = M_PI/2 - atan(y_cord/(-x_cord));
-	      if(MC_zdir<0)
-	          phi_rad_mc = 2*M_PI-atan(-y_cord/x_cord);
-      }
-      //Compute angular separation
-      double xone=sin(theta_rad_mc)*cos(phi_rad_mc);
-      double yone=sin(theta_rad_mc)*sin(phi_rad_mc);
-      double zone=cos(theta_rad_mc);
-      double xtwo=sin(tracks[currMax].theta_rad)*cos(tracks[currMax].phi_rad);
-      double ytwo=sin(tracks[currMax].theta_rad)*sin(tracks[currMax].phi_rad);
-      double ztwo=cos(tracks[currMax].theta_rad);
-      double dot_product=xone*xtwo+yone*ytwo+zone*ztwo;
-      double separation_rad=acos(dot_product);
-      //if (separation_rad > M_PI/2.)
-      //      separation_rad = M_PI - separation_rad; //we always assume that events come from "above"
-      status->setSeparation(separation_rad*180/M_PI);
+      double track_theta_rad = tracks[currMax].theta_rad;
+	        double track_phi_rad = tracks[currMax].phi_rad;
+	        double theta_rad_mc, phi_rad_mc;
+            /*
+            NOTE: I've realized that the code below is wrong and dumb, so I'm commenting it out
+	        //this little patch of code compensates for tracks that have a theta
+	        //angle which indicates that the track comes in from below horizontal.
+	        //if the telescope is going to assume that tracks come from "above,"
+	        //I need to adjust for this by putting the incoming point at the more
+	        //likely position.  To do this, flip the theta and phi angles
+	        if (m_zenith){
+	        if ((m_theta_rad*180/M_PI)<90){
+	           m_theta_rad = M_PI - m_theta_rad;//theta should not ever be less than 90 if
+	           m_phi_rad += M_PI;              //events come from "above". (measured from zenith)
+	        }
+	        }
+            */
+	        double separation_rad=GetMCAngles(track_theta_rad, track_phi_rad, theta_rad_mc, phi_rad_mc);
+
+      //status->setSeparation(separation_rad*180/M_PI);//set this in TrackSelect() instead
     }
     else{
-      status->setSeparation(-1);
+      //status->setSeparation(-1);
       log<<MSG::DEBUG <<"Unable to obtain McParticleCol from TDS"<<endreq;
     }
   }
   else{
-    status->setSeparation(-1);
+    //status->setSeparation(-1);
     log<<MSG::DEBUG<<"No tracks found"<<endreq;
   }
 
@@ -221,8 +195,11 @@ StatusCode FilterTracks::execute(){
   if (m_writehits){
     sc = WriteHits();
   }
-  if (m_trackselect){
-  	sc = TrackSelect();
+  //if (m_trackselect){
+  	sc = TrackSelect();//This is no longer an option.  It is mandatory!
+  //}
+  if (m_hough){
+    sc = HoughTransform();
   }
 
   return StatusCode::SUCCESS;
@@ -235,6 +212,23 @@ void FilterTracks::computeAngles(double x_h, double x_v, double y_h, double y_v,
     //double y_v = m_yz[0]-m_yz[1];
     //double z_v = m_zAvg[0]-m_zAvg[1];
   double t_h_ave = 1;
+  /*
+    Must do a little stretching of vectors here!
+    This accounts for the difference in z distance
+    between x and y layers.  To get the vectors to
+    line up, we have to adjust them a bit.
+    */
+    if (y_v < x_v){
+        y_h = x_v*(y_h/y_v);
+        y_v = x_v;
+        z_v = x_v;
+    }
+    else if (x_v < y_v){
+        x_h = y_v*(x_h/x_v);
+        x_v = y_v;
+        z_v = y_v;
+  }
+
   if(x_h == 0 && y_h==0){
     m_phi_rad=0;
     m_theta_rad=0;
@@ -289,6 +283,67 @@ void FilterTracks::computeAngles(double x_h, double x_v, double y_h, double y_v,
   }
   m_theta=m_theta_rad*180/M_PI;
   m_phi=m_phi_rad*180/M_PI;
+}
+
+
+double FilterTracks::GetMCAngles(double track_theta_rad, double track_phi_rad,
+                                 double &theta_rad_mc, double &phi_rad_mc){
+
+    double separation_rad = -1;
+    //Obtain McZDir, McXDir, McYDir (copied from McValsTools.cxx)
+    SmartDataPtr<Event::McParticleCol> pMcParticle(eventSvc(),EventModel::MC::McParticleCol);
+    if(pMcParticle){
+      Event::McParticleCol::const_iterator pMCTrack1 = pMcParticle->begin();
+      HepLorentzVector Mc_p0 = (*pMCTrack1)->initialFourMomentum();
+      Vector Mc_t0 = Vector(Mc_p0.x(),Mc_p0.y(), Mc_p0.z()).unit();
+      double MC_xdir,MC_ydir,MC_zdir;
+      MC_xdir   = Mc_t0.x();
+      MC_ydir   = Mc_t0.y();
+      MC_zdir   = Mc_t0.z();
+      //Convert MC dir into theta and phi
+      phi_rad_mc=0;
+      theta_rad_mc=acos(-MC_zdir);
+      if(MC_zdir < 0)
+	  theta_rad_mc=M_PI - acos(-MC_zdir);
+      double x_cord=-MC_xdir;
+      double y_cord=-MC_ydir;
+      if(y_cord==0)
+	      phi_rad_mc=M_PI/2;
+      if ((x_cord>0)&&(y_cord>0)){
+	      phi_rad_mc = atan(y_cord/x_cord);
+	      if(MC_zdir<0)
+	          phi_rad_mc = 3*M_PI/2 - atan(x_cord/y_cord);
+      }
+      if ((x_cord<0)&&(y_cord<0)){
+	      phi_rad_mc = 3*M_PI/2 - atan(x_cord/y_cord);
+	      if(MC_zdir<0)
+	          phi_rad_mc = atan(y_cord/x_cord);
+      }
+      if ((x_cord>0)&&(y_cord<0)){
+	      phi_rad_mc = 2*M_PI-atan(-y_cord/x_cord);
+	      if(MC_zdir<0)
+	          phi_rad_mc=M_PI/2 - atan(x_cord/y_cord);
+      }
+      if ((x_cord<0)&&(y_cord>0)){
+	      phi_rad_mc = M_PI/2 - atan(y_cord/(-x_cord));
+	      if(MC_zdir<0)
+	          phi_rad_mc = 2*M_PI-atan(-y_cord/x_cord);
+      }
+      //Compute angular separation
+      double xone=sin(theta_rad_mc)*cos(phi_rad_mc);
+      double yone=sin(theta_rad_mc)*sin(phi_rad_mc);
+      double zone=cos(theta_rad_mc);
+      double xtwo=sin(track_theta_rad)*cos(track_phi_rad);
+      double ytwo=sin(track_theta_rad)*sin(track_phi_rad);
+      double ztwo=cos(track_theta_rad);
+      double dot_product=xone*xtwo+yone*ytwo+zone*ztwo;
+      separation_rad=acos(dot_product);
+    }
+    else
+        separation_rad = -1;
+
+    return separation_rad;
+
 }
 
 void FilterTracks::computeLength(){
@@ -827,13 +882,27 @@ StatusCode FilterTracks::WriteHits(){
 	HepPoint3D stripcoord;
 	double x, y, z;
 
-	//loop over towers
+    //Calculate the Monte Carlo theta and phi
+    //Obtain McZDir, McXDir, McYDir (copied from McValsTools.cxx)
+    SmartDataPtr<Event::McParticleCol> pMcParticle(eventSvc(),EventModel::MC::McParticleCol);
+    double phi_rad_mc=0;
+    double theta_rad_mc=0;
+    if(pMcParticle){
+
+    //double theta_rad_mc, phi_rad_mc;
+    double track_theta_rad = 1;
+    double track_phi_rad = 1;
+    double throwaway=GetMCAngles(track_theta_rad, track_phi_rad, theta_rad_mc, phi_rad_mc);
+    }
+    //loop over towers
+    int i, j;
+    int wrote=0;
 	for (tower=0;tower<16;tower++){
 	    if ((hits[tower].lcnt[0]) || (hits[tower].lcnt[1]>0)){
 
-			//loop over the layers to collect the hits
-		    for (int i=0;i<36;i++){
-		        if (hits[tower].cnt[i] != 0){
+            //loop over the layers to collect the hits
+		    for (i=0;i<36;i++){
+                if (hits[tower].cnt[i] != 0){
 
 					//write the view, tower, layer, and hit number.
 					//first get the view and layer
@@ -847,7 +916,7 @@ StatusCode FilterTracks::WriteHits(){
 					}
 
 					//now loop over all the strips in this layer
-					for (int j=0;j<hits[tower].cnt[i];j++){
+					for (j=0;j<hits[tower].cnt[i];j++){
 					    stripId = hits[tower].beg[i][j];
 					    //call get strip position
                         stripcoord = findStripPosition(tkrGeoSvc,tower,layer,view,stripId);
@@ -859,8 +928,16 @@ StatusCode FilterTracks::WriteHits(){
 					    //write: event, x, y, z, view, tower, layer, strip
 						//std::cout << event"  "<<tower<<"  "<<view<<"  "<<layer<<"  "<<stripId<<"  "<<x<<"  "<<y<<"  "<<z<<std::endl;
                         if (m_writehits){
-						    if (m_outfile.is_open()){
-								    m_outfile << event <<"\t"<< tower <<"\t"<< view <<"\t"<< layer
+                            if (m_outfile.is_open()){
+
+                                //write the mc angles one time
+                                if (wrote==0){
+                                    m_outfile << -1 << "\t" << theta_rad_mc*180/M_PI
+                                    << "\t" << phi_rad_mc*180/M_PI << std::endl;
+                                    wrote=1;
+                                }
+
+                                m_outfile << event <<"\t"<< tower <<"\t"<< view <<"\t"<< layer
 									  <<"\t"<< stripId  <<"\t"<< x <<"\t"<< y <<"\t"<< z << std::endl;
 							}
 						}
@@ -868,9 +945,9 @@ StatusCode FilterTracks::WriteHits(){
 			    }//if any hits in layer
 		    }//loop over layers
 	    }//if any layers hit
-		else{//if no layers are hit
-			;
-		}
+		//else{//if no layers are hit
+		//	;
+		//}
 	    //there aren't any hits for this event
     }//tower loop
 
@@ -924,7 +1001,7 @@ StatusCode FilterTracks::TrackSelect(){
 	  int tempxhigh=0;
 	  int sethighok=0;
 	  for (tower=0;tower<16;tower++){
-		//FIRST: find the layer of the higest x and y projection
+		//FIRST: find the highest common layer of the x and y projections
 		//if there are any x projections
 		int tempxhigh=0;
 		if(prjs->xy[tower][0]>0){
@@ -1195,67 +1272,352 @@ StatusCode FilterTracks::TrackSelect(){
 		//now compute theta and phi for these tracks
         computeAngles(x_h, x_v, y_h, y_v, z_v);
 		//now compute the seperation
-		    //Obtain McZDir, McXDir, McYDir (copied from McValsTools.cxx)
+
+            //Obtain McZDir, McXDir, McYDir (copied from McValsTools.cxx)
             SmartDataPtr<Event::McParticleCol> pMcParticle(eventSvc(),EventModel::MC::McParticleCol);
             if(pMcParticle){
-            Event::McParticleCol::const_iterator pMCTrack1 = pMcParticle->begin();
-            HepLorentzVector Mc_p0 = (*pMCTrack1)->initialFourMomentum();
-            Vector Mc_t0 = Vector(Mc_p0.x(),Mc_p0.y(), Mc_p0.z()).unit();
-            double MC_xdir,MC_ydir,MC_zdir;
-            MC_xdir   = Mc_t0.x();
-            MC_ydir   = Mc_t0.y();
-            MC_zdir   = Mc_t0.z();
-            //Convert MC dir into theta and phi
-            double phi_rad_mc=0;
-            double theta_rad_mc=acos(-MC_zdir);
-            if(MC_zdir < 0)
-	        theta_rad_mc=M_PI - acos(-MC_zdir);
-            double x_cord=-MC_xdir;
-            double y_cord=-MC_ydir;
-            if(y_cord==0)
-                phi_rad_mc=M_PI/2;
-            if ((x_cord>0)&&(y_cord>0)){
-                phi_rad_mc = atan(y_cord/x_cord);
-                if(MC_zdir<0)
-                    phi_rad_mc = 3*M_PI/2 - atan(x_cord/y_cord);
+
+            double theta_rad_mc, phi_rad_mc;
+            /*
+            NOTE: The code below was misguided and dumb.  Commenting it out.
+            //this little patch of code compensates for tracks that have a theta
+            //angle which indicates that the track comes in from below horizontal.
+            //if the telescope is going to assume that tracks come from "above,"
+            //I need to adjust for this by putting the incoming point at the more
+            //likely position.  To do this, flip the theta and phi angles
+            if (m_zenith){
+            if ((m_theta_rad*180/M_PI)<90){
+               m_theta_rad = M_PI - m_theta_rad;//theta should not ever be less than 90 if
+               m_phi_rad += M_PI;              //events come from "above". (measured from zenith)
             }
-            if ((x_cord<0)&&(y_cord<0)){
-                phi_rad_mc = 3*M_PI/2 - atan(x_cord/y_cord);
-                if(MC_zdir<0)
-                    phi_rad_mc = atan(y_cord/x_cord);
             }
-            if ((x_cord>0)&&(y_cord<0)){
-                phi_rad_mc = 2*M_PI-atan(-y_cord/x_cord);
-                if(MC_zdir<0)
-                    phi_rad_mc=M_PI/2 - atan(x_cord/y_cord);
-            }
-            if ((x_cord<0)&&(y_cord>0)){
-                phi_rad_mc = M_PI/2 - atan(y_cord/(-x_cord));
-                if(MC_zdir<0)
-                    phi_rad_mc = 2*M_PI-atan(-y_cord/x_cord);
-            }
-            //Compute angular seperation
-            double xone=sin(theta_rad_mc)*cos(phi_rad_mc);
-            double yone=sin(theta_rad_mc)*sin(phi_rad_mc);
-            double zone=cos(theta_rad_mc);
-            double xtwo=sin(m_theta_rad)*cos(m_phi_rad);
-            double ytwo=sin(m_theta_rad)*sin(m_phi_rad);
-            double ztwo=cos(m_theta_rad);
-            double dot_product=xone*xtwo+yone*ytwo+zone*ztwo;
-            double separation_rad=acos(dot_product);
-			//if (separation_rad > M_PI/2.)
-			//	separation_rad = M_PI - separation_rad; //we always assume that events come from "above"
+            */
+            double separation_rad=GetMCAngles(m_theta_rad, m_phi_rad, theta_rad_mc, phi_rad_mc);
+
             status->setSeparation2(separation_rad*180/M_PI);
+            status->setSeparation(separation_rad*180/M_PI);//overwrite the value set above
+            status->setHighLayer(highestlayer);
         }
         else{
             log<<MSG::ERROR <<"Unable to obtain McParticleCol from TDS"<<endreq;
             status->setSeparation2(-1.0);
+            status->setSeparation(-1.0);
+            status->setHighLayer(-1);
         }
 	  }//if tower_exists (that has an x and y pair starting in the highest layer hit
-	  else status->setSeparation2(-1.0);
+      else {status->setSeparation2(-1.0);
+            status->setSeparation(-1.0);
+            status->setHighLayer(-1); }
     }//if (xcount && ycount)
-    else status->setSeparation2(-1.0);
+    else {status->setSeparation2(-1.0); 
+          status->setSeparation(-1.0);
+          status->setHighLayer(-1); }
 
 	return StatusCode::SUCCESS;
 
+}
+
+
+StatusCode FilterTracks::HoughTransform(){
+
+    //******************************************************************
+    MsgStream log(msgSvc(),name());
+    //get geometry access
+    ITkrGeometrySvc *tkrGeoSvc=NULL;
+    if(service("TkrGeometrySvc",tkrGeoSvc,true).isFailure()){
+        log<<MSG::ERROR<<"Couldn't set up TkrGeometrySvc!"<<endreq;
+        return StatusCode::SUCCESS;
+    }
+
+    //get TDS object for the hits
+    SmartDataPtr<OnboardFilterTds::TowerHits> status(eventSvc(),
+                                                   "/Event/Filter/TowerHits");
+    if(!status){
+        log<<MSG::ERROR<<"Unable to retrieve FilterStatus from TDS"<<endreq;
+        return StatusCode::SUCCESS;
+    }
+    //get a pointer to the hits
+	const OnboardFilterTds::TowerHits::towerRecord *hits = status->get();
+    //******************************************************************
+
+    //******************************************************************
+    //initialize some variables
+    int stripId;
+    HepPoint3D stripcoord;
+    double x, y, z;
+    double rho_upperbound = 970;  //from the outer tracker dimensions of 1000*(1.4925x0.6178)
+    double rho_grid_unit, theta_grid_unit;
+
+    //initialize the matrix and set up the vectors
+    InitHoughMatrix();
+    SetUpHoughVectors();
+    BuildHoughZLayerIntercepts();
+
+    //Loop over all clusters
+    int tower, i, j, view, layer;
+    for (tower=0;tower<16;tower++){
+	    if ((hits[tower].lcnt[0]) || (hits[tower].lcnt[1]>0)){
+            for (i=0;i<36;i++){                           //loop over the layers to collect the hits
+		        if (hits[tower].cnt[i] != 0){
+                    if (i<18){       view = 0; layer = i;    }
+					else if (i>=18){ view = 1; layer = i-18; }
+                    for (j=0;j<hits[tower].cnt[i];j++){   //now loop over all the strips in this layer
+					    stripId = hits[tower].beg[i][j];
+					    stripcoord = findStripPosition(tkrGeoSvc,tower,layer,view,stripId);
+					    x = stripcoord.x(); //x coordinate
+						y = stripcoord.y(); //y coordinate
+						z = stripcoord.z(); //z coordinate
+
+                        //Use these coordinates and view to find rho and theta
+                        ComputeHoughRhoAndMatrix(x,y,z,view);
+                        IncrementHoughMatrix(rho_upperbound, view, rho_grid_unit, theta_grid_unit);
+				    }
+			    }//if any hits in layer
+		    }//loop over layers
+	    }//if any layers hit
+    }//tower loop
+
+    //Find maximums in accumulation matrix, make sure they do not
+    //describe hits on one layer(!), and convert the rho, theta pair
+    //to
+    FindHoughMaxima(rho_grid_unit, theta_grid_unit);
+    FindHoughLayerIntersections();
+  //  FindNearbyHits();
+    ComputeHoughAngles();
+  //  ReconstructHoughTrack();
+  //  CompareHoughMC();
+
+    return StatusCode::SUCCESS;
+}
+
+void FilterTracks::InitHoughMatrix(){
+    //sets it all to zero.  note that the rho grid has twice
+    //the dimension as the theta grid
+    for (int r_idx=0;r_idx< (m_rho_grid*2);r_idx++){
+        for (int t_idx=0;t_idx< m_theta_grid;t_idx++){
+            m_HX[r_idx][t_idx]=0;
+            m_HY[r_idx][t_idx]=0;
+        }
+    }
+
+    return;
+}
+
+void FilterTracks::SetUpHoughVectors(){
+
+    //need a rho vector and a theta vector
+    for (int r_idx=0; r_idx< m_rho_numelements; r_idx++){
+        m_rho_vectorX[r_idx] = 0;
+        m_rho_vectorY[r_idx] = 0;
+    }
+
+    m_theta_vector[0]=0;
+    for (int t_idx=0; t_idx< m_theta_numelements-1; t_idx++)
+        m_theta_vector[t_idx+1] = m_theta_vector[t_idx] + 180/m_theta_numelements;
+
+    //Now set up the sin and cos vectors.
+    //In the future, this will be in a lookup table,
+    //so m_theta_vector will also not be necessary.
+    for (int t_idx=0; t_idx< m_theta_numelements; t_idx++){
+        m_cos_vector[t_idx] = cos(m_theta_vector[t_idx]*M_PI/180.0);
+        m_sin_vector[t_idx] = sin(m_theta_vector[t_idx]*M_PI/180.0);
+    }
+
+    return;
+}
+
+StatusCode FilterTracks::BuildHoughZLayerIntercepts(){
+
+    MsgStream log(msgSvc(),name());
+	//get geometry access
+	ITkrGeometrySvc *tkrGeoSvc=NULL;
+    if(service("TkrGeometrySvc",tkrGeoSvc,true).isFailure()){
+      log<<MSG::ERROR<<"Couldn't set up TkrGeometrySvc!"<<endreq;
+      return StatusCode::SUCCESS;
+    }
+
+    //Note: this can be hard coded into a lookup table,
+    //but for now, we calculate it every time.
+    HepPoint3D point;
+    int tower=0;
+    int view;
+    int anystrip = 100; //could be any value
+    for (int layer=0; layer < 18; layer++){
+        view=0;
+        point=findStripPosition(tkrGeoSvc,tower,layer,view,anystrip);
+        m_ZLayerInterceptsX[layer] = point.z();
+
+        view=1;
+        point=findStripPosition(tkrGeoSvc,tower,layer,view,anystrip);
+        m_ZLayerInterceptsY[layer] = point.z();
+    }
+
+    return StatusCode::SUCCESS;
+}
+
+void FilterTracks::ComputeHoughRhoAndMatrix(double x, double y, double z, int view){
+
+    double local_x;
+    double local_y = z;
+    if (view == 0)      local_x = x;
+    else if (view == 1) local_x = y;
+
+    //loop over the angle and compute rho
+    for (int idx=0; idx< m_theta_numelements; idx++){
+        //compute rho
+        if (view == 0){
+            m_rho_vectorX[idx] = local_x*m_cos_vector[idx] + local_y*m_sin_vector[idx];
+        }
+        if (view == 1){
+            m_rho_vectorY[idx] = local_x*m_cos_vector[idx] + local_y*m_sin_vector[idx];
+        }
+   }
+
+    return;
+}
+
+void FilterTracks::IncrementHoughMatrix(double rho_upperbound, int view,
+                                        double &rho_grid_unit, double &theta_grid_unit){
+
+    //Note:  when the quantization is decided upon, the grid
+    //boundaries can be coded into a lookup table for speed
+    //Create the rho grid boundaries
+    rho_grid_unit = rho_upperbound/(double)m_rho_grid;
+    //Create the theta grid boundaries
+    theta_grid_unit = 180.0/(double)m_theta_grid;
+
+    //Fill the matrix.
+    //Loop to get rho and theta.  Since the quantization is the
+    //same for both, we just need one index.
+    int ridx, tidx;
+    for (int idx=0; idx< m_theta_numelements; idx++){
+        if (view==0){
+            ridx = (m_rho_vectorX[idx]/rho_grid_unit);
+            tidx = (m_theta_vector[idx]/theta_grid_unit);
+            m_HX[ridx + m_rho_grid][tidx] = m_HX[ridx + m_rho_grid][tidx] + 1;
+        }
+        else if (view==1){
+            ridx = (m_rho_vectorY[idx]/rho_grid_unit);
+            tidx = (m_theta_vector[idx]/theta_grid_unit);
+            m_HY[ridx + m_rho_grid][tidx] = m_HY[ridx + m_rho_grid][tidx] + 1;
+        }
+    }
+    return;
+}
+
+void FilterTracks::FindHoughMaxima(double rho_grid_unit, double theta_grid_unit){
+    int maxX=0, maxY=0;
+    //Find Ignore Zone: this is where the slope is too
+    //close to horizonal to trust.  It could be finding a
+    //set of hits all on one layer.
+    //Define the Ignore Zone to be 15 degrees from horizontal.
+    //This means that we can still detect events coming in from
+    //75 degrees from zenith.  Because the angle, theta, is measured
+    //up from the horizontal axis, we will exclude the range of angles
+    //around 75 deg to 105 deg.
+    double tolerance = 15.0;
+    int lesser_bound = (90.0 - tolerance)/theta_grid_unit;
+    int upper_bound  = (90.0 + tolerance)/theta_grid_unit;
+
+    //Find the indices for the maxima
+    for (int r_idx=0; r_idx<(m_rho_grid*2); r_idx++){
+        for (int t_idx=0; t_idx< m_theta_grid; t_idx++){
+            if (m_HX[r_idx][t_idx]>maxX){
+                if ( !((t_idx >= lesser_bound)&&(t_idx <= upper_bound)) ){
+                    maxX = m_HX[r_idx][t_idx];
+                    m_rho_indexX = r_idx;
+                    m_theta_indexX = t_idx;
+                }
+
+            }
+            if (m_HY[r_idx][t_idx]>maxY){
+                if ( !((t_idx >= lesser_bound)&&(t_idx <= upper_bound)) ){
+                    maxY = m_HY[r_idx][t_idx];
+                    m_rho_indexY = r_idx;
+                    m_theta_indexY = t_idx;
+                }
+            }
+        }
+    }
+
+    //now convert the indices to a rho and theta
+    m_final_rhoX = (m_rho_indexX - m_rho_grid)*rho_grid_unit + rho_grid_unit/2;
+    m_final_rhoY = (m_rho_indexY - m_rho_grid)*rho_grid_unit + rho_grid_unit/2;
+    m_final_thetaX = m_theta_indexX*theta_grid_unit + theta_grid_unit/2;
+    m_final_thetaY = m_theta_indexY*theta_grid_unit + theta_grid_unit/2;
+
+    //after that, use the z positions of the layers to create
+    //a list of layer intercept points to look around
+
+    return;
+}
+
+void FilterTracks::FindHoughLayerIntersections(){
+    //Take the final rho and theta values to get x and y view layer intersections
+    for (int layer =0 ;layer<18 ;layer++){
+        m_XviewIntersections[layer] =
+            (m_final_rhoX - m_ZLayerInterceptsX[layer]*m_sin_vector[m_theta_indexX*m_grid_divisor])
+            /m_cos_vector[m_theta_indexX*m_grid_divisor];
+        m_YviewIntersections[layer] =
+            (m_final_rhoY - m_ZLayerInterceptsY[layer]*m_sin_vector[m_theta_indexY*m_grid_divisor])
+            /m_cos_vector[m_theta_indexY*m_grid_divisor];
+    }
+
+    return;
+}
+
+StatusCode FilterTracks::ComputeHoughAngles(){
+    MsgStream log(msgSvc(),name());
+    SmartDataPtr<OnboardFilterTds::FilterStatus> status(eventSvc(),
+        "/Event/Filter/FilterStatus");
+	if(!status){
+        log<<MSG::ERROR<<"Unable to retrieve FilterStatus from TDS"<<endreq;
+        return StatusCode::SUCCESS;
+    }
+
+    //Here we want to turn the slopes into theta and phi angles
+
+    //calculate some preliminary slopes in both views
+    m_XviewZDist = m_ZLayerInterceptsX[1]-m_ZLayerInterceptsX[0];
+    m_YviewZDist = m_ZLayerInterceptsY[1]-m_ZLayerInterceptsY[0];
+    m_XviewXDist = m_XviewIntersections[0]-m_XviewIntersections[1];
+    m_YviewYDist = m_YviewIntersections[0]-m_YviewIntersections[1];
+    m_ZAvgDist = (m_XviewZDist + m_YviewZDist)/2;
+    m_XviewPrelimSlope = m_XviewZDist/m_XviewXDist;
+    m_YviewPrelimSlope = m_YviewZDist/m_YviewYDist;
+
+    //refine the slope calculation with this function call
+    //CODE THIS IN
+
+    //we can use a call to compute angles to get the theta and phi values
+    computeAngles(m_XviewXDist, m_XviewZDist, m_YviewYDist, m_YviewZDist, m_ZAvgDist);
+    double theta_rad_mc, phi_rad_mc;
+
+    /*NOTE: the code below was misguided and numb.  Commenting it out.
+    if (m_zenith){
+    if ((m_theta_rad*180/M_PI)<90){
+        m_theta_rad = M_PI - m_theta_rad;//theta should not ever be less than 90 if
+        m_phi_rad += M_PI;              //events come from "above". (measured from zenith)
+    }                                    //NOTE that this correction is currently only
+                                         //valid for zenith pointed LAT.  But this is good
+                                         //enough for testing Hough.
+    }
+    */
+
+    double separation_rad=GetMCAngles(m_theta_rad, m_phi_rad, theta_rad_mc, phi_rad_mc);
+    //DEBUG
+    //std::cout<<"MC Theta: "<<theta_rad_mc*180/M_PI<<"  MC Phi: "<<phi_rad_mc*180/M_PI<<std::endl;
+    //std::cout<<"   Theta: "<<m_theta_rad*180/M_PI<<"  Phi: "<<m_phi_rad*180/M_PI<<std::endl;
+    //std::cout<< "Separation: "<<separation_rad*180/M_PI <<std::endl;
+    log<<MSG::DEBUG<<"MC Theta: "<<theta_rad_mc*180/M_PI<<"  MC Phi: "<<phi_rad_mc*180/M_PI<<endreq;
+    log<<MSG::DEBUG<<"   Theta: "<<m_theta_rad*180/M_PI<<"  Phi: "<<m_phi_rad*180/M_PI<<endreq;
+    log<<MSG::DEBUG<<"Separation: "<<separation_rad*180/M_PI <<endreq;
+
+    if (separation_rad*180/M_PI >= 0){
+        status->setHoughSep(separation_rad*180/M_PI);
+    }
+    else
+        status->setHoughSep(-1);
+
+    return StatusCode::SUCCESS;
 }
