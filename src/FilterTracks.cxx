@@ -5,6 +5,9 @@ const IAlgFactory& FilterTracksFactory = Factory;
 
 FilterTracks::FilterTracks(const std::string& name, ISvcLocator* pSvcLocator)
 :Algorithm(name, pSvcLocator){
+
+    declareProperty("UseNumHits",     m_usenumhits = 0);
+
 }
 
 StatusCode FilterTracks::initialize(){
@@ -40,13 +43,16 @@ StatusCode FilterTracks::execute(){
         return StatusCode::FAILURE;
     }
     //Loop over the towers
-    for(int tower=0;tower<16;tower++){
-        const OnboardFilterTds::projections *prjs=status->getProjection(tower);
-        HepPoint3D point;
-        if(prjs->xy[0]>0 && prjs->xy[1]>0){
-            //Loop over the x projections
-            for(int xprj=0;xprj<prjs->xy[0];xprj++){
-                log<<MSG::DEBUG<<"Obtaining X and XZ for hits 0 and 1"<<endreq;
+ 
+      const OnboardFilterTds::projections *prjs=status->getProjection();
+      int startPrj=0;
+      for(int tower=0;tower<16;tower++){
+          HepPoint3D point;
+          if(prjs->xy[tower][0]>0 && prjs->xy[tower][1]>0){
+              //Loop over the x projections
+              for(int xprj=startPrj;xprj<prjs->xy[tower][0];xprj++){
+                
+				log<<MSG::DEBUG<<"Obtaining X and XZ for hits 0 and 1"<<endreq;
                 point=findStripPosition(tkrGeoSvc,tower,prjs->prjs[xprj].max,0,
                                                   prjs->prjs[xprj].hits[0]);
                 m_x[0]=point.x();
@@ -56,8 +62,9 @@ StatusCode FilterTracks::execute(){
                 m_x[1]=point.x();
                 m_xz[1]=point.z();
                 //Loop over the y projections
-                for(int yprj=prjs->xy[0];yprj<prjs->xy[1]+prjs->xy[0];yprj++){
-                    if(prjs->prjs[xprj].max==prjs->prjs[yprj].max){
+                for(int yprj=startPrj+prjs->xy[tower][0];yprj<startPrj+prjs->xy[tower][1]+prjs->xy[tower][0];yprj++){
+				    
+					if(prjs->prjs[xprj].max==prjs->prjs[yprj].max){//if they start in the same layer
                         log<<MSG::DEBUG<<"Obtaining Y and YZ for hits 0 and 1"
                            << endreq;
                         point=findStripPosition(tkrGeoSvc,tower,prjs->prjs[yprj].max,
@@ -69,9 +76,9 @@ StatusCode FilterTracks::execute(){
                         m_y[1]=point.y();
                         m_yz[1]=point.z();
                         unsigned char maxhits;
-                        if(prjs->prjs[xprj].nhits<prjs->prjs[yprj].nhits)
-                            maxhits=prjs->prjs[xprj].nhits;
-                        else
+                        if(prjs->prjs[xprj].nhits<prjs->prjs[yprj].nhits)//they don't need the same number
+                            maxhits=prjs->prjs[xprj].nhits;              //of layers.  use the smaller number
+                        else                                             //of hits.
                             maxhits=prjs->prjs[yprj].nhits;
                         log << MSG::DEBUG << "Obtaining X,Y,XZ,YZ for max hits"<<endreq;
                         point=findStripPosition(tkrGeoSvc,tower,prjs->prjs[xprj].max-(maxhits-1),
@@ -98,23 +105,35 @@ StatusCode FilterTracks::execute(){
                         newTrack.exLowCoord=m_extendLow;
                         newTrack.exHighCoord=m_extendHigh;
                         newTrack.length=m_length;
+						newTrack.numhits=maxhits;
                         status->setTrack(newTrack);
                     }
                 }
             }
+			startPrj+=prjs->curCnt[tower];//I moved this 06/14/04 - DW
         }
     }
     std::vector<OnboardFilterTds::track> tracks=status->getTracks();
     double maxLength=0;
-    unsigned int currMax;
+	int   maxnumhits=0;
+    unsigned int currMax,currMaxHits;
     log<<MSG::DEBUG<<"Processing "<<tracks.size()<<" tracks"<<endreq;
     if(tracks.size()>0){
-        for(unsigned int counter=0;counter<tracks.size();counter++){
-            if(tracks[counter].length>maxLength){
-                maxLength=tracks[counter].length;
-                currMax=counter;
-            }
-        }
+        for(unsigned int counter=0;counter<tracks.size();counter++){//currently using the track that is the
+            if(tracks[counter].length>maxLength){                   //longest, not the track with the most
+                maxLength=tracks[counter].length;                   //hits.  Usually, these will be the same,
+                currMax=counter;                                    //but it is possible to have a long track
+            }                                                       //at a shallow angle with only 3 hits,
+		}                                                           //and a short track with more than this.
+		for(unsigned int counter2=0;counter2<tracks.size();counter2++){//This is an alternative method to picking
+		    if(tracks[counter2].numhits>maxnumhits){                   //the track to use.  This one picks out
+		        maxnumhits=tracks[counter2].numhits;                   //the track that has the most hits, not
+				currMaxHits=counter2;                                  //the longest track
+			}
+		}
+		if (m_usenumhits){      //if the jobOptions say to use the number of hits to pick out the track
+			currMax=currMaxHits;//this is executed and currMax is replaced with a different track selector
+	    }
         log<<MSG::DEBUG<<"Using track "<<currMax<<" out of "<<tracks.size()<<endreq;
         //Obtain McZDir, McXDir, McYDir (copied from McValsTools.cxx)
         SmartDataPtr<Event::McParticleCol> pMcParticle(eventSvc(),EventModel::MC::McParticleCol);
@@ -164,6 +183,8 @@ StatusCode FilterTracks::execute(){
             double ztwo=cos(tracks[currMax].theta_rad);
             double dot_product=xone*xtwo+yone*ytwo+zone*ztwo;
             double seperation_rad=acos(dot_product);
+			if (seperation_rad > m_pi/2.) 
+				seperation_rad = m_pi - seperation_rad; //we always assume that events come from "above"
             status->setSeperation(seperation_rad*180/m_pi);
         }
         else{
@@ -305,3 +326,4 @@ HepPoint3D FilterTracks::findStripPosition(ITkrGeometrySvc *tkrGeoSvc,int tower,
     pointBelow+=incPoint;
   return pointBelow;
 }
+

@@ -23,11 +23,6 @@
 
 
 
-#if 1
-#include "DFC/CFC_towerRecordPrint.h"
-#include "DFC/CFC_towerPrint.h"
-#endif
-
 /* ---------------------------------------------------------------------- *//*!
 
   \fn int *CFC_latUnpack (struct _CFC_latRecord                    *clr,
@@ -90,9 +85,6 @@ int *CFC_latUnpack (struct       _CFC_latRecord              *clr,
             
          /* Accumulate the energy seen in layer 0 */
          if (layerMap < 0) e0 += ctr->layerEnergy[0];
-
-         /// CFC_towerPrint (data, tower);
-         /// CFC_towerRecordPrint (ctr, tower);           
       }
    }
    while (ctr++, src++, tower++, twrMap <<= 1);

@@ -1,15 +1,29 @@
 #ifndef TMR_H_SX_XXX_XXX
 #define TMR_H_SX_XXX_XXX
 
+/* ----------------------------------------------------------------------- *//*!
+
+  \file   tmr.h.sx-xxx-xxx
+  \brief  Provides the implementation of the timing macros on a SUN platform
+  \author JJRussell - russell@slac.stanford.edu
+
+\verbatim
+
+CVS $Id
+\endverbatim
+
+  \b ABSTRACT \n
+     -------- \n
+     SUN implementation of the TMR facility. The implementation is based
+     of SUN's high resolution timer library.
+ 
+  \b USAGE \n
+     ----- \n
+     See the documentation for the generic TMR facility.
+                                                                           */
+/* ----------------------------------------------------------------------- */
+
 /*
- *  ABSTRACT
- *  --------
- *  SUN implementation of the TMR facility. The implementation is based
- *  of SUNs high resolution timer library.
- *
- *  USAGE
- *  -----
- *  See the documentation for the generic TMR facility.
  *
  *  HISTORY
  *  -------

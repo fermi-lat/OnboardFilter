@@ -1,7 +1,30 @@
+/* ---------------------------------------------------------------------- *//*!
+   
+  \file   TFC_geometryStd.c
+  \brief  Defines the LAT geometry from the tracker's perspective
+  \author JJRussell - russell@slac.stanford.edu
+
+\verbatim
+   CVS $Id$
+\endverbatim 
+                                                                          */
+/* ---------------------------------------------------------------------- */
+
+
+#include "DFC/TFC_geoIds.h"
 #include "TFC_geometryDef.h"
 
 
+#ifndef CMX_DOXYGEN
 
+
+#define TFC_STD_CMT    TFC_TAGCMT(TFC_K_TAGTYPE_GLEAM, 0, 0, 10)
+#define TFC_STD_CREATE TFC_TAGDATE  (1, 11, 2002)
+#define TFC_STD_REVISE TFC_TAGDATE  (2, 12, 2003)
+#define TFC_STD_TAG    TFC_TAG      ( TFC_K_GEO_ID_INITIAL, \
+                                      TFC_STD_CMT,          \
+                                      TFC_STD_CREATE,       \
+                                      TFC_STD_REVISE)
 
 
 
@@ -34,6 +57,8 @@
 #define TKR_X2_END_MM (TKR_X2_BEG_MM    + TKR_X_ACTIVE_MM)
 #define TKR_X3_END_MM (TKR_X3_BEG_MM    + TKR_X_ACTIVE_MM)
 
+
+#define TKR_K_STRIP   (TKR_K_STRIP_MM * 1000 + 0.5)
 #define TKR_X_ACTIVE   TFC_XY_SCALE(TKR_X_ACTIVE_MM,  TKR_K_STRIP_MM) 
 
 #define TKR_X0_BEG     TFC_XY_SCALE(TKR_X0_BEG_MM,    TKR_K_STRIP_MM)
@@ -576,15 +601,17 @@
  |                                                                       |  
  | This defines how to project from any TKR layer to the ACD TOP face.   |
  |                                                                       |
+ | Jan 11, 2004 - Added minus sign                                       |
+ |                                                                       |
 \* --------------------------------------------------------------------- */
 #define SKIRT_XPROJECTION(_layer)                                        \
-    TFC_SKIRT_PROJECTION(SKIRT_Z_MM,                                     \
+   -TFC_SKIRT_PROJECTION(SKIRT_Z_MM,                                     \
                          TKR_Z_XLAYER_MM(_layer),                        \
                          TKR_Z_XLAYER_MM(_layer-1))
 
 
 #define SKIRT_YPROJECTION(_layer)                                        \
-    TFC_SKIRT_PROJECTION(SKIRT_Z_MM,                                     \
+   -TFC_SKIRT_PROJECTION(SKIRT_Z_MM,                                     \
                          TKR_Z_YLAYER_MM(_layer),                        \
                          TKR_Z_YLAYER_MM(_layer-1))
 
@@ -666,6 +693,7 @@
 
 #define TKR_GEOMETRY                                           \
    {                                                           \
+         TKR_K_STRIP,                                          \
         (TKR_Z_FIND_MAX  << 16) | TKR_Z_FIND_MIN,              \
         (TKR_Z_EXTEND_MAX<< 16) | TKR_Z_EXTEND_MIN,            \
          TKR_XY_WIDTHS,                                        \
@@ -801,6 +829,8 @@
       ACD_X_TOP_EDGES,                                            \
       ACD_Y_TOP_EDGES,                                            \
       ACD_X_SIDE_YEDGES,                                          \
+      ACD_X_SIDE_YEDGES,                                          \
+      ACD_Y_SIDE_XEDGES,                                          \
       ACD_Y_SIDE_XEDGES,                                          \
       ACD_Z_SIDE_ROWS,                                            \
       ACD_SIDE_FACES,                                             \
@@ -865,11 +895,13 @@
   SKIRT_XPROJECTIONS,                                                         \
   SKIRT_YPROJECTIONS                                                          \
 }
+#endif
+
 
 
 /* ---------------------------------------------------------------------- *//*!
 
-  \var const struct _TFC_geometry TFC_GeometryStd
+  \var   const struct _TFC_geometry TFC_GeometryStd
   \brief Defines the standard (nominal) geometry for the LAT in a form
          that the filtering code can readily digest. That is, this is
          not a full and general description of the LAT, but it is tailored
@@ -878,8 +910,12 @@
 /* ---------------------------------------------------------------------- */
 const struct _TFC_geometry TFC_GeometryStd =
 {
+   TFC_STD_TAG,
    TKR_GEOMETRY,
    ACD_GEOMETRY,
    SKIRT_GEOMETRY
 };
 /* ---------------------------------------------------------------------- */
+
+
+

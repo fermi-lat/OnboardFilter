@@ -5,7 +5,8 @@
    \author JJRussell - russell@slac.stanford.edu
 
    \verbatim
-    CVS $Id$
+
+CVS $Id$
    \endverbatim 
                                                                          */
 /* --------------------------------------------------------------------- */
@@ -15,10 +16,9 @@
 #include "DFC/LCB.h"
 #include "DFC/EBF_directory.h"
 
-#include "windowsCompat.h"
 
-static inline unsigned char calLogCnt (unsigned int calCnt,
-                                       unsigned int   mask);
+static __inline unsigned char calLogCnt (unsigned int calCnt,
+					 unsigned int   mask);
 
 
 
@@ -29,11 +29,11 @@ static inline unsigned char calLogCnt (unsigned int calCnt,
             recast to the type of \a _ptr.
    \param   _ptr    The pointer to advance
    \param   _nbytes The number of nbytes to advance \a _ptr by.
-   \return  The advanced pointer, recast to the type of \a _ptr.
+   \return  The advanced pointer, the pointer is recast to a void *.
                                                                          */
 /* --------------------------------------------------------------------- */
 #define _ADVANCE(_ptr, _nbytes) \
-         ((unsigned char *)(_ptr) + (_nbytes))
+         (void *)((unsigned char *)(_ptr) + (_nbytes))
 /* --------------------------------------------------------------------- */
 
 
@@ -48,7 +48,7 @@ static inline unsigned char calLogCnt (unsigned int calCnt,
    \brief         Calculates the total number of logs struck in this
                   contributor's CAL record.
                   
-   \param  calCnt 8 nibbles representing the number of counts in each
+   \param  calcnt 8 nibbles representing the number of counts in each
                   of the 8 CAL layers.
                   
    \param    mask A bit mask with every other nibble being 0 of 0xf.
@@ -59,7 +59,7 @@ static inline unsigned char calLogCnt (unsigned int calCnt,
                   CAL record.
                                                                          */
 /* --------------------------------------------------------------------- */
-static unsigned char calLogCnt (unsigned int calcnt, unsigned int mask)
+static __inline unsigned char calLogCnt (unsigned int calcnt, unsigned int mask)
 {
    /*
     | This code computes the number of struck logs in the CAL.
@@ -232,8 +232,8 @@ int EBF_directoryCompose (EBF_directory      *dir,
         | Advance the contributor's pointer past the LCB header,
         | Advance the event pointer to the next contribution.
        */
-       ptr  = (const unsigned int *)_ADVANCE (evt, sizeof (LCB_header));
-       evt  = (const unsigned int *)_ADVANCE (evt, clen);
+       ptr  = _ADVANCE (evt, sizeof (LCB_header));
+       evt  = _ADVANCE (evt, clen);
        
        
        /* Locate and fill in the relevant contributor record     */
@@ -328,6 +328,7 @@ int EBF_directoryCompose (EBF_directory      *dir,
    return elen == 0 ? ncids : -ncids;
 }
 /* --------------------------------------------------------------------- */
+
 
 
 

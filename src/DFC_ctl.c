@@ -1,15 +1,13 @@
-/*------------------------------------------------------------------------
-| CVS $Id
-+-------------------------------------------------------------------------*/
-
-
-
 /* ---------------------------------------------------------------------- *//*!
    
    \file  DFC_ctl.c
    \brief Routines to size and locate the filtering control parameters for
           each of the subsystems, Implementation
    \author JJRussell - russell@slac.stanford.edu
+
+\verbatim
+    CVS $Id
+\endverbatim
                                                                           */
 /* ---------------------------------------------------------------------- */
 
@@ -134,18 +132,22 @@ extern int DFC_ctlSysSizeof (void)
 
 /* ---------------------------------------------------------------------- *//*!
 
-  \fn        int DFC_ctlInit (struct _DFC_ctl *dfc)
+  \fn        int DFC_ctlInit (struct _DFC_ctl            *dfc, 
+                              const struct _TFC_geometry *geo)
   \brief     Provides default initialization of control structure
   \param dfc Pointer to the filtering process control parameters
+  \param geo Pointer to the track geometry. Only the pointer is saved
+             so the backing memory must remain valid.
   \return    Status
                                                                           */
 /* ---------------------------------------------------------------------- */
-extern int DFC_ctlInit (struct _DFC_ctl *dfc)
+extern int DFC_ctlInit (struct _DFC_ctl      *dfc,
+		const 	struct _TFC_geometry *geo)
 {
    DFC_ctlAfcInit (&dfc->afc);
    DFC_ctlAtfInit (&dfc->atf);
    DFC_ctlCfcInit (&dfc->cfc);
-   DFC_ctlTfcInit (&dfc->tfc);
+   DFC_ctlTfcInit (&dfc->tfc, geo);
 
    return 0;
 }

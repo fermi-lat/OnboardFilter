@@ -1,16 +1,15 @@
-/*------------------------------------------------------------------------
-| CVS $Id
-+-------------------------------------------------------------------------*/
-
-
-
 /* ---------------------------------------------------------------------- *//*!
    
    \file  DFC_ctlAfc.c
    \brief Routines to size and initialize the AFC filtering control
           parameters
    \author JJRussell - russell@slac.stanford.edu
-                                                                          */
+
+   \verbatim
+
+CVS $Id$
+   \endverbatim 
+									  */
 /* ---------------------------------------------------------------------- */
 
 
@@ -60,8 +59,9 @@ int DFC_ctlAfcSizeof (void)
    
   \fn int DFC_ctlAfcInit (struct _DFC_ctlAfc *afc)
   \brief      Initializes the AFC filtering control parameters
-  \param  atf Pointer to the AFC filtering parameters to initialize
   \return     Status
+
+  \param  afc Pointer to the AFC filtering parameters to initialize
                                                                           */
 /* ---------------------------------------------------------------------- */
 int DFC_ctlAfcInit (struct _DFC_ctlAfc *afc)

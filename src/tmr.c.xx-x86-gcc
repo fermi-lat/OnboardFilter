@@ -1,6 +1,20 @@
 #ifndef TMR_C_XX_X86_GCC
 #define TMR_C_XX_X86_GCC
 
+/*----------------------------------------------------------------------- *//*!
+
+    \file   tmr.c.xx-x86-gcc
+    \brief  Provides the implementation of the timing routines on a x86
+            using the GCC compiler.
+    \author JJRussell - russell@slac.stanford.edu
+
+\verbatim
+
+CVS $Id
+\endverbatim
+									  */
+/*----------------------------------------------------------------------- */
+
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -8,16 +22,33 @@
 #include "src/tmr.h"
 
 
+/* ---------------------------------------------------------------------- *//*!
 
-struct _TMR_parameters
+ \struct _TMR_parameters
+ \brief   X86 specific constants for tick <=> nsecs conversion
+                                                                          *//*!
+ \typedef TMR_parameters
+ \brief   Typedef for struct \e _TMR_parameters 
+                                                                          */
+/* ---------------------------------------------------------------------- */
+typedef struct _TMR_parameters
 {
-    double      frequency;  /*!< Number of ticks in a second                 */
-    double nsecs_per_tick;  /*!< Number of nsecs/tick                        */
-};
+    double      frequency;  /*!< Number of ticks in a second              */
+    double nsecs_per_tick;  /*!< Number of nsecs/tick                     */
+}
+TMR_parameters;
+/* ---------------------------------------------------------------------- */
 
 
-typedef struct _TMR_parameters TMR_parameters;
-static  struct _TMR_parameters TMR_Parameters = {0.0, 0.0};
+
+/* ---------------------------------------------------------------------- *//*!
+
+  \var   TMR_parameters TMR_Parameters
+  \brief Holds the constants for the tick <-> nsecs conversion
+                                                                          */
+/* ---------------------------------------------------------------------- */
+static TMR_parameters TMR_Parameters = {0.0, 0.0};
+/* ---------------------------------------------------------------------- */
 
 
 
@@ -101,14 +132,14 @@ int TMR_initialize (void)
    frequency          = 1000000 * mhz;
    pp->frequency      = frequency;
    pp->nsecs_per_tick = 1000000000/frequency;
-#ifndef GLEAM
+
    printf ("TMR_initialize    : %d cpus\n"
            "Frequency         : %10.3f Hz\n"
            "Nseconds / tick   :      %8.3f nsecs\n",            
             ncpus,
             pp->frequency,
             pp->nsecs_per_tick);
-#endif
+
    return 0;
 } 
 
@@ -159,6 +190,36 @@ unsigned int TMR_ticks_to_nsecs (TMR_tick ticks)
    return ticks * pp->nsecs_per_tick;
 }
 
+
+
+TMR_usecs_nsecs TMR_ticks_to_usecs_nsecs (TMR_tick ticks)
+/*
+   DESCRIPTION
+   -----------
+   Convert a number of ticks into nanoseconds. 
+
+
+   PARAMETERS
+   ----------
+        ticks: The number of ticks to convert
+
+   RETURNS
+   -------
+   The equivalent number of ticks
+*/
+{ 
+   TMR_usecs_nsecs unsecs;
+   TMR_parameters *pp = &TMR_Parameters;
+   double nsecs = ticks * pp->nsecs_per_tick + 0.5;
+   unsecs.usecs = nsecs / 1000;
+   unsecs.nsecs = nsecs - unsecs.usecs * 1000;
+
+//   printf ("ticks = %llx(%lld) nsecs = %f  un.usecs = %d  un.nsecs = %d\n",
+//	    ticks, ticks, nsecs, unsecs.usecs, unsecs.nsecs);
+
+   return unsecs;
+}
+
    
 
 unsigned int TMR_frequency (void)
@@ -181,6 +242,3 @@ unsigned int TMR_frequency (void)
 }
 
 #endif
-
-
-

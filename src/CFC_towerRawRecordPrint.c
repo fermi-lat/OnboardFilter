@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------- *//*!
    
-   \file   CFC_towerRecordPrint.c
+   \file   CFC_towerRawRecordPrint.c
    \brief  Implementation of the CAL tower print routine
    \author JJRussell - russell@slac.stanford.edu
 
@@ -14,6 +14,12 @@
 
 
 #include <stdio.h>
+
+/* Unfortunately snprintf seems to be somewhat of an orphan in VxWorks   */
+#ifdef VXWORKS
+#include "private/stdioP.h"
+#endif
+
 #include "DFC/CFC_towerRawRecord.h"
 #include "DFC/CFC_towerRawRecordPrint.h"
 
@@ -62,28 +68,33 @@ void CFC_towerRawRecordPrint (const struct _CFC_towerRawRecord *ctr,
    /* Loop over the struck layers */
    do
    {
-       int    colMap;
-       int    column;
-       char   layerNum;
-       char   line[2][80];
-       int    i0, i1, n0, n1;
-
        /* MSB (sign bit) indicates whether this tower has something in it */
        if (layerMap > 0) continue;
-       
 
-       /* Tower has something in it, pick up the column map */
-       colMap   = colMapP[layer] << 16;
-       layerNum = 0x30 | layer;
-
-       n0 -= i0 = snprintf (line[0], 80, " %1d%c",
-                            layer % 4, layer/4 ? 'y' : 'x');
-       n1 -= i1 = snprintf (line[1], 80, "   ");
-       
-
-       /* Loop over the columns */
-       for (column = 0;  column < 12; colMap <<= 1, column++)
        {
+	 int    colMap;
+	 int    column;
+	 char   layerNum;
+	 char   line[2][80];
+	 int    i0, i1, n0, n1;
+
+
+	 /* Tower has something in it, pick up the column map */
+	 colMap   = colMapP[layer] << 16;
+	 layerNum = 0x30 | layer;
+
+	 /* Maximum number of characters that can be held in a line */
+         n0  = sizeof (line[0]);
+         n1  = sizeof (line[1]);
+
+	 n0 -= i0 = snprintf (line[0], 80, " %1d%c",
+			      layer % 4, layer/4 ? 'y' : 'x');
+	 n1 -= i1 = snprintf (line[1], 80, "   ");
+       
+
+	 /* Loop over the columns */
+	 for (column = 0;  column < 12; colMap <<= 1, column++)
+	 {
            int phaA;
            int phaB;
 
@@ -108,23 +119,25 @@ void CFC_towerRawRecordPrint (const struct _CFC_towerRawRecord *ctr,
            
            
            
-//           printf ("  %c.%2d %5d  %4.4x %5d  %4.4x\n",
-//                   layerNum,
-//                   column,
-//                   phaA, phaA,
-//                   phaB, phaB);
-//
+	   //           printf ("  %c.%2d %5d  %4.4x %5d  %4.4x\n",
+	   //                   layerNum,
+	   //                   column,
+	   //                   phaA, phaA,
+	   //                   phaB, phaB);
+	   //
 
-//           layerNum = ' ';
+	   //           layerNum = ' ';
+	 }
+
+       
+	 line[0][i0] = ' ';  line[0][i0+1] = 'a';  line[0][i0+2] = 0;
+	 line[1][i1] = ' ';  line[1][i1+1] = 'b';  line[1][i1+2] = 0;
+
+       
+	 puts (line[0]);
+	 puts (line[1]);
+
        }
-
-       
-       line[0][i0] = ' ';  line[0][i0+1] = 'a';  line[0][i0+2] = 0;
-       line[1][i1] = ' ';  line[1][i1+1] = 'b';  line[1][i1+2] = 0;
-
-       
-       puts (line[0]);
-       puts (line[1]);
        
    }
    while (layer == 3 ? puts ("") : 0, layer++, layerMap <<= 1);   

@@ -1,9 +1,34 @@
+/* ---------------------------------------------------------------------- *//*!
+   
+   \file   CFC_towerPrint.c
+   \brief  Interface to the CAL tower printing routines
+   \author JJRussell - russell@slac.stanford.edu
+
+\verbatim
+
+CVS $Id
+\endverbatim
+
+    These routines exist for diagnostic reasons only.
+                                                                          */
+/* ---------------------------------------------------------------------- */
+
+
 #include <stdio.h>
 #include "DFC/CFC_towerPrint.h"
 #include "DFC/CFC_logData.h"
     
 
+/* ---------------------------------------------------------------------- *//*!
 
+  \fn    void CFC_towerPrint (const unsigned int *data,
+                              int                tower)
+  \brief        Produces an ASCII display of the CAL data for the specified
+                tower
+  \param data   The array of 32-bit CAL data words
+  \param tower  The tower number of this data
+                                                                          */
+/* ---------------------------------------------------------------------- */
 void CFC_towerPrint (const unsigned int *data, int tower)
 {
    int          layer;
@@ -48,7 +73,7 @@ void CFC_towerPrint (const unsigned int *data, int tower)
    return;
    
 }
-
+/* ---------------------------------------------------------------------- */
 
 
 

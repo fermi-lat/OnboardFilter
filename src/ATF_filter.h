@@ -2,22 +2,16 @@
 #define ATF_FILTER_H
 
 
-/*------------------------------------------------------------------------
-| CVS $Id
-+-------------------------------------------------------------------------*/
-
-
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-    
-
 /* ---------------------------------------------------------------------- *//*!
    
    \file   ATF_filter.h
    \brief  Defines the interface to implement the Acd/Tkr Fast filter
    \author JJRussell - russell@slac.stanford.edu
+
+\verbatim
+    CVS $Id$
+\endverbatim 
+
                                                                           */
 /* ---------------------------------------------------------------------- */
 
@@ -53,21 +47,21 @@ extern "C" {
     
 
 /* ---------------------------------------------------------------------- */
-static inline int ATF__filterSideMasksGet (int start,
-                                           int length);
+static __inline int ATF__filterSideMasksGet (int start,
+                                             int length);
     
-static inline int ATF__filterTop          (int   tower,
-                                           int   start,
-                                           int acd_top);
+static __inline int ATF__filterTop          (int   tower,
+                                             int   start,
+                                             int acd_top);
     
-static inline int ATF__filterSides        (int tower,
-                                           int tower_mask,
-                                           int start,
-                                           int length,
-                                           int xm_candidates, int xm,
-                                           int xp_candidates, int xp,
-                                           int ym_candidates, int ym,
-                                           int yp_candidates, int yp);
+static __inline int ATF__filterSides        (int tower,
+                                             int tower_mask,
+                                             int start,
+                                             int length,
+                                             int xm_candidates, int xm,
+                                             int xp_candidates, int xp,
+                                             int ym_candidates, int ym,
+                                             int yp_candidates, int yp);
 /* ---------------------------------------------------------------------- */
 
     
@@ -76,9 +70,10 @@ static inline int ATF__filterSides        (int tower,
 /* ---------------------------------------------------------------------- *//*!
 
   \fn        int ATF__filterTop (int tower,int start, int acd_top)
-
   \brief     Vetos an event based on whether the track, as determined by
              the layer bit masks, is associated with an ACD tile.
+  \return    The subset of the bits in \a acd_top that are matched for
+             this tower. If 0, none match.
   
   \param    tower  The tower number being examined
   \param    start  Starting layer of the track
@@ -93,18 +88,10 @@ static inline int ATF__filterSides        (int tower,
   coincidence can be any one of 4 tiles.
 
  \warning 
-  The tower numbering used within this routine matches the official GLAST
-  numbering. This is not the numbering of DAQEngine, so be careful when
-  matching. The transformation involves switching the X & Y. Practically
-  speaking, the tower number is a 4 bit number, just swap the upper 2 bits
-  with the lower 2 bits. The official GLAST numbering scheme is used
-  because 1) it's the official scheme, 2) it is more convenient.
-
-
   The list of ACD tiles associated with a tower is determined by
   examining the diagram below.
 
- \verbatim
+ \code
  
   TOP COINCIDENCE PATTERN    Tower   ACD Tiles    Tower     ACD Tiles
   -----------------------    -----   ----------   -----   -----------   
@@ -113,12 +100,17 @@ static inline int ATF__filterSides        (int tower,
   ACD  15  16  17  18  19        2   2, 3, 7, 8      10   12,13,17,18
   twr     8   9  10  11          3   3, 4, 8, 9      11   13,14,18,19
   ACD  10  11  12  13  14        4   5, 6,10,11      12   15,16,20,21
-  twr     4   5   6   7          5   6, 7,11,12      13   16,17,21,22
+  twr     4  <5>  6   7      ->  5   6, 7,11,12 <-   13   16,17,21,22
   ACD  05  06  07  08  09        6   7, 8,12,13      14   17,18,22,23
   twr     0   1   2   3          7   8, 9,13,14      15   18,19,23,24    
   ACD  00  01  02  03  04
 
- \endverbatim 
+ \endcode
+
+  For example, concentrate on \e twr \e 5 in the left most diagram. The
+  shadowing ACD tiles are <em>6,7,11,12</em>. Now locate tower 5 in the
+  middle cluster of numbers and note that tower 5 is indeed associated
+  with tiles <em>6,7,11,12</em>
 
   A little numerology shows that the proper bit mask is formed if one
   takes the following bit pattern
@@ -135,7 +127,7 @@ static inline int ATF__filterSides        (int tower,
   calculation is a couple of simple register-to-register instructions.
                                                                           */
 /* ---------------------------------------------------------------------- */
-static int ATF__filterTop (int tower, int start, int acd_top)
+static __inline int ATF__filterTop (int tower, int start, int acd_top)
 {
    int          mt;
    int coincidence;
@@ -157,15 +149,16 @@ static int ATF__filterTop (int tower, int start, int acd_top)
 
 /* ---------------------------------------------------------------------- *//*!
 
-  \fn    int ATF__filterSideMasksGet (int start, int length)
-  \brief Returns the list of ACD tiles associated with a side exiting
-         track.
-  \param  start the starting layer of the track closest to the ACD top
-                plane.
+  \fn     int ATF__filterSideMasksGet (int start, int length)
+  \brief  Returns the list of ACD tiles associated with a side exiting
+          track.
+  \return A bit mask representing the list of ACD tiles associated
+          with a track of the specified length and starting point
+          exiting the side of the specified tower.
+
+  \param  start The starting layer of the track (0 is closest to the ACD 
+                top tiles).
   \param length The length of the track, in layers
-  \return       A bit mask representing the list of ACD tiles associated
-                with a track of the specified length and starting point
-                exiting the side of the specified tower.
 
   While the list of ACD tiles associated a track exiting the top of tower
   can be determined algorithmically, unfortunately this is not the case
@@ -173,7 +166,7 @@ static int ATF__filterTop (int tower, int start, int acd_top)
 
   However, building a straight lookup table based on the tower, the
   track's starting point and its length, would be prohibitively large,
-  ensuring that it will never by cached. Therefore, a combination of
+  ensuring that it will never be cached. Therefore, a combination of
   a lookup table and algorithm is used to form the mask.
 
   The association is only in the vertical direction for the lowest
@@ -184,7 +177,7 @@ static int ATF__filterTop (int tower, int start, int acd_top)
   the two faces that are exposed.
                                                                           */
 /* ---------------------------------------------------------------------- */  
-static int ATF__filterSideMasksGet (int start, int length)
+static __inline int ATF__filterSideMasksGet (int start, int length)
 {
    int mask;
  
@@ -258,16 +251,16 @@ static int ATF__filterSideMasksGet (int start, int length)
   \brief  Looks for a ACD coincidence with a side exiting track.
   \param  tower         The tower to be examined.
   \param  tower_mask    The towers to consider, expressed as a bit mask.
-  \param  start         The starting layer (0 is closest to the ACD).
+  \param  start         The starting layer (0 is closest to the ACD top tiles)
   \param  length        The length of the coincidence. This must
                         be a minimum of 3 layers, in keeping with
                         the 3-in-a-row philosophy.
   \param  xm_candidates The towers to consider along the XM face.
-  \param  xm         .  The struck ACD XM face tiles.
+  \param  xm            The struck ACD XM face tiles.
   \param  xp_candidates The towers to consider along the XP face.
   \param  xp            The struck ACD XP face tiles.
   \param  ym_candidates The towers to consider along the YM face.
-  \param  yp            The struck ACD YM face tiles.  
+  \param  ym            The struck ACD YM face tiles.  
   \param  yp_candidates The towers to consider along the YP face
   \param  yp            The struck ACD YP face tiles.  
   \retval       == 0, if no coincidence

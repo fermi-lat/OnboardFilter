@@ -20,7 +20,6 @@
 #include "EBF_swap.h"
 #include "DFC/DFC_endianness.h"
 
-#include "windowsCompat.h"
 
 
 /* --------------------------------------------------------------------- *//*!
@@ -92,7 +91,7 @@
 
 
 /* --------------------------------------------------------------------- */
-inline unsigned int EBF_swap32 (unsigned int w)
+__inline unsigned int EBF_swap32 (unsigned int w)
 {
    return   (((w >>  0) & 0xff) << 24)
           | (((w >>  8) & 0xff) << 16)
@@ -104,7 +103,7 @@ inline unsigned int EBF_swap32 (unsigned int w)
 
 
 /* --------------------------------------------------------------------- */
-inline unsigned int EBF_swap16 (unsigned short w)
+__inline unsigned int EBF_swap16 (unsigned short w)
 {
    return   (((w >> 0) & 0xff) <<  8)
           |  ((w >> 8) & 0xff);
@@ -114,7 +113,7 @@ inline unsigned int EBF_swap16 (unsigned short w)
 
 
 /* --------------------------------------------------------------------- */
-inline void EBF_swap32N (unsigned int *w, int n)
+__inline void EBF_swap32N (unsigned int *w, int n)
 {
     while (--n >= 0)
     {
@@ -133,7 +132,7 @@ inline void EBF_swap32N (unsigned int *w, int n)
 
 
 /* --------------------------------------------------------------------- */
-inline void EBF_swap16N (unsigned short *w, int n)
+__inline void EBF_swap16N (unsigned short *w, int n)
 {
     while (--n >= 0)
     {

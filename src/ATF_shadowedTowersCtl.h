@@ -13,6 +13,11 @@
    \brief  Defines the data structure needed to translate a list of
            ACD tiles into a list of shadowed towers.
    \author JJRussell - russell@slac.stanford.edu
+
+   \verbatim
+
+CVS $Id$
+   \endverbatim 
                                                                           */
 /* ---------------------------------------------------------------------- */
 
@@ -32,7 +37,7 @@ extern "C" {
            a list of struct tiles to a list of shadowed towers.
                                                                           *//*!
   \typedef ATF_shadowedTowersCtl
-  \briedf  Typedef for struct _ATF_shadowedTowersCtl
+  \brief   Typedef for struct _ATF_shadowedTowersCtl
                                                                           */
 /* ---------------------------------------------------------------------- */
 typedef struct _ATF_shadowedTowersCtl

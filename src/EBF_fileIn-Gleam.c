@@ -19,9 +19,10 @@
 #include <sys/stat.h>
 #ifndef _WIN32
 #include <unistd.h>
+#else
+#include <memory.h>
 #endif
 #include <fcntl.h>
-#include "windowsCompat.h"
 
 #include "DFC/DFC_endianness.h"
 #include "DFC/EBF_fileIn-Gleam.h"
@@ -79,8 +80,8 @@ struct _EBF_file
 
 
 /* --------------------------------------------------------------------- */
-static inline void halfswap  (unsigned short int *beg, int cnt);
-static inline  int fixup_acd (unsigned       int *evt, int elen, int ievt);
+static __inline void halfswap  (unsigned short int *beg, int cnt);
+static __inline  int fixup_acd (unsigned       int *evt, int elen, int ievt);
 static         int fixup     (unsigned       int *evt, int elen);
 /* --------------------------------------------------------------------- */
 

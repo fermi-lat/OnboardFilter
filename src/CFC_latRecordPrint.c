@@ -1,21 +1,17 @@
-#include <stdio.h>
-
-/*------------------------------------------------------------------------
-| CVS $Id
-+-------------------------------------------------------------------------*/
-
-
-
 /* ---------------------------------------------------------------------- *//*!
    
    \file   CFC_latRecordPrint.c
    \brief  Defines the implementaion of the CAL LAT record print routine.
    \author JJRussell - russell@slac.stanford.edu
+
+\verbatim
+    CVS $Id
+\endverbatim
                                                                          */
 /* --------------------------------------------------------------------- */
 
 
-
+#include <stdio.h>
 #include "ffs.h"
 #include "DFC/CFC_latRecord.h"
 #include "DFC/CFC_latRecordPrint.h"
@@ -85,7 +81,7 @@ void CFC_latRecordPrint (const struct _CFC_latRecord *clr, int which)
 
        tower = FFS (map);
        ctr   = clr->twr + tower;
-       map  &= ~(0x80000000 >> tower);
+       map   = FFS_eliminate (map, tower);
 
        CFC_towerRecordPrint (ctr, tower);
    }

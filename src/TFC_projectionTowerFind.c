@@ -1,24 +1,55 @@
-/*------------------------------------------------------------------------
-| CVS $Id: TFC_projectionTowerFind.c,v 1.2 2003/08/19 04:14:36 burnett Exp $
-+-------------------------------------------------------------------------*/
-
-
-
 /* ---------------------------------------------------------------------- *//*!
    
    \file  TFC_projectionTowerFind.c
    \brief Finds projections in the TKR
    \author JJRussell - russell@slac.stanford.edu
+
+\verbatim
+    CVS $Id
+\endverbatim 
+
                                                                           */
 /* ---------------------------------------------------------------------- */
-#include <stdlib.h>
 
+
+#include <stdlib.h>
 #include "ffs.h"
+#include "DFC/EDM.h"
 #include "DFC/TFC_towerRecord.h"
 #include "DFC/TFC_projectionTowerFind.h"
 
 #include "TFC_projectionDef.h"
 #include "TFC_geometryDef.h"
+
+/* ---------------------------------------------------------------------- *//*!
+
+  \fn     int _abs (int x)
+  \brief  Returns the absolute value of the signed integer x
+  \return The absolute value of the signed integer x
+
+   This function at one time was an intrinsic function of the GNU-C
+   compiler. For some reason (at least I think it did), it disappeared and
+   was replaced was with a call. I do not want that, so this function
+   places the absolute value function as an inline.
+
+   The algorithm is simple and uses no if's
+
+  \code
+                   
+     X               2 = 0x00000002    -2 = 0xfffffffe
+     Y = X >> 31         0x00000000         0xffffffff
+     Z = X ^ Y           0x00000002         0x00000001
+     ABS(X) = Z - Y      0x00000002         0x00000002
+  \endcode
+									  */
+/* ---------------------------------------------------------------------- */  
+static __inline int _abs(int x)
+{
+  
+  int y = x >> 31;
+  return (x ^ y) - y;
+}
+/* ---------------------------------------------------------------------- */
 
 
 
@@ -40,9 +71,124 @@
           extending a projection 2 layers.
                                                                           */
 /* ---------------------------------------------------------------------- */
-#define          FIND_TOLERANCE 192//ALTERED: was 32
-#define EXTEND_1LAYER_TOLERANCE 192//ALTERED: was 32
-#define EXTEND_2LAYER_TOLERANCE 384//ALTERED: was 64
+#define          FIND_TOLERANCE 32
+#define EXTEND_1LAYER_TOLERANCE 32
+#define EXTEND_2LAYER_TOLERANCE 64
+/* ---------------------------------------------------------------------- */
+
+
+
+
+/* ---------------------------------------------------------------------- *\
+ |                                                                        |
+ |                      DEBUGGING/DEVELOPMENT MACROS                      |
+ |                      ----------------------------                      |
+ | The following macros are used to when debugging of developing the code.|
+ | They are not compiled into the code unless the EDM facility is active. |
+ | They produce no output unless the print level is DEBUG or lower.       |
+ |                                                                        |
+\* ---------------------------------------------------------------------- */
+
+
+EDM_CODE(EDM_level TFC_ProjectionTowerFind_edm = EDM_K_DEBUG;)
+
+
+/* ---------------------------------------------------------------------- *//*!
+
+  \def    _PRINT_TITLE(_tower)
+  \brief  Prints a header line if EDM is active and the print level
+          is DEBUG or lower. otherwise is a NOP.
+  \param _tower The tower number being used to find the projections        
+									  */
+/* ---------------------------------------------------------------------- */
+#define _PRINT_TITLE(_tower)                                              \
+   EDM_DEBUGPRINTF ((                                                     \
+       TFC_ProjectionTowerFind_edm,                                       \
+      "\n"                                                                \
+      "%1.1X%c OP Lyr  Top  Mid  Bot Zfactor Pred   Diff  Tol Status\n"   \
+           " ---- --- ---- ---- ---- ------- ---- ------ ---- ------\n",  \
+           _tower&0xf, (int)_tower < 0 ? 'y' : 'x'))
+/* ---------------------------------------------------------------------- */
+
+
+
+
+/* ---------------------------------------------------------------------- *//*!
+
+  \def    _PRINT_CHK(_lay, _top, _mid, _bot, _zex, _pred, _res, _tol)
+  \brief  Prints the status of checking a middle point when finding a
+          seed projection if EDM is active and the print level is DEBUG
+          or lower; otherwise is a NOP.
+  \param  _lay  The layer number of the top layer being used.
+  \param  _top  The strip number in the top    layer.
+  \param  _mid  The strip number in the middle layer.
+  \param  _bot  The strip number in the bottom layer.
+  \param  _zex  The zextension factor being used to predict the middle
+                strip address.
+  \param  _pred The predicted middle layer strip number.
+  \param  _res  The residual (actual - predicted).
+  \param  _tol  The tolerance used to declare a match between the actual
+                and predicted hit number.
+
+   This macro prints a status line for every triple of strip addresses
+   being examined as a possible seed projection.
+									  */
+/* ---------------------------------------------------------------------- */
+#define _PRINT_CHK(_lay, _top, _mid, _bot, _zex, _pred, _res, _tol)       \
+  EDM_DEBUGPRINTF ((                                                      \
+           TFC_ProjectionTowerFind_edm,                                   \
+           " Seed %3d %4d %4d %4d %7d %4d %6d %4d %s\n",                  \
+            _lay, _top, _mid, _bot, _zex, _pred, _res, _tol,              \
+            _abs(_res) <= _tol ? "found" : ""))
+/* ---------------------------------------------------------------------- */
+
+
+
+
+/* ---------------------------------------------------------------------- *//*!
+
+  \def   _PRINT_EXTI(_msk)
+  \brief  Prints a line introducing the beginning of looking for
+          additional layers to extend an existing projection, if
+          EDM is active and the print level is DEBUG or lower; otherwise
+          is a NOP.
+  \param  _msk  A bit mask of the layers which have hits in them and,
+                thus, are possible candidate extension layers.
+									  */
+/* ---------------------------------------------------------------------- */
+#define _PRINT_EXTI(_msk);                                                \
+  EDM_DEBUGPRINTF ((TFC_ProjectionTowerFind_edm,                          \
+                   "  Ext %*c %8.8x\n", 43, ' ',  _msk))
+/* ---------------------------------------------------------------------- */
+
+
+
+
+/* ---------------------------------------------------------------------- *//*!
+
+  \def   _PRINT_EXT(_lay, _top, _mid, _bot, _zex, _pred, _res, _tol)
+  \brief  Prints the status of checking a point when extending a
+          projection if EDM is active and the print level is DEBUG or
+          lower; otherwise is a NOP.
+  \param  _lay  The layer number of the top layer being used.
+  \param  _top  The strip number in the top    layer.
+  \param  _mid  The strip number in the middle layer.
+  \param  _bot  The strip number in the bottom layer.
+  \param  _zex  The zextension factor being used to predict the strip
+                address in the extension layer
+  \param  _pred The predicted extension layer strip number.
+  \param  _res  The residual (actual - predicted).
+  \param  _tol  The tolerance used to declare a match between the actual
+                and predicted hit number.
+                                                                              
+                                                                          */
+/* ---------------------------------------------------------------------- */
+#define _PRINT_EXT(_lay, _top, _mid,  _bot, _zex, _pred, _res, _tol)      \
+  EDM_DEBUGPRINTF ((TFC_ProjectionTowerFind_edm,                          \
+                   "  Ext %3d %4d %4d %4d %7d %4d %6d %4d %s\n",          \
+                     _lay, _top, _mid, _bot, _zex, _pred, _res, _tol,     \
+                     _abs(_res) <= _tol ? "extended" : ""))
+   
 /* ---------------------------------------------------------------------- */
 
 
@@ -82,7 +228,7 @@ typedef struct _MatchVal_bf
 }
 MatchVal_bf;
 
-
+/* ---------------------------------------------------------------------- */
     
 typedef union _MatchVal
 {
@@ -94,20 +240,20 @@ MatchVal;
 
 
     
-static inline int             project (int                    top,
+static __inline int           project (int                    top,
                                        int                    bot,
                                        int                     dz);
 
-static inline int           projectDx (int                     x0,
+static __inline int         projectDx (int                     x0,
                                        int                     dx,
                                        int                     dz);
 
-static inline int          projectMid (int                    top,
+static __inline int        projectMid (int                    top,
                                        int                    bot,
                                        int                     dz);
 
 
-static inline MatchVal   findMatchTop (int              tolerance,
+static __inline MatchVal findMatchTop (int              tolerance,
                                        int             prediction,
                                        int                 topMsk,
                                        const TFC_strip *topStrips,
@@ -117,7 +263,7 @@ static inline MatchVal   findMatchTop (int              tolerance,
                                        int                     dz);
 
 
-static inline MatchVal   findMatchMid (int              tolerance,
+static __inline MatchVal findMatchMid (int              tolerance,
                                        int             prediction,
                                        int                 midMsk,
                                        const TFC_strip *midStrips,
@@ -126,7 +272,7 @@ static inline MatchVal   findMatchMid (int              tolerance,
                                        int               botStrip,
                                        int                     dz);
     
-static inline MatchVal   findMatchBot (int              tolerance,
+static __inline MatchVal findMatchBot (int              tolerance,
                                        int             prediction,
                                        int                 midMsk,
                                        const TFC_strip *midStrips,
@@ -135,14 +281,14 @@ static inline MatchVal   findMatchBot (int              tolerance,
                                        int               botStrip,
                                        int                     dz);
     
-static inline void   storeProjection  (TFC_projection        *prj,
+static __inline void storeProjection  (TFC_projection        *prj,
                                        int            topLayerNum,
                                        int                  paTop, 
                                        int                  paMid, 
                                        int                  paBot);
                                      
 
-static inline int      findProjection (int                towerId,
+static __inline int    findProjection (int                towerId,
                                        int                 layers,
                                        int               layerNum,
                                        int                  zfind,
@@ -151,154 +297,36 @@ static inline int      findProjection (int                towerId,
                                        TFC_projection        *prj);
 
 #if 0
-static inline int   findProjection111 (int            topLayerNum,
-                                       int                 deltaz,
-                                       const TFC_strip  *stripTop,
-                                       const TFC_strip  *stripMid,
-                                       const TFC_strip  *stripBot,
-                                       TFC_projection        *prj);
+static __inline int   findProjection111 (int            topLayerNum,
+                                         int                 deltaz,
+                                         const TFC_strip  *stripTop,
+                                         const TFC_strip  *stripMid,
+                                         const TFC_strip  *stripBot,
+                                         TFC_projection        *prj);
 #endif
 
-static inline int extendProjectionDwn (TFC_projection        *prj,
-                                       int                 layers,
-                                       int               layerNum,
-                                       TFC_towerLayer        *nxt,
-                                       int               topStrip,
-                                       int               midStrip,
-                                       int                zextend);
+static __inline int extendProjectionDwn(TFC_projection        *prj,
+                                        int                 layers,
+                                        int               layerNum,
+                                        TFC_towerLayer        *nxt,
+                                        int               topStrip,
+                                        int               midStrip,
+                                        int                zextend);
 
-static inline int extendProjectionUp  (TFC_projection        *prj,
-                                       int                 layers,
-                                       int               layerNum,
-                                       TFC_towerLayer        *nxt,
-                                       int               midStrip,
-                                       int               botStrip,
-                                       int                zextend);
+static __inline int extendProjectionUp (TFC_projection        *prj,
+                                        int                 layers,
+                                        int               layerNum,
+                                        TFC_towerLayer        *nxt,
+                                        int               midStrip,
+                                        int               botStrip,
+                                        int                zextend);
 
 #ifdef __cplusplus
 }
 #endif
 
 
-/* ---------------------------------------------------------------------- *//*!
 
-  \def    ELIMINATE(_bitNumber)
-  \brief  Creates a mask used to clears bit \a _bitNumber (MSB = 0)
-  \return A mask with all but bit = \a _bitNumber set.
-
-  This macro is used to clear a bit after it has been found by the FFS
-  routine.
-                                                                          */
-/* ---------------------------------------------------------------------- */
-#define ELIMINATE(_bitNumber) (~(0x80000000 >> (_bitNumber))) 
-/* ---------------------------------------------------------------------- */
-
-
-/* ---------------------------------------------------------------------- *//*!
-
-  \def    _DBG(_statement)
-  \brief  A macro, defined to either, drop the C \a _statement or drop
-          nothing. The macro is defined to drop the statement if the
-          symbol \e DEBUG is defined, or do nothing if it is not defined.
-
-   The obvious use of this macro is too drop debugging statements in
-   the code when the symbol \e DEBUG is defined and to be unobtrusive,
-   otherwise.
-                                                                          *//*!
-  \def    _PRINT_TITLE(_tower)
-  \brief  Prints a header line if the symbol \a DEBUG is defined,
-          otherwise, does nothing.
-  \param _tower The tower number being used to find the projections        
-                                                                          *//*!
-  \def    _PRINT_CHK(_lay, _top, _mid, _bot, _zex, _pred, _res, _tol)
-  \brief  Prints the status of checking a middle point when finding a
-          seed projection if the symbol \a DEBUG is defined, otherwise
-          does nothing.
-  \param  _lay  The layer number of the top layer being used.
-  \param  _top  The strip number in the top    layer.
-  \param  _mid  The strip number in the middle layer.
-  \param  _bot  The strip number in the bottom layer.
-  \param  _zex  The zextension factor being used to predict the middle
-                strip address.
-  \param  _pred The predicted middle layer strip number.
-  \param  _res  The residual (actual - predicted).
-  \param  _tol  The tolerance used to declare a match between the actual
-                and predicted hit number.
-
-   This macro prints a status line for every triple of strip addresses
-   being examined as a possible seed projection.
-   
-                                                                          *//*!
-  \def   _PRINT_EXTI(_msk)
-  \brief  Prints a line introducing the beginning of looking for
-          additional layers to extend an existing projection, if
-          the symbol \a DEBUG is defined, otherwise it does nothing.
-  \param  _msk  A bit mask of the layers which have hits in them and,
-                thus, are possible candidate extension layers.
-                
-                                                                          *//*!
-  \def   _PRINT_EXT(_lay, _top, _mid, _bot, _zex, _pred, _res, _tol)
-  \brief  Prints the status of checking a point when extending a
-          projection if the symbol \a DEBUG is defined, otherwise
-          does nothing.
-  \param  _lay  The layer number of the top layer being used.
-  \param  _top  The strip number in the top    layer.
-  \param  _mid  The strip number in the middle layer.
-  \param  _bot  The strip number in the bottom layer.
-  \param  _zex  The zextension factor being used to predict the strip
-                address in the extension layer
-  \param  _pred The predicted extension layer strip number.
-  \param  _res  The residual (actual - predicted).
-  \param  _tol  The tolerance used to declare a match between the actual
-                and predicted hit number.
-                                                                              
-                                                                          */
-/* ---------------------------------------------------------------------- */
-#ifdef DEBUG //THB disable this for now
-# undef DEBUG
-#endif
-
-#ifdef DEBUG
-
-#include <stdio.h>
-#include "DFC/TFC_towerRecordPrint.h"
-#include "DFC/TFC_projectionPrint.h"
-
-#define _DBG(_statement)  _statement 
-
-#define _PRINT_TITLE(_tower)                                                \
-   printf ("\n"                                                             \
-      "%1.1X%c OP Lyr  Top  Mid  Bot Zfactor Pred   Diff  Tol Status\n"     \
-           " ---- --- ---- ---- ---- ------- ---- ------ ---- ------\n",    \
-           _tower&0xf, (int)_tower < 0 ? 'y' : 'x')
-
-#define _PRINT_CHK(_lay, _top, _mid, _bot, _zex, _pred, _res, _tol)        \
-   printf (" Seed %3d %4d %4d %4d %7d %4d %6d %4d %s\n",                   \
-            _lay, _top, _mid, _bot, _zex, _pred, _res, _tol,               \
-            abs(_res) <= _tol ? "found" : "")
-
-#define _PRINT_EXTI(_msk);                                                \
-   printf ("  Ext %*c %8.8x\n", 43, ' ',  _msk)
-
-
-#define _PRINT_EXT(_lay, _top, _mid,  _bot, _zex, _pred, _res, _tol)      \
-   printf ("  Ext %3d %4d %4d %4d %7d %4d %6d %4d %s\n",                  \
-            _lay, _top, _mid, _bot, _zex, _pred, _res, _tol,              \
-            abs(_res) <= _tol ? "extended" : "")
-   
-#else
-
-#define _DBG(_statement)
-
-#define _PRINT_TITLE(_tower)
-#define _PRINT_CHK(_lay, _top, _mid, _bot, _zex, _pred, _res, _tol)
-
-#define _PRINT_EXTI(_msk)   
-#define _PRINT_EXT(_lay, _top, _mid, _bot, _zex, _pred, _res, _tol)
-
-
-#endif
-/* ---------------------------------------------------------------------- */
 
 
 
@@ -324,6 +352,8 @@ static int project (int top, int bot, int dz)
 }
 /* ---------------------------------------------------------------------- */
 
+
+
 /* ---------------------------------------------------------------------- *//*!
 
   \fn    int projectDx (int p0, int dx, int dz)
@@ -346,13 +376,15 @@ static int projectDx (int p0, int dx, int dz)
 
 /* ---------------------------------------------------------------------- *//*!
 
-  \fn  int projectMid (int top, int bot, int dz)
+  \fn     int projectMid (int top, int bot, int dz)
   \brief  Another projection function, used to predict a point in a skipped
           layer. 
-  \top    The top strip address
-  \bot    The bottom strip address
-  \dz     The scaled distance from the top strip to the missing strip
   \return The predicted strip number in the missing layer.
+
+  \param top    The top strip address
+  \param bot    The bottom strip address
+  \param dz     The scaled distance from the top strip to the missing strip
+
                                                                           */
 /* ---------------------------------------------------------------------- */
 static int projectMid (int top, int bot, int dz)
@@ -416,10 +448,10 @@ static MatchVal findMatchTop (int              tolerance,
         | it is from the prediction.
        */
        topIdx      = FFS (topMsk);       
-       topMsk     &= ELIMINATE(topIdx);
+       topMsk      = FFS_eliminate (topMsk, topIdx);
        topStrip    = topStrips[topIdx];
        residual    = topStrip - prediction;
-       absResidual = abs (residual);
+       absResidual = _abs (residual);
 
 
        _PRINT_EXT(topLayerNum,
@@ -509,10 +541,10 @@ static MatchVal findMatchBot (int              tolerance,
         | it is from the prediction.
        */
        botIdx      = FFS (botMsk);       
-       botMsk     &= ELIMINATE(botIdx);
+       botMsk      = FFS_eliminate (botMsk, botIdx);
        botStrip    = botStrips[botIdx];
        residual    = botStrip - prediction;
-       absResidual = abs (residual);
+       absResidual = _abs (residual);
 
 
        _PRINT_EXT(botLayerNum,
@@ -552,26 +584,26 @@ static MatchVal findMatchBot (int              tolerance,
 
 /* ---------------------------------------------------------------------- *//*!
 
-  \fn  MatchVal findMatchMid (int              tolerance,
-                              int             prediction,
-                              int                 midMsk,
-                              const TFC_strip *midStrips,
-                              int            topLayerNum,
-                              int               topStrip,
-                              int               botStrip,
-                              int                     dz)
-  \brief Finds the best match when projecting to a middle layer
+  \fn     MatchVal findMatchMid (int              tolerance,
+                                 int             prediction,
+                                 int                 midMsk,
+                                 const TFC_strip *midStrips,
+                                 int            topLayerNum,
+                                 int               topStrip,
+                                 int               botStrip,
+                                 int                     dz)
+  \brief  Finds the best match when projecting to a middle layer
+  \return A packed status word, summarizing the best match.
+
   \param tolerance   The tolerance used to accept a match
   \param prediction  The predicted strip number
   \param midMsk      The mask of available hits in the middle layer
   \param midStrips   The array of strip addresses in the middle layer
   \param topLayerNum The top layer number
   \param topStrip    The top strip number
-  \param midStrip    The bottom strip number  
+  \param botStrip    The bottom strip number  
   \param dz          A geometrical factor used when extending
                      the projection to the middle layer.
-  \return            A packed status word, summarizing the
-                     best match.
                                                                           */
 /* ---------------------------------------------------------------------- */
 static MatchVal findMatchMid (int              tolerance,
@@ -599,11 +631,11 @@ static MatchVal findMatchMid (int              tolerance,
         | Locate the next unused strip address and calculate how far
         | it is from the prediction.
        */
-       midIdx      = FFS      (midMsk);       
-       midMsk     &= ELIMINATE(midIdx);
+       midIdx      = FFS (midMsk);       
+       midMsk      = FFS_eliminate (midMsk, midIdx);
        midStrip    = midStrips[midIdx];
        residual    = midStrip - prediction;
-       absResidual = abs (residual);
+       absResidual = _abs (residual);
 
                
        _PRINT_CHK(topLayerNum,
@@ -660,11 +692,11 @@ static MatchVal findMatchMid (int              tolerance,
   \param       paBot: Strip number of bottom  layer of the projection
                                                                           */
 /* ---------------------------------------------------------------------- */
-static inline void storeProjection (TFC_projection *prj,
-                                    int     topLayerNum,
-                                    int           paTop, 
-                                    int           paMid, 
-                                    int           paBot) 
+static __inline void storeProjection (TFC_projection *prj,
+                                      int     topLayerNum,
+                                      int           paTop, 
+                                      int           paMid, 
+                                      int           paBot) 
 {
    int topLayerNumM2 = topLayerNum - 2;
  
@@ -685,12 +717,12 @@ static inline void storeProjection (TFC_projection *prj,
 
 
 #if 0
-static inline int findProjection111 (int        topLayerNum,
-                                     int             deltaz,
-                                     TFC_strip    *stripTop,
-                                     TFC_strip    *stripMid,
-                                     TFC_strip    *stripBot,
-                                     TFC_projection    *prj)
+static __inline int findProjection111 (int        topLayerNum,
+                                       int             deltaz,
+                                       TFC_strip    *stripTop,
+                                       TFC_strip    *stripMid,
+                                       TFC_strip    *stripBot,
+                                       TFC_projection    *prj)
 /*
   DESCRIPTION
   -----------
@@ -735,7 +767,7 @@ static inline int findProjection111 (int        topLayerNum,
   _PRINT_L2ALIGN_CHK (paTop, paMid, paBot, prediction, residual);
   
   
-   if (abs(residual) < ALIGNMENT_TOLERANCE)
+   if (_abs(residual) < ALIGNMENT_TOLERANCE)
    {
         storeProjection (topLayerNum,
                          paTop, stripTop,
@@ -786,13 +818,13 @@ static inline int findProjection111 (int        topLayerNum,
   fail to produce a match, the routine quits searching. 
                                                                           */  
 /* ---------------------------------------------------------------------- */
-static inline int extendProjectionDwn (TFC_projection   *prj,
-                                       int            layers,
-                                       int          layerNum,
-                                       TFC_towerLayer   *bot,
-                                       int          topStrip,
-                                       int          midStrip,
-                                       int           zextend)
+static __inline int extendProjectionDwn (TFC_projection   *prj,
+                                         int            layers,
+                                         int          layerNum,
+                                         TFC_towerLayer   *bot,
+                                         int          topStrip,
+                                         int          midStrip,
+                                         int           zextend)
 {
    TFC_strip         *hits;
    unsigned int prj_layers;
@@ -910,7 +942,7 @@ static inline int extendProjectionDwn (TFC_projection   *prj,
        | Mark the hit as used. The hit is not stored until it
        | has been determined whether one or two layers were skipped.
       */
-      botMap     &= ELIMINATE (mv.bf.idx);
+      botMap      = FFS_eliminate (botMap, mv.bf.idx);
       botStrip    = mv.bf.strip;
       minLayer    = layerNum;
       prj_layers |= (1 << layerNum);
@@ -1001,14 +1033,16 @@ static inline int extendProjectionDwn (TFC_projection   *prj,
 /* ---------------------------------------------------------------------- */
 
 
+
+
 /* ---------------------------------------------------------------------- *//*!
 
   \fn int extendProjectionUp (TFC_projection   *prj,
                               int            layers,
                               int          layerNum,
                               TFC_towerLayer   *bot,
-                              int          topStrip,
                               int          midStrip,
+                              int          botStrip,
                               int           zextend)
   \brief Attempts to extend a projection up through the next hit layers
   
@@ -1019,8 +1053,8 @@ static inline int extendProjectionDwn (TFC_projection   *prj,
   \param       top Pointer to the next layer structure, containing the
                    beginning and ending address to the hits on the layer
                    and array of hits.
-  \param  topStrip The projection's top layer strip number
-  \param  midStrip The projection's middle layer strip number
+  \param  midStrip The projection's middle layer strip number.
+  \param  botStrip The projection's top layer strip number.
   \param   zextend The delta z's to the subsequent layers in units of
                    TFC_Z_FIND_SCALE_FACTOR strips. These are used when
                    projecting to the subsequent layers.
@@ -1034,13 +1068,13 @@ static inline int extendProjectionDwn (TFC_projection   *prj,
   fail to produce a match, the routine quits searching. 
                                                                           */  
 /* ---------------------------------------------------------------------- */
-static inline int extendProjectionUp  (TFC_projection   *prj,
-                                       int            layers,
-                                       int          layerNum,
-                                       TFC_towerLayer   *top,
-                                       int          midStrip,
-                                       int          botStrip,
-                                       int           zextend)
+static __inline int extendProjectionUp  (TFC_projection   *prj,
+                                         int            layers,
+                                         int          layerNum,
+                                         TFC_towerLayer   *top,
+                                         int          midStrip,
+                                         int          botStrip,
+                                         int           zextend)
 {
    TFC_strip         *hits;
    unsigned int prj_layers;
@@ -1158,7 +1192,7 @@ static inline int extendProjectionUp  (TFC_projection   *prj,
        | Mark the hit as used and
        | store the results
       */
-      topMap     &= ELIMINATE (mv.bf.idx);
+      topMap      = FFS_eliminate (topMap, mv.bf.idx);
       topStrip    = mv.bf.strip;
       minLayer    = layerNum;
      *hits++      = topStrip;
@@ -1280,13 +1314,13 @@ static inline int extendProjectionUp  (TFC_projection   *prj,
    be successful.
                                                                           */
 /* ---------------------------------------------------------------------- */
-static inline int findProjection (int               towerId,
-                                  int                layers,
-                                  int           topLayerNum,
-                                  int                 zfind,
-                                  int               zextend,
-                                  TFC_towerLayer       *top,
-                                  TFC_projection       *prj)
+static __inline int findProjection (int               towerId,
+                                    int                layers,
+                                    int           topLayerNum,
+                                    int                 zfind,
+                                    int               zextend,
+                                    TFC_towerLayer       *top,
+                                    TFC_projection       *prj)
 {
    int cnt    = 0;        /* Number of projections found           */
 
@@ -1334,7 +1368,7 @@ static inline int findProjection (int               towerId,
        
        
        topIdx   = FFS (topMsk);              /* Locate next available strip */
-       topMsk  &= ELIMINATE(topIdx);         /* Eliminate it                */
+       topMsk   = FFS_eliminate (topMsk, topIdx); /* Eliminate it           */
        topStrip = topStrips[topIdx];         /* Get strip number            */
        botMsk   = botMap;                    /* Map of available bot strips */
        
@@ -1346,18 +1380,18 @@ static inline int findProjection (int               towerId,
            MatchVal       mv;
            
            
-           botIdx       = FFS (botMsk);            /* Next available strip */
-           botMsk      &= ELIMINATE(botIdx);       /* Eliminate it         */
-           botStrip     = botStrips[botIdx];       /* Get strip number     */
-           prediction   = project (topStrip, botStrip, zfind);
-           mv           = findMatchMid (FIND_TOLERANCE,
-                                        prediction,
-                                        midMap,
-                                        midStrips,
-                                        topLayerNum,
-                                        topStrip,
-                                        botStrip,
-                                        zfind);
+           botIdx      = FFS (botMsk);            /* Next available strip */
+           botMsk      = FFS_eliminate (botMsk, botIdx);  /* Eliminate it */
+           botStrip    = botStrips[botIdx];       /* Get strip number     */
+           prediction  = project (topStrip, botStrip, zfind);
+           mv          = findMatchMid (FIND_TOLERANCE,
+				       prediction,
+				       midMap,
+				       midStrips,
+				       topLayerNum,
+				       topStrip,
+				       botStrip,
+				       zfind);
 
            
            /* Was a decent projection found */
@@ -1368,9 +1402,9 @@ static inline int findProjection (int               towerId,
                
                    
                /* Mark as used */
-               topMap &= ELIMINATE (topIdx);
-               botMap &= ELIMINATE (botIdx);
-               midMap &= ELIMINATE (midIdx);
+               topMap = FFS_eliminate (topMap, topIdx);
+               botMap = FFS_eliminate (botMap, botIdx);
+               midMap = FFS_eliminate (midMap, midIdx);
 
                
                storeProjection (prj,
@@ -1493,10 +1527,28 @@ static const char Filler[] = "===============================================";
 
 
 
+/* ---------------------------------------------------------------------- *//*!
+
+  \fn     int TFC_projectionsSizeof (void)
+  \brief  Returns the size of a projections results record 
+  \return The size, in bytes, of a projections results record 
+
+   This routine is provided to hide the implemenation of a TFC_projections
+   record allowing a caller to determine the size so it can be allocated.
+									  */
+/* ---------------------------------------------------------------------- */
+int TFC_projectionsSizeof (void)
+{
+  return sizeof (TFC_projections);
+}
+/* ---------------------------------------------------------------------- */
+
+
+
 
 /* ---------------------------------------------------------------------- *//*!
 
-  \fn int TFC_projectionTowerFind (struct _TFC_projections       *prjs,
+  \fn int TFC_projectionTowerFind (struct _TFC_projection        *prjs,
                                    const struct _TFC_geometryTkr  *geo,
                                    struct _TFC_towerRecord      *tower,
                                    unsigned int                xLayers,
@@ -1516,14 +1568,13 @@ static const char Filler[] = "===============================================";
                  bits representing the count of X projections found.
                                                                           */
 /* ---------------------------------------------------------------------- */
-int TFC_projectionTowerFind (struct _TFC_projections       *prjs,
+int TFC_projectionTowerFind (struct _TFC_projection        *prjs,
                              const struct _TFC_geometryTkr  *geo,
                              struct _TFC_towerRecord      *tower,
                              unsigned int                xLayers,
                              unsigned int                yLayers)
 {
    TFC_towerLayer    *layerBeg;
-   TFC_projection         *prj;
    int                    xCnt;
    int                    yCnt;
    int                 towerId;
@@ -1531,17 +1582,14 @@ int TFC_projectionTowerFind (struct _TFC_projections       *prjs,
    unsigned int  zextendMaxMin;
 
    
-
-   
    /* Get the variables that apply to both the X and Y projection finders */
-   prj           = prjs->prjs;
    towerId       = tower->id;      
    zfindMaxMin   = geo->zfindMaxMin;
    zextendMaxMin = geo->zextendMaxMin;
 
    
    _PRINT_TKRFIND_BEG(towerId);   
-   // _DBG (TFC_towerRecordPrint (tower));
+   // EDM_CODE (TFC_towerRecordPrint (tower));
    
    
    /*-------------------------------------------------------------------*\
@@ -1590,7 +1638,7 @@ int TFC_projectionTowerFind (struct _TFC_projections       *prjs,
                              zfind,
                              zextend,
                              layerBeg + layerNum,
-                             &prj[xCnt]);
+                             &prjs[xCnt]);
        /*
         | If the return code is zero, no projections where found.
         | If non-zero, the lower 18 bits represent a bit mask
@@ -1651,7 +1699,7 @@ int TFC_projectionTowerFind (struct _TFC_projections       *prjs,
                              zfind,
                              zextend,
                              layerBeg + layerNum,
-                             &prj[yCnt]);
+                             &prjs[yCnt]);
        
        /*
         | If the return code is zero, no projections where found.
@@ -1666,14 +1714,8 @@ int TFC_projectionTowerFind (struct _TFC_projections       *prjs,
 
    }
 
-   prjs->curCnt = yCnt;
-   prjs->xy[0]  = xCnt;
-   prjs->xy[1]  = yCnt -= xCnt;
-
-   // _DBG (TFC_projectionsPrint (prjs, towerId));
-   _PRINT_TKRFIND_END;
    
-   return (yCnt << 16) | xCnt;
+   return ((yCnt - xCnt) << 16) | xCnt;
 }
 /* ---------------------------------------------------------------------- */
 

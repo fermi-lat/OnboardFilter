@@ -56,6 +56,25 @@ TFC_projection;
 /* --------------------------------------------------------------------- */  
 
 
+/* --------------------------------------------------------------------- *//*!
+
+  \struct  _TFC_projectionDir
+  \brief    Directory structure to locate the projections
+									 *//*!
+  \typedef  TFC_projectionDir
+  \brief    Typedef for struct \e TFC_projectionDir
+									 */
+/* --------------------------------------------------------------------- */
+typedef struct _TFC_projectionDir
+{
+  unsigned short int  idx; /*!< Index to the first projection            */
+  unsigned char      xCnt; /*!< Count of the X projections               */
+  unsigned char      yCnt; /*!< Count of the Y projections               */
+}
+TFC_projectionDir;
+/* --------------------------------------------------------------------- */
+
+
 
 /* --------------------------------------------------------------------- *//*!
 
@@ -69,10 +88,11 @@ TFC_projection;
 /* --------------------------------------------------------------------- */  
 typedef struct _TFC_projections
 {
-  unsigned short int maxCnt; /*!< Maximum number of projections available*/
-  unsigned short int curCnt; /*!< Current number of projections in use   */
-  unsigned short int  xy[2]; /*!< Count of X/Y projections               */
-  TFC_projection prjs[1000]; /*!< List of projections                    */
+  unsigned short int    maxCnt; /*!< Maximum # of projections available  */
+  unsigned short int    curCnt; /*!< Current # of projections in use     */
+  unsigned short int    twrMsk; /*!< Mask of the tower with projections  */
+  TFC_projectionDir    dir[16]; /*!< Directory of the projections by twr */
+  TFC_projection    prjs[1000]; /*!< List of projections                 */
 }
 TFC_projections;
 /* --------------------------------------------------------------------- */  

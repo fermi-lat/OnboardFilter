@@ -1,17 +1,15 @@
 /* ---------------------------------------------------------------------- *//*!
    
-   \file  TFC_latUnpack.c
-   \brief Routines to unpack the TKR data for all towers in the LAT.
+   \file   TFC_latUnpack.c
+   \brief  Routines to unpack the TKR data for all towers in the LAT.
    \author JJRussell - russell@slac.stanford.edu
 
 \verbatim
-
- CVS $Id: TFC_latUnpack.c,v 1.1.1.1 2003/07/07 16:50:48 golpa Exp $
+    CVS $Id$
 \endverbatim 
                                                                           */
 /* ---------------------------------------------------------------------- */
 
-#include "windowsCompat.h"
 
 #include "DFC/DFC_endianness.h"
 #include "DFC/TFC_latUnpack.h"
@@ -61,7 +59,42 @@
 extern "C" {
 #endif
 
-static inline void setActive (int xyL, TFC_towerLayer *layer);
+
+/* -----------------------------------------------------------------------*//*!
+
+  \typedef int TowerUnpackRtn (struct _TFC_towerRecord *ttr,
+                               const struct _EBF_tkr   *tkr,
+                               int                  maxwrds)
+  \brief   Callback routine to unpack a tower's worth of data
+  \return  Status
+
+  \param      ttr The Tracker Tower Record to fill in
+  \param      tkr The Tracker Raw data
+  \param  maxwrds The maximum number of 32-bit words in \a tkr. Since
+                  the tracker record is serially encoded along with
+                  the CAL record, only the sum of the lengths of the
+                  two records is known. 
+									  */
+/* -----------------------------------------------------------------------*/
+typedef int (TowerUnpackRtn) (struct _TFC_towerRecord *ttr,
+                              const struct _EBF_tkr   *tkr,
+                              int                  maxwrds);
+/* -----------------------------------------------------------------------*/
+
+
+
+
+/* -----------------------------------------------------------------------*/    
+static int latUnpack (struct _TFC_latRecord       *tlr,
+                      const struct _EBF_directory *dir,
+                      int                         tmsk,
+                      TowerUnpackRtn        *twrUnpack);
+
+    
+static __inline void setActive (int xyL, TFC_towerLayer *layer);
+/* -----------------------------------------------------------------------*/
+
+
 
     
 /* -----------------------------------------------------------------------*//*!
@@ -96,20 +129,17 @@ static inline void setActive (int xyL, TFC_towerLayer *layer);
     
 
 /* -----------------------------------------------------------------------*//*!
-  \def   INIT_LAYERS(_lyrs, _accepts, _ylayers, _map, _layers, _topBit)
+  \def   INIT_LAYERS(_lyrs, _accepts, _mlayers, _map, _layers)
   \brief Process the layer bit masks associated with the either X or Y layers
   
   \param _lyrs    An array which receives the address of the layer
                   structure for each of the struck layers.
   \param _accepts The 18 bits representing on end of the layers
-  \param _ylayers Bit mask of the struck y layers in layer order, as
+  \param _mlayers Bit mask of the struck y layers in layer order, as
                   opposed to readin order of the \a _accepts.
   \param _map     A an array mapping readin bit position order to
                   the canonical layer order.
   \param _layers  The array layer structures.
-  \param _topBit  An integer with its MSB set. (Purely an optimization
-                  to prevent the compiler from reloading this value
-                  each time.
                   
    The macro continuously scans the \a _accepts bit array, seeking the
    first set bit. Each such found bit is translated to a canonical layer
@@ -118,11 +148,17 @@ static inline void setActive (int xyL, TFC_towerLayer *layer);
    the \a _accepts, except that the layer ends are OR'd together. In
    addition, the addresses of the layer structure describing the hits
    on each struck layer are stored in \a lyrs array.
+
+  \warning
+   At one time this macro returned the updated \a _lyrs. The technique
+   used to do this, however, is not portable. While the code read nicely,
+   this technique has been abandoned in favor of portability. Just 
+   remember, that \a _lyrs is modified by this macro.
                                                                           */
 /* -----------------------------------------------------------------------*/
-/*
-#define INIT_LAYERS(_lyrs, _accepts, _xlayers, _map, _layers, _topBit) \
-({                                                                     \
+#define INIT_LAYERS(_lyrs, _accepts, _mlayers, _map, _layers)          \
+{                                                                     \
+   _mlayers = 0;                                                       \
    while (_accepts)                                                    \
    {                                                                   \
        int                 n;                                          \
@@ -130,38 +166,18 @@ static inline void setActive (int xyL, TFC_towerLayer *layer);
        TFC_towerLayer *layer;                                          \
                                                                        \
        n           = FFS (_accepts);                                   \
-      _accepts    &= ~(_topBit >> n);                                  \
+      _accepts     = FFS_eliminate (_accepts, n);                      \
        layerNum    = _map[n];                                          \
        layer       = &_layers[layerNum];                               \
      *_lyrs++      = layer;                                            \
+       layer->hiLo = 0;                                                \
        layer->end  = layer->beg;                                       \
-      _xlayers    |= 1 << layerNum;                                    \
+      _mlayers    |= 1 << layerNum;                                    \
    }                                                                   \
-                                                                       \
-   _lyrs;                                                              \
-})
-*/
-
+}
 /* -----------------------------------------------------------------------*/
 
-inline TFC_towerLayer **INIT_LAYERS(TFC_towerLayer **_lyrs, int *_accepts, int *_xlayers, const unsigned char *_map, TFC_towerLayer *_layers, unsigned int _topBit){
-   while (*_accepts)
-   {
-       int                 n;
-       int          layerNum;
-       TFC_towerLayer *layer;
 
-       n           = FFS (*_accepts);
-      *_accepts    &= ~(_topBit >> n);
-       layerNum    = _map[n];
-       layer       = &_layers[layerNum];
-     *_lyrs++      = layer;
-       layer->end  = layer->beg;
-      *_xlayers    |= 1 << layerNum;
-   }
-
-   return _lyrs;
-}
 
 /* -----------------------------------------------------------------------*//*!
 
@@ -391,13 +407,13 @@ inline TFC_towerLayer **INIT_LAYERS(TFC_towerLayer **_lyrs, int *_accepts, int *
 
 /* -----------------------------------------------------------------------*//*!
 
-  \def  PROCESS(_Ni,_Pi         
+  \def  PROCESS(_Ni, _Pi         
                 _strip, _beg, _prv, _cur, _lcnt, _layer, _layers,
-                _No,_Po)
+                _No, _Po)
   \brief A convenience macro to drop down a process cluster in progress
          and a new cluster macro.
   \param  _Ni    C statement label to assign to the new cluster macro
-  \param  _Ci    C statement label to assing to the cluster in progress macro
+  \param  _Pi    C statement label to assign to the cluster in progress macro
   \param _strip  The strip address to process
   \param _beg    Beginning strip address of the cluster.
   \param _prv    Ending strip address of the cluster, i.e. the previous
@@ -405,7 +421,7 @@ inline TFC_towerLayer **INIT_LAYERS(TFC_towerLayer **_lyrs, int *_accepts, int *
   \param _cur    Current address to store the strip address.
   \param _lcnt   Number of layers left to process.
   \param _layer  The current TFC tower layer address
-  \param _lyrs   A stack of the TFC tower layer addresses.
+  \param _layers A stack of the TFC tower layer addresses.
   \param _No     Target statement label when the next strip to process
                  begins a new cluster.
   \param _Po     Target statement label when the next strip to process
@@ -778,7 +794,7 @@ TFC_8strips2;
   This works only if the number of struck strips is 32 or less
                                                                           */
 /* -----------------------------------------------------------------------*/
-static void setActive (int xyL, TFC_towerLayer *layer)
+static __inline void setActive (int xyL, TFC_towerLayer *layer)
 { 
     /*
      | Adjust the array of layer descriptors to be compatiable with the
@@ -793,11 +809,11 @@ static void setActive (int xyL, TFC_towerLayer *layer)
         int             n;
         int           cnt;
         
-        n      = FFS (xyL);            /* Locate the next struck layer */
-        xyL   &= ~(0x80000000 >> n);   /* Eliminate it from the mask   */
-        l      = layer - n;            /* Index to the correct layer   */
-        cnt    = l->end - l->beg;      /* Number of strips this layer  */
-        l->cnt = cnt;                  /* Save count                   */
+        n      = FFS (xyL);              /* Locate the next struck layer */
+        xyL    = FFS_eliminate (xyL, n); /* Eliminate it from the mask   */
+        l      = layer - n;              /* Index to the correct layer   */
+        cnt    = l->end - l->beg;        /* Number of strips this layer  */
+        l->cnt = cnt;                    /* Save count                   */
 
 
         /*
@@ -816,167 +832,61 @@ static void setActive (int xyL, TFC_towerLayer *layer)
 /* -----------------------------------------------------------------------*/
 
 
-#ifdef __cplusplus
-}
-#endif
-    
+
 
 
 /* -----------------------------------------------------------------------*//*!
+                                                                              
+  \fn  int init (TFC_towerRecord          *ttr,
+                 TFC_towerLayer *layersBuf[72],
+                 unsigned int               a0,
+                 unsigned int               a1,
+                 unsigned int               a2)
+  \brief Initializes/extracts the layer information from the accept masks
 
-  \fn  int TFC_latUnpack (struct _TFC_latRecord       *tlr,
-                          const struct _EBF_directory *dir,
-                          int                         tmsk)
-
-  \brief Driver routine to unpack the specified TKR towers.
-  \param tlr  The TKR LAT record structure to receive the unpacked data
-  \param dir  The standard directory structure allowing the routine
-              to traverse the LAT event record.
-  \param tmsk A bit mask of which towers to unpack. MSB = Tower 0.
-  \return     Status, currently always success.
+  \param  ttr       The TKR tower record
+  \param  layersBuf Buffer to hold a pointer to a pointer to the next layer
+                    structure to receive the unpacked hits
+  \param  a0        The first  of the 3 accept masks
+  \param  a1        The second of the 3 accept masks
+  \param  a2        The last   of the 3 accept masks
+  \return           The number of layers with hit strips.
                                                                           */
 /* -----------------------------------------------------------------------*/
-int TFC_latUnpack (struct _TFC_latRecord       *tlr,
-                   const struct _EBF_directory *dir,
-                   int                         tmsk)
+static int init (TFC_towerRecord          *ttr,
+                 TFC_towerLayer *layersBuf[72],
+                 unsigned int               a0,
+                 unsigned int               a1,
+                 unsigned int               a2) 
 {
-   const EBF_contributor *contributors;
-   TFC_strip                   *strips;
-   int                          twrMap;
-   unsigned int                 topBit;
+   int          axlo, axhi;
+   int          aylo, ayhi;
+   unsigned int mxlo, mxhi;
+   unsigned int mylo, myhi;
+
+   int     xlocnt,  xhicnt;
+   int     ylocnt,  yhicnt;
+   int    xcnt, ycnt, lcnt;
+   TFC_towerLayer **layers;
+   TFC_towerLayer *tlayers;
+
    
-
-   /*
-    | Limit towers to be unpacked to those requested, that exist and still
-    | need to be unpacked.
-   */
-   twrMap       = tlr->twrMap;
-   tmsk        &= EBF_DIRECTORY_TWRS_TKR (dir->ctids) & ~twrMap;
-   tlr->twrMap |= tmsk;
-   contributors = dir->contributors;
-   strips       = tlr->strips + tlr->stripCnt;
-   topBit       = 1 << 31;
-   
-   
-   do
-   {
-       int                          tower;
-       int                         calcnt;
-       int                            cnt;
-       const struct _EBF_tkr         *tkr;       
-       const EBF_contributor *contributor;
-       TFC_towerRecord               *ttr;
-
-       
-       /*
-        | Locate the first tower to unpack
-        | The tower number is used to locate the tracker data and the
-        | structure to unpack into.
-       */       
-       tower       = FFS (tmsk);
-       contributor = &contributors[tower];
-       ttr         = &tlr->twr[tower];
-       tmsk       &= ~(topBit >> tower);
-       cnt         = contributor->len / sizeof (int);
-       calcnt      = contributor->calcnt;
-       tkr         = EBF__tkrLocate (contributor->ptr, calcnt);
-       cnt        -= calcnt;
-       ttr->id     = tower;
-       strips      = TFC_towerUnpack (ttr, strips, tkr, cnt);
-   }
-   while (tmsk);
-
-   return 0;
-}
-/* -----------------------------------------------------------------------*/
-
-
-
-       
-/* --------------------------------------------------------------------- *//*!
-
-  \fn TFC_strip *TFC_towerUnpack (struct _TFC_towerRecord *ttr,
-                                  TFC_strip            *strips,
-                                  const struct _EBF_tkr   *tkr,
-                                  int                      cnt)
-  \brief Unpacks the data from one tower
-  \param ttr  Pointer to the data structure to receive the unpacked data
-  \param strips UNUSED...
-  \param tkr    The tracker data as received from the hardware
-  \parm  cnt    UNUSED
-                                                                         *//*!
-  \def       GAP(_n)
-  \brief     Calculates the cumulative length due to the gaps between the
-             ladders
-  \param  _n The ladder number (0-3)
-  \return    The cumulative length due to the gaps between the ladders
-             in units of strips.
-                                                                         */
-/* --------------------------------------------------------------------- */
-TFC_strip *TFC_towerUnpack (struct _TFC_towerRecord *ttr,
-                            TFC_strip            *strips,
-                            const struct _EBF_tkr   *tkr,
-                            int                      cnt)
-{
-# if USE_GAPS 
-# define GAP(_n) ((int)((_n) * ((.974 + .2 + .974) / .228) + 0.5))
-# else 
-# define GAP(_n) 0
-# endif 
-   static const unsigned char SxL[16] =
-   { GAP(0), GAP(0), GAP(0),
-     GAP(1), GAP(1), GAP(1),
-     GAP(2), GAP(2), GAP(2),
-     GAP(3), GAP(3), GAP(3),
-     GAP(3), GAP(3), GAP(3)   /* Should be unused since only 12 segments */
-   };
- 
- 
-   int  a0;
-   int  a1;
-   int  axlo, axhi;
-   int  aylo, ayhi;
-   int  xL;
-   int  yL;
-   
-   TFC_2strips              a2;
-   int                    lcnt;
-   TFC_towerLayer      *layers;
-   TFC_towerLayer       *layer;
-   TFC_towerLayer       **lyrs;
-   TFC_towerLayer *lyrsBuf[72];
-
-   TFC_strip              *cur;
-   int                     beg;
-   int                     prv;
-   unsigned int            b31;
-   const unsigned int    *data;
-   TFC_8strips0             d0;
-   TFC_8strips1             d1;
-   TFC_8strips2             d2;
-   const unsigned char    *sXl;
-   
-
    /*
     |  Extract accept list for the 4 pairs of cables representing
     |
-    |    X lo even | X lo odd  : Bits  0-17
-    |    X hi even | X hi odd  : Bits 18-35
-    |    Y lo even | Y lo odd  : Bits 36-53
-    |    Y hi even | Y hi odd  : Bits 54-71
+    |    axlo:  X lo even | X lo odd  : Bits  0-17
+    |    axhi:  X hi even | X hi odd  : Bits 18-35
+    |    aylo:  Y lo even | Y lo odd  : Bits 36-53
+    |    ayhi:  Y hi even | Y hi odd  : Bits 54-71
     |
     |  Note that each mask is 18 bits long and they are cut out
     |  of the 72 accept bits in sequential order with MSB of accept
     |  word 0 carrying the X0 lo even layer bit.
    */
-   a0    = tkr->accepts[0];
-   a1    = tkr->accepts[1];
-   a2.ui = tkr->accepts[2];
-   
    axlo  = EBF_TKR_ACCEPTS_LEFT_XLO (a0);
    axhi  = EBF_TKR_ACCEPTS_LEFT_XHI (a0, a1);
    aylo  = EBF_TKR_ACCEPTS_LEFT_YLO (a1);
-   ayhi  = EBF_TKR_ACCEPTS_LEFT_YHI (a1, a2.ui);
+   ayhi  = EBF_TKR_ACCEPTS_LEFT_YHI (a1, a2);
 
    /*
         printf ("axlo = %8.8x\n"
@@ -986,10 +896,7 @@ TFC_strip *TFC_towerUnpack (struct _TFC_towerRecord *ttr,
                 axlo, axhi, aylo, ayhi);
    */        
    
-   xL    = 0;
-   yL    = 0;
-   b31   = (1 << 31);
-   lyrs  = lyrsBuf;
+   layers  = layersBuf;
 
    
    /*
@@ -1021,38 +928,340 @@ TFC_strip *TFC_towerUnpack (struct _TFC_towerRecord *ttr,
    */
 
    /* Process the X layers */
-   layers = ttr->layers;
-   lyrs   = INIT_LAYERS (lyrs, &axlo, &xL, Map, layers, b31);
-   lyrs   = INIT_LAYERS (lyrs, &axhi, &xL, Map, layers, b31);
+   tlayers = ttr->layers;
+   INIT_LAYERS (layers, axlo, mxlo, Map, tlayers);
+   xlocnt  = layers - layersBuf;
+   
+   INIT_LAYERS (layers, axhi, mxhi, Map, tlayers);
+   xcnt    = layers - layersBuf;
+   xhicnt  = xcnt   - xlocnt;
 
+   
    /* Process the Y layers */
-   layers = ttr->layers + sizeof(ttr->layers)/(2*sizeof(*ttr->layers));
-   lyrs   = INIT_LAYERS (lyrs, &aylo, &yL, Map, layers, b31);
-   lyrs   = INIT_LAYERS (lyrs, &ayhi, &yL, Map, layers, b31);
+   tlayers = ttr->layers + sizeof(ttr->layers)/(2*sizeof(*ttr->layers));
+   INIT_LAYERS (layers, aylo, mylo, Map, tlayers);
+   ylocnt  = layers - layersBuf - xcnt;
+   
+   INIT_LAYERS (layers, ayhi, myhi, Map, tlayers);
+   lcnt   = layers - layersBuf;
+   ycnt   = lcnt   - xcnt;
+   yhicnt = ycnt   - ylocnt;
 
-   /* Count the number of active layers in this tower */
-   lcnt   = lyrs - lyrsBuf;
-
+   
    /*
-       printf ("xL  = %8.8x\n"
-               "yL  = %8.8x\n"
-               "lcnt= %2d\n",
-               xL, yL, lcnt);
+    | Initialize the tower structure with the x & y layer masks.
+    | Note that the layer masks are in the canonical order. Thus bit 0
+    | represents layer 0, bit 1, layer 1, etc. This is because the track
+    | finding is done starting from the layers closest to the ACD top face,
+    | i.e. from the highest number layers. Therefore the layer bit maps
+    | match the FFS convention, that is, the first bit (layer) that will
+    | be found by the FFS will correspond to the highest layer number.
    */
+   ttr->loHiLayerMaps[0] = mxlo;
+   ttr->loHiLayerMaps[1] = mxhi;
+   ttr->loHiLayerMaps[2] = mylo;
+   ttr->loHiLayerMaps[3] = myhi;
+   
+   ttr->layerMaps[0]     = mxlo | mxhi;
+   ttr->layerMaps[1]     = mylo | myhi;
+
+   ttr->loHiCnts         = (xlocnt << 24) | (xhicnt << 16)
+                         | (ylocnt <<  8) | (yhicnt <<  0);
+
+   ttr->lcnt[0]          = xcnt;
+   ttr->lcnt[1]          = ycnt;
+   
+   return lcnt;
+}
+/* -----------------------------------------------------------------------*/
+
+
+
+
+
+/* -----------------------------------------------------------------------*//*!
+
+  \fn     int unpackTots (TFC_towerLayer   **layers,
+                          unsigned int         cnts,
+                          const unsigned int  *data,
+                          int                   bit)
+  \brief  Unpacks the TOTs
+
+  \param  layers  An array of pointers to the layers to be filled with
+                  the TOT values. This array is in the same sequential
+                  order as the TOTS to be unpacked.
+  \param  cnts    A longword  packed, big endian style, with the counts
+                  of the number of struck layers in XLO, XHI, YLO, YHI
+  \param  data    Pointer to the TKR data
+  \param  bit     Bit offset to the last strip address unpacked. 
+
+
+   Unpack the TOT information. The TOTs are laid out in the accept bit
+   field order. The \a layers is an array mapping the set bits in the
+   accept bit arrays to the canonical layer numbers (actually to pointers
+   holding the data for that layer). Therefore one just pulls a layer
+   number off this array and associates it with the next TOT. One keeps
+   going until the \a cnts 'array' is exhausted. The TOT data is arranged
+   as byte oriented data starting on the first integral byte boundary after
+   the data.  The \a data argument is a pointer to the TKR data and \a bit
+   is the bit offset of the last strip unpacked.
+                                                                          */
+/* -----------------------------------------------------------------------*/
+static int unpackTots (TFC_towerLayer   **layers,
+                       unsigned int         cnts,
+                       const unsigned int  *data,
+                       int                   bit)
+{
+   int                  hiLo;
+   unsigned int         word;
+
+
+   /*  Locate and extract 32-bit word with the first TOT                   */
+   bit   =  (bit + 4);  /* Round to the next 8 bit boundary                */
+   data +=  bit >> 5;   /* Locate the 32-bit word with the TOT information */
+   bit  &=  0x18;       /* Get the byte offset (in terms of bits)          */
+   word  = *data++;     /* Extract the first word                          */
+   
+   
+   hiLo = 0;
+   while (cnts)
+   {
+       int  cnt;
+       
+       /*
+        | Extract the count of struck layers in this group,
+        | Advance the counts word to the next count to be extracted
+       */
+       cnt     = (cnts >> 24) & 0xff;
+       cnts  <<= 8;
+       
+       while (--cnt >= 0)
+       {
+           TFC_towerLayer *layer;
+           unsigned char     tot;
+
+           
+           /* If have moved on to the next word.. */
+           if (bit == 32)
+           {
+               word = *data++;
+               bit  =  0;
+           }
+
+           /* Extract the TOT    */           
+           tot               = ((word << bit) >> 24) & 0xff;
+           bit              += 8;
+           layer             = *layers++;
+           layer->tots[hiLo] =  tot;
+           layer->hiLo      |= (1 << hiLo);
+       }
+
+       /* Alternate the LO, HI index */
+       hiLo ^= 1;
+       
+   }
+
+   return 0;
+}
+
+
+
+#ifdef __cplusplus
+}
+#endif
+    
+
+
+/* -----------------------------------------------------------------------*//*!
+
+  \fn  int TFC_latUnpack (struct _TFC_latRecord       *tlr,
+                          const struct _EBF_directory *dir,
+                          int                         tmsk)
+
+  \brief Driver routine to unpack the specified TKR towers.
+  
+  \param tlr  The TKR LAT record structure to receive the unpacked data
+  \param dir  The standard directory structure allowing the routine
+              to traverse the LAT event record.
+  \param tmsk A bit mask of which towers to unpack. MSB = Tower 0.
+  \return     Status, currently always success.
+                                                                          */
+/* -----------------------------------------------------------------------*/
+int TFC_latUnpack (struct _TFC_latRecord       *tlr,
+                   const struct _EBF_directory *dir,
+                   int                         tmsk)
+{
+   return latUnpack (tlr, dir, tmsk, TFC_towerUnpack);
+}
+/* -----------------------------------------------------------------------*/
+
+
+
+
+
+
+
+/* -----------------------------------------------------------------------*//*!
+
+  \fn  int TFC_latRawUnpack (struct _TFC_latRecord       *tlr,
+                             const struct _EBF_directory *dir,
+                             int                         tmsk)
+
+  \brief Driver routine to unpack the specified TKR towers. No gap
+         correction nor clustering is performed.
+         
+  \param tlr  The TKR LAT record structure to receive the unpacked data
+  \param dir  The standard directory structure allowing the routine
+              to traverse the LAT event record.
+  \param tmsk A bit mask of which towers to unpack. MSB = Tower 0.
+  \return     Status, currently always success.
+                                                                          */
+/* -----------------------------------------------------------------------*/
+int TFC_latRawUnpack (struct _TFC_latRecord       *tlr,
+                      const struct _EBF_directory *dir,
+                      int                         tmsk)
+{
+   return latUnpack (tlr, dir, tmsk, TFC_towerRawUnpack);
+}
+/* -----------------------------------------------------------------------*/
+
+
+
+
+
+
+
+/* -----------------------------------------------------------------------*//*!
+
+  \fn  int latUnpack (struct _TFC_latRecord       *tlr,
+                      const struct _EBF_directory *dir,
+                      int                         tmsk,
+                      TowerUnpackRtn      *towerUnpack)
+  \brief Driver function to unpack the desired towers of the LAT. The
+         tower unpack routine is specified as a parameter.
+  
+  \param tlr         The target TKR LAT record to populate
+  \param dir         The EBF directory structure for this event
+  \param tmsk        The mask of towers to unpack, MSB = TOWER 0
+  \param towerUnpack The tower unpack routine to use.
+  \return            Status     
+                                                                          */
+/* -----------------------------------------------------------------------*/
+static int latUnpack (struct _TFC_latRecord       *tlr,
+                      const struct _EBF_directory *dir,
+                      int                         tmsk,
+                      TowerUnpackRtn      *towerUnpack)
+{
+   const EBF_contributor *contributors;
+   TFC_strip                   *strips;
+   int                          twrMap;
+   unsigned int                 topBit;
    
 
    /*
-    | Initialize the tower structure with the beginning strip address
-    | and the x & y layer masks. Note that the layer masks are in the
-    | canonical order. Thus bit 0 represents layer 0, bit 1, layer 1,
-    | etc. This is because the track finding is done starting from the
-    | layers closest to the ACD top face, i.e. from the highest number
-    | layers. Therefore the layer bit maps match the FFS convention,
-    | that is, the first bit (layer) that will be found by the FFS
-    | will be the highest layer number.
+    | Limit towers to be unpacked to those requested, that exist and still
+    | need to be unpacked.
    */
-   ttr->layerMaps[0] = xL;
-   ttr->layerMaps[1] = yL;
+   twrMap       = tlr->twrMap;
+   tmsk        &= EBF_DIRECTORY_TWRS_TKR (dir->ctids) & ~twrMap;
+   tlr->twrMap |= tmsk;
+   contributors = dir->contributors;
+   strips       = tlr->strips;
+   topBit       = 1 << 31;
+   
+   
+   do
+   {
+       int                          tower;
+       int                         calcnt;
+       int                            cnt;
+       const struct _EBF_tkr         *tkr;       
+       const EBF_contributor *contributor;
+       TFC_towerRecord               *ttr;
+
+       
+       /*
+        | Locate the first tower to unpack
+        | The tower number is used to locate the tracker data and the
+        | structure to unpack into.
+       */       
+       tower        = FFS (tmsk);
+       contributor  = &contributors[tower];
+       ttr          = &tlr->twr[tower];
+       tmsk        &= ~(topBit >> tower);
+       cnt          = contributor->len / sizeof (int);
+       calcnt       = contributor->calcnt;
+       tkr          = EBF__tkrLocate (contributor->ptr, calcnt);
+       cnt         -= calcnt;
+       ttr->id      = tower;
+       (*towerUnpack) (ttr, tkr, cnt);
+   }
+   while (tmsk);
+
+   
+   return 0;
+}
+/* -----------------------------------------------------------------------*/
+
+
+
+
+
+       
+/* --------------------------------------------------------------------- *//*!
+
+  \fn int TFC_towerUnpack (struct _TFC_towerRecord *ttr,
+                           const struct _EBF_tkr   *tkr,
+                           int                  maxwrds)
+
+  \brief Unpacks the data from one tower
+  \param ttr     Pointer to the data structure to receive the unpacked data
+  \param tkr     The tracker data as received from the hardware
+  \param maxwrds The maximum number of words in \a tkr.
+                                                                         *//*!
+  \def       GAP(_n)
+  \brief     Calculates the cumulative length due to the gaps between the
+             ladders
+  \param  _n The ladder number (0-3)
+  \return    The cumulative length due to the gaps between the ladders
+             in units of strips.
+                                                                         */
+/* --------------------------------------------------------------------- */
+int TFC_towerUnpack (struct _TFC_towerRecord *ttr,
+                     const struct _EBF_tkr   *tkr,
+                     int                  maxwrds)
+{
+#if USE_GAPS 
+#define GAP(_n) ((int)((_n) * ((.974 + .2 + .974) / .228) + 0.5))
+#else 
+#define GAP(_n) 0
+#endif 
+   static const unsigned char SxL[16] =
+   { GAP(0), GAP(0), GAP(0),
+     GAP(1), GAP(1), GAP(1),
+     GAP(2), GAP(2), GAP(2),
+     GAP(3), GAP(3), GAP(3),
+     GAP(3), GAP(3), GAP(3)   /* Should be unused since only 12 segments */
+   };
+ 
+ 
+   int                      lcnt;
+   TFC_towerLayer         *layer;
+   TFC_towerLayer       **layers;
+   TFC_towerLayer *layersBuf[72];
+
+   TFC_strip              *cur;
+   int                     beg;
+   int                     prv;
+   const unsigned int    *data;
+   TFC_8strips0             d0;
+   TFC_8strips1             d1;
+   TFC_8strips2             d2;
+   const unsigned char    *sXl;
+   
+
+   d2.ui = tkr->accepts[2];
+   lcnt  = init (ttr, layersBuf, tkr->accepts[0], tkr->accepts[1], d2.ui);
 
 
    /*
@@ -1075,11 +1284,10 @@ TFC_strip *TFC_towerUnpack (struct _TFC_towerRecord *ttr,
     | pointer and the current strip storage address must be established,
     | along with a pointer the strip data.
    */
-   lyrs  = lyrsBuf;     /* Array of active layer descriptors pointers */
-   layer = *lyrs++;     /* The first layer descriptor                 */
+   layers = layersBuf;  /* Array of active layer descriptors pointers */
+   layer = *layers++;   /* The first layer descriptor                 */
    cur   = layer->beg;  /* Address to store the next strip address    */
    data  = &tkr->accepts[3] - 3;  /* Beginning of the strip data....  */
-   d2.ui = a2.ui;       /* .. after the shard has been processed      */
    sXl   = SxL;         /* Array giving the inter-ladder gap          */
 
    
@@ -1100,8 +1308,8 @@ TFC_strip *TFC_towerUnpack (struct _TFC_towerRecord *ttr,
    */ 
    while (1)
    {
-       PROCESS (N6, P6, d2.bf.s6, beg, prv, cur, lcnt, layer, lyrs, N7, P7);
-       PROCESS (N7, P7, d2.bf.s7, beg, prv, cur, lcnt, layer, lyrs, N0, P0);
+       PROCESS (N6, P6, d2.bf.s6, beg, prv, cur, lcnt, layer, layers, N7, P7);
+       PROCESS (N7, P7, d2.bf.s7, beg, prv, cur, lcnt, layer, layers, N0, P0);
 
        
        /*
@@ -1120,21 +1328,21 @@ TFC_strip *TFC_towerUnpack (struct _TFC_towerRecord *ttr,
        d0.ui = data[0];
        d1.ui = data[1];
        d2.ui = data[2];
-       NPROCESS (d0.bf.s0, beg, prv, cur, lcnt, layer, lyrs,  N1, P1);     
+       NPROCESS (d0.bf.s0, beg, prv, cur, lcnt, layer, layers,  N1, P1);     
 
        P0:
        data += 3;       
        d0.ui = data[0];
        d1.ui = data[1];
        d2.ui = data[2];
-       CPROCESS (d0.bf.s0, beg, prv, cur, lcnt, layer, lyrs, N1, P1);     
+       CPROCESS (d0.bf.s0, beg, prv, cur, lcnt, layer, layers, N1, P1);     
        
 
-       PROCESS (N1,P1, d0.bf.s1,  beg, prv, cur, lcnt, layer, lyrs, N2, P2);
-       PROCESS (N2,P2, S2(d0,d1), beg, prv, cur, lcnt, layer, lyrs, N3, P3);
-       PROCESS (N3,P3, d1.bf.s3,  beg, prv, cur, lcnt, layer, lyrs, N4, P4);
-       PROCESS (N4,P4, d1.bf.s4,  beg, prv, cur, lcnt, layer, lyrs, N5, P5);
-       PROCESS (N5,P5, S5(d1,d2), beg, prv, cur, lcnt, layer, lyrs, N6, P6);
+       PROCESS (N1,P1, d0.bf.s1,  beg, prv, cur, lcnt, layer, layers, N2, P2);
+       PROCESS (N2,P2, S2(d0,d1), beg, prv, cur, lcnt, layer, layers, N3, P3);
+       PROCESS (N3,P3, d1.bf.s3,  beg, prv, cur, lcnt, layer, layers, N4, P4);
+       PROCESS (N4,P4, d1.bf.s4,  beg, prv, cur, lcnt, layer, layers, N5, P5);
+       PROCESS (N5,P5, S5(d1,d2), beg, prv, cur, lcnt, layer, layers, N6, P6);
    }
 
    
@@ -1146,16 +1354,169 @@ TFC_strip *TFC_towerUnpack (struct _TFC_towerRecord *ttr,
     | WARNING
     | Only the first 32 strip addresses can be handled using this method
    */
-   setActive (xL, ttr->layers);
-   setActive (yL, ttr->layers + sizeof(ttr->layers)/(2*sizeof(*ttr->layers)));
+   setActive (ttr->layerMaps[0], ttr->layers);
+   setActive (ttr->layerMaps[1], ttr->layers
+                               + sizeof(ttr->layers)/(2*sizeof(*ttr->layers)));
 
-   
-   return strips + TFC_K_MAX_STRIPS_PER_TOWER;
+   return 0;
 }
 /* ---------------------------------------------------------------------- */
 
 
+
+
+/* -----------------------------------------------------------------------*//*!
    
+  \def   RPROCESS(_strip, _bit, _cur, _lcnt, _layer, _layers)
+  \brief Macro to process a strip address when starting a new cluster.
+  \param _strip  The strip address to process
+  \param _bit    The number of bits of input consumed so far, updated
+                 on exit
+  \param _cur    Current address to store the strip address.
+  \param _lcnt   Number of layers left to process.
+  \param _layer  The current TFC tower layer address
+  \param _layers A stack of the TFC tower layer addresses.
+                 may be a member of the cluster in progress
+                                                                          */
+/* -----------------------------------------------------------------------*/
+#define RPROCESS(_strip, _bit, _cur, _lcnt, _layer, _layers)          \
+     {                                                                \
+          int strip = _strip;                                         \
+                                                                      \
+          /* Keep track of the number of bits consumed */             \
+          bit += 12;                                                  \
+                                                                      \
+          /* Store the strip, without the terminator */               \
+          *_cur++   = strip & ~(1 << 11);                             \
+                                                                      \
+          /* Check if their was a terminator */                       \
+          if ((strip & (1 << 11)))                                    \
+          {                                                           \
+             /* Do the usual end of layer processing */               \
+             _lcnt       -= 1;                                        \
+             _layer->end  = _cur;                                     \
+              if (_lcnt <= 0) { break; }                              \
+                                                                      \
+             _layer       = *_layers++;                               \
+             _cur         =  _layer->end;                             \
+          }                                                           \
+     }
+/* -----------------------------------------------------------------------*/
+
+
+
+
+
+/* --------------------------------------------------------------------- *//*!
+
+  \fn    int TFC_towerRawUnpack (struct _TFC_towerRecord *ttr,
+                                 const struct _EBF_tkr   *tkr,
+                                 int                  maxwrds)
+  \brief Unpacks the data from one tower. One clustering of GAP correction
+         is performed.
+         
+  \param ttr     Pointer to the data structure to receive the unpacked data
+  \param tkr     The tracker data as received from the hardware
+  \param maxwrds The maximum number of words in \a tkr.  
+                                                                         */
+/* --------------------------------------------------------------------- */
+int TFC_towerRawUnpack (struct _TFC_towerRecord *ttr,
+                        const struct _EBF_tkr   *tkr,
+                        int                  maxwrds)
+{
+
+   TFC_towerLayer *layersBuf[72];
+   int                      lcnt;   
+   TFC_towerLayer       **layers;
+   TFC_towerLayer         *layer;   
+
+
+   TFC_strip              *cur;
+   const unsigned int    *data;
+   TFC_8strips0             d0;
+   TFC_8strips1             d1;
+   TFC_8strips2             d2;
+   int                     bit;
+   
+
+   d2.ui = tkr->accepts[2];
+   lcnt  = init (ttr, layersBuf, tkr->accepts[0], tkr->accepts[1], d2.ui);   
+   
+
+   /*
+    | 
+    | MAIN LOOP TO UNPACK THE STRIP ADDRESSES
+    | ---------------------------------------
+    | The while loop is arranged so that it handles 3 words (8 strip
+    | addresses in a pass. This is the lowest harmonic of the 12 (the
+    | number of bits in a strip address) and 32, (the number of bits
+    | in a 32 bit word.)
+    |
+    | The loop is phased so that the first two strip addresses left in
+    | the last accept word are correctly processed. This means sticking
+    | the 32 bit pattern that has 8 bits, followed by 2 12 bit strip
+    | addresses at the beginning (this occurs in the TFC_8strips2 
+    | structure). After the shard is processed, a fresh set of 3 32 bit
+    | words is extracted and processed.
+    |
+    | The loop needs to have some context established. The current layer
+    | pointer and the current strip storage address must be established,
+    | along with a pointer the strip data.
+   */
+   layers = layersBuf;  /* Array of active layer descriptors pointers */
+   layer = *layers++;   /* The first layer descriptor                 */
+   cur   = layer->beg;  /* Address to store the next strip address    */
+   data  = &tkr->accepts[3] - 3;  /* Beginning of the strip data....  */
+   bit   = 72;
+   
+   /*   
+    | The loop is completed when all the struck layers, represented by
+    | lcnt, have been processed. 
+   */ 
+   while (1)
+   {
+       RPROCESS (d2.bf.s6, bit, cur, lcnt, layer, layers);
+       RPROCESS (d2.bf.s7, bit, cur, lcnt, layer, layers);
+
+       
+       /*
+        | Now on a even word boundary, decode 3 words or 8 strips worth.
+        | Note that there is no guarantee that 8 strips of data remain,
+        | but the cost of checking is not worth the cost of just blindly
+        | extracting the next 96 bits. If some of the data is not used,
+        | no harm, beyond the 3 or less extra fetches, is done.
+       */
+       data += 3;       
+       d0.ui = data[0];
+       d1.ui = data[1];
+       d2.ui = data[2];
+       RPROCESS (d0.bf.s0,  bit, cur, lcnt, layer, layers);     
+       RPROCESS (d0.bf.s1,  bit, cur, lcnt, layer, layers);
+       RPROCESS (S2(d0,d1), bit, cur, lcnt, layer, layers);
+       RPROCESS (d1.bf.s3,  bit, cur, lcnt, layer, layers);
+       RPROCESS (d1.bf.s4,  bit, cur, lcnt, layer, layers);
+       RPROCESS (S5(d1,d2), bit, cur, lcnt, layer, layers);
+   }
+
+   
+   /*
+    | Set the bit masks of active strips in each struck layer. This mask
+    | is used to keep track of which strip addresses on a layer are valid.
+    |
+    | WARNING
+    | Only the first 32 strip addresses can be handled using this method
+   */
+   setActive (ttr->layerMaps[0], ttr->layers);
+   setActive (ttr->layerMaps[1], ttr->layers
+                               + sizeof(ttr->layers)/(2*sizeof(*ttr->layers)));
+
+   unpackTots (layersBuf, ttr->loHiCnts, tkr->accepts, bit);
+   
+   return 0;
+}
+/* ---------------------------------------------------------------------- */
+
+
 
 /* ---------------------------------------------------------------------- *//*!
 
@@ -1200,7 +1561,6 @@ void TFC_latUnpackInit (struct _TFC_latRecord *tlr)
    /*
     | Initialize the global part of the structure
    */
-   tlr->stripCnt = 0;
    tlr->twrMap   = 0;
 
 
@@ -1215,11 +1575,17 @@ void TFC_latUnpackInit (struct _TFC_latRecord *tlr)
        int          lyrNum;
        TFC_towerLayer *lyr;
        
-       twr->id           = twrNum;
-       twr->layerMaps[0] = 0;
-       twr->layerMaps[1] = 0;
-
-
+       twr->id               = twrNum;
+       twr->rsvd             = 0;
+       twr->lcnt[0]          = 0;
+       twr->lcnt[1]          = 0;
+       twr->layerMaps[0]     = 0;
+       twr->layerMaps[1]     = 0;
+       twr->loHiLayerMaps[0] = 0;
+       twr->loHiLayerMaps[1] = 0;
+       twr->loHiLayerMaps[2] = 0;
+       twr->loHiLayerMaps[3] = 0;       
+       
 
        /*
         | Initialize the layer descriptors. This structure contains pointers
@@ -1232,9 +1598,14 @@ void TFC_latUnpackInit (struct _TFC_latRecord *tlr)
             lyrNum < sizeof (twr->layers) / sizeof (twr->layers[0]);
             lyrNum++, lyr++)
        {
-           lyr->beg = strip;
-           lyr->end = strip;
-           strip   += TFC_K_MAX_STRIPS_PER_LAYER;
+           lyr->map     = 0;
+           lyr->cnt     = 0;
+           lyr->hiLo    = 0;
+           lyr->tots[0] = 0;
+           lyr->tots[1] = 0;
+           lyr->beg     = strip;
+           lyr->end     = strip;
+           strip       += TFC_K_MAX_STRIPS_PER_LAYER;
        }
    }
 
@@ -1260,7 +1631,6 @@ void TFC_latUnpackInit (struct _TFC_latRecord *tlr)
 /* ---------------------------------------------------------------------- */
 void TFC_latUnpackReset (struct _TFC_latRecord *tlr)
 {
-   tlr->stripCnt = 0;
    tlr->twrMap   = 0;
    return;
 }

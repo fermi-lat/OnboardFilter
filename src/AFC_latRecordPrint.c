@@ -5,12 +5,12 @@
            also its supporting data structures
    \author JJRussell - russell@slac.stanford.edu
    
-   \verbatim
+   \code
     $ squeeze  in.ebf out.ebf 4
-   \endverbatim
+   \endcode
 
    
-verbatim
+\verbatim
     CVS $Id$
     
 \endverbatim
@@ -25,10 +25,19 @@ verbatim
 #include "AFC_remapDef.h"
 
 
+/* --------------------------------------------------------------------- *//*!
+
+  \struct AcdLists
+  \brief  Internal only structure to hold the bit maps of the ACD values.
+									 */
+/* --------------------------------------------------------------------- */
 struct AcdLists
 {
     unsigned int m[EBF_K_ACD_SIDE_CNT][EBF_K_ACD_LIST_CNT];
+  /*!< The ACD bit maps by side (A/B) and plane (X-,X+,Y-,Y+,TOP)        */
 };
+/* --------------------------------------------------------------------- */
+
 
 
 static unsigned int classify (int          *chn,
@@ -101,7 +110,7 @@ static void printPhas (const unsigned  short *phas,
 {
    static const char *Format[4] = {"               ",
                                    " %d%d%d %4.4x ",
-                                   " %d%d%d     %4.4x ",
+                                   " %d%d%d      %4.4x ",
                                    " %d%d%d %4.4x %4.4x " };
                                     
    const char **format = Format;
@@ -220,15 +229,15 @@ static unsigned int classify (int *chn, unsigned int *_a0, unsigned int *_a1)
            m |= 0x1;
        }
    }
-   else if (a1)
+   else 
    {
-       /* Only a1 is active */
+       /* Only a1 is active, it must be active since a0 wasn't */
        c  = FFS (a1);
        m |= 0x2;
    }
 
-   if (m & 1) *_a0 = a0 & ~ (0x80000000 >> c);
-   if (m & 2) *_a1 = a1 & ~ (0x80000000 >> c);
+   if (m & 1) *_a0 = FFS_eliminate (a0, c);
+   if (m & 2) *_a1 = FFS_eliminate (a1, c);
    *chn = 31 - c;
        
    return m;

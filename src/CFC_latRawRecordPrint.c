@@ -1,8 +1,3 @@
-#include <stdio.h>
-
-
-
-
 /* ---------------------------------------------------------------------- *//*!
    
    \file   CFC_latRawRecordPrint.c
@@ -10,14 +5,13 @@
    \author JJRussell - russell@slac.stanford.edu
 
 \verbatim
-
-   CVS $id
+    CVS $id
 \endverbatim   
                                                                          */
 /* --------------------------------------------------------------------- */
 
 
-
+#include <stdio.h>
 #include "ffs.h"
 #include "DFC/CFC_latRawRecord.h"
 #include "DFC/CFC_latRawRecordPrint.h"
@@ -66,7 +60,7 @@ void CFC_latRawRecordPrint (const struct _CFC_latRawRecord *clr,
 
        tower = FFS (map);
        ctr   = clr->twrs + tower;
-       map  &= ~(0x80000000 >> tower);
+       map   = FFS_eliminate (map, tower);
 
        CFC_towerRawRecordPrint (ctr, tower);
    }
@@ -79,6 +73,15 @@ void CFC_latRawRecordPrint (const struct _CFC_latRawRecord *clr,
 
 
 
+/* ---------------------------------------------------------------------- *//*!
+
+  \fn    void CFC_latRawRecordMapPrint (const struct _CFC_latRawRecord *clr)
+  \brief        Produces an ASCII display of the CAL data in the form
+                of a map, giving one an geometrical idea of where the
+                energy is deposited.
+  \param clr    A previously unpacked CAL LAT Raw Record.
+                                                                          */
+/* ---------------------------------------------------------------------- */
 void CFC_latRawRecordMapPrint (const struct _CFC_latRawRecord *clr)
 {
    int twrMap;
@@ -106,43 +109,29 @@ void CFC_latRawRecordMapPrint (const struct _CFC_latRawRecord *clr)
                    layer%4, (layer/4) ? 'y' : 'x');
 
            
-           
            for (col = 0;  col < 4; col++)
            {
-               int tcol;
-               int colMap;
+               int     tcol;
+               int   colMap;
                int layerMap;
-               int twrNum;
+               int   twrNum;
                const unsigned short int *phas;
                const CFC_towerRawRecord  *ctr;
 
                twrNum = itwr + col;
                
-               if ((twrMap & (0x80000000 >> twrNum)) == 0)
+               if ((twrMap & FFS_mask (twrNum)) == 0)
                {
-                   layerMap = 0;
-               }
-               else
-               {
-                   ctr      = &clr->twrs[twrNum];
-                   layerMap = ctr->layerMap;
-               }
-               
+		   printf ("  ............\n");
+		   continue;
+	       }
 
+	       ctr      = &clr->twrs[twrNum];
+	       layerMap =  ctr->layerMap;
+               colMap   =  ctr->colMap[layer] << 16;
+               phas     = &ctr->phas[ctr->ophas[layer]];
+               
                printf ("  ");
-               
-               /* If nothing to print */
-               if ((layerMap & (0x8000 >> layer)) == 0)
-               {
-                   printf ("............");
-                   continue;
-               }
-               
-
-               colMap =  ctr->colMap[layer] << 16;
-               phas   = &ctr->phas[ctr->ophas[layer]];
-               
-
                for (tcol = 0; tcol < 12;  tcol++)
                {
                    char c;
@@ -192,6 +181,19 @@ void CFC_latRawRecordMapPrint (const struct _CFC_latRawRecord *clr)
        
 
 
+/* ---------------------------------------------------------------------- *//*!
+
+  \fn    char get_display_char (const unsigned short int *phas)
+  \brief  Encodes the PHA values of both ends of the log into a single
+          character based on their logarithms.
+  \return The display character.
+  \param phas The array PHA values of the 2 ends.
+
+  The symbol always indicates the largest power of 2 of either end. If the
+  largest power of 2 is the same for both ends, a lower case letter is used.
+  Otherwise, an upper case letter is used.
+									  */
+/* ---------------------------------------------------------------------- */
 static char get_display_char (const unsigned short int *phas)
 {
     const static char Display[2][8] =
@@ -241,7 +243,7 @@ static char get_display_char (const unsigned short int *phas)
 
     return (diff == 0) ? Display[0][max] : Display[1][max];
 }
-
+/* ---------------------------------------------------------------------- */
 
                        
                         

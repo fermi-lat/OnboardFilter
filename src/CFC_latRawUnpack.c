@@ -78,7 +78,7 @@ unsigned short int  *CFC_latRawUnpack (struct       _CFC_latRawRecord *clr,
 
 
    /* Fill in the global numbers for this event */
-   clr->logCnt         = (phas - clr->phas);
+   clr->nphas  = (phas - clr->phas);
     
     
    return phas; 

@@ -1,72 +1,72 @@
-/*------------------------------------------------------------------------
-| CVS $Id
-+-------------------------------------------------------------------------*/
-
-
-
 /* ---------------------------------------------------------------------- *//*!
    
-   \file   TFC_skirt.h
+   \file   TFC_skirt.c
    \brief  Routines to project XY projections to the skirt region
    \author JJRussell - russell@slac.stanford.edu
+
+\verbatim
+
+ CVS $Id
+\endverbatim 
 
                                                                          */
 /* --------------------------------------------------------------------- */
 
 
+#include "DFC/EDM.h"
 #include "TFC_skirt.h"
 #include "TFC_projectionDef.h"
 #include "TFC_geometryDef.h"
 
-#include "windowsCompat.h"
+
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+/* ---------------------------------------------------------------------- */
+#ifndef CMX_DOXYGEN
+/* ---------------------------------------------------------------------- */
 
-#ifdef  DEBUG
+EDM_CODE (EDM_level TFC_Skirt_edm = EDM_K_DEBUG);
+EDM_CODE (static int printSkirtTitle (void));
 
-#include <stdio.h>    
-#define PRINTF(args) printf args
-#define DBG(_statement)  _statement
-static int printSkirtTitle (void);
-
-#else
-
-#define PRINTF(args)
-#define DBG(_statement)
-
+/* ---------------------------------------------------------------------- */
 #endif
-
-
-    
-static inline int getRegionMask (int             position,
-                                 const short int edges[4],
-                                 int         leftTemplate,
-                                 int          midTemplate,
-                                 int        rightTemplate);
+/* ---------------------------------------------------------------------- */
 
 
 
-static inline int projectXYtoSkirt (TFC_projection             *prj,
-                                    int                     towerId,
-                                    int                      offset,
-                                    const unsigned short int  z[18],
-                                    const short int        edges[4],
-                                    int                leftTemplate,
-                                    int                 midTemplate,
-                                    int               rightTemplate);
+
+/* ---------------------------------------------------------------------- */
+#ifndef CMX_DOXYGEN
+/* ---------------------------------------------------------------------- */
+static __inline int getRegionMask (int             position,
+				   const short int edges[4],
+				   int         leftTemplate,
+				   int          midTemplate,
+				   int        rightTemplate);
+
+
+
+static __inline int projectXYtoSkirt (TFC_projection             *prj,
+				      int                     towerId,
+				      int                      offset,
+				      const unsigned short int  z[18],
+				      const short int        edges[4],
+				      int                leftTemplate,
+				      int                 midTemplate,
+				      int               rightTemplate);
 #ifdef __cplusplus
 }
 #endif
 
     
-static int getRegionMask (int             position,
-                          const short int edges[4],
-                          int         leftTemplate,
-                          int          midTemplate,
-                          int        rightTemplate)
+static __inline int getRegionMask (int             position,
+				   const short int edges[4],
+				   int         leftTemplate,
+				   int          midTemplate,
+				   int        rightTemplate)
 {
  
    /*  Is it outside the left edge */
@@ -84,20 +84,20 @@ static int getRegionMask (int             position,
 
 
 
-static inline int projectXYtoSkirt (TFC_projection             *prj,
-                                    int                     towerId,
-                                    int                      offset,
-                                    const unsigned short int  z[18],
-                                    const short int        edges[4],
-                                    int                leftTemplate,
-                                    int                 midTemplate,
-                                    int               rightTemplate)
+static __inline int projectXYtoSkirt (TFC_projection             *prj,
+				      int                     towerId,
+				      int                      offset,
+				      const unsigned short int  z[18],
+				      const short int        edges[4],
+				      int                leftTemplate,
+				      int                 midTemplate,
+				      int               rightTemplate)
 {
    int botLayerNum;
    
    botLayerNum = prj->min;
    
-   PRINTF ((" %3d %3d", towerId, botLayerNum));
+   EDM_DEBUGPRINTF ((TFC_Skirt_edm, " %3d %3d", towerId, botLayerNum));
 
    /*
     | !!! KLUDGE !!!
@@ -126,19 +126,22 @@ static inline int projectXYtoSkirt (TFC_projection             *prj,
                                  midTemplate,
                                  rightTemplate);
        
-       PRINTF ((" %9d + %6d + %10d * %5d =  %7d     %2.2x\n",
-                botHit,
-                offset,
-                deltaZ,
-                slope,
-                position,
-                regions));
+       EDM_DEBUGPRINTF ((TFC_Skirt_edm,
+			 " %9d + %6d + %10d * %5d =  %7d     %2.2x\n",
+			 botHit,
+			 offset,
+			 deltaZ,
+			 slope,
+			 position,
+			 regions));
 
        return regions;
    }
    
    return 0;
 }
+/* ---------------------------------------------------------------------- */
+#endif
 /* ---------------------------------------------------------------------- */
 
 
@@ -174,7 +177,7 @@ int TFC_skirtProject (struct _TFC_projection     *prj,
    int offset;
    int  xMask;
    int  yMask;
-   DBG (int printTitle = 1);
+   EDM_CODE (int printTitle = 1);
    
    /*
     | Project the X track projections to the TKR/CAL boundary.
@@ -188,7 +191,7 @@ int TFC_skirtProject (struct _TFC_projection     *prj,
    {
        int mask;
 
-       DBG (if (printTitle) printTitle = printSkirtTitle ());
+       EDM_CODE (if (printTitle) printTitle = printSkirtTitle ());
        
        mask = projectXYtoSkirt (prj,
                                 towerId,
@@ -216,7 +219,7 @@ int TFC_skirtProject (struct _TFC_projection     *prj,
    {
        int mask;
        
-       DBG (if (printTitle) printTitle = printSkirtTitle ());
+       EDM_CODE (if (printTitle) printTitle = printSkirtTitle ());
      
        mask = projectXYtoSkirt (prj,
                                 towerId,
@@ -232,11 +235,12 @@ int TFC_skirtProject (struct _TFC_projection     *prj,
        prj++;
    }
 
-   DBG (printf ("Coincidence = %2.2x & %2.2x = %2.2x %s\n",
-                xMask,
-                yMask,
-                xMask & yMask,
-                (xMask & yMask) ? "SKIRT REJECT\n" : ""));
+   EDM_DEBUGPRINTF ((TFC_Skirt_edm,
+		     "Coincidence = %2.2x & %2.2x = %2.2x %s\n",
+		     xMask,
+		     yMask,
+		     xMask & yMask,
+		     (xMask & yMask) ? "SKIRT REJECT\n" : ""));
    
    return xMask & yMask;
 }
@@ -247,7 +251,7 @@ int TFC_skirtProject (struct _TFC_projection     *prj,
 
 
 
-#ifdef DEBUG
+#ifdef EDM_USE
 /* ---------------------------------------------------------------------- *//*!
 
   \fn     int prjAcd_TopTitlePrint (void)
@@ -258,14 +262,14 @@ int TFC_skirtProject (struct _TFC_projection     *prj,
 /* ---------------------------------------------------------------------- */
 static int printSkirtTitle (void)
 {
-    printf ("\n"
+  EDM_DEBUGPRINTF ((TFC_Skirt_edm,
+   "\n"
    " Project to SKIRT\n"
    " Twr Lyr Intercept + Offset + projection * slope = At Skirt Region\n"
-   " --- --- ---------   ------   ----------   -----   -------- ------\n");
+   " --- --- ---------   ------   ----------   -----   -------- ------\n"));
 
     return 0;
 }
 /* ---------------------------------------------------------------------- */
-
 #endif
 
