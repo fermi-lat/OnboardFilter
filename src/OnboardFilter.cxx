@@ -4,7 +4,7 @@
  * @author JJRussell - russell@slac.stanford.edu
  * @author David Wren - dnwren@milkyway.gsfc.nasa.gov
  * @author Navid Golpayegani - golpa@milkyway.gsfc.nasa.gov
- * $Header$
+ * $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/OnboardFilter.cxx,v 1.9 2003/08/08 19:23:20 golpa Exp $
  */
    
 #include <stdlib.h>
@@ -141,18 +141,18 @@ StatusCode OnboardFilter::initialize()
   MsgStream log(msgSvc(),name());
   log<< MSG::INFO << "Initializing Filter Settings"<<endreq;
   //Set up default values for the control structure
-  ctl_buf.ifile="test.ebf";
-  ctl_buf.ofile=NULL;
-  ctl_buf.data=NULL;
-  ctl_buf.to_process=1;
-  ctl_buf.to_skip=0;
-  ctl_buf.to_print=0;
-  ctl_buf.ss_to_print=0;
-  ctl_buf.quiet=1;
-  ctl_buf.list=0;
-  ctl_buf.esummary=0;
-  ctl_buf.geometry=0;
-  ctl    = &ctl_buf;
+  m_ctl_buf.ifile="test.ebf";
+  m_ctl_buf.ofile=NULL;
+  m_ctl_buf.data=NULL;
+  m_ctl_buf.to_process=1;
+  m_ctl_buf.to_skip=0;
+  m_ctl_buf.to_print=0;
+  m_ctl_buf.ss_to_print=0;
+  m_ctl_buf.quiet=1;
+  m_ctl_buf.list=0;
+  m_ctl_buf.esummary=0;
+  m_ctl_buf.geometry=0;
+  m_ctl    = &m_ctl_buf;
   //Initialize variables that will temporarily store data to be put in TDS
   for(int counter=0;counter<16;counter++)
     TDS_layers[counter]=0;
@@ -238,11 +238,11 @@ StatusCode OnboardFilter::execute()
     nevts = countEvts       (evt, size);
 	
     /* If number of events not specified, use all */
-    to_process = ctl->to_process;
+    to_process = m_ctl->to_process;
     if (to_process < 0) to_process = nevts;
     
-    nskip       = ctl->to_skip;
-    nprint      = ctl->to_print;
+    nskip       = m_ctl->to_skip;
+    nprint      = m_ctl->to_print;
     to_process += nskip;
     nevts       = to_process > nevts ? nevts : to_process;
 
@@ -341,7 +341,7 @@ StatusCode OnboardFilter::execute()
         newStatus->setLayers(TDS_layers);
 		log<< MSG::INFO << "FilterStatus Code: "<<(unsigned int)status<<" : "
 			<<convertBase(status)<<endreq;
-        if (ctl->list && (result->status & DFC_M_STATUS_VETOES) == 0)
+        if (m_ctl->list && (result->status & DFC_M_STATUS_VETOES) == 0)
         {
             printf ("0000 %8d %8d\n", getMCsequence (evt, size), idx);
         }
@@ -352,14 +352,14 @@ StatusCode OnboardFilter::execute()
     
     
     nprocessed = nevts - nskip;
-    DFC_resultsPrint (results, evtCnt, ctl->esummary);
+    DFC_resultsPrint (results, evtCnt, m_ctl->esummary);
     
     printf ("Elapsed Time: %10d / %5d = %7d nsecs\n",
             elapsed,
             nprocessed,
             elapsed/(nprocessed ? nprocessed : 1));
         
-    if (ctl->quiet == 0)
+    if (m_ctl->quiet == 0)
     {
         DFC_statisticsAccumulate (&statistics, results, evtCnt);
         DFC_statisticsPrint      (&statistics);
