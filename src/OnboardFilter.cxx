@@ -4,7 +4,7 @@
  * @author JJRussell - russell@slac.stanford.edu
  * @author David Wren - dnwren@milkyway.gsfc.nasa.gov
  * @author Navid Golpayegani - golpa@milkyway.gsfc.nasa.gov
- * $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/OnboardFilter.cxx,v 1.10 2003/08/12 02:57:34 golpa Exp $
+ * $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/OnboardFilter.cxx,v 1.11 2003/08/16 18:37:52 golpa Exp $
  */
    
 #include <stdlib.h>
@@ -50,18 +50,6 @@
 #include <string.h>
 #ifdef   __linux
 #include <getopt.h>
-#endif
-
-/**
- * Simple macro to drop the specified statement into the code. This
- * macro will only drop the statement if DEBUG is defined, otherwise
- * this macro is a NOOP.
- */
-#ifdef DEBUG
-#include <stdio.h>
-#define _DBG(statement) statement
-#else
-#define _DBG(statement)
 #endif
 
 /**
@@ -294,8 +282,6 @@ StatusCode OnboardFilter::execute()
         int status;
         int  esize;
 
-        _DBG (printf("GLASTSIM = %9d\n", mcsequence));
-        
      
         /* Perform any diagnostic print-out of the event */
         if (dfcSys->toPrint > 0)
@@ -309,10 +295,6 @@ StatusCode OnboardFilter::execute()
         esize   = *evt;
         status  = DFC_filter (dfcCtl, result, dfcEvt, evt, esize);
 
-        if ((status & DFC_M_STATUS_VETOES) == 0)
-            _DBG (printf("GLASTSIM EVENT = %9d (%9d) NOT REJECTED (%8.8x)\n",
-                    getMCsequence(evt), idx, status));
-        
         evt = (const unsigned int *)((char *)(evt)+esize);
         result  = (struct _DFC_results *)((unsigned char *)result
                                                          + resultsSize);
