@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: golpa  Fri Sep  5 13:01:10 PDT 2003
+OnboardFilter/src
+
+Modified Files:
+	FilterTracks.cxx 
+Log Message:
+Removed unecessary call to clear()
+    *
+------------------------------------------------------------
 User: golpa  Fri Sep  5 09:26:59 PDT 2003
 OnboardFilter/src
 
