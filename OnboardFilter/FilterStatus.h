@@ -19,8 +19,6 @@
 
 
 namespace OnboardFilterTds{
-  static const std::string Path = EventModel::EventHeader + "/Filter" + "/FilterStats";
-
   class FilterStatus : public DataObject{
   public:
     FilterStatus();

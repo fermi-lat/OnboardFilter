@@ -250,14 +250,15 @@ StatusCode OnboardFilter::execute()
     
     MsgStream log(msgSvc(),name());
     OnboardFilterTds::FilterStatus *newStatus=new OnboardFilterTds::FilterStatus;
-    eventSvc()->registerObject(OnboardFilterTds::Path,newStatus);
-
-    log << MSG::INFO << "Processing Event"<<endreq;
+    eventSvc()->registerObject("/Event/Filter/FilterStatus",newStatus);
+	
+	log << MSG::INFO << "Processing Event"<<endreq;
     /* Initialize the time base */
     TMR_initialize ();
-
-    dfcSize = DFC_ctlSizeof ();
+	
+	dfcSize = DFC_ctlSizeof ();
     dfcCtl  = (struct _DFC_ctl *)malloc (dfcSize);
+	
     if (dfcCtl == NULL)
     {
         printf ("Cannot allocate %8.8x(%d) bytes for control structure\n",
@@ -265,8 +266,7 @@ StatusCode OnboardFilter::execute()
         return StatusCode::FAILURE;
     }
     DFC_ctlInit (dfcCtl);
-
-
+	
     dfcSize  = DFC_latRecordSizeof ();
     dfcEvt   = (struct _DFC_latRecord *)malloc (dfcSize);
     if (dfcEvt == NULL)
@@ -276,12 +276,12 @@ StatusCode OnboardFilter::execute()
         return StatusCode::FAILURE;
     }
     DFC_latRecordInit (dfcEvt);
-
-    SmartDataPtr<EbfWriterTds::Ebf> ebfData(eventSvc(),EbfWriterTds::Path);
-    if(!ebfData){
+	SmartDataPtr<EbfWriterTds::Ebf> ebfData(eventSvc(),"/Event/Filter/Ebf");
+	
+	if(!ebfData){
       return StatusCode::FAILURE;
     }
-    unsigned int length;
+	unsigned int length;
     char *data=ebfData->get(length);
     ebf   = EBF_openGleam   (length);
     iss   = EBF_readGleam   (ebf,(unsigned int *)data);
@@ -289,11 +289,10 @@ StatusCode OnboardFilter::execute()
     size  = EBF_esizeGleam  (ebf);
     evt   = EBF_edataGleam  (ebf);
     nevts = countEvts       (evt, size);
-
+	
     /* If number of events not specified, use all */
     to_process = ctl->to_process;
     if (to_process < 0) to_process = nevts;
-    
     
     nskip       = ctl->to_skip;
     nprint      = ctl->to_print;
@@ -306,7 +305,7 @@ StatusCode OnboardFilter::execute()
     if (nprint > nevts) nprint = nevts;
     evtCnt = nevts - nskip;
 
-
+	
     /* Allocate the memory for the results vector */
     resultsSize     = DFC_resultsSizeof ();
     results         = (struct _DFC_results *)malloc (resultsSize * evtCnt);
@@ -327,7 +326,7 @@ StatusCode OnboardFilter::execute()
 	evt = (const unsigned int *)((char *)(evt)+esize);
     }
     
-
+	
     begevt          = evt;
     result          = results;
     cfc             = DFC_ctlCfcLocate (dfcCtl);
@@ -340,7 +339,7 @@ StatusCode OnboardFilter::execute()
     //CACHE_invalidateData (evt, size);
     
 
-       
+	
     beg             = TMR_GET ();
     for (idx = nskip; idx < nevts; idx++)
     {
@@ -375,7 +374,7 @@ StatusCode OnboardFilter::execute()
     elapsed    = TMR_DELTA_IN_NSECS (beg, end);
 
     
-
+	
     /* Ensure that the energy status is filled in */
     evt    = begevt;
     result = results;
@@ -406,7 +405,7 @@ StatusCode OnboardFilter::execute()
         
     }
     
-        
+    
     nprocessed = nevts - nskip;
     DFC_resultsPrint (results, evtCnt, ctl->esummary);
     
