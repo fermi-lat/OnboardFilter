@@ -1,5 +1,16 @@
 ------------------------------------------------------------
 User: golpa  Tue Jul 15 12:52:48 PDT 2003
+OnboardFilter/src
+
+Modified Files:
+	OnboardFilter.cxx windowsCompat.h 
+Added Files:
+	FilterStatus.cxx 
+Log Message:
+Added code to store the Filter StatusCode in TDS
+    *
+------------------------------------------------------------
+User: golpa  Tue Jul 15 12:52:48 PDT 2003
 OnboardFilter/cmt
 
 Modified Files:
