@@ -4,7 +4,7 @@
  * @author JJRussell - russell@slac.stanford.edu
  * @author David Wren - dnwren@milkyway.gsfc.nasa.gov
  * @author Navid Golpayegani - golpa@milkyway.gsfc.nasa.gov
- * $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/OnboardFilter.cxx,v 1.17 2003/08/21 21:11:51 golpa Exp $
+ * $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/OnboardFilter.cxx,v 1.18 2003/08/22 19:42:33 golpa Exp $
  */
    
 #include <stdlib.h>
@@ -524,10 +524,10 @@ StatusCode OnboardFilter::computeCoordinates(OnboardFilterTds::FilterStatus *sta
 	    maxhits=prjs->prjs[xprj].nhits;
 	  else
 	    maxhits=prjs->prjs[yprj].nhits;
-	  point=tkrGeoSvc->getStripPosition(tower,prjs->prjs[xprj].max-maxhits,0,prjs->prjs[xprj].hits[maxhits]);
+	  point=tkrGeoSvc->getStripPosition(tower,prjs->prjs[xprj].max-maxhits-1,0,prjs->prjs[xprj].hits[maxhits-1]);
 	  x.push_back(point.x());
 	  xz.push_back(point.z());
-	  point=tkrGeoSvc->getStripPosition(tower,prjs->prjs[yprj].max-maxhits,1,prjs->prjs[yprj].hits[maxhits]);
+	  point=tkrGeoSvc->getStripPosition(tower,prjs->prjs[yprj].max-maxhits-1,1,prjs->prjs[yprj].hits[maxhits-1]);
 	  y.push_back(point.y());
 	  yz.push_back(point.z());
 	  for(int counter=0;counter<3;counter++)
