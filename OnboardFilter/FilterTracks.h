@@ -3,7 +3,7 @@
  * @brief Algorithm to compute tracks from the Filter's projections
  * @author Navid Golpayeagani - golpa@milkyway.gsfc.nasa.gov
  * @author David Wren - dnwren@milkyway.gsfc.nasa.gov
- * $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/OnboardFilter/FilterTracks.h,v 1.1 2003/09/05 00:45:22 golpa Exp $
+ * $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/OnboardFilter/FilterTracks.h,v 1.2 2003/10/03 17:57:04 golpa Exp $
  */
 
 #ifndef _FILTER_TRACKS_H_
@@ -65,6 +65,8 @@ private:
     double m_theta, m_theta_rad;
     double m_length;
     double m_pi;
+
+	int m_usenumhits;
 };
 
 #endif
