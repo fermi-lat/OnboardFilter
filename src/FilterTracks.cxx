@@ -98,9 +98,6 @@ StatusCode FilterTracks::execute(){
                         newTrack.exHighCoord=m_extendHigh;
                         newTrack.length=m_length;
                         status->setTrack(newTrack);
-                        m_pointHigh.clear();
-                        m_extendLow.clear();
-                        m_extendHigh.clear();
                     }
                 }
             }
