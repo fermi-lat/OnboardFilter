@@ -4,7 +4,7 @@
  * @author JJRussell - russell@slac.stanford.edu
  * @author David Wren - dnwren@milkyway.gsfc.nasa.gov
  * @author Navid Golpayegani - golpa@milkyway.gsfc.nasa.gov
- * $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/OnboardFilter.cxx,v 1.21 2003/08/25 21:05:20 golpa Exp $
+ * $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/OnboardFilter.cxx,v 1.22 2003/08/26 15:01:28 golpa Exp $
  */
    
 #include <stdlib.h>
@@ -191,17 +191,6 @@ StatusCode OnboardFilter::initialize()
   m_ctl_buf.esummary=0;
   m_ctl_buf.geometry=0;
   m_ctl    = &m_ctl_buf;
-  //Initialize variables that will temporarily store data to be put in TDS
-  for(int counter=0;counter<16;counter++)
-    TDS_layers[counter]=0;
-  TDS_variables.tcids=0;
-  TDS_variables.acd_xz=0;
-  TDS_variables.acd_yz=0;
-  TDS_variables.acd_xy=0;
-  for(int counter=0;counter<16;counter++){
-    TDS_variables.acdStatus[counter]=0;
-  }
-
   //Set up GUI display
   IGuiSvc *guiSvc;
   if(!service("GuiSvc",guiSvc).isFailure()){
@@ -244,6 +233,18 @@ StatusCode OnboardFilter::execute()
     struct _DFC_latRecord *dfcEvt;
     const struct _DFC_ctlCfc *cfc;
     
+    //Initialize variables that will temporarily store data to be put in TDS
+    for(int counter=0;counter<16;counter++)
+      TDS_layers[counter]=0;
+    TDS_variables.tcids=0;
+    TDS_variables.acd_xz=0;
+    TDS_variables.acd_yz=0;
+    TDS_variables.acd_xy=0;
+    for(int counter=0;counter<16;counter++){
+      TDS_variables.acdStatus[counter]=0;
+      memset(&TDS_variables.prjs[counter],0,sizeof(TDS_variables.prjs[counter]));
+    }
+
     MsgStream log(msgSvc(),name());
 	//Initialize the TDS object
     OnboardFilterTds::FilterStatus *newStatus=
@@ -499,67 +500,69 @@ StatusCode OnboardFilter::computeCoordinates(OnboardFilterTds::FilterStatus *sta
     std::vector<double> pointHigh;
     std::vector<double> extendedLow;
     std::vector<double> extendedHigh;
-    //Loop over the x projections
-    for(int xprj=0;xprj<prjs->xy[0];xprj++){
-      //Get x,z coordinates for hits 0 and 1
-      log << MSG::DEBUG << "Obtaining X and XZ for hits 0 and 1" << endreq;
-      point=tkrGeoSvc->getStripPosition(tower,prjs->prjs[xprj].max,0,prjs->prjs[xprj].hits[0]);
-      x.push_back(point.x());
-      xz.push_back(point.z());
-      point=tkrGeoSvc->getStripPosition(tower, prjs->prjs[xprj].max-1, 0, prjs->prjs[xprj].hits[1]);
-      x.push_back(point.x());
-      xz.push_back(point.z());
-      //Loop over the y projections
-      for(int yprj=prjs->xy[1];yprj<prjs->xy[1]+prjs->xy[0];yprj++){
-	y.clear();
-	yz.clear();
-	if(prjs->prjs[xprj].max==prjs->prjs[yprj].max){
-	  log << MSG::DEBUG << "Obtaining Y and YZ for hits 0 and 1" << endreq;
-	  point=tkrGeoSvc->getStripPosition(tower,prjs->prjs[yprj].max,1,prjs->prjs[yprj].hits[0]);
-	  y.push_back(point.y());
-	  yz.push_back(point.z());
-	  point=tkrGeoSvc->getStripPosition(tower,prjs->prjs[yprj].max-1,1,prjs->prjs[yprj].hits[1]);
-	  y.push_back(point.y());
-	  yz.push_back(point.z());
-	  unsigned char maxhits;
-	  if(prjs->prjs[xprj].nhits<prjs->prjs[yprj].nhits)
-	    maxhits=prjs->prjs[xprj].nhits;
-	  else
-	    maxhits=prjs->prjs[yprj].nhits;
-	  log << MSG::DEBUG << "Obtaining X,Y,XZ,YZ for max hits"<<endreq;
-	  point=tkrGeoSvc->getStripPosition(tower,prjs->prjs[xprj].max-(maxhits-1),0,prjs->prjs[xprj].hits[maxhits-1]);
-	  x.push_back(point.x());
-	  xz.push_back(point.z());
-	  point=tkrGeoSvc->getStripPosition(tower,prjs->prjs[yprj].max-(maxhits-1),1,prjs->prjs[yprj].hits[maxhits-1]);
-	  y.push_back(point.y());
-	  yz.push_back(point.z());
-	  for(int counter=0;counter<3;counter++)
-	    zAvg.push_back((xz[counter]+yz[counter])/2);
-	  double phi,phi_rad;
-	  double theta,theta_rad;
-	  double length;
-	  computeAngles(x,y,xz,yz,zAvg,phi,phi_rad,theta,theta_rad);
-	  computeLength(x,y,zAvg,theta_rad,phi_rad,length,pointHigh);
-	  computeExtension(x,y,zAvg,phi_rad,theta_rad, extendedLow, extendedHigh);
-	  //Add track to TDS
-	  OnboardFilterTds::track newTrack;
-	  newTrack.phi_rad=phi_rad;
-	  newTrack.theta_rad=theta_rad;
-	  newTrack.lowCoord.push_back(x[0]);
-	  newTrack.lowCoord.push_back(y[0]);
-	  newTrack.lowCoord.push_back(zAvg[0]);
-	  newTrack.highCoord=pointHigh;
-	  newTrack.exLowCoord=extendedLow;
-	  newTrack.exHighCoord=extendedHigh;
-	  status->setTrack(newTrack);
-	  x.clear();
+    if(prjs->xy[0]>0 && prjs->xy[1]>0){
+      //Loop over the x projections
+      for(int xprj=0;xprj<prjs->xy[0];xprj++){
+	//Get x,z coordinates for hits 0 and 1
+	log << MSG::DEBUG << "Obtaining X and XZ for hits 0 and 1" << endreq;
+	point=tkrGeoSvc->getStripPosition(tower,prjs->prjs[xprj].max,0,prjs->prjs[xprj].hits[0]);
+	x.push_back(point.x());
+	xz.push_back(point.z());
+	point=tkrGeoSvc->getStripPosition(tower, prjs->prjs[xprj].max-1, 0, prjs->prjs[xprj].hits[1]);
+	x.push_back(point.x());
+	xz.push_back(point.z());
+	//Loop over the y projections
+	for(int yprj=prjs->xy[1];yprj<prjs->xy[1]+prjs->xy[0];yprj++){
 	  y.clear();
-	  xz.clear();
 	  yz.clear();
-	  zAvg.clear();
-	  pointHigh.clear();
-	  extendedLow.clear();
-	  extendedHigh.clear();
+	  if(prjs->prjs[xprj].max==prjs->prjs[yprj].max){
+	    log << MSG::DEBUG << "Obtaining Y and YZ for hits 0 and 1" << endreq;
+	    point=tkrGeoSvc->getStripPosition(tower,prjs->prjs[yprj].max,1,prjs->prjs[yprj].hits[0]);
+	    y.push_back(point.y());
+	    yz.push_back(point.z());
+	    point=tkrGeoSvc->getStripPosition(tower,prjs->prjs[yprj].max-1,1,prjs->prjs[yprj].hits[1]);
+	    y.push_back(point.y());
+	    yz.push_back(point.z());
+	    unsigned char maxhits;
+	    if(prjs->prjs[xprj].nhits<prjs->prjs[yprj].nhits)
+	      maxhits=prjs->prjs[xprj].nhits;
+	    else
+	      maxhits=prjs->prjs[yprj].nhits;
+	    log << MSG::DEBUG << "Obtaining X,Y,XZ,YZ for max hits"<<endreq;
+	    point=tkrGeoSvc->getStripPosition(tower,prjs->prjs[xprj].max-(maxhits-1),0,prjs->prjs[xprj].hits[maxhits-1]);
+	    x.push_back(point.x());
+	    xz.push_back(point.z());
+	    point=tkrGeoSvc->getStripPosition(tower,prjs->prjs[yprj].max-(maxhits-1),1,prjs->prjs[yprj].hits[maxhits-1]);
+	    y.push_back(point.y());
+	    yz.push_back(point.z());
+	    for(int counter=0;counter<3;counter++)
+	      zAvg.push_back((xz[counter]+yz[counter])/2);
+	    double phi,phi_rad;
+	    double theta,theta_rad;
+	    double length;
+	    computeAngles(x,y,xz,yz,zAvg,phi,phi_rad,theta,theta_rad);
+	    computeLength(x,y,zAvg,theta_rad,phi_rad,length,pointHigh);
+	    computeExtension(x,y,zAvg,phi_rad,theta_rad, extendedLow, extendedHigh);
+	    //Add track to TDS
+	    OnboardFilterTds::track newTrack;
+	    newTrack.phi_rad=phi_rad;
+	    newTrack.theta_rad=theta_rad;
+	    newTrack.lowCoord.push_back(x[0]);
+	    newTrack.lowCoord.push_back(y[0]);
+	    newTrack.lowCoord.push_back(zAvg[0]);
+	    newTrack.highCoord=pointHigh;
+	    newTrack.exLowCoord=extendedLow;
+	    newTrack.exHighCoord=extendedHigh;
+	    status->setTrack(newTrack);
+	    x.clear();
+	    y.clear();
+	    xz.clear();
+	    yz.clear();
+	    zAvg.clear();
+	    pointHigh.clear();
+	    extendedLow.clear();
+	    extendedHigh.clear();
+	  }
 	}
       }
     }
@@ -585,10 +588,21 @@ StatusCode OnboardFilter::computeCoordinates(OnboardFilterTds::FilterStatus *sta
       MC_ydir   = Mc_t0.y();
       MC_zdir   = Mc_t0.z();
       //Convert MC dir into theta and phi
-      double theta_mc=acos(-MC_zdir);
-      double phi_mc=acos(-MC_xdir);
-      double theta_rad_mc=theta_mc*pi/180;
-      double phi_rad_mc=phi_mc*pi/180;
+      double phi_rad_mc=0;
+      double theta_rad_mc=acos(MC_zdir);
+      double x_cord=sin(acos(MC_xdir)-pi/2);
+      double y_cord=sin(acos(MC_ydir)-pi/2);
+      if(y_cord==0)
+	phi_rad_mc=pi/2;
+      if ((x_cord>0)&&(y_cord>0))
+	phi_rad_mc = atan(y_cord/x_cord);
+      if ((x_cord<0)&&(y_cord<0))
+	phi_rad_mc = atan(y_cord/x_cord)+pi;
+      if ((x_cord>0)&&(y_cord<0))
+	phi_rad_mc = 2*pi-atan(-y_cord/x_cord);
+      if ((x_cord<0)&&(y_cord>0))
+	phi_rad_mc = pi/2+atan(y_cord/(-x_cord));
+      phi_rad_mc += pi;
       //Compute angular seperation
       double xone=sin(theta_rad_mc)*cos(phi_rad_mc);
       double yone=sin(theta_rad_mc)*sin(phi_rad_mc);
