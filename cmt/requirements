@@ -1,6 +1,6 @@
 package OnboardFilter
 version v0r1p1
-# $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/cmt/requirements,v 1.13 2003/08/21 19:21:34 golpa Exp $
+# $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/cmt/requirements,v 1.14 2003/08/21 19:35:13 golpa Exp $
 use EbfWriter           *
 use TkrUtil             *
 use GuiSvc              *
@@ -32,6 +32,7 @@ use Trigger        *
 use CalUtil        *
 use CalRecon       *
 use AcdRecon       *
+use RootIo         *
 
 public
 
