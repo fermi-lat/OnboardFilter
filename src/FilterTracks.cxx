@@ -983,10 +983,12 @@ StatusCode FilterTracks::TrackSelect(){
 	int yhightower = 0;
 	int xcount = 0;
 	int ycount = 0;
+#if 0 //THB: these are not used.
 	int xlist[100];
 	int ylist[100];
 	int xsizes[100];
 	int ysizes[100];
+#endif
 	int xmaxhits = 0;
 	int ymaxhits = 0;
     int xspot = 0;
