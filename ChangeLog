@@ -1,5 +1,14 @@
 ------------------------------------------------------------
 User: golpa  Tue Jul 22 12:17:26 PDT 2003
+OnboardFilter/OnboardFilter
+
+Modified Files:
+	FilterStatus.h 
+Log Message:
+Added more status codes into the TDS
+    *
+------------------------------------------------------------
+User: golpa  Tue Jul 22 12:17:26 PDT 2003
 OnboardFilter/DFC
 
 Modified Files:
