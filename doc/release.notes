@@ -2,6 +2,7 @@
  * @file release.notes
  * @brief Package OnboardFilter
  * @verbatim
+ * v0r7   09-Feb-2004   NG : Changes of filter logic and increase in track finding tolerance
  * v0r6p3 13-Jan-2004   THB: need explicit include path for gcc with CMT v1r14
  * v0r6p2 03-Oct-2003   NG : Improved computation of strip positions
  * v0r6p1 02-Oct-2003   NG : All towers now used for finding tracks
