@@ -4,7 +4,7 @@
  * @author JJRussell - russell@slac.stanford.edu
  * @author David Wren - dnwren@milkyway.gsfc.nasa.gov
  * @author Navid Golpayegani - golpa@milkyway.gsfc.nasa.gov
- * $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/OnboardFilter.cxx,v 1.15 2003/08/21 19:21:34 golpa Exp $
+ * $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/OnboardFilter.cxx,v 1.16 2003/08/21 20:44:04 golpa Exp $
  */
    
 #include <stdlib.h>
@@ -437,7 +437,7 @@ StatusCode OnboardFilter::execute()
     delete[] results;
     free(dfcCtl);
     delete dfcEvt;
-    return StatusCode::SUCCESS;
+    return computeCoordinates(newStatus);
 }
 
 int OnboardFilter::countEvts (const unsigned int *evts, int size)
