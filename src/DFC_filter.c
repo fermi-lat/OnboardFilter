@@ -1,5 +1,5 @@
 /*------------------------------------------------------------------------
-| CVS $Id: DFC_filter.c,v 1.3 2003/08/06 18:01:11 golpa Exp $
+| CVS $Id: DFC_filter.c,v 1.4 2003/08/16 18:37:52 golpa Exp $
 +-------------------------------------------------------------------------*/
 
 
@@ -73,7 +73,10 @@
           this macro is a NOOP.
                                                                           */
 /* ---------------------------------------------------------------------- */
-#define DEBUG
+#ifdef DEBUG
+# undef DEBUG
+#endif
+
 #ifdef DEBUG
 #include <stdio.h>
 #define _DBG(_statement) _statement

@@ -1,5 +1,5 @@
 /*------------------------------------------------------------------------
-| CVS $Id$
+| CVS $Id: TFC_projectionTowerFind.c,v 1.1.1.1 2003/07/07 16:50:48 golpa Exp $
 +-------------------------------------------------------------------------*/
 
 
@@ -254,7 +254,10 @@ static inline int extendProjectionUp  (TFC_projection        *prj,
                                                                               
                                                                           */
 /* ---------------------------------------------------------------------- */
-#define DEBUG
+#ifdef DEBUG //THB disable this for now
+# undef DEBUG
+#endif
+
 #ifdef DEBUG
 
 #include <stdio.h>
