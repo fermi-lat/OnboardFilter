@@ -1,0 +1,105 @@
+#ifndef TMR_H_WX_XXX_XXX
+#define TMR_H_WX_XXX_XXX
+
+
+/* ----------------------------------------------------------------------- *//*!
+
+  \file   tmr.h.wx-xxx-xxx
+  \brief  Provides the implementation of the timing macros on a Windows
+          platform.
+  \author JJRussell - russell@slac.stanford.edu
+
+\verbatim
+
+CVS $Id
+\endverbatim
+
+  \b ABSTRACT\n
+     --------\n
+     Generic Windows implementation of the TIMER facility. The implementation 
+     is based on the time of day clock. 
+
+  \b USAGE\n
+     -----\n
+     See the documentation for the generic TIMER facility.
+                                                                           */
+/* ----------------------------------------------------------------------- */
+
+/*
+ *
+ *  HISTORY
+ *  -------
+ *  16.12.03 jjr - Created
+ */
+
+#include <sys/timeb.h>
+#include <sys/types.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
+#ifdef __unix__
+#define _ftime ftime
+#define _timeb timeb
+#endif
+
+typedef struct _TMR_tick
+{
+    unsigned int tb_sec;
+    unsigned int tb_msec;
+}
+TMR_tick;
+
+
+static __inline TMR_tick TMR_get (void)
+{
+   struct  _timeb  tb;
+   TMR_tick        tv;
+
+   _ftime (&tb);
+   tv.tb_sec  = tb.time;
+   tv.tb_msec = tb.millitm;
+   return tv;
+}
+
+#define TMR_GET()  TMR_get()
+
+#define TMR_TO_NSECS(_time) (1000000000*_time.tb_sec + 1000*1000*_time.tb_msec)
+#define TMR_FORMAT           "%6d.%03d"
+
+
+static __inline TMR_tick TMR_delta (TMR_tick beg, TMR_tick end)
+{
+  TMR_tick   result;
+  int          secs;
+  int         msecs;
+
+  secs  = end.tb_sec  - beg.tb_sec;
+  msecs = end.tb_msec - beg.tb_msec;
+
+  if (msecs < 0)
+  {
+      msecs += 1000;
+      secs  -= 1;
+  }
+
+  result.tb_sec  =  secs;
+  result.tb_msec = msecs;
+
+  return result;
+}
+
+#define TMR_DELTA(_beg, _end) TMR_delta(beg, end)
+
+#define TMR_DELTA_IN_NSECS(_beg, _end)                   \
+        ((_end.tb_sec   - _beg.tb_sec )  * 1000000000 +  \
+         (_end.tb_msec  - _beg.tb_msec)) * 1000000
+
+#ifdef __cplusplus
+}
+#endif
+
+
+#endif
