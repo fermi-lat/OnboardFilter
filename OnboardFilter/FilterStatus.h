@@ -12,7 +12,7 @@
 #include "Event/TopLevel/Definitions.h"
 #include "Event/TopLevel/EventModel.h"
 
-#include "TFC_projectionDef.h"
+//#include "TFC_projectionDef.h"
 /**
  * @class FilterStatus
  * @brief TDS for storing the information returned by the filter
@@ -21,6 +21,27 @@
 
 
 namespace OnboardFilterTds{
+	struct TFC_projection{
+        int           intercept; /*!< Intercept at the beginning layer         */
+        int               slope; /*!< Slope                                    */
+        int          acdTopMask; /*!< ACD top tile candidates                  */
+        int            acdXMask; /*!< ACD x facing candidates                  */
+        int            acdYMask; /*!< ACD y facing candidates                  */
+        unsigned char skirtMask; /*!< Mask of which skirt region prj strikes   */
+        unsigned char       min; /*!< Beginning layer number of the projection */
+        unsigned char       max; /*!< Ending    layer number of the projection */
+        unsigned char     nhits; /*!< Number of hits assigned                  */
+        unsigned         layers; /*!< Bit mask representing the struck layers  */
+        TFC_strip      hits[18]; /*!< Hits assigned to proj                    */
+	};
+
+	struct TFC_projections{
+        unsigned short int maxCnt; /*!< Maximum number of projections available*/
+        unsigned short int curCnt; /*!< Current number of projections in use   */
+        unsigned short int  xy[2]; /*!< Count of X/Y projections               */
+        TFC_projection prjs[1000]; /*!< List of projections                    */
+	};
+
     class FilterStatus : public DataObject{
     public:
         FilterStatus();
