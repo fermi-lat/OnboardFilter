@@ -1,5 +1,16 @@
 ------------------------------------------------------------
 User: dnwren  Mon Aug  2 12:57:46 PDT 2004
+OnboardFilter/src
+
+Modified Files:
+	FilterTracks.cxx 
+Log Message:
+Fixed errors in FilterTracks::multiplescattering().  Changed AngleSep calc back to original method.
+
+
+    *
+------------------------------------------------------------
+User: dnwren  Mon Aug  2 12:57:46 PDT 2004
 OnboardFilter/OnboardFilter
 
 Modified Files:
