@@ -2,6 +2,7 @@
  * @file release.notes
  * @brief Package OnboardFilter
  * @verbatim
+ * v0r2   25-Aug-2003   NG : Projections and tracks now stored in TDS.
  * v0r1p1 17-Aug-2003   THB:had to inline everything
  * v0r1   17-Aug-2003   THB: made constructors, all set methods private; others all inlined  
  * v0r0p1 16-Aug-2003     Cleaned up requirements file. Ready to add to GR
