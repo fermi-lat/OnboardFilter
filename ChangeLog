@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: golpa  Fri Aug 29 09:39:27 PDT 2003
+OnboardFilter/src
+
+Modified Files:
+	OnboardFilter.cxx 
+Log Message:
+Removed track computation and display
+    *
+------------------------------------------------------------
 User: burnett  Fri Aug 29 07:04:23 PDT 2003
 OnboardFilter/doc
 
