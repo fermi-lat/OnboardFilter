@@ -1,0 +1,143 @@
+#ifndef TMR_C_WX_XXX_XXX
+#define TMR_C_WX_XXX_XXX
+
+
+/*----------------------------------------------------------------------- *//*!
+
+    \file   tmr.c.wx-xxx-xxx
+    \brief  Provides the implementation of the generic WINDOWs timing 
+            routines.
+    \author JJRussell - russell@slac.stanford.edu
+
+\verbatim
+
+CVS $Id
+\endverbatim
+									  */
+/*----------------------------------------------------------------------- */
+
+
+#include "src/tmr.h"
+
+int TMR_initialize (void)
+/*
+   DESCRIPTION
+   -----------
+   Initializes the TMR parameter block. For the generic implementation
+   this is a NOOP.
+
+   PARAMETERS
+   ----------
+         NONE
+
+   RETURNS
+   -------
+   Nothing
+*/
+{
+   return 0;
+} 
+
+
+
+TMR_tick TMR_nsecs_to_ticks (int nanoseconds)
+/*
+   DESCRIPTION
+   -----------
+   Convert a number of nanoseconds to ticks.
+
+   PARAMETERS
+   ----------
+  nanoseconds: The number of nanoseconds to convert to ticks.
+
+   RETURNS
+   -------
+   The equivalent number of ticks
+*/
+{
+   unsigned int msec;
+   unsigned int  sec;
+   TMR_tick    ticks;
+
+   /* Round to msecs */
+   msec          = (nanoseconds + 500000)/ 1000000;
+   sec           = msec / 1000;
+   msec         -=  sec * 1000;
+   ticks.tb_sec  =  sec;
+   ticks.tb_msec = msec;
+
+   return ticks;
+}
+
+
+
+unsigned int TMR_ticks_to_nsecs (TMR_tick ticks)
+/*
+   DESCRIPTION
+   -----------
+   Convert a number of ticks to nanoseconds. Generic Windows does not have
+   a high resolution timer that exists in any natural units. Times must 
+   always to be converted to a 'timeb' structure. So given this, one just 
+   adopts nanoseconds.
+
+   PARAMETERS
+   ----------
+  nanoseconds: The number of nanoseconds to convert to ticks.
+
+   RETURNS
+   -------
+   The equivalent number of ticks
+*/
+{
+   return ticks.tb_sec * 1000000000 + ticks.tb_msec * 1000000;
+} 
+
+
+
+
+TMR_usecs_nsecs TMR_ticks_to_usecs_nsecs (TMR_tick ticks)
+/*
+   DESCRIPTION
+   -----------
+   Convert a number of ticks to microseconds and nanoseconds. Generic 
+   Windows does not have a high resolution timer that exists in any natural
+   units. Times must always to be converted to a 'timeb' structure. So 
+   given this, one just adopts nanoseconds.
+
+   PARAMETERS
+   ----------
+  nanoseconds: The number of nanoseconds to convert to ticks.
+
+   RETURNS
+   -------
+   The equivalent number of ticks
+*/
+{
+   TMR_usecs_nsecs unsecs;
+   unsecs.usecs = ticks.tb_sec * 10000000 + ticks.tb_msec * 1000;
+   unsecs.nsecs = 0;
+} 
+
+
+   
+
+unsigned int TMR_frequency (void)
+/*
+    DESCRIPTION
+    -----------
+    Returns the frequency, in Hertz, of the processor clock. This is the
+    number of ticks/sec.
+
+    PARAMETERS
+    ----------
+          NONE
+
+    RETURNS
+    -------
+    The frequency in Hertz
+*/
+{   
+    return 1000000000;
+}
+
+#endif

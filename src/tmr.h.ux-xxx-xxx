@@ -1,0 +1,86 @@
+#ifndef TMR_H_UX_XXX_XXX
+#define TMR_H_UX_XXX_XXX
+
+
+/* ----------------------------------------------------------------------- *//*!
+
+  \file   tmr.h.ux-xxx-xxx
+  \brief  Provides a set of timing macros
+  \author JJRussell - russell@slac.stanford.edu
+
+\verbatim
+
+CVS $Id
+\endverbatim
+
+  \b ABSTRACT\n
+     --------\n
+     Generic Unidx implementation of the TIMER facility. The implementation 
+     is based on the time of day clock. The resolution is given in microseconds
+     and the implementation is looks good to ~1 usecs, at least on the 
+     LINUX platforms I've tried.
+ 
+  \b USAGE\n
+     -----\n
+     See the documentation for the generic TIMER facility.
+                                                                           */
+/* ----------------------------------------------------------------------- */
+
+/*
+ *
+ *  HISTORY
+ *  -------
+ *  26.10.00 jjr - Created
+ */
+
+#include <sys/time.h>
+#include <unistd.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+typedef struct timeval TMR_tick;
+
+#define TMR_GET()                   \
+      ({                            \
+          TMR_tick tv;              \
+          gettimeofday(&tv, NULL);  \
+	  tv;                       \
+      })
+
+#define TMR_TO_NSECS(_time) (1000000000*_time.tv_sec + 1000*_time.tv_usec)
+#define TMR_FORMAT           "%6d.%06d"
+
+#define TMR_DELTA(_beg, _end)                          \
+       ({	                                       \
+           TMR_tick   result;                          \
+           int          secs;                          \
+           int         usecs;                          \
+                                                       \
+           secs  = _end.tv_sec  - _beg.tv_sec;         \
+           usecs = _end.tv_usec - _beg.tv_usec;        \
+                                                       \
+           if (usecs < 0)                              \
+           {                                           \
+               usecs += 1000000;                       \
+               secs  -= 1;                             \
+           }                                           \
+                                                       \
+           result.tv_sec  = secs;                      \
+           result.tv_usec = usecs;                     \
+                                                       \
+           result;                                     \
+        })                                             \
+
+#define TMR_DELTA_IN_NSECS(_beg, _end)                 \
+        ((_end.tv_sec   - _beg.tv_sec) * 1000000000 +  \
+         (_end.tv_usec  - _beg.tv_usec)) * 1000
+
+#ifdef __cplusplus
+}
+#endif
+
+
+#endif
+
