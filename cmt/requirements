@@ -1,6 +1,6 @@
 package OnboardFilter
-version v0r2p4
-# $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/cmt/requirements,v 1.15 2003/08/21 20:42:54 golpa Exp $
+version v0r3
+# $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/cmt/requirements,v 1.16 2003/08/28 23:00:52 golpa Exp $
 use EbfWriter           *
 use TkrUtil             *
 use GuiSvc              *
@@ -21,7 +21,7 @@ macro headers "" WIN32 "*.h"
 
 library OnboardFilter $(headers) *.cxx *.c Dll/*.cxx
 
-private
+# use this only for the test. TODO: make it cleaner
 apply_pattern package_Cshlibflags
 use TkrRecon       *
 use FluxSvc        *
