@@ -3,7 +3,7 @@
  * @brief Algorithm to compute tracks from the Filter's projections
  * @author Navid Golpayeagani - golpa@milkyway.gsfc.nasa.gov
  * @author David Wren - dnwren@milkyway.gsfc.nasa.gov
- * $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/OnboardFilter/FilterTracks.h,v 1.5 2004/07/23 15:58:10 golpa Exp $
+ * $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/OnboardFilter/FilterTracks.h,v 1.6 2004/08/13 22:08:57 golpa Exp $
  */
 
 #ifndef _FILTER_TRACKS_H_
@@ -37,12 +37,12 @@ class FilterTracks : public Algorithm{
   StatusCode initialize();
   StatusCode execute();
   StatusCode finalize();
-  
+
  private:
   /**
    * Compute Angles for a given track
    */
-  void computeAngles();
+  void computeAngles(double x_h, double x_v, double y_h, double y_v, double z_v);
   /**
    * Compute the Length of a track
    */
@@ -51,14 +51,14 @@ class FilterTracks : public Algorithm{
    * Compute the extensions to the tracks
    */
   void computeExtension();
-  
+
   /**
    * Find out the position of a strip after converting Filter's strip
    * numbering into numbering consistent with getStripPosition()
    */
-  HepPoint3D findStripPosition(ITkrGeometrySvc *tkrGeoSvc, int tower, 
+  HepPoint3D findStripPosition(ITkrGeometrySvc *tkrGeoSvc, int tower,
                                int layer, int view, double stripId);
-  
+
   /**
    * Compute the multiple scattering angles
    */
@@ -67,7 +67,11 @@ class FilterTracks : public Algorithm{
    * Write out the OnboardFilter hits
    */
   StatusCode WriteHits();
-  
+  /**
+   * Experiment with different track selection methods
+   */
+  StatusCode TrackSelect();
+
   std::vector<double> m_x;
   std::vector<double> m_y;
   std::vector<double> m_xz;
@@ -79,13 +83,14 @@ class FilterTracks : public Algorithm{
   double m_phi, m_phi_rad;
   double m_theta, m_theta_rad;
   double m_length;
-  
+
   int m_usenumhits;
   int m_writehits;
   int m_scattering;
-  
+  int m_trackselect;
+
   std::ofstream m_outfile;
-  
+
   //StringProperty m_hitsfilename;
   //const char *m_hitsfilename;
 };
