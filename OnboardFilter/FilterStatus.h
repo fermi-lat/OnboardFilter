@@ -14,10 +14,12 @@
 
 //#include "TFC_projectionDef.h"
 /**
- * @class FilterStatus
- * @brief TDS for storing the information returned by the filter
- */
+* @class FilterStatus
+* @brief TDS for storing the information returned by the filter
+*/
 //extern const CLID& CLID_FilterStatus;
+
+class OnboardFilter;
 
 
 namespace OnboardFilterTds{
@@ -42,62 +44,71 @@ namespace OnboardFilterTds{
         TFC_projection prjs[1000]; /*!< List of projections                    */
     };
 
+
     class FilterStatus : public DataObject{
     public:
-        FilterStatus();
-        FilterStatus(const unsigned int code, const int energey=0,
-			         const int ids=0, const int xz=0, const int yz=0,
-					 const int xy=0, const int *acdstatus=NULL,
-					 const int *layerCode=NULL,
-					 const TFC_projections *projections=NULL);
         virtual ~FilterStatus();
-    
-        ///Set the statuscode of the filter
-        void set(const unsigned int code);
-    
+
+
         ///Return the statuscode of the filter
         unsigned int get() const;
-    
+
         ///Returns the 16 most significant bits of the filter code
         unsigned int getHigh() const;
 
         ///Returns the 16 least signifcat bits of the filter code
         unsigned int getLow() const;
 
-        ///Set the Energy in CAL
-        void setCalEnergy(const int energy);
-
         ///Returns the value stored in CalEnergy
         int getCalEnergy() const;
 
-        ///Set the Code specifying the towers with triggers or possible triggers
-        void setTcids(const int ids);
         ///Return the Code specifying the towers with triggers or possible triggers
         int getTcids() const;
 
-        ///Set the ACD hit map results
-        void setAcdMap(const int xz, const int yz, const int xy);
         ///Return the ACD hit map results
         void getAcdMap(int &xz, int &yz, int &xy) const;
 
-        ///Set the ACD faces intersected by projections
-        void setAcdStatus(const int tower, const int status);
         ///Return the ACD faces intersected by projections
         void getAcdStatus(int *copy) const;
-
-        ///Set what layers were hit in each tower
-        void setLayers(const int *layerCode);
-        ///Return what layers were hit in each tower
-        int *getLayers();
         
-		///Set the projection of a specific tower
-		void setProjection(const int tower,const TFC_projections projections);
-		///Return the projections for a specific tower
-		std::vector<TFC_projection> getProjection(const int tower);
+        ///Return pointer to array of layers that were hit in each tower
+        const int *getLayers()const ;
+
+        ///Return the projections for a specific tower
+        std::vector<TFC_projection> getProjection(int tower)const ;
 
         virtual std::ostream& fillStream(std::ostream &s) const;
         friend std::ostream& operator << (std::ostream &s, const FilterStatus &obj);
+
+        // only this guy can create one, or modify it
+        friend class OnboardFilter;
     private:
+        FilterStatus();
+        FilterStatus(const unsigned int code, const int energey=0,
+            const int ids=0, const int xz=0, const int yz=0,
+            const int xy=0, const int *acdstatus=NULL,
+            const int *layerCode=NULL,
+            const TFC_projections *projections=NULL);
+        ///Set the statuscode of the filter
+        void set(const unsigned int code);
+
+        ///Set the Energy in CAL
+        void setCalEnergy(const int energy);
+
+        ///Set the Code specifying the towers with triggers or possible triggers
+        void setTcids(const int ids);
+
+
+        ///Set the ACD hit map results
+        void setAcdMap(const int xz, const int yz, const int xy);
+        ///Set the ACD faces intersected by projections
+        void setAcdStatus(const int tower, const int status);
+
+        ///Set what layers were hit in each tower
+        void setLayers(const int *layerCode);
+        ///Set the projection of a specific tower
+        void setProjection(const int tower,const TFC_projections projections);
+
         ///Filter status code
         unsigned int m_status;
         ///Energy in CAL
@@ -112,19 +123,45 @@ namespace OnboardFilterTds{
         int m_acdStatus[16];
         ///Layers hit in each tower
         int m_layers[16];
-		///Projections for the towers
-		std::vector<TFC_projection> m_prjs[16];
+        ///Projections for the towers
+        std::vector<TFC_projection> m_prjs[16];
     };
-	inline unsigned int FilterStatus::get() const{
-		return m_status;
-	}
 
-	inline unsigned int FilterStatus::getHigh() const{
-		return m_status>>15;
-	}
+    // inline the public get methods for clients besides OnboardFilter.
 
-	inline unsigned int FilterStatus::getLow() const{
-		return m_status & 0x7FFF;
-	}
+    inline unsigned int FilterStatus::get() const{
+        return m_status;
+    }
+
+    inline unsigned int FilterStatus::getHigh() const{
+        return m_status>>15;
+    }
+
+    inline unsigned int FilterStatus::getLow() const{
+        return m_status & 0x7FFF;
+    }
+    inline void FilterStatus::getAcdMap(int &xz, int &yz, int &xy) const {
+        xz=m_acd_xz;
+        yz=m_acd_yz;
+        xy=m_acd_xy;
+    }
+    inline void FilterStatus::getAcdStatus(int *copy) const {
+        memcpy(copy,m_acdStatus,sizeof(m_acdStatus)*16);
+    }
+    inline std::vector<TFC_projection> FilterStatus::getProjection(int tower)const{
+        return m_prjs[tower];
+    }
+    inline int FilterStatus::getCalEnergy() const{
+        return m_calEnergy;
+    }
+    inline int FilterStatus::getTcids()const{
+        return m_tcids;
+    }
+    inline const int * FilterStatus::getLayers()const {
+        return m_layers;
+    }
+
+
+
 };
 #endif
