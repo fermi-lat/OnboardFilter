@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: golpa  Wed Oct  8 09:47:37 PDT 2003
+OnboardFilter/cmt
+
+Modified Files:
+	requirements 
+Log Message:
+Added Johann's recommendation to make it gcc3.2 compatible
+    *
+------------------------------------------------------------
 User: golpa  Fri Oct  3 12:23:03 PDT 2003
 OnboardFilter/doc
 
