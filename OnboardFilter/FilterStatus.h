@@ -102,7 +102,7 @@ namespace OnboardFilterTds{
 
         // only this guy can create one, or modify it
         friend class OnboardFilter;
-    private:
+
         FilterStatus();
 
         ///Set the statuscode of the filter
@@ -129,6 +129,7 @@ namespace OnboardFilterTds{
 
         void setSeperation(const double sep);
 
+    private:
         ///Filter status code
         unsigned int m_status;
         ///Energy in CAL
