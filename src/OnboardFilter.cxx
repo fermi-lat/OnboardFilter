@@ -80,9 +80,9 @@
 /* ---------------------------------------------------------------------- */
 /*!
 
-  \def   CACHE_invalidateData(_ptr, _nbytes)
-  \brief Macro to laundry the cache invalidate routine. This is a NOP on
-         all but VxWorks platforms
+\def   CACHE_invalidateData(_ptr, _nbytes)
+\brief Macro to laundry the cache invalidate routine. This is a NOP on
+all but VxWorks platforms
                                                                           */
 /* ---------------------------------------------------------------------- */  
 #define CACHE_invalidateData(_ptr, _nbytes) /* NOOP */
@@ -120,84 +120,85 @@ extern const struct _TFC_geometry *TFC_Geos[];
 
 class OnboardFilter:public Algorithm{
 public:
-	OnboardFilter(const std::string& name, ISvcLocator *pSvcLocator);
-	StatusCode initialize();
-	StatusCode execute();
-	StatusCode finalize();
+  OnboardFilter(const std::string& name, ISvcLocator *pSvcLocator);
+  StatusCode initialize();
+  StatusCode execute();
+  StatusCode finalize();
 private:
-	std::string convertBase(unsigned int number);
-	void *allocate (int nbytes, const char *name);
-	void   free_em (void *ptr);
-
-
-	const struct _DFC_ctl *dfcCtlConstruct (TFC_geoId geoId, int geoPrint);
-	struct _DFC_evt *dfcEvtConstruct (void);
-
-	const struct _TFC_geometry *locateGeo (int            id, 
-		                                          int      printIt);
-
-	int  countEvts (const unsigned int *evts, 
-		                                  int                 size);
-
-	const unsigned int *setupEvts (const unsigned int  *evt,
-		                                  int              totsize,
-	 						              int              maxevts,
-							              int                nskip,
-										  int               *nevts,
-										  unsigned int       *size);
-
-	int filterEvts         (const unsigned int         *evt,
-			       int                     nbegevt,
-			       int                     nendevt,
-			       int                      nprint,
-			       unsigned int        ss_to_print,
-			       const struct _DFC_ctl   *dfcCtl,
-			       struct _DFC_results    *results,
-			       int                 resultsSize,
-			       struct _DFC_evt         *dfcEvt,
-			       unsigned int             vetoes);
-
-	int filterCompleteEvts (const unsigned int         *evt,
-			       int                     nbegevt,
-			       int                     nendevt,
-			       EBF_ofile                  *ebo,
-			       const struct _DFC_ctl   *dfcCtl,
-			       struct _DFC_results    *results,
-			       int                 resultsSize,
-			       struct _DFC_evt         *dfcEvt,
-			       unsigned int        listPasses);
-
-	void     resultsPrint  (TMR_tick                       beg, 
-		   	       TMR_tick                       end,
-			       const struct _DFC_results *results,
-			       int                       nresults,
-			       unsigned int               options);
-
-	void statisticsPrint   (const struct _DFC_results *results,
-			       int                       nresults);
-
-	__inline int getMCsequence (const unsigned int *evt, int esize);
-	EBF_ofile *createOutputFile (const char *name);
-
-	IntegerProperty m_mask;  //mask for setting filter to reject
-	int m_rejected;
-	int m_passThrough;
-	int m_vetoBits[17];      //array to count # of times each veto bit was set
-	DFC_rto m_rto;
+  std::string convertBase(unsigned int number);
+  void *allocate (int nbytes, const char *name);
+  void   free_em (void *ptr);
+  
+  
+  const struct _DFC_ctl *dfcCtlConstruct (TFC_geoId geoId, int geoPrint);
+  struct _DFC_evt *dfcEvtConstruct (void);
+  
+  const struct _TFC_geometry *locateGeo (int            id, 
+					 int      printIt);
+  
+  int  countEvts (const unsigned int *evts, 
+		  int                 size);
+  
+  const unsigned int *setupEvts (const unsigned int  *evt,
+				 int              totsize,
+				 int              maxevts,
+				 int                nskip,
+				 int               *nevts,
+				 unsigned int       *size);
+  
+  int filterEvts         (const unsigned int         *evt,
+			  int                     nbegevt,
+			  int                     nendevt,
+			  int                      nprint,
+			  unsigned int        ss_to_print,
+			  const struct _DFC_ctl   *dfcCtl,
+			  struct _DFC_results    *results,
+			  int                 resultsSize,
+			  struct _DFC_evt         *dfcEvt,
+			  unsigned int             vetoes);
+  
+  int filterCompleteEvts (const unsigned int         *evt,
+			  int                     nbegevt,
+			  int                     nendevt,
+			  EBF_ofile                  *ebo,
+			  const struct _DFC_ctl   *dfcCtl,
+			  struct _DFC_results    *results,
+			  int                 resultsSize,
+			  struct _DFC_evt         *dfcEvt,
+			  unsigned int        listPasses);
+  
+  void     resultsPrint  (TMR_tick                       beg, 
+			  TMR_tick                       end,
+			  const struct _DFC_results *results,
+			  int                       nresults,
+			  unsigned int               options);
+  
+  void statisticsPrint   (const struct _DFC_results *results,
+			  int                       nresults);
+  
+  __inline int getMCsequence (const unsigned int *evt, int esize);
+  EBF_ofile *createOutputFile (const char *name);
+  void storeHits(OnboardFilterTds::TowerHits *hits);
+  
+  IntegerProperty m_mask;  //mask for setting filter to reject
+  int m_rejected;
+  int m_passThrough;
+  int m_vetoBits[17];      //array to count # of times each veto bit was set
+  DFC_rto m_rto;
 };
 
 static const AlgFactory<OnboardFilter> Factory;
 const IAlgFactory& OnboardFilterFactory = Factory;
 
 OnboardFilter::OnboardFilter(const std::string& name, ISvcLocator *pSvcLocator):Algorithm(name,pSvcLocator),m_rejected(0){
-	declareProperty("mask",m_mask=0);
-	declareProperty("PassThrough",m_passThrough=1);
+  declareProperty("mask",m_mask=0);
+  declareProperty("PassThrough",m_passThrough=1);
 }
 
 
 /* ---------------------------------------------------------------------- */
 /*!
-
+  
    \fn          int getMCsequence (const unsigned int *evt, int esize)
    \brief       Retrieves the GLEAM Monte Carlo Event Sequence Number
    \param   evt Pointer to the event
@@ -207,7 +208,7 @@ OnboardFilter::OnboardFilter(const std::string& name, ISvcLocator *pSvcLocator):
 /* ---------------------------------------------------------------------- */
 __inline int OnboardFilter::getMCsequence (const unsigned int *evt, int esize)
 {
-    return evt[0x10];
+  return evt[0x10];
 }
 /* ---------------------------------------------------------------------- */
     
@@ -221,11 +222,10 @@ StatusCode OnboardFilter::initialize()
   status = DFC_rtoFill (&m_rto, 0, NULL);
   if(!m_passThrough)
     m_rto.vetoes=DFC_M_STATUS_VETOES;
-  if (status)
-    {
-      log<<MSG::DEBUG<<"Failed to set up default values for control structure"<<endreq;
-      return StatusCode::FAILURE;
-    }
+  if (status){
+    log<<MSG::DEBUG<<"Failed to set up default values for control structure"<<endreq;
+    return StatusCode::FAILURE;
+  }
   for(int counter=0;counter<17;counter++)
     m_vetoBits[counter]=0;
   return StatusCode::SUCCESS;
@@ -252,54 +252,55 @@ StatusCode OnboardFilter::execute()
     int                     iendevt;
     int                      evtCnt;
     
-	//Initialize variables that will temporarily store data to be put in TDS
-	for(int counter=0;counter<16;counter++)
-		TDS_layers[counter]=0;
-	TDS_variables.tcids=0;
-	TDS_variables.acd_xz=0;
-	TDS_variables.acd_yz=0;
-	TDS_variables.acd_xy=0;
-	for(int counter=0;counter<16;counter++){
-		TDS_variables.acdStatus[counter]=0;
-		TDS_variables.xCnt[counter]=0;
-		TDS_variables.yCnt[counter]=0;
-		//memset(&TDS_variables.prjs[counter],0,sizeof(TDS_variables.prjs[counter]));
-	    memset(&TDS_variables.prjs,0,sizeof(TDS_variables.prjs));
-	}
-	MsgStream log(msgSvc(),name());
-	OnboardFilterTds::FilterStatus *newStatus=new OnboardFilterTds::FilterStatus;
-	eventSvc()->registerObject("/Event/Filter/FilterStatus",newStatus);
-
+    //Initialize variables that will temporarily store data to be put in TDS
+    for(int counter=0;counter<16;counter++)
+      TDS_layers[counter]=0;
+    TDS_variables.tcids=0;
+    TDS_variables.acd_xz=0;
+    TDS_variables.acd_yz=0;
+    TDS_variables.acd_xy=0;
+    for(int counter=0;counter<16;counter++){
+      TDS_variables.acdStatus[counter]=0;
+      TDS_variables.xCnt[counter]=0;
+      TDS_variables.yCnt[counter]=0;
+      //memset(&TDS_variables.prjs[counter],0,sizeof(TDS_variables.prjs[counter]));
+      memset(&TDS_variables.prjs,0,sizeof(TDS_variables.prjs));
+    }
+    MsgStream log(msgSvc(),name());
+    OnboardFilterTds::TowerHits *hits = new OnboardFilterTds::TowerHits;
+    eventSvc()->registerObject("/Event/Filter/TowerHits",hits);
+    OnboardFilterTds::FilterStatus *newStatus=new OnboardFilterTds::FilterStatus;
+    eventSvc()->registerObject("/Event/Filter/FilterStatus",newStatus);
+    
     /* Initialize the time base */
     TMR_initialize  ();
-
+    
     /* Print information about the runtime options */
     //DFC_rtoPrint (rto);
-
+    
     /* Set the diagnostic message/print levels */
     EDM_CODE (setMessageLevels (rto->levels));
-
+    
     /* Construct, i.e. alloc and initialize, the filtering control structure */
     dfcCtl = dfcCtlConstruct (m_rto.geo_id, m_rto.geometry);
-	if (dfcCtl == NULL) return StatusCode::FAILURE;
-
+    if (dfcCtl == NULL) return StatusCode::FAILURE;
+    
     /* Construct the storage needed to analayze an event */
     dfcEvt = dfcEvtConstruct ();
-    if (dfcEvt == NULL) 
-    {  
+    if (dfcEvt == NULL){  
       free_em ((void *)dfcCtl);
-	  log<<MSG::ERROR<<"Cannot allocated memory for DFC unpack record"<<endreq;
-	  return StatusCode::FAILURE;
+      log<<MSG::ERROR<<"Cannot allocated memory for DFC unpack record"<<endreq;
+      return StatusCode::FAILURE;
     }
-	SmartDataPtr<EbfWriterTds::Ebf> ebfData(eventSvc(),"/Event/Filter/Ebf");
-	if(!ebfData){
-		log<<MSG::ERROR<<"Unable to retrieve ebf data from TDS"<<endreq;
-		return StatusCode::FAILURE;
-	}
+    SmartDataPtr<EbfWriterTds::Ebf> ebfData(eventSvc(),"/Event/Filter/Ebf");
+    if(!ebfData){
+      log<<MSG::ERROR<<"Unable to retrieve ebf data from TDS"<<endreq;
+      return StatusCode::FAILURE;
+    }
     
     /* Open, read, close and process the input data */
-	unsigned int length;
-	char *data=ebfData->get(length);
+    unsigned int length;
+    char *data=ebfData->get(length);
     if(length==0){
       log<<MSG::DEBUG<<"Event has no EBF data. Ignoring"<<endreq;
       free_em((void *)dfcCtl);
@@ -307,12 +308,11 @@ StatusCode OnboardFilter::execute()
       return StatusCode::SUCCESS;
     }
     ebf    = EBF_openGleam(length);
-    if (ebf == NULL)
-    {
+    if (ebf == NULL){
       free_em ((void *)dfcCtl);
       free_em ((void *)dfcEvt);
-	  log<<MSG::ERROR<<"Unable to pass ebf data to the ebf reader"<<endreq;
-	  return StatusCode::FAILURE;
+      log<<MSG::ERROR<<"Unable to pass ebf data to the ebf reader"<<endreq;
+      return StatusCode::FAILURE;
     }
 
     status = EBF_readGleam    (ebf,(unsigned int *)data);
@@ -327,17 +327,16 @@ StatusCode OnboardFilter::execute()
     //        "Event Count: %8d\n",
     //        size,
     //        nevts);
-
-
+    
+    
     /* Create an output file by specified name iff rto->ofile is not NULL */
     ebo = 0;
-    if ( m_rto.ofile && ((ebo = createOutputFile (m_rto.ofile)) == 0) )
-    {
+    if ( m_rto.ofile && ((ebo = createOutputFile (m_rto.ofile)) == 0) ){
       free_em ((void *)dfcCtl);
       free_em ((void *)dfcEvt);
       EBF_free (ebf);
-	  log<<MSG::ERROR<<"Unable to create output file"<<endreq;
-	  return StatusCode::FAILURE;
+      log<<MSG::ERROR<<"Unable to create output file"<<endreq;
+      return StatusCode::FAILURE;
     }
     
     
@@ -359,14 +358,13 @@ StatusCode OnboardFilter::execute()
     resultsSize = sizeof(DFC_results);
     results     = (struct _DFC_results *)allocate (resultsSize * evtCnt,
 						   "result vectors");
-    if (results == NULL) 
-    {
+    if (results == NULL){
       free_em ((void *)dfcCtl);
       free_em ((void *)dfcEvt);
       EBF_ofree (ebo);
       EBF_free  (ebf);
-	  log<<MSG::ERROR<<"Cannot allocate memory for the results vector"<<endreq;
-	  return StatusCode::FAILURE;
+      log<<MSG::ERROR<<"Cannot allocate memory for the results vector"<<endreq;
+      return StatusCode::FAILURE;
     }
 
 
@@ -382,105 +380,128 @@ StatusCode OnboardFilter::execute()
 			  results, resultsSize, dfcEvt,  m_rto.vetoes);
     end     = TMR_GET ();
     
-
+    
     /* Ensure that the energy status is filled in */
     status = filterCompleteEvts (evts, ibegevt, iendevt,
                                  ebo,
                                  dfcCtl, 
 				 results, resultsSize, dfcEvt, m_rto.list);
-
-
+    
+    
     /*
-     |  Print the results of the filtering process
+      |  Print the results of the filtering process
     */
     //resultsPrint (beg, end, results, evtCnt, rto->esummary);
 
     /* If not quiet mode, print the statistics */
     //if (rto->quiet == 0) statisticsPrint (results, evtCnt);
 
-	if(m_mask!=0 && (m_mask & (status >> 15)) !=0){
-		this->setFilterPassed(false);
-		m_rejected++;
-	}
+    if(m_mask!=0 && (m_mask & (status >> 15)) !=0){
+      this->setFilterPassed(false);
+      m_rejected++;
+    }
 
-	if((results->status & DFC_M_STATUS_TKR_LT_2_ELO) != 0)
-		m_vetoBits[0]++;
-	if((results->status & DFC_M_STATUS_TKR_SKIRT) != 0)
-		m_vetoBits[1]++;
-	if((results->status & DFC_M_STATUS_TKR_EQ_0) != 0)
-		m_vetoBits[2]++;
-	if((results->status & DFC_M_STATUS_TKR_ROW2) != 0)
-		m_vetoBits[3]++;
-	if((results->status & DFC_M_STATUS_TKR_ROW01) != 0)
-		m_vetoBits[4]++;
-	if((results->status & DFC_M_STATUS_TKR_TOP) != 0)
-		m_vetoBits[5]++;
-	if((results->status & DFC_M_STATUS_ZBOTTOM) != 0)
-		m_vetoBits[6]++;
-	if((results->status & DFC_M_STATUS_EL0_ETOT_90) != 0)
-		m_vetoBits[7]++;
-	if((results->status & DFC_M_STATUS_EL0_ETOT_01) != 0)
-		m_vetoBits[8]++;
-	if((results->status & DFC_M_STATUS_SIDE) != 0)
-		m_vetoBits[9]++;
-	if((results->status & DFC_M_STATUS_TOP) != 0)
-		m_vetoBits[10]++;
-	if((results->status & DFC_M_STATUS_SPLASH_1) != 0)
-		m_vetoBits[11]++;
-	if((results->status & DFC_M_STATUS_E350_FILTER_TILE) != 0)
-		m_vetoBits[12]++;
-	if((results->status & DFC_M_STATUS_E0_TILE) != 0)
-		m_vetoBits[13]++;
-	if((results->status & DFC_M_STATUS_SPLASH_0) != 0)
-		m_vetoBits[14]++;
-	if((results->status & DFC_M_STATUS_NOCALLO_FILTER_TILE) != 0)
-		m_vetoBits[15]++;
-	if((results->status & DFC_M_STATUS_VETOED) != 0)
-		m_vetoBits[16]++;
-
-	newStatus->set(results->status);
-	newStatus->setCalEnergy(results->energy);
-	newStatus->setTcids(TDS_variables.tcids);
-	newStatus->setAcdMap(TDS_variables.acd_xz,TDS_variables.acd_yz,TDS_variables.acd_xy);
-	newStatus->setLayerEnergy(TDS_variables.layerEnergy);
-	newStatus->setCapture(TDS_variables.xcapture,TDS_variables.ycapture);
-
-	newStatus->setXY(TDS_variables.xy00, TDS_variables.xy11, TDS_variables.xy22, TDS_variables.xy33);
-	OnboardFilterTds::projections prjs;
-	for(int counter=0;counter<16;counter++){
-		newStatus->setAcdStatus(counter,TDS_variables.acdStatus[counter]);
-		prjs.xy[counter][0]=TDS_variables.xCnt[counter];
-		prjs.xy[counter][1]=TDS_variables.yCnt[counter];
-		prjs.curCnt[counter]=prjs.xy[counter][0]+prjs.xy[counter][1];
-		for(int prjCounter=0;prjCounter<1000;prjCounter++){
-			prjs.prjs[prjCounter].layers=TDS_variables.prjs.prjs[prjCounter].layers;
-			prjs.prjs[prjCounter].min   =TDS_variables.prjs.prjs[prjCounter].min;
-			prjs.prjs[prjCounter].max   =TDS_variables.prjs.prjs[prjCounter].max;
-			prjs.prjs[prjCounter].nhits =TDS_variables.prjs.prjs[prjCounter].nhits;
-			for(int hitCounter=0;hitCounter<18;hitCounter++)
-				prjs.prjs[prjCounter].hits[hitCounter]=TDS_variables.prjs.prjs[prjCounter].hits[hitCounter];
-		}
-	}
-	newStatus->setProjection(prjs);
-	newStatus->setLayers(TDS_layers);
-	newStatus->setTmsk(TDS_variables.tmsk);
-	log<<MSG::DEBUG;
-	if(log.isActive()){
-		log.stream()<< "FilterStauts Code: " << std::setbase(16) << (unsigned int)results->status<<" : "
-			<< convertBase(results->status);
-	}
-	log << endreq;
-
+    if((results->status & DFC_M_STATUS_TKR_LT_2_ELO) != 0)
+      m_vetoBits[0]++;
+    if((results->status & DFC_M_STATUS_TKR_SKIRT) != 0)
+      m_vetoBits[1]++;
+    if((results->status & DFC_M_STATUS_TKR_EQ_0) != 0)
+      m_vetoBits[2]++;
+    if((results->status & DFC_M_STATUS_TKR_ROW2) != 0)
+      m_vetoBits[3]++;
+    if((results->status & DFC_M_STATUS_TKR_ROW01) != 0)
+      m_vetoBits[4]++;
+    if((results->status & DFC_M_STATUS_TKR_TOP) != 0)
+      m_vetoBits[5]++;
+    if((results->status & DFC_M_STATUS_ZBOTTOM) != 0)
+      m_vetoBits[6]++;
+    if((results->status & DFC_M_STATUS_EL0_ETOT_90) != 0)
+      m_vetoBits[7]++;
+    if((results->status & DFC_M_STATUS_EL0_ETOT_01) != 0)
+      m_vetoBits[8]++;
+    if((results->status & DFC_M_STATUS_SIDE) != 0)
+      m_vetoBits[9]++;
+    if((results->status & DFC_M_STATUS_TOP) != 0)
+      m_vetoBits[10]++;
+    if((results->status & DFC_M_STATUS_SPLASH_1) != 0)
+      m_vetoBits[11]++;
+    if((results->status & DFC_M_STATUS_E350_FILTER_TILE) != 0)
+      m_vetoBits[12]++;
+    if((results->status & DFC_M_STATUS_E0_TILE) != 0)
+      m_vetoBits[13]++;
+    if((results->status & DFC_M_STATUS_SPLASH_0) != 0)
+      m_vetoBits[14]++;
+    if((results->status & DFC_M_STATUS_NOCALLO_FILTER_TILE) != 0)
+      m_vetoBits[15]++;
+    if((results->status & DFC_M_STATUS_VETOED) != 0)
+      m_vetoBits[16]++;
+    
+    newStatus->set(results->status);
+    newStatus->setCalEnergy(results->energy);
+    newStatus->setTcids(TDS_variables.tcids);
+    newStatus->setAcdMap(TDS_variables.acd_xz,TDS_variables.acd_yz,TDS_variables.acd_xy);
+    newStatus->setLayerEnergy(TDS_variables.layerEnergy);
+    newStatus->setCapture(TDS_variables.xcapture,TDS_variables.ycapture);
+    
+    newStatus->setXY(TDS_variables.xy00, TDS_variables.xy11, TDS_variables.xy22, TDS_variables.xy33);
+    OnboardFilterTds::projections prjs;
+    for(int counter=0;counter<16;counter++){
+      newStatus->setAcdStatus(counter,TDS_variables.acdStatus[counter]);
+      prjs.xy[counter][0]=TDS_variables.xCnt[counter];
+      prjs.xy[counter][1]=TDS_variables.yCnt[counter];
+      prjs.curCnt[counter]=prjs.xy[counter][0]+prjs.xy[counter][1];
+      for(int prjCounter=0;prjCounter<1000;prjCounter++){
+	prjs.prjs[prjCounter].layers=TDS_variables.prjs.prjs[prjCounter].layers;
+	prjs.prjs[prjCounter].min   =TDS_variables.prjs.prjs[prjCounter].min;
+	prjs.prjs[prjCounter].max   =TDS_variables.prjs.prjs[prjCounter].max;
+	prjs.prjs[prjCounter].nhits =TDS_variables.prjs.prjs[prjCounter].nhits;
+	for(int hitCounter=0;hitCounter<18;hitCounter++)
+	  prjs.prjs[prjCounter].hits[hitCounter]=TDS_variables.prjs.prjs[prjCounter].hits[hitCounter];
+      }
+    }
+    newStatus->setProjection(prjs);
+    newStatus->setLayers(TDS_layers);
+    newStatus->setTmsk(TDS_variables.tmsk);
+    storeHits(hits);
+    log<<MSG::DEBUG;
+    if(log.isActive()){
+      log.stream()<< "FilterStauts Code: " << std::setbase(16) << (unsigned int)results->status<<" : "
+		  << convertBase(results->status);
+    }
+    log << endreq;
+    
     free_em ((void *)results);
     free_em ((void *)dfcCtl);
     free_em ((void *)dfcEvt);
     EBF_ofree (ebo);    
-	EBF_free(ebf);
-	return StatusCode::SUCCESS;
+    EBF_free(ebf);
+    return StatusCode::SUCCESS;
 }
 /* ---------------------------------------------------------------------- */
 
 
+void OnboardFilter::storeHits(OnboardFilterTds::TowerHits *hits){
+  struct OnboardFilterTds::TowerHits::towerRecord hitRecords[16];
+  for(int counter=0;counter<16;counter++){
+    hitRecords[counter].lcnt[0]=TDS_variables.hits[counter].lcnt[0];
+    hitRecords[counter].lcnt[1]=TDS_variables.hits[counter].lcnt[1];
+    hitRecords[counter].layerMaps[0]=TDS_variables.hits[counter].layerMaps[0];
+    hitRecords[counter].layerMaps[1]=TDS_variables.hits[counter].layerMaps[1];
+    for(int layerCounter=0;layerCounter<36;layerCounter++){
+      hitRecords[counter].cnt[layerCounter]=TDS_variables.hits[counter].layers[layerCounter].cnt;
+      hitRecords[counter].beg[layerCounter]=new short int[hitRecords[counter].cnt[layerCounter]];
+      memcpy(hitRecords[counter].beg[layerCounter],TDS_variables.hits[counter].layers[layerCounter].beg,hitRecords[counter].cnt[layerCounter]*sizeof(short int));
+    }
+  }
+  hits->set(hitRecords);
+  for(int counter=0;counter<16;counter++){
+    for(int layerCounter=0;layerCounter<36;layerCounter++){
+      if(hitRecords[counter].beg[layerCounter]){
+	delete[] hitRecords[counter].beg[layerCounter];
+      }
+    }
+  }
+}
 
 /* ---------------------------------------------------------------------- */
 /*!
