@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: golpa  Tue Aug 26 13:00:56 PDT 2003
+OnboardFilter/src
+
+Modified Files:
+	OnboardFilter.cxx 
+Log Message:
+1)More math fixes 2)Fixed initialization problem
+    *
+------------------------------------------------------------
 User: golpa  Tue Aug 26 12:59:42 PDT 2003
 OnboardFilter/OnboardFilter
 
