@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: golpa  Mon Aug 11 19:57:34 PDT 2003
+OnboardFilter/src
+
+Modified Files:
+	FilterStatus.cxx OnboardFilter.cxx mainpage.h 
+Log Message:
+Added Class Image and fixed variable names
+    *
+------------------------------------------------------------
 User: golpa  Fri Aug  8 12:23:20 PDT 2003
 OnboardFilter/src
 
