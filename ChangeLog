@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: golpa  Sun Feb  8 22:11:25 PST 2004
+OnboardFilter/OnboardFilter
+
+Modified Files:
+	FilterStatus.h 
+Log Message:
+changed units of calEnergy
+    *
+------------------------------------------------------------
 User: burnett  Tue Jan 13 18:09:35 PST 2004
 OnboardFilter/doc
 
