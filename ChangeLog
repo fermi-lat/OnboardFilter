@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: golpa  Fri Aug 15 15:01:55 PDT 2003
+OnboardFilter/src
+
+Modified Files:
+	FilterStatus.cxx 
+Log Message:
+removed static library for TDS
+    *
+------------------------------------------------------------
 User: burnett  Fri Aug 15 14:17:15 PDT 2003
 OnboardFilter/cmt
 
