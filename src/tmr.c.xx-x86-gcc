@@ -101,14 +101,14 @@ int TMR_initialize (void)
    frequency          = 1000000 * mhz;
    pp->frequency      = frequency;
    pp->nsecs_per_tick = 1000000000/frequency;
-
+#ifndef GLEAM
    printf ("TMR_initialize    : %d cpus\n"
            "Frequency         : %10.3f Hz\n"
            "Nseconds / tick   :      %8.3f nsecs\n",            
             ncpus,
             pp->frequency,
             pp->nsecs_per_tick);
-
+#endif
    return 0;
 } 
 
