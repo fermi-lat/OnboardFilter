@@ -6,7 +6,7 @@
 
 \verbatim
 
- CVS $Id$
+ CVS $Id: TFC_latUnpack.c,v 1.1.1.1 2003/07/07 16:50:48 golpa Exp $
 \endverbatim 
                                                                           */
 /* ---------------------------------------------------------------------- */
@@ -144,20 +144,20 @@ static inline void setActive (int xyL, TFC_towerLayer *layer);
 
 /* -----------------------------------------------------------------------*/
 
-inline TFC_towerLayer **INIT_LAYERS(TFC_towerLayer **_lyrs, int _accepts, int _xlayers, const unsigned char *_map, TFC_towerLayer *_layers, unsigned int _topBit){
-   while (_accepts)
+inline TFC_towerLayer **INIT_LAYERS(TFC_towerLayer **_lyrs, int *_accepts, int *_xlayers, const unsigned char *_map, TFC_towerLayer *_layers, unsigned int _topBit){
+   while (*_accepts)
    {
        int                 n;
        int          layerNum;
        TFC_towerLayer *layer;
 
-       n           = FFS (_accepts);
-      _accepts    &= ~(_topBit >> n);
+       n           = FFS (*_accepts);
+      *_accepts    &= ~(_topBit >> n);
        layerNum    = _map[n];
        layer       = &_layers[layerNum];
      *_lyrs++      = layer;
        layer->end  = layer->beg;
-      _xlayers    |= 1 << layerNum;
+      *_xlayers    |= 1 << layerNum;
    }
 
    return _lyrs;
@@ -1022,13 +1022,13 @@ TFC_strip *TFC_towerUnpack (struct _TFC_towerRecord *ttr,
 
    /* Process the X layers */
    layers = ttr->layers;
-   lyrs   = INIT_LAYERS (lyrs, axlo, xL, Map, layers, b31);
-   lyrs   = INIT_LAYERS (lyrs, axhi, xL, Map, layers, b31);
+   lyrs   = INIT_LAYERS (lyrs, &axlo, &xL, Map, layers, b31);
+   lyrs   = INIT_LAYERS (lyrs, &axhi, &xL, Map, layers, b31);
 
    /* Process the Y layers */
    layers = ttr->layers + sizeof(ttr->layers)/(2*sizeof(*ttr->layers));
-   lyrs   = INIT_LAYERS (lyrs, aylo, yL, Map, layers, b31);
-   lyrs   = INIT_LAYERS (lyrs, ayhi, yL, Map, layers, b31);
+   lyrs   = INIT_LAYERS (lyrs, &aylo, &yL, Map, layers, b31);
+   lyrs   = INIT_LAYERS (lyrs, &ayhi, &yL, Map, layers, b31);
 
    /* Count the number of active layers in this tower */
    lcnt   = lyrs - lyrsBuf;
