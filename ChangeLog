@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: golpa  Mon Jul 19 20:04:05 PDT 2004
+OnboardFilter/src
+
+Modified Files:
+	DFC_filter.c OnboardFilter.cxx 
+Log Message:
+Added hits to TDS
+    *
+------------------------------------------------------------
 User: golpa  Mon Jul 19 20:04:04 PDT 2004
 OnboardFilter/OnboardFilter
 
