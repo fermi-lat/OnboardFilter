@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: golpa  Tue Aug 26 13:46:27 PDT 2003
+OnboardFilter/src
+
+Modified Files:
+	FilterExtendedDisplay.cxx 
+Log Message:
+Fixed incorrect display of extended tracks
+    *
+------------------------------------------------------------
 User: golpa  Tue Aug 26 13:45:37 PDT 2003
 OnboardFilter/src
 
