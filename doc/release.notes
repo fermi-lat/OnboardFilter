@@ -2,6 +2,7 @@
  * @file release.notes
  * @brief Package OnboardFilter
  * @verbatim
+ * v1r1p3 25-Aug-2004   NG : FilterTracks no longer fails if there's no MC
  * v1r1p2 10-Aug-2004   NG : Removed some printf statements that were outputting too much
  * v1r1p1 02-Aug-2004   NG : David fixed multiplescattering and moved back to old Angular Seperation calculation
  * v1r1p0 23-Jul-2004   NG : Hits are written out now.
