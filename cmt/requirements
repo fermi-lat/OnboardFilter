@@ -12,8 +12,8 @@ apply_pattern library_Llinkopts library="OnboardFilterTds"
 private
 
 macro OnboardFilter_cppflags "" \
-   Linux "-DGLEAM" -D__i382\
-   Win32 "/D "GLEAM /D__i386"
+   Linux "-DGLEAM -D__i386"\
+   WIN32 "/D GLEAM /D__i386"
 
 macro OnboardFilter_cflags $(OnboardFilter_cppflags)
 
