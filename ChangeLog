@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: golpa  Thu Oct  2 12:12:40 PDT 2003
+OnboardFilter/src
+
+Modified Files:
+	FilterTracks.cxx 
+Log Message:
+Fixed problem of skipping some y projections
+    *
+------------------------------------------------------------
 User: golpa  Thu Oct  2 12:11:18 PDT 2003
 OnboardFilter/src
 
