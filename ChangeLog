@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: golpa  Fri Aug 15 19:20:00 PDT 2003
+OnboardFilter/OnboardFilter
+
+Modified Files:
+	FilterStatus.h 
+Log Message:
+Created copy of TFC_projections for TDS
+    *
+------------------------------------------------------------
 User: golpa  Fri Aug 15 15:01:55 PDT 2003
 OnboardFilter/OnboardFilter
 
