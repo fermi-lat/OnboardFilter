@@ -27,7 +27,7 @@ FilterStatus::FilterStatus(const unsigned int code, const int energy,
     m_acdStatus=acdstatus;
     if(m_layers!=NULL){
         for(int counter=0;counter<16;counter++)
-            layers[counter]=layerCode[counter];
+            m_layers[counter]=layerCode[counter];
     }
 }
 
@@ -73,9 +73,9 @@ void FilterStatus::setAcdMap(const int xz, const int yz, const int xy){
 }
 
 void FilterStatus::getAcdMap(int &xz, int &yz, int &xy) const {
-    m_xz=acd_xz;
-    m_yz=acd_yz;
-    m_xy=acd_xy;
+    xz=m_acd_xz;
+    yz=m_acd_yz;
+    xy=m_acd_xy;
 }
 
 

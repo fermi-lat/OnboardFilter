@@ -5,6 +5,7 @@
  * run in Gleam. This package requires EbfWriter to convert Events into a format similar
  * to EBF.
  *
+ * @image html OnboardFilter.jpg
  * <hr>
  * @section jobOptions jobOptions
  * @include jobOptions.txt
