@@ -44,9 +44,9 @@ StatusCode FilterTracks::finalize(){
     log<<MSG::DEBUG<<"Finalizing"<<endreq;
 
 	if (m_writehits){
-        m_outfile.close(); 
+        m_outfile.close();
 	}
-    
+
 	return StatusCode::SUCCESS;
 }
 
@@ -205,8 +205,8 @@ StatusCode FilterTracks::execute(){
             double ztwo=cos(tracks[currMax].theta_rad);
             double dot_product=xone*xtwo+yone*ytwo+zone*ztwo;
             double seperation_rad=acos(dot_product);
-			if (seperation_rad > m_pi/2.)
-				seperation_rad = m_pi - seperation_rad; //we always assume that events come from "above"
+			//if (seperation_rad > m_pi/2.)
+			//	seperation_rad = m_pi - seperation_rad; //we always assume that events come from "above"
             status->setSeperation(seperation_rad*180/m_pi);
         }
         else{
@@ -360,6 +360,13 @@ HepPoint3D FilterTracks::findStripPosition(ITkrGeometrySvc *tkrGeoSvc,int tower,
 
 StatusCode FilterTracks::MultipleScattering(){
     MsgStream log(msgSvc(),name());
+	//get geometry access
+	ITkrGeometrySvc *tkrGeoSvc=NULL;
+    if(service("TkrGeometrySvc",tkrGeoSvc,true).isFailure()){
+      log<<MSG::ERROR<<"Couldn't set up TkrGeometrySvc!"<<endreq;
+      return StatusCode::FAILURE;
+    }
+
 	SmartDataPtr<OnboardFilterTds::FilterStatus> status(eventSvc(),
         "/Event/Filter/FilterStatus");
 	if(!status){
@@ -375,9 +382,9 @@ StatusCode FilterTracks::MultipleScattering(){
       double old_longest_x = 0;
 	  double old_longest_y = 0;
 	  double disp_one_t, disp_one_b, disp_two_t, disp_two_b, proj_two_b, proj_two_t,
-		  bottomhit, tophit, xcompare, xsum_comparison, longest_xcompare,
-		  ycompare, ysum_comparison, longest_ycompare, xmax, xmin,
-		  ymax, ymin;
+		  bottomhit, tophit, xcompare, xsum_comparison, longest_xcompare, long_firstanglex,
+		  ycompare, ysum_comparison, longest_ycompare, xmax, xmin, long_firstangley,
+		  ymax, ymin, xcompareBottom, ycompareBottom, longest_xcompareBottom, longest_ycompareBottom;
 	  int longest_xprj, longest_yprj, tower;
 	  int xcount = 0;
 	  int ycount = 0;
@@ -389,6 +396,8 @@ StatusCode FilterTracks::MultipleScattering(){
 	  double xoverall_sum=0;
 	  double yoverall_count=0;
 	  double xoverall_count=0;
+	  long_firstanglex = -2000;
+	  long_firstangley = -2000;
 	  xsum_comparison=0;
 	  ysum_comparison=0;
 
@@ -405,6 +414,13 @@ StatusCode FilterTracks::MultipleScattering(){
 	  double yslopeAvg = -2000;
 	  int xslopeCount = 0;
 	  int yslopeCount = 0;
+	  double xslopetower=-1;
+	  double yslopetower=-1;
+
+	  HepPoint3D point1, point2, point3, point4;
+	  double zdist1, zdist2, angle1, angle2, xangleL, yangleL;
+	  xangleL = -2000;
+	  yangleL = -2000;
 
 	  for (int n=0; n<10;n++){
 	      xcomparisons[n] = -2000;
@@ -434,8 +450,18 @@ StatusCode FilterTracks::MultipleScattering(){
 			    	  longest_xprj = xprj;
 			          xprjlength = xhits;
 					  xslopeL = prjs->prjs[xprj].hits[1] - prjs->prjs[xprj].hits[0];
+
+					  point1=findStripPosition(tkrGeoSvc,tower,prjs->prjs[xprj].max,0,
+                                                            prjs->prjs[xprj].hits[0]);
+					  point2=findStripPosition(tkrGeoSvc,tower,prjs->prjs[xprj].max-1,0,
+                                                            prjs->prjs[xprj].hits[1]);
+					  disp_one_t = point2.x() - point1.x();//the x displacement
+					  zdist1 = point1.z() - point2.z();    //the z distance
+					  xangleL= 180/3.14159*atan(disp_one_t/zdist1);//the angle from LAT 90 deg
+
+					  xslopetower = tower;
 			        }
-                    
+
 					xslope = prjs->prjs[xprj].hits[1] - prjs->prjs[xprj].hits[0];
 					xslopeTotal += xslope;
 					xslopeCount++;
@@ -447,28 +473,96 @@ StatusCode FilterTracks::MultipleScattering(){
 					  bottomhit = prjs->prjs[xprj].hits[xhits-1];
 
 					  //Calculate the first displacement
-                      disp_one_t = prjs->prjs[xprj].hits[1] - tophit;
+                      //disp_one_t = prjs->prjs[xprj].hits[1] - tophit;
+					  //changing this to be in units of mm instead of strips
+					  point1=findStripPosition(tkrGeoSvc,tower,prjs->prjs[xprj].max,0,
+                                              prjs->prjs[xprj].hits[0]);
+					  point2=findStripPosition(tkrGeoSvc,tower,prjs->prjs[xprj].max-1,0,
+                                                  prjs->prjs[xprj].hits[1]);
+					  disp_one_t = point2.x() - point1.x();//the x displacement
+					  zdist1 = point1.z() - point2.z();    //the z distance
+					  angle1=180/3.14159*atan(disp_one_t/zdist1);//the angle
+
 					  //Calculate the projected displacement to the next level
-					  proj_two_t = prjs->prjs[xprj].hits[1] + disp_one_t;
+					  //proj_two_t = prjs->prjs[xprj].hits[1] + disp_one_t;
+					  point3=findStripPosition(tkrGeoSvc,tower,prjs->prjs[xprj].max-2,0,
+                                                  prjs->prjs[xprj].hits[0]);
+					  zdist2 = point2.z() - point3.z();
+					  proj_two_t = point2.x() + zdist2*tan(angle1/180*3.14159);
+
 					  //Calculate the second displacement - the "angle"
-					  disp_two_t = abs(prjs->prjs[xprj].hits[2] - proj_two_t);
+					  //disp_two_t = abs(prjs->prjs[xprj].hits[2] - proj_two_t);
+                      point4=findStripPosition(tkrGeoSvc,tower,prjs->prjs[xprj].max-2,0,
+                                                  prjs->prjs[xprj].hits[2]);
+					  disp_two_t = point4.x() - point2.x();
+					  angle2=180/3.14159*atan(disp_two_t/zdist2);
+					  disp_two_t = fabs(angle2-angle1);
 
-                      //Calculate the next displacement (going up from the bottom this time)
-					  //Call it disp_one_b, where "b" is for "bottom."
-					  //disp_one_b = prjs->prjs[xprj].hits[(xhits-1)-1] - prjs->prjs[xprj].hits[(xhits-1)-2];
-                      disp_one_b = prjs->prjs[xprj].hits[2] - prjs->prjs[xprj].hits[1];
+                          //Calculate the next displacement (going up from the bottom this time)
+					  	  //Call it disp_one_b, where "b" is for "bottom."
+					  	  //disp_one_b = prjs->prjs[xprj].hits[2] - prjs->prjs[xprj].hits[1];
+					  	  point1=findStripPosition(tkrGeoSvc,tower,prjs->prjs[xprj].max-1,0,
+                                                    prjs->prjs[xprj].hits[1]);
+					  	  point2=findStripPosition(tkrGeoSvc,tower,prjs->prjs[xprj].max-2,0,
+                                                        prjs->prjs[xprj].hits[2]);
+					  	  disp_one_b = point2.x() - point1.x();
+					  	  zdist1 = point1.z() - point2.z();
+					  	  angle1=180/3.14159*atan(disp_one_b/zdist1);//the angle
 
+					  	  //Calculate the projected displacement to the next level
+					  	  //proj_two_b = prjs->prjs[xprj].hits[(xhits-1)-1] + disp_one_b;
+					  	  //proj_two_b = prjs->prjs[xprj].hits[2] + disp_one_b;
+                            point3=findStripPosition(tkrGeoSvc,tower,prjs->prjs[xprj].max-3,0,
+                                                        prjs->prjs[xprj].hits[1]);
+					  	  zdist2 = point2.z() - point3.z();
+					  	  proj_two_t = point2.x() + zdist2*tan(angle1/180*3.14159);
 
-					  //Calculate the projected displacement to the next level
-					  //proj_two_b = prjs->prjs[xprj].hits[(xhits-1)-1] + disp_one_b;
-					  proj_two_b = prjs->prjs[xprj].hits[2] + disp_one_b;
+					  	  //Calculate the last displacement that we need (an "angle")
+					  	  //disp_two_b = abs(prjs->prjs[xprj].hits[(xhits-1)] - proj_two_b);
+					  	  //disp_two_b = abs(prjs->prjs[xprj].hits[3] - proj_two_b);
+                            point4=findStripPosition(tkrGeoSvc,tower,prjs->prjs[xprj].max-3,0,
+                                                        prjs->prjs[xprj].hits[3]);
+					  	  disp_two_b = point4.x() - point2.x();
+					  	  angle2=180/3.14159*atan(disp_two_b/zdist2);
+					  	  disp_two_b = fabs(angle2-angle1);
 
-					  //Calculate the last displacement that we need (an "angle")
-					  //disp_two_b = abs(prjs->prjs[xprj].hits[(xhits-1)] - proj_two_b);
-					  disp_two_b = abs(prjs->prjs[xprj].hits[3] - proj_two_b);
+				            //Compare the two.  This is what we write out.
+					  	  xcompare = disp_two_b - disp_two_t;
 
-				      //Compare the two.  This is what we write out.
-					  xcompare = disp_two_b - disp_two_t;
+					      //**************************************************************
+					      //Or if we use the bottommost hits:
+
+					      //Calculate the next displacement (going up from the bottom this time)
+						  //Call it disp_one_b, where "b" is for "bottom."
+						  //disp_one_b = prjs->prjs[xprj].hits[(xhits-1)-1] - prjs->prjs[xprj].hits[(xhits-1)-2];
+						  point1=findStripPosition(tkrGeoSvc,tower,prjs->prjs[xprj].min+2,0,
+						                              prjs->prjs[xprj].hits[(xhits-1)-2]);
+						  point2=findStripPosition(tkrGeoSvc,tower,prjs->prjs[xprj].min+1,0,
+						                                  prjs->prjs[xprj].hits[(xhits-1)-1]);
+						  disp_one_b = point2.x() - point1.x();
+						  zdist1 = point1.z() - point2.z();
+						  angle1=180/3.14159*atan(disp_one_b/zdist1);//the angle
+
+						  //Calculate the projected displacement to the next level
+						  //proj_two_b = prjs->prjs[xprj].hits[(xhits-1)-1] + disp_one_b;
+						  //proj_two_b = prjs->prjs[xprj].hits[2] + disp_one_b;
+						      point3=findStripPosition(tkrGeoSvc,tower,prjs->prjs[xprj].min,0,
+						                                  prjs->prjs[xprj].hits[(xhits-1)]);
+						  zdist2 = point2.z() - point3.z();
+						  proj_two_t = point2.x() + zdist2*tan(angle1/180*3.14159);
+
+						  //Calculate the last displacement that we need (an "angle")
+						  //disp_two_b = abs(prjs->prjs[xprj].hits[(xhits-1)] - proj_two_b);
+						  //disp_two_b = abs(prjs->prjs[xprj].hits[3] - proj_two_b);
+						      point4=findStripPosition(tkrGeoSvc,tower,prjs->prjs[xprj].min,0,
+						                                  prjs->prjs[xprj].hits[(xhits-1)]);
+						  disp_two_b = point4.x() - point2.x();
+						  angle2=180/3.14159*atan(disp_two_b/zdist2);
+						  disp_two_b = fabs(angle2-angle1);
+
+						    //Compare the two.  This is what we write out.
+					  	  xcompareBottom = disp_two_b - disp_two_t;
+
 
 					  //save the first 10 that we come to
 					  if (xcount < 10){
@@ -478,6 +572,8 @@ StatusCode FilterTracks::MultipleScattering(){
 					  //keep track of the longest one for this tower
 					  if (xprj == longest_xprj){
 						  longest_xcompare = xcompare;
+						  longest_xcompareBottom = xcompareBottom;
+						  long_firstanglex = disp_two_t;
 					  }
 
 					  //sum up the differences so we can average them later
@@ -501,8 +597,18 @@ StatusCode FilterTracks::MultipleScattering(){
 			    	  longest_yprj = yprj;
 			          yprjlength = yhits;
 			          yslopeL = prjs->prjs[yprj].hits[1] - prjs->prjs[yprj].hits[0];
+
+					  point1=findStripPosition(tkrGeoSvc,tower,prjs->prjs[yprj].max,1,
+                                              prjs->prjs[yprj].hits[0]);
+					  point2=findStripPosition(tkrGeoSvc,tower,prjs->prjs[yprj].max-1,1,
+                                                  prjs->prjs[yprj].hits[1]);
+					  disp_one_t = point2.y() - point1.y();//the x displacement
+					  zdist1 = point1.z() - point2.z();    //the z distance
+					  yangleL=180/3.14159*atan(disp_one_t/zdist1);//the angle
+
+					  yslopetower=tower;
 			        }
-                    
+
 					yslope = prjs->prjs[yprj].hits[1] - prjs->prjs[yprj].hits[0];
 					yslopeTotal += yslope;
 					yslopeCount++;
@@ -512,26 +618,96 @@ StatusCode FilterTracks::MultipleScattering(){
 					  bottomhit = prjs->prjs[yprj].hits[yhits-1];
 
 					  //Calculate the first displacement
-                      disp_one_t = prjs->prjs[yprj].hits[1] - tophit;
+                      //disp_one_t = prjs->prjs[yprj].hits[1] - tophit;
+					  //changing this to be in units of mm instead of strips
+					  point1=findStripPosition(tkrGeoSvc,tower,prjs->prjs[yprj].max,1,
+                                              prjs->prjs[yprj].hits[0]);
+					  point2=findStripPosition(tkrGeoSvc,tower,prjs->prjs[yprj].max-1,1,
+                                                  prjs->prjs[yprj].hits[1]);
+					  disp_one_t = point2.y() - point1.y();//the x displacement
+					  zdist1 = point1.z() - point2.z();    //the z distance
+					  angle1=180/3.14159*atan(disp_one_t/zdist1);//the angle
+
 					  //Calculate the projected displacement to the next level
-					  proj_two_t = prjs->prjs[yprj].hits[1] + disp_one_t;
+					  //proj_two_t = prjs->prjs[yprj].hits[1] + disp_one_t;
+					  point3=findStripPosition(tkrGeoSvc,tower,prjs->prjs[yprj].max-2,1,
+                                                  prjs->prjs[yprj].hits[0]);
+					  zdist2 = point2.z() - point3.z();
+					  proj_two_t = point2.y() + zdist2*tan(angle1/180*3.14159);
+
 					  //Calculate the second displacement - the "angle"
-					  disp_two_t = abs(prjs->prjs[yprj].hits[2] - proj_two_t);
-					  //Calculate the next displacement (going up from the bottom this time)
-					  //Call it disp_one_b, where "b" is for "bottom."
-					  //disp_one_b = prjs->prjs[yprj].hits[(yhits-1)-1] - prjs->prjs[yprj].hits[(yhits-1)-2];
-                      disp_one_b = prjs->prjs[yprj].hits[2] - prjs->prjs[yprj].hits[1];
+					  //disp_two_t = abs(prjs->prjs[yprj].hits[2] - proj_two_t);
+					  point4=findStripPosition(tkrGeoSvc,tower,prjs->prjs[yprj].max-2,1,
+                                                  prjs->prjs[yprj].hits[2]);
+					  disp_two_t = point4.y() - point2.y();
+					  angle2=180/3.14159*atan(disp_two_t/zdist2);
+					  disp_two_t = fabs(angle2-angle1);
 
-					  //Calculate the projected displacement to the next level
-					  //proj_two_b = prjs->prjs[yprj].hits[(yhits-1)-1] + disp_one_b;
-					  proj_two_b = prjs->prjs[yprj].hits[2] + disp_one_b;
+					  	  //Calculate the next displacement (going up from the bottom this time)
+					  	  //Call it disp_one_b, where "b" is for "bottom."
+					  	  //disp_one_b = prjs->prjs[yprj].hits[(yhits-1)-1] - prjs->prjs[yprj].hits[(yhits-1)-2];
+                            //disp_one_b = prjs->prjs[yprj].hits[2] - prjs->prjs[yprj].hits[1];
+                            point1=findStripPosition(tkrGeoSvc,tower,prjs->prjs[yprj].max-1,1,
+                                                    prjs->prjs[yprj].hits[1]);
+					  	  point2=findStripPosition(tkrGeoSvc,tower,prjs->prjs[yprj].max-2,1,
+                                                        prjs->prjs[yprj].hits[2]);
+					  	  disp_one_b = point2.y() - point1.y();
+					  	  zdist1 = point1.z() - point2.z();
+					  	  angle1=180/3.14159*atan(disp_one_t/zdist1);//the angle
 
-					  //Calculate the last displacement that we need (an "angle")
-					  //disp_two_b = abs(prjs->prjs[yprj].hits[(yhits-1)] - proj_two_b);
-					  disp_two_b = abs(prjs->prjs[yprj].hits[3] - proj_two_b);
+					  	  //Calculate the projected displacement to the next level
+					  	  //proj_two_b = prjs->prjs[yprj].hits[(yhits-1)-1] + disp_one_b;
+					  	  //proj_two_b = prjs->prjs[yprj].hits[2] + disp_one_b;
+                            point3=findStripPosition(tkrGeoSvc,tower,prjs->prjs[yprj].max-3,1,
+                                                        prjs->prjs[yprj].hits[1]);
+					  	  zdist2 = point2.z() - point3.z();
+					  	  proj_two_t = point2.y() + zdist2*tan(angle1/180*3.14159);
 
-				      //Compare the two
-					  ycompare = disp_two_b - disp_two_t;
+					  	  //Calculate the last displacement that we need (an "angle")
+					  	  //disp_two_b = abs(prjs->prjs[yprj].hits[(yhits-1)] - proj_two_b);
+					  	  //disp_two_b = abs(prjs->prjs[yprj].hits[3] - proj_two_b);
+                            point4=findStripPosition(tkrGeoSvc,tower,prjs->prjs[yprj].max-3,1,
+                                                        prjs->prjs[yprj].hits[3]);
+					  	  disp_two_b = point4.y() - point2.y();
+					  	  angle2=180/3.14159*atan(disp_two_b/zdist2);
+					  	  disp_two_b = fabs(angle2-angle1);
+
+				            //Compare the two
+					  	  ycompare = disp_two_b - disp_two_t;
+
+					  	  //**************************************************************
+					  		//Or if we use the bottommost hits:
+
+					  		//Calculate the next displacement (going up from the bottom this time)
+					  		//Call it disp_one_b, where "b" is for "bottom."
+					  		//disp_one_b = prjs->prjs[yprj].hits[(yhits-1)-1] - prjs->prjs[yprj].hits[(yhits-1)-2];
+					  		point1=findStripPosition(tkrGeoSvc,tower,prjs->prjs[yprj].min+2,1,
+					  		                            prjs->prjs[yprj].hits[(yhits-1)-2]);
+					  		point2=findStripPosition(tkrGeoSvc,tower,prjs->prjs[yprj].min+1,1,
+					  		                                prjs->prjs[yprj].hits[(yhits-1)-1]);
+					  		disp_one_b = point2.y() - point1.y();
+					  		zdist1 = point1.z() - point2.z();
+					  		angle1=180/3.14159*atan(disp_one_b/zdist1);//the angle
+
+					  		//Calculate the projected displacement to the next level
+					  		//proj_two_b = prjs->prjs[yprj].hits[(yhits-1)-1] + disp_one_b;
+					  		//proj_two_b = prjs->prjs[yprj].hits[2] + disp_one_b;
+					  		    point3=findStripPosition(tkrGeoSvc,tower,prjs->prjs[yprj].min,1,
+					  		                                prjs->prjs[yprj].hits[(yhits-1)]);
+					  		zdist2 = point2.z() - point3.z();
+					  		proj_two_t = point2.y() + zdist2*tan(angle1/180*3.14159);
+
+					  		//Calculate the last displacement that we need (an "angle")
+					  		//disp_two_b = abs(prjs->prjs[yprj].hits[(yhits-1)] - proj_two_b);
+					  		//disp_two_b = abs(prjs->prjs[yprj].hits[3] - proj_two_b);
+					  		    point4=findStripPosition(tkrGeoSvc,tower,prjs->prjs[yprj].min,0,
+					  		                                prjs->prjs[yprj].hits[(yhits-1)]);
+					  		disp_two_b = point4.y() - point2.y();
+					  		angle2=180/3.14159*atan(disp_two_b/zdist2);
+					  		disp_two_b = fabs(angle2-angle1);
+
+					  	  //Compare the two.  This is what we write out.
+					  	  ycompareBottom = disp_two_b - disp_two_t;
 
 					  //save the first 10 that we come to
 					  if (ycount <10){
@@ -541,6 +717,8 @@ StatusCode FilterTracks::MultipleScattering(){
 					  //keep track of the longest one for this tower
 					  if (yprj == longest_yprj){
 						  longest_ycompare = ycompare;
+						  longest_ycompareBottom = ycompareBottom;
+						  long_firstangley = disp_two_t;
 					  }
 
 					  //sum up the differences so we can average them later
@@ -570,19 +748,24 @@ StatusCode FilterTracks::MultipleScattering(){
 			  status->setXlongest(longest_xcompare);
 			  log<<MSG::DEBUG<<"Set longest x"<<endreq;
 		      status->setXavg(xavg_compare);
+		      status->setXlongestB(longest_xcompareBottom);
 		  }
 		  else{
 			  log<<MSG::DEBUG<<"About to set longest_xcompare empty: "<< longest_xcompare<<endreq;
 			  status->setXlongest(-2000);
 			  log<<MSG::DEBUG<<"set longest x"<<endreq;
 		      status->setXavg(-2000);
+		      status->setXlongestB(-2000);
 		  }
-		  
+
 		  if (xslopeCount >0){
 			  xslopeAvg = xslopeTotal/xslopeCount;
 		  }
 		  status->setXslopeL(xslopeL);
 		  status->setXslopeAvg(xslopeAvg);
+		  status->setXfirst(long_firstanglex);
+		  status->setXtower(xslopetower);
+		  status->setXangleL(xangleL);
 		  /*
 		  status->setXcompare0(xcomparisons[0]);
 		  status->setXcompare1(xcomparisons[1]);
@@ -604,19 +787,24 @@ StatusCode FilterTracks::MultipleScattering(){
 			  status->setYlongest(longest_ycompare);
 			  log<<MSG::DEBUG<<"set longest y"<<endreq;
 			  status->setYavg(yavg_compare);
+			  status->setYlongestB(longest_ycompareBottom);
 		  }
 		  else{
 			  log<<MSG::DEBUG<<"About to set longest_ycompare empty: "<< longest_ycompare<<endreq;
 			  status->setYlongest(-2000);
 			  log<<MSG::DEBUG<<"set empty y "<<endreq;
 			  status->setYavg(-2000);
+			  status->setYlongestB(-2000);
 		  }
-		  
+
 		  if (yslopeCount>0){
 			  yslopeAvg = yslopeTotal/yslopeCount;
 		  }
 		  status->setYslopeL(yslopeL);
 		  status->setYslopeAvg(yslopeAvg);
+		  status->setYfirst(long_firstangley);
+		  status->setYtower(yslopetower);
+		  status->setYangleL(yangleL);
 		  /*
 		  status->setYcompare0(ycomparisons[0]);
 		  log<<MSG::DEBUG<<"set ycomparisons[0]"<<endreq;
@@ -642,7 +830,7 @@ StatusCode FilterTracks::WriteHits(){
       log<<MSG::ERROR<<"Couldn't set up TkrGeometrySvc!"<<endreq;
       return StatusCode::FAILURE;
     }
-	
+
 	//get TDS object for the hits
 	SmartDataPtr<OnboardFilterTds::TowerHits> status(eventSvc(),
         "/Event/Filter/TowerHits");
@@ -669,14 +857,14 @@ StatusCode FilterTracks::WriteHits(){
 	//loop over towers
 	for (tower=0;tower<16;tower++){
 	    if ((hits[tower].lcnt[0]) || (hits[tower].lcnt[1]>0)){
-            
+
 			//loop over the layers to collect the hits
 		    for (int i=0;i<36;i++){
 		        if (hits[tower].cnt[i] != 0){
-			        
+
 					//write the view, tower, layer, and hit number.
 					//first get the view and layer
-					if (i<18){ 
+					if (i<18){
 						view = 0;   //this may be backwards!
 					    layer = i;
 					}
@@ -684,9 +872,9 @@ StatusCode FilterTracks::WriteHits(){
 						view = 1;   //this may be backwards!
 					    layer = i-18;
 					}
-					
+
 					//now loop over all the strips in this layer
-					for (int j=0;j<hits[tower].cnt[i];j++){					
+					for (int j=0;j<hits[tower].cnt[i];j++){
 					    stripId = hits[tower].beg[i][j];
 					    //call get strip position
                         stripcoord = findStripPosition(tkrGeoSvc,tower,layer,view,stripId);
@@ -712,7 +900,7 @@ StatusCode FilterTracks::WriteHits(){
 		}
 	    //there aren't any hits for this event
     }//tower loop
-	
+
 	return StatusCode::SUCCESS;
 }
 
