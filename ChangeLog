@@ -1,4 +1,15 @@
 ------------------------------------------------------------
+User: golpa  Mon Jul 12 10:22:23 PDT 2004
+OnboardFilter/OnboardFilter
+
+Modified Files:
+	FilterDisplay.h FilterStatus.h FilterTracks.h 
+Added Files:
+	FilterAlg.h FilterAlgTds.h 
+Log Message:
+New version of Filter from JJ
+    *
+------------------------------------------------------------
 User: golpa  Mon Jul 12 10:18:30 PDT 2004
 OnboardFilter/DFC
 
