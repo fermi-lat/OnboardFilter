@@ -3,7 +3,7 @@
 /**
  * @file DetectorDisplay.h
  * @brief Classes to display computed tracks in the Gui
- * $Header$
+ * $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/OnboardFilter/FilterDisplay.h,v 1.1 2003/09/10 17:22:50 golpa Exp $
  */
 
 #include "GaudiKernel/MsgStream.h"
