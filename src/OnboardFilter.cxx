@@ -26,6 +26,7 @@
 #include "DFC/DFC_status.h"
 #include "DFC/DFC_statistics.h"
 #include "DFC/DFC_filter.h"
+#include "DFC/TFC_triggerFill.h"
 #include "DFC/DFC_latRecord.h"
 #include "DFC/DFC_latUnpack.h"
 
@@ -56,7 +57,6 @@
 #ifdef   __linux
 #include <getopt.h>
 #endif
-
 
 /* --------------------------------------------------------------------- *//*!
 
@@ -198,6 +198,13 @@ StatusCode OnboardFilter::initialize()
   ctl_buf.esummary=0;
   ctl_buf.geometry=0;
   ctl    = &ctl_buf;
+  for(int counter=0;counter<16;counter++)
+    TDS_layers[counter]=0;
+  TDS_variables.tcids=0;
+  TDS_variables.acd_xz=0;
+  TDS_variables.acd_yz=0;
+  TDS_variables.acd_xy=0;
+  TDS_variables.acdStatus=0;
   return StatusCode::SUCCESS;
 }
 /* ---------------------------------------------------------------------- */
@@ -383,7 +390,10 @@ StatusCode OnboardFilter::execute()
         status = result->status;
 	newStatus->set(status);
 	newStatus->setCalEnergy(result->energy);
-
+        newStatus->setTcids(TDS_variables.tcids);
+        newStatus->setAcdMap(TDS_variables.acd_xz,TDS_variables.acd_yz,TDS_variables.acd_xy);
+        newStatus->setAcdStatus(TDS_variables.acdStatus);
+        newStatus->setLayers(TDS_layers);
         if (ctl->list && (result->status & DFC_M_STATUS_VETOES) == 0)
         {
             printf ("0000 %8d %8d\n", getMCsequence (evt, size), idx);
