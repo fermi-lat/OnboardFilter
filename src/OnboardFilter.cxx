@@ -4,7 +4,7 @@
  * @author JJRussell - russell@slac.stanford.edu
  * @author David Wren - dnwren@milkyway.gsfc.nasa.gov
  * @author Navid Golpayegani - golpa@milkyway.gsfc.nasa.gov
- * $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/OnboardFilter.cxx,v 1.23 2003/08/26 20:00:56 golpa Exp $
+ * $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/OnboardFilter.cxx,v 1.24 2003/08/26 20:45:37 golpa Exp $
  */
    
 #include <stdlib.h>
@@ -589,20 +589,33 @@ StatusCode OnboardFilter::computeCoordinates(OnboardFilterTds::FilterStatus *sta
       MC_zdir   = Mc_t0.z();
       //Convert MC dir into theta and phi
       double phi_rad_mc=0;
-      double theta_rad_mc=acos(MC_zdir);
-      double x_cord=sin(acos(MC_xdir)-pi/2);
-      double y_cord=sin(acos(MC_ydir)-pi/2);
+      double theta_rad_mc=acos(-MC_zdir);
+      if(MC_zdir < 0)
+	theta_rad_mc=pi - acos(-MC_zdir);
+      double x_cord=-MC_xdir;
+      double y_cord=-MC_ydir;
       if(y_cord==0)
 	phi_rad_mc=pi/2;
-      if ((x_cord>0)&&(y_cord>0))
+      if ((x_cord>0)&&(y_cord>0)){
 	phi_rad_mc = atan(y_cord/x_cord);
-      if ((x_cord<0)&&(y_cord<0))
-	phi_rad_mc = atan(y_cord/x_cord)+pi;
-      if ((x_cord>0)&&(y_cord<0))
+	if(MC_zdir<0)
+	  phi_rad_mc = 3*pi/2 - atan(x_cord/y_cord);
+      }
+      if ((x_cord<0)&&(y_cord<0)){
+	phi_rad_mc = 3*pi/2 - atan(x_cord/y_cord);
+	if(MC_zdir<0)
+	  phi_rad_mc = atan(y_cord/x_cord);
+      }
+      if ((x_cord>0)&&(y_cord<0)){
 	phi_rad_mc = 2*pi-atan(-y_cord/x_cord);
-      if ((x_cord<0)&&(y_cord>0))
-	phi_rad_mc = pi/2+atan(y_cord/(-x_cord));
-      phi_rad_mc += pi;
+	if(MC_zdir<0)
+	  phi_rad_mc=pi/2 - atan(x_cord/y_cord);
+      }
+      if ((x_cord<0)&&(y_cord>0)){
+	phi_rad_mc = pi/2 - atan(y_cord/(-x_cord));
+	if(MC_zdir<0)
+	  phi_rad_mc = 2*pi-atan(-y_cord/x_cord);
+      }
       //Compute angular seperation
       double xone=sin(theta_rad_mc)*cos(phi_rad_mc);
       double yone=sin(theta_rad_mc)*sin(phi_rad_mc);
