@@ -1,5 +1,5 @@
 /*------------------------------------------------------------------------
-| CVS $Id: DFC_filter.c,v 1.2 2003/07/22 19:17:26 golpa Exp $
+| CVS $Id: DFC_filter.c,v 1.3 2003/08/06 18:01:11 golpa Exp $
 +-------------------------------------------------------------------------*/
 
 
@@ -1533,7 +1533,7 @@ static unsigned int latFilter  (TFC_latRecord *tlr,
                                        acd_xz,
                                        acd_yz);
 #ifdef GLEAM
-           TDS_variables.acdStatus=acdStatus;
+           TDS_variables.acdStatus[tower]=acdStatus;
 #endif
            
            

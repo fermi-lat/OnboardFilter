@@ -4,7 +4,7 @@
  * @author JJRussell - russell@slac.stanford.edu
  * @author David Wren - dnwren@milkyway.gsfc.nasa.gov
  * @author Navid Golpayegani - golpa@milkyway.gsfc.nasa.gov
- * $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/OnboardFilter.cxx,v 1.9 2003/08/08 19:23:20 golpa Exp $
+ * $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/OnboardFilter.cxx,v 1.10 2003/08/12 02:57:34 golpa Exp $
  */
    
 #include <stdlib.h>
@@ -160,7 +160,9 @@ StatusCode OnboardFilter::initialize()
   TDS_variables.acd_xz=0;
   TDS_variables.acd_yz=0;
   TDS_variables.acd_xy=0;
-  TDS_variables.acdStatus=0;
+  for(int counter=0;counter<16;counter++){
+    TDS_variables.acdStatus[counter]=0;
+  }
   return StatusCode::SUCCESS;
 }
 
@@ -337,7 +339,9 @@ StatusCode OnboardFilter::execute()
         newStatus->setTcids(TDS_variables.tcids);
         newStatus->setAcdMap(TDS_variables.acd_xz,TDS_variables.acd_yz,
 			TDS_variables.acd_xy);
-        newStatus->setAcdStatus(TDS_variables.acdStatus);
+        for(int counter=0;counter<16;counter++){
+          newStatus->setAcdStatus(counter,TDS_variables.acdStatus[counter]);
+        }
         newStatus->setLayers(TDS_layers);
 		log<< MSG::INFO << "FilterStatus Code: "<<(unsigned int)status<<" : "
 			<<convertBase(status)<<endreq;

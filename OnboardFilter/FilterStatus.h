@@ -21,7 +21,7 @@
 
 
 namespace OnboardFilterTds{
-	struct TFC_projection{
+    struct TFC_projection{
         int           intercept; /*!< Intercept at the beginning layer         */
         int               slope; /*!< Slope                                    */
         int          acdTopMask; /*!< ACD top tile candidates                  */
@@ -32,15 +32,15 @@ namespace OnboardFilterTds{
         unsigned char       max; /*!< Ending    layer number of the projection */
         unsigned char     nhits; /*!< Number of hits assigned                  */
         unsigned         layers; /*!< Bit mask representing the struck layers  */
-        TFC_strip      hits[18]; /*!< Hits assigned to proj                    */
-	};
+        short int      hits[18]; /*!< Hits assigned to proj                    */
+    };
 
-	struct TFC_projections{
+    struct TFC_projections{
         unsigned short int maxCnt; /*!< Maximum number of projections available*/
         unsigned short int curCnt; /*!< Current number of projections in use   */
         unsigned short int  xy[2]; /*!< Count of X/Y projections               */
         TFC_projection prjs[1000]; /*!< List of projections                    */
-	};
+    };
 
     class FilterStatus : public DataObject{
     public:
