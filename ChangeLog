@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: golpa  Thu Sep  4 13:08:36 PDT 2003
+OnboardFilter/cmt
+
+Modified Files:
+	requirements 
+Log Message:
+Made passThrough option more intuitive
+    *
+------------------------------------------------------------
 User: golpa  Thu Sep  4 12:57:15 PDT 2003
 OnboardFilter/src
 
