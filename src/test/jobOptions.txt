@@ -1,50 +1,176 @@
-//$Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/test/jobOptions.txt,v 1.2 2003/07/09 15:35:07 golpa Exp $
+//$Header: /nfs/slac/g/glast/ground/cvs/EbfWriter/src/test/jobOptions.txt,v 1.1.1.1 2003/07/03 18:13:57 golpa Exp $
 
+ApplicationMgr.DLLs+= { "GaudiAlg", "GaudiAud"};
+ApplicationMgr.ExtSvc += {"ChronoStatSvc"};
+AuditorSvc.Auditors = {"ChronoAuditor"};
 
-// start with the basic program defined in Gleam
-#include "$GLEAMROOT/src/basicOptions.txt"
-
-// this would run the GUI
-//#include "$GLEAMROOT/src/guiOptions.txt"
-
+// ----------------------------
+// setup basic event loop stuff
 //
-// The next three lines allow one to read a previously generated file
-//Generator.Members = {} ;                      // turn off generation
-//Digitization.Members = {"digiRootReaderAlg"}; // replace digi algs.
-//digiRootReaderAlg.digiRootFile="/nfs/farm/g/glast/u06/richard/WBA/AllGamma/IndividualRuns/digi_0000.root";
+ApplicationMgr.ExtSvc = {
+    "GlastEventSelector/EventSelector" ,
+    "EventCnvSvc"
+    };
+
+EventPersistencySvc.CnvServices = {"EventCnvSvc"};
+EventSelector.Input = "NONE";
 
 
+// ----------------------------
+//  a structure for the topalg, using sequencer steps
+
+ApplicationMgr.TopAlg = {
+      "Sequencer/Top" };
+
+//the top sequence loop
+Top.Members={
+    "Sequencer/Generator",
+    "Sequencer/Digitization",
+    "Sequencer/EventDisplay",
+    "Sequencer/Triggered" };
+
+
+// the sequence that is triggered
+Triggered.Members={
+    "TriggerAlg",
+    "Sequencer/Reconstruction",
+    "Sequencer/RecoDisplay",
+    "Sequencer/Output" };
+
+// ----------------------------
+//  Geometry definition
 //
-// this would write an ntuple
-//
-/// JJ: Commented this line out when build could not find the required shareable
-///
-// 
-//#include "$EBFWRITERROOT/src/test/ntuple.txt"
+ApplicationMgr.DLLs += {"GlastSvc"};
+ApplicationMgr.ExtSvc += { "GlastDetSvc"};
+GlastDetSvc.topVolume="LAT";
 
-// If you want mc, digi, and recon full ROOT files written
-// Comment out the following line
+
+GlastDetSvc.xmlfile="$(XMLGEODBSROOT)/xml/flight/flightSegVols.xml";
+GlastDetSvc.visitorMode="recon";
+
+// ----------------------------
+//  Randoms definition
+//
+ApplicationMgr.ExtSvc += { "GlastRandomSvc"};
+
+// ----------------------------
+//  Generation or input
+//
+ApplicationMgr.DLLs +={ "G4Generator","G4Propagator"};
+ApplicationMgr.ExtSvc += {"G4GeometrySvc"};
+Generator.Members = {"FluxAlg", "G4Generator"};
+G4Generator.defaultCutValue=0.7; // instead of 0.1 default
+
+#include "$FLUXSVCROOT/src/defaultOptions.txt"
+
+// Append (or replace) the list of source library documents
+FluxSvc.source_lib += {"$(G4GENERATORROOT)/src/test/test_sources.xml"};
+FluxAlg.source_name="muon_pencil_angle";
+
+
+// ----------------------------
+//  Digitization
+//
+ApplicationMgr.DLLs +={ "TkrDigi", "CalDigi", "AcdDigi"  };
+Digitization.Members = {
+    "TkrSimpleDigiAlg",
+    "CalDigiAlg",
+    "AcdDigiAlg"};
+
+
+// ----------------------------
+//  Trigger calculation
+//
+ApplicationMgr.DLLs +={ "Trigger"};
+Trigger.Members = {"TriggerAlg"};
+TriggerAlg.mask = -1; // all bits on by default
+
+
+// ----------------------------
+//   Reconstruction
+//
+
+ApplicationMgr.ExtSvc += { "GlastPropagatorSvc" };
+
+ApplicationMgr.DLLs +={
+    "CalibSvc",
+    "CalRecon", "CalUtil", "TkrUtil",
+    "TkrRecon"
+    };
+Reconstruction.Members={
+      "Sequencer/Cal1",
+      "Sequencer/Tkr",
+      "Sequencer/Cal2",
+      "Sequencer/Acd"
+      };
+
+
+//          tracker
+// -------------------------------------------
+ApplicationMgr.ExtSvc   += { "TkrGeometrySvc"};
+ApplicationMgr.ExtSvc   += { "TkrInitSvc"};
+
+
+// Start up a CalibDataSvc
+ApplicationMgr.ExtSvc += {"CalibDataSvc"};
+
+ApplicationMgr.ExtSvc += {"CalibMySQLCnvSvc", "CalibXmlCnvSvc" };
+
+DetectorPersistencySvc.CnvServices += {"CalibMySQLCnvSvc"};
+DetectorPersistencySvc.CnvServices += {"CalibXmlCnvSvc"};
+
+// CalibDataSvc properties
+// Storage type of 14 corresponds to MYSQL
+CalibDataSvc.CalibInstrumentName = "LAT";
+CalibDataSvc.CalibStorageType = 14;
+CalibDataSvc.CalibRootName = "Calib";
+CalibDataSvc.CalibFlavorList = {"ideal"};
+
+
+Cal1.Members = {
+      "CalXtalRecAlg",
+      "CalClustersAlg/first"
+      };
+Tkr.Members = {
+      "TkrReconAlg"
+      };
+Cal2.Members = {
+      "CalClustersAlg/second"
+      };
+second.OutputLevel=5;  // since this guy generates INFO lines
+// ----------------------------
+//   ACD recon
+//
+ApplicationMgr.DLLs += {"AcdRecon"};
+Acd.Members = {"AcdReconAlg"};
+
+// ----------------------------
+//   Atwood's tuple
+//
+ApplicationMgr.DLLs += {"AnalysisNtuple"};
+
+// ----------------------------
+//   Output
+//
+//ApplicationMgr.DLLs +={
+//    "RootIo"
+//};
+
+mcRootWriterAlg.OutputLevel=3;
+digiRootWriterAlg.OutputLevel=3;
+reconRootWriterAlg.OutputLevel=3;
+
+// Set output level threshold (2=DEBUG, 3=INFO, 4=WARNING, 5=ERROR, 6=FATAL )
+ToolSvc.OutputLevel=3;    // too verbose in debug
+
 Output.Members = {};
 
-
-
-// append our alg 
-ApplicationMgr.DLLs += {"EbfWriter","OnboardFilter"};
-ApplicationMgr.TopAlg += 
-{
-     "EbfWriter",
-     "OnboardFilter"
-};
-
-
-// If running simulation - specify what source to use
-// add the local specs to  the list of source library documents
-/////FluxSvc.source_lib += {"$(EBFWRITERROOT)/src/test/test_sources.xml"};
-FluxAlg.source_name="backgndmaxpdr";
-
+// append our alg
+ApplicationMgr.TopAlg += { "EbfWriter" };
 
 // Number of events to process
 ApplicationMgr.EvtMax = 100;
+
 
 // Set output level threshold (2=DEBUG, 3=INFO, 4=WARNING, 5=ERROR, 6=FATAL )
 MessageSvc.OutputLevel      =2;
