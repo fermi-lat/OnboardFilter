@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: golpa  Fri Aug 22 12:42:33 PDT 2003
+OnboardFilter/src
+
+Modified Files:
+	OnboardFilter.cxx 
+Log Message:
+Using getStripPosition() correctly now and copying nhits
+    *
+------------------------------------------------------------
 User: golpa  Fri Aug 22 08:14:16 PDT 2003
 OnboardFilter/src
 
