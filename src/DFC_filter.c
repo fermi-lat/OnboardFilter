@@ -1,5 +1,5 @@
 /*------------------------------------------------------------------------
-| CVS $Id: DFC_filter.c,v 1.9 2003/09/10 17:22:50 golpa Exp $
+| CVS $Id: DFC_filter.c,v 1.10 2003/10/02 19:11:18 golpa Exp $
 +-------------------------------------------------------------------------*/
 
 
@@ -448,7 +448,7 @@ static int  evaluateAcd (int                             status,
    if (status & (DFC_M_STATUS_ACD_TOP | DFC_M_STATUS_ACD_SIDE) )
    {
        /* If energy is below 0-tolerance level, reject if any hits */
-       if (energy < threshold0) return status | DFC_M_STATUS_E0_TILE;
+       if (energy < threshold0) return status | DFC_M_STATUS_E0_TILE;//Veto 28
 
        
        /* If have any hits in the upper part of the ACD */
@@ -468,6 +468,7 @@ static int  evaluateAcd (int                             status,
     | ----------------
     | If have less than 40Gev and more than 4 tiles reject
    */
+   /*
    if (energy < CFC_MEV_TO_LEU(40000))
    {
        int count;
@@ -487,7 +488,7 @@ static int  evaluateAcd (int                             status,
        status |= AFC_splash (splashMap, acd_xy, acd_xz, acd_yz)
                  << DFC_V_STATUS_SPLASH_1;
    }
-
+   */
    
    return status;
 }
@@ -588,6 +589,10 @@ static int evaluateZbottom (const EBF_directory *dir, int energy)
    int                              m0;
    int                              m1;
    
+   //the next line eliminates this veto completely!
+   //return 0;
+   //done eliminating!
+   if (energy > CFC_MEV_TO_LEU (100)) {//ALTERED Veto 21 - remove line to change back
    if (energy < CFC_MEV_TO_LEU (10)) return 0;   
 
    tcids        = 0;
@@ -660,6 +665,10 @@ static int evaluateZbottom (const EBF_directory *dir, int energy)
            
        }
    }
+   }             //ALTERED Veto 21 - remove line to change back
+   else{         //ALTERED - remove line to change back
+	   return 0; //ALTERED - remove line to change back
+   }             //ALTERED - remove line to change back
 
    return DFC_M_STATUS_ZBOTTOM;
 }
@@ -721,9 +730,9 @@ static int evaluateCal1 (const EBF_directory               *dir,
            | 0 also has 11 free bits.
            |
           */
-           status |= CFC__ratioCheck (clr->layerEnergy[0],   energy,
-                                      10,  DFC_M_STATUS_EL0_ETOT_01,
-                                      900, DFC_M_STATUS_EL0_ETOT_90);
+           //status |= CFC__ratioCheck (clr->layerEnergy[0],   energy,
+           //                           10,  DFC_M_STATUS_EL0_ETOT_01,
+           //                           900, DFC_M_STATUS_EL0_ETOT_90);//REMOVED 22 & 23
            if (isVetoed (status))
            {
                _DBG (printf ("REJECT on ratio\n"));
@@ -1248,7 +1257,8 @@ int DFC_filter (struct _DFC_ctl         *dfc,
 
        if (tcids == 0)
        {
-           status |= DFC_M_STATUS_TKR_EQ_0;
+           if (energy > CFC_MEV_TO_LEU (250)) //ALTERED 17
+		   status |= DFC_M_STATUS_TKR_EQ_0;
        }
        else    
        {
@@ -1495,8 +1505,12 @@ static unsigned int latFilter  (TFC_latRecord *tlr,
    
    /* If nothing to do... */
    tmsk = tlr->twrMap;
-   if (tmsk == 0) return DFC_M_STATUS_TKR_EQ_0;
-
+   //if (tmsk == 0) return DFC_M_STATUS_TKR_EQ_0;//ALTERED 17
+   if (tmsk == 0) {
+      if (energy > CFC_MEV_TO_LEU (250)) return DFC_M_STATUS_TKR_EQ_0;
+	  else 
+      return status;
+   }
 
    /*
     |  !!! KLUDGE !!!
@@ -1559,18 +1573,27 @@ static unsigned int latFilter  (TFC_latRecord *tlr,
            
            
            /* Check if have any matches */
-           if (acdStatus)
+            if (acdStatus)
            {
                int which;
 
                /* Check whether have TOP or SIDE face match */
                which = (acdStatus & 0xf0000000) >> 28;
-               if (which == 4)            status |= DFC_M_STATUS_TKR_TOP;
+			   if (which == 4) {
+				   if (energy < CFC_MEV_TO_LEU (30000))
+					   status |= DFC_M_STATUS_TKR_TOP;//ALTERED 20 - 30 GeV Cut
+			   }
                else
                {
                    /* Side face match, check if have ROW01 or ROW23 match */
-                   if (acdStatus & 0x3ff) status |= DFC_M_STATUS_TKR_ROW01;
-                   else                   status |= DFC_M_STATUS_TKR_ROW2;
+				   if (acdStatus & 0x3ff) {
+					   if (energy < CFC_MEV_TO_LEU (10000))
+						   status |= DFC_M_STATUS_TKR_ROW01;//ALTERED 19 - 10 GeV Cut
+				   }
+				   else {                   
+					   if ( (energy < CFC_MEV_TO_LEU (30000)) )
+					       status |= DFC_M_STATUS_TKR_ROW2;//ALTERED 18 - 30 GeV Cut
+				   }
                }
 
                return status;
@@ -1606,11 +1629,15 @@ static unsigned int latFilter  (TFC_latRecord *tlr,
    if (xyCnt < 3)
    {
 
-       if (xyCnt < 2)  return status | DFC_M_STATUS_TKR_EQ_0;
+	   if (xyCnt < 2) {
+		   if (energy > CFC_MEV_TO_LEU (250))
+			   return status | DFC_M_STATUS_TKR_EQ_0;//ALTERED 17
+	   }
        else            status |= DFC_M_STATUS_TKR_EQ_1;
 
        /* If energy low enough, must have some evidence of two tracks */
-       if (energy < CFC_MEV_TO_LEU (350)) status |= DFC_M_STATUS_TKR_LT_2_ELO;
+       //if (energy < CFC_MEV_TO_LEU (350)) status |= DFC_M_STATUS_TKR_LT_2_ELO;//REMOVED 15
+
    }
    else
    {

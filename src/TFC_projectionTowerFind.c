@@ -1,5 +1,5 @@
 /*------------------------------------------------------------------------
-| CVS $Id: TFC_projectionTowerFind.c,v 1.1.1.1 2003/07/07 16:50:48 golpa Exp $
+| CVS $Id: TFC_projectionTowerFind.c,v 1.2 2003/08/19 04:14:36 burnett Exp $
 +-------------------------------------------------------------------------*/
 
 
@@ -40,9 +40,9 @@
           extending a projection 2 layers.
                                                                           */
 /* ---------------------------------------------------------------------- */
-#define          FIND_TOLERANCE 32
-#define EXTEND_1LAYER_TOLERANCE 32
-#define EXTEND_2LAYER_TOLERANCE 64
+#define          FIND_TOLERANCE 192//ALTERED: was 32
+#define EXTEND_1LAYER_TOLERANCE 192//ALTERED: was 32
+#define EXTEND_2LAYER_TOLERANCE 384//ALTERED: was 64
 /* ---------------------------------------------------------------------- */
 
 
