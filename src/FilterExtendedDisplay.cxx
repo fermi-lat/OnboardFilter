@@ -10,7 +10,7 @@ void FilterExtendedDisplay::update(){
     <OnboardFilterTds::FilterStatus>(dps,"/Event/Filter/FilterStatus");
   if(status){
     setColor("green");
-    vector<OnboardFilterTds::track> tracks=status->getTracks();
+	std::vector<OnboardFilterTds::track> tracks=status->getTracks();
     for(int counter=0;counter<tracks.size();counter++){
       set_line_style(DOTTED_LINE);
       moveTo(tracks[counter].exLowCoord[0],tracks[counter].exLowCoord[1],
