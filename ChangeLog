@@ -1,5 +1,14 @@
 ------------------------------------------------------------
 User: golpa  Fri Aug  8 12:23:19 PDT 2003
+OnboardFilter/OnboardFilter
+
+Modified Files:
+	FilterStatus.h 
+Log Message:
+Cleaned up code
+    *
+------------------------------------------------------------
+User: golpa  Fri Aug  8 12:23:19 PDT 2003
 OnboardFilter/doc
 
 Added Files:
