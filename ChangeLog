@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: burnett  Sun Aug 17 11:44:31 PDT 2003
+OnboardFilter/OnboardFilter
+
+Modified Files:
+	FilterStatus.h 
+Log Message:
+Make all set methods private, accessible to OnboardFilter only. 
+    *
+------------------------------------------------------------
 User: golpa  Sat Aug 16 20:07:15 PDT 2003
 OnboardFilter/doc
 
