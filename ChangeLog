@@ -1,5 +1,14 @@
 ------------------------------------------------------------
 User: golpa  Thu Sep  4 17:45:22 PDT 2003
+OnboardFilter/doc
+
+Modified Files:
+	release.notes 
+Log Message:
+Seperated track computation into new Alg
+    *
+------------------------------------------------------------
+User: golpa  Thu Sep  4 17:45:22 PDT 2003
 OnboardFilter/cmt
 
 Modified Files:
