@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: golpa  Wed Sep 10 10:22:50 PDT 2003
+OnboardFilter/OnboardFilter
+
+Added Files:
+	FilterDisplay.h 
+Log Message:
+Made seperate tool for Track display, fixed passThrough mode bug, added veto bit summary
+    *
+------------------------------------------------------------
 User: golpa  Tue Sep  9 11:52:30 PDT 2003
 OnboardFilter/cmt
 
