@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: burnett  Wed Sep 10 11:13:44 PDT 2003
+OnboardFilter/src
+
+Modified Files:
+	OnboardFilter.cxx 
+Log Message:
+fix to compile in Windows without many warnings.
+    *
+------------------------------------------------------------
 User: golpa  Wed Sep 10 10:30:20 PDT 2003
 OnboardFilter/doc
 
