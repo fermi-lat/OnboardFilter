@@ -35,7 +35,9 @@ namespace OnboardFilterTds{
             length=copy.length;
             phi_rad=copy.phi_rad;
             theta_rad=copy.theta_rad;
+			numhits=copy.numhits;
         };
+		int numhits;
         double phi_rad,theta_rad;
         std::vector<double> lowCoord;
         std::vector<double> highCoord;
@@ -131,7 +133,8 @@ namespace OnboardFilterTds{
 	void setCapture(const int xcapture[16], const int ycapture[16]);
 	void setXY(const int xy00[16], const int xy11[16], const int xy22[16], const int xy33[16]);
 	void setTmsk(int tmsk);
-    private:
+    
+	private:
         ///Filter status code
         unsigned int m_status;
         ///Energy in CAL
