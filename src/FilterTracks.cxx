@@ -7,6 +7,9 @@ FilterTracks::FilterTracks(const std::string& name, ISvcLocator* pSvcLocator)
 :Algorithm(name, pSvcLocator){
 
     declareProperty("UseNumHits",     m_usenumhits = 0);
+	declareProperty("WriteHits",      m_writehits = 0);
+	declareProperty("Scattering",     m_scattering = 0);
+	//declareProperty("HitsFile", m_hitsfilename="hits.txt");
 
 }
 
@@ -19,13 +22,32 @@ StatusCode FilterTracks::initialize(){
     m_y=m_xz=m_yz=m_zAvg=m_pointHigh=
       m_extendHigh=m_extendLow=m_x;
     m_pi = 3.14159265358979323846;
+
+    if (m_writehits){
+	    //create the file and the stream here
+		//std::string path = m_hitsfilename.value();
+		//facilities::Util::expandEnvVar(&path);
+		//m_outfile.open(path);
+		//m_outfile.open(m_hitsfilename);
+		m_outfile.open("hits.txt");
+        if (m_outfile.is_open()){
+			m_outfile << "Event\tTower\tView\tLayer\tStripId\tX Coord\tY Coord\tZ Coord"<<std::endl;
+			m_outfile << std::endl;
+		}
+	}
+
     return StatusCode::SUCCESS;
 }
 
 StatusCode FilterTracks::finalize(){
     MsgStream log(msgSvc(),name());
     log<<MSG::DEBUG<<"Finalizing"<<endreq;
-    return StatusCode::SUCCESS;
+
+	if (m_writehits){
+        m_outfile.close(); 
+	}
+    
+	return StatusCode::SUCCESS;
 }
 
 StatusCode FilterTracks::execute(){
@@ -43,7 +65,7 @@ StatusCode FilterTracks::execute(){
         return StatusCode::FAILURE;
     }
     //Loop over the towers
- 
+
       const OnboardFilterTds::projections *prjs=status->getProjection();
       int startPrj=0;
       for(int tower=0;tower<16;tower++){
@@ -51,7 +73,7 @@ StatusCode FilterTracks::execute(){
           if(prjs->xy[tower][0]>0 && prjs->xy[tower][1]>0){
               //Loop over the x projections
               for(int xprj=startPrj;xprj<prjs->xy[tower][0];xprj++){
-                
+
 				log<<MSG::DEBUG<<"Obtaining X and XZ for hits 0 and 1"<<endreq;
                 point=findStripPosition(tkrGeoSvc,tower,prjs->prjs[xprj].max,0,
                                                   prjs->prjs[xprj].hits[0]);
@@ -63,7 +85,7 @@ StatusCode FilterTracks::execute(){
                 m_xz[1]=point.z();
                 //Loop over the y projections
                 for(int yprj=startPrj+prjs->xy[tower][0];yprj<startPrj+prjs->xy[tower][1]+prjs->xy[tower][0];yprj++){
-				    
+
 					if(prjs->prjs[xprj].max==prjs->prjs[yprj].max){//if they start in the same layer
                         log<<MSG::DEBUG<<"Obtaining Y and YZ for hits 0 and 1"
                            << endreq;
@@ -183,7 +205,7 @@ StatusCode FilterTracks::execute(){
             double ztwo=cos(tracks[currMax].theta_rad);
             double dot_product=xone*xtwo+yone*ytwo+zone*ztwo;
             double seperation_rad=acos(dot_product);
-			if (seperation_rad > m_pi/2.) 
+			if (seperation_rad > m_pi/2.)
 				seperation_rad = m_pi - seperation_rad; //we always assume that events come from "above"
             status->setSeperation(seperation_rad*180/m_pi);
         }
@@ -196,6 +218,15 @@ StatusCode FilterTracks::execute(){
         status->setSeperation(-1);
         log<<MSG::DEBUG<<"No tracks found"<<endreq;
     }
+
+    StatusCode sc;
+	if (m_scattering){
+	sc = MultipleScattering();
+	}
+	if (m_writehits){
+	sc = WriteHits();
+	}
+
     return StatusCode::SUCCESS;
 }
 
@@ -282,7 +313,7 @@ void FilterTracks::computeExtension(){
     m_extendHigh[2]=length*cos(m_theta_rad)+m_zAvg[2];
 }
 
-HepPoint3D FilterTracks::findStripPosition(ITkrGeometrySvc *tkrGeoSvc,int tower, 
+HepPoint3D FilterTracks::findStripPosition(ITkrGeometrySvc *tkrGeoSvc,int tower,
                                            int layer, int view, double stripId){
   //stripId is in first ladder
   if(stripId<384)
@@ -325,5 +356,363 @@ HepPoint3D FilterTracks::findStripPosition(ITkrGeometrySvc *tkrGeoSvc,int tower,
   for(int counter=below;counter<stripId;counter++)
     pointBelow+=incPoint;
   return pointBelow;
+}
+
+StatusCode FilterTracks::MultipleScattering(){
+    MsgStream log(msgSvc(),name());
+	SmartDataPtr<OnboardFilterTds::FilterStatus> status(eventSvc(),
+        "/Event/Filter/FilterStatus");
+	if(!status){
+        log<<MSG::ERROR<<"Unable to retrieve FilterStatus from TDS"<<endreq;
+        return StatusCode::FAILURE;
+    }
+
+    //Loop over the towers
+
+      const OnboardFilterTds::projections *prjs=status->getProjection();
+      double startPrj=0;
+
+      double old_longest_x = 0;
+	  double old_longest_y = 0;
+	  double disp_one_t, disp_one_b, disp_two_t, disp_two_b, proj_two_b, proj_two_t,
+		  bottomhit, tophit, xcompare, xsum_comparison, longest_xcompare,
+		  ycompare, ysum_comparison, longest_ycompare, xmax, xmin,
+		  ymax, ymin;
+	  int longest_xprj, longest_yprj, tower;
+	  int xcount = 0;
+	  int ycount = 0;
+	  double xprjlength = 0;
+	  double yprjlength = 0;
+	  double xavg_compare= -2000;
+	  double yavg_compare= -2000;;
+	  double yoverall_sum=0;
+	  double xoverall_sum=0;
+	  double yoverall_count=0;
+	  double xoverall_count=0;
+	  xsum_comparison=0;
+	  ysum_comparison=0;
+
+	  double xcomparisons[10];
+	  double ycomparisons[10];
+
+	  double xslope = -2000;
+	  double xslopeL = -2000;
+	  double xslopeTotal = 0;
+	  double yslope = -2000;
+	  double yslopeL = -2000;
+	  double yslopeTotal = 0;
+	  double xslopeAvg = -2000;
+	  double yslopeAvg = -2000;
+	  int xslopeCount = 0;
+	  int yslopeCount = 0;
+
+	  for (int n=0; n<10;n++){
+	      xcomparisons[n] = -2000;
+		  ycomparisons[n] = -2000;
+	  }
+
+      xcount=0;
+	  ycount=0;
+	  xprjlength = 0;
+	  yprjlength = 0;
+      longest_xprj = 0;
+	  longest_yprj = 0;
+
+	  for(tower=0;tower<16;tower++){
+          //loop over projections regardless of whether there are both x and y
+          int xhits=0;
+		  int yhits=0;
+
+		  //if there are any x projections
+		  if(prjs->xy[tower][0]>0){
+             //loop over the x projections
+			  for(int xprj=startPrj;xprj<prjs->xy[tower][0];xprj++){
+
+				  xhits=prjs->prjs[xprj].nhits;
+				    //find the longest x projection
+			        if (xhits > xprjlength){
+			    	  longest_xprj = xprj;
+			          xprjlength = xhits;
+					  xslopeL = prjs->prjs[xprj].hits[1] - prjs->prjs[xprj].hits[0];
+			        }
+                    
+					xslope = prjs->prjs[xprj].hits[1] - prjs->prjs[xprj].hits[0];
+					xslopeTotal += xslope;
+					xslopeCount++;
+
+				  if (xhits > 3){ //if there are at least 4 hits
+				      xmax=prjs->prjs[xprj].max;
+					  xmin=prjs->prjs[xprj].min;
+					  tophit = prjs->prjs[xprj].hits[0];
+					  bottomhit = prjs->prjs[xprj].hits[xhits-1];
+
+					  //Calculate the first displacement
+                      disp_one_t = prjs->prjs[xprj].hits[1] - tophit;
+					  //Calculate the projected displacement to the next level
+					  proj_two_t = prjs->prjs[xprj].hits[1] + disp_one_t;
+					  //Calculate the second displacement - the "angle"
+					  disp_two_t = abs(prjs->prjs[xprj].hits[2] - proj_two_t);
+
+                      //Calculate the next displacement (going up from the bottom this time)
+					  //Call it disp_one_b, where "b" is for "bottom."
+					  //disp_one_b = prjs->prjs[xprj].hits[(xhits-1)-1] - prjs->prjs[xprj].hits[(xhits-1)-2];
+                      disp_one_b = prjs->prjs[xprj].hits[2] - prjs->prjs[xprj].hits[1];
+
+
+					  //Calculate the projected displacement to the next level
+					  //proj_two_b = prjs->prjs[xprj].hits[(xhits-1)-1] + disp_one_b;
+					  proj_two_b = prjs->prjs[xprj].hits[2] + disp_one_b;
+
+					  //Calculate the last displacement that we need (an "angle")
+					  //disp_two_b = abs(prjs->prjs[xprj].hits[(xhits-1)] - proj_two_b);
+					  disp_two_b = abs(prjs->prjs[xprj].hits[3] - proj_two_b);
+
+				      //Compare the two.  This is what we write out.
+					  xcompare = disp_two_b - disp_two_t;
+
+					  //save the first 10 that we come to
+					  if (xcount < 10){
+					  xcomparisons[xcount] = xcompare;
+					  }
+
+					  //keep track of the longest one for this tower
+					  if (xprj == longest_xprj){
+						  longest_xcompare = xcompare;
+					  }
+
+					  //sum up the differences so we can average them later
+					  xsum_comparison += xcompare;
+					  xcount++;
+				  }
+
+			  }
+              //xavg_compare = (float)xsum_comparison/(float)xcount;
+          }
+
+		  if(prjs->xy[tower][1]>0){//if there are any y projections
+		      //loop over the y projections
+			  for(int yprj=startPrj+prjs->xy[tower][0];yprj<startPrj+prjs->xy[tower][1]+prjs->xy[tower][0];yprj++){
+			      ymax=prjs->prjs[yprj].max;
+				  ymin=prjs->prjs[yprj].min;
+
+				  yhits=prjs->prjs[yprj].nhits;
+				    //find the longest x projection
+			        if (yhits > yprjlength){
+			    	  longest_yprj = yprj;
+			          yprjlength = yhits;
+			          yslopeL = prjs->prjs[yprj].hits[1] - prjs->prjs[yprj].hits[0];
+			        }
+                    
+					yslope = prjs->prjs[yprj].hits[1] - prjs->prjs[yprj].hits[0];
+					yslopeTotal += yslope;
+					yslopeCount++;
+
+				  if (yhits > 3){ //if there are at least 4 hits
+				      tophit = prjs->prjs[yprj].hits[0];
+					  bottomhit = prjs->prjs[yprj].hits[yhits-1];
+
+					  //Calculate the first displacement
+                      disp_one_t = prjs->prjs[yprj].hits[1] - tophit;
+					  //Calculate the projected displacement to the next level
+					  proj_two_t = prjs->prjs[yprj].hits[1] + disp_one_t;
+					  //Calculate the second displacement - the "angle"
+					  disp_two_t = abs(prjs->prjs[yprj].hits[2] - proj_two_t);
+					  //Calculate the next displacement (going up from the bottom this time)
+					  //Call it disp_one_b, where "b" is for "bottom."
+					  //disp_one_b = prjs->prjs[yprj].hits[(yhits-1)-1] - prjs->prjs[yprj].hits[(yhits-1)-2];
+                      disp_one_b = prjs->prjs[yprj].hits[2] - prjs->prjs[yprj].hits[1];
+
+					  //Calculate the projected displacement to the next level
+					  //proj_two_b = prjs->prjs[yprj].hits[(yhits-1)-1] + disp_one_b;
+					  proj_two_b = prjs->prjs[yprj].hits[2] + disp_one_b;
+
+					  //Calculate the last displacement that we need (an "angle")
+					  //disp_two_b = abs(prjs->prjs[yprj].hits[(yhits-1)] - proj_two_b);
+					  disp_two_b = abs(prjs->prjs[yprj].hits[3] - proj_two_b);
+
+				      //Compare the two
+					  ycompare = disp_two_b - disp_two_t;
+
+					  //save the first 10 that we come to
+					  if (ycount <10){
+					  ycomparisons[ycount] = ycompare;
+					  }
+
+					  //keep track of the longest one for this tower
+					  if (yprj == longest_yprj){
+						  longest_ycompare = ycompare;
+					  }
+
+					  //sum up the differences so we can average them later
+					  ysum_comparison += ycompare;
+					  ycount++;
+				  }
+			  }
+              //yavg_compare = (float)ysum_comparison/(float)ycount;
+			  }
+		  }
+
+          //Have now looped over all x and all y projections for this tower
+		  //Keep track of the difference for the longest track in any tower,
+		  //and the average for all towers.
+
+		  //this finds the longest of all the tracks in any tower.
+		  //this projection may or may not be in the list of 10
+		  /*int xcompare_report= -2000;
+		  int ycompare_report= -2000;
+		  */
+		  if (xcount > 0){
+		      //this finds the average of all differences for every projection
+		      if (tower>=15){
+			      xavg_compare = xsum_comparison/xcount;
+		      }
+			  log<<MSG::DEBUG<<"About to set longest_xcompare: "<< longest_xcompare<<endreq;
+			  status->setXlongest(longest_xcompare);
+			  log<<MSG::DEBUG<<"Set longest x"<<endreq;
+		      status->setXavg(xavg_compare);
+		  }
+		  else{
+			  log<<MSG::DEBUG<<"About to set longest_xcompare empty: "<< longest_xcompare<<endreq;
+			  status->setXlongest(-2000);
+			  log<<MSG::DEBUG<<"set longest x"<<endreq;
+		      status->setXavg(-2000);
+		  }
+		  
+		  if (xslopeCount >0){
+			  xslopeAvg = xslopeTotal/xslopeCount;
+		  }
+		  status->setXslopeL(xslopeL);
+		  status->setXslopeAvg(xslopeAvg);
+		  /*
+		  status->setXcompare0(xcomparisons[0]);
+		  status->setXcompare1(xcomparisons[1]);
+		  status->setXcompare2(xcomparisons[2]);
+		  status->setXcompare3(xcomparisons[3]);
+		  status->setXcompare4(xcomparisons[4]);
+		  status->setXcompare5(xcomparisons[5]);
+		  status->setXcompare6(xcomparisons[6]);
+		  status->setXcompare7(xcomparisons[7]);
+		  status->setXcompare8(xcomparisons[8]);
+		  status->setXcompare9(xcomparisons[9]);*/
+
+          if (ycount>0){
+		      //this finds the average of all differences for every projection
+		      if (tower>=15){
+			      yavg_compare = ysum_comparison/ycount;
+		      }
+			  log<<MSG::DEBUG<<"About to set longest_ycompare: "<< longest_ycompare<<endreq;
+			  status->setYlongest(longest_ycompare);
+			  log<<MSG::DEBUG<<"set longest y"<<endreq;
+			  status->setYavg(yavg_compare);
+		  }
+		  else{
+			  log<<MSG::DEBUG<<"About to set longest_ycompare empty: "<< longest_ycompare<<endreq;
+			  status->setYlongest(-2000);
+			  log<<MSG::DEBUG<<"set empty y "<<endreq;
+			  status->setYavg(-2000);
+		  }
+		  
+		  if (yslopeCount>0){
+			  yslopeAvg = yslopeTotal/yslopeCount;
+		  }
+		  status->setYslopeL(yslopeL);
+		  status->setYslopeAvg(yslopeAvg);
+		  /*
+		  status->setYcompare0(ycomparisons[0]);
+		  log<<MSG::DEBUG<<"set ycomparisons[0]"<<endreq;
+		  status->setYcompare1(ycomparisons[1]);
+		  status->setYcompare2(ycomparisons[2]);
+		  status->setYcompare3(ycomparisons[3]);
+		  status->setYcompare4(ycomparisons[4]);
+		  status->setYcompare5(ycomparisons[5]);
+		  status->setYcompare6(ycomparisons[6]);
+		  status->setYcompare7(ycomparisons[7]);
+		  status->setYcompare8(ycomparisons[8]);
+		  status->setYcompare9(ycomparisons[9]);*/
+
+		  return StatusCode::SUCCESS;
+
+}
+
+StatusCode FilterTracks::WriteHits(){
+    MsgStream log(msgSvc(),name());
+	//get geometry access
+	ITkrGeometrySvc *tkrGeoSvc=NULL;
+    if(service("TkrGeometrySvc",tkrGeoSvc,true).isFailure()){
+      log<<MSG::ERROR<<"Couldn't set up TkrGeometrySvc!"<<endreq;
+      return StatusCode::FAILURE;
+    }
+	
+	//get TDS object for the hits
+	SmartDataPtr<OnboardFilterTds::TowerHits> status(eventSvc(),
+        "/Event/Filter/TowerHits");
+	if(!status){
+        log<<MSG::ERROR<<"Unable to retrieve FilterStatus from TDS"<<endreq;
+        return StatusCode::FAILURE;
+    }
+
+    //get a pointer to the hits
+	const OnboardFilterTds::TowerHits::towerRecord *hits = status->get();
+
+    //get pointer to the event so we can get the event number
+	SmartDataPtr<Event::MCEvent>     mcheader(eventSvc(),    EventModel::MC::Event);
+    double event = mcheader->getSequence();
+
+	//Here is the basic algorithm
+    int tower=0;
+	int view;
+	int layer;
+	short stripId;
+	HepPoint3D stripcoord;
+	double x, y, z;
+
+	//loop over towers
+	for (tower=0;tower<16;tower++){
+	    if ((hits[tower].lcnt[0]) || (hits[tower].lcnt[1]>0)){
+            
+			//loop over the layers to collect the hits
+		    for (int i=0;i<36;i++){
+		        if (hits[tower].cnt[i] != 0){
+			        
+					//write the view, tower, layer, and hit number.
+					//first get the view and layer
+					if (i<18){ 
+						view = 0;   //this may be backwards!
+					    layer = i;
+					}
+					else if (i>=18){
+						view = 1;   //this may be backwards!
+					    layer = i-18;
+					}
+					
+					//now loop over all the strips in this layer
+					for (int j=0;j<hits[tower].cnt[i];j++){					
+					    stripId = hits[tower].beg[i][j];
+					    //call get strip position
+                        stripcoord = findStripPosition(tkrGeoSvc,tower,layer,view,stripId);
+					    //get the coordinates
+						x = stripcoord.x();
+						y = stripcoord.y();
+						z = stripcoord.z();
+					    //here, write everything out.
+					    //write: event, x, y, z, view, tower, layer, strip
+						//std::cout << event"  "<<tower<<"  "<<view<<"  "<<layer<<"  "<<stripId<<"  "<<x<<"  "<<y<<"  "<<z<<std::endl;
+                        if (m_writehits){
+						    if (m_outfile.is_open()){
+								    m_outfile << event <<"\t"<< tower <<"\t"<< view <<"\t"<< layer
+									  <<"\t"<< stripId  <<"\t"<< x <<"\t"<< y <<"\t"<< z << std::endl;
+							}
+						}
+				    }
+			    }//if any hits in layer
+		    }//loop over layers
+	    }//if any layers hit
+		else{//if no layers are hit
+			;
+		}
+	    //there aren't any hits for this event
+    }//tower loop
+	
+	return StatusCode::SUCCESS;
 }
 

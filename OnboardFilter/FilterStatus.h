@@ -33,53 +33,53 @@ namespace OnboardFilterTds{
       short int *beg[36];
     };
     inline TowerHits(){
-      for(int counter=0;counter<16;counter++){
-	for(int layerCounter=0;layerCounter<36;layerCounter++){
-	  m_hits[counter].cnt[layerCounter]=0;
-	  m_hits[counter].beg[layerCounter]=NULL;
-	}
-      }
+        for(int counter=0;counter<16;counter++){
+	        for(int layerCounter=0;layerCounter<36;layerCounter++){
+	           m_hits[counter].cnt[layerCounter]=0;
+	           m_hits[counter].beg[layerCounter]=NULL;
+	        }
+        }
     };
     inline ~TowerHits(){
       for(int counter=0;counter<16;counter++){
-	for(int layerCounter=0;layerCounter<36;layerCounter++){
-	  if(m_hits[counter].beg[layerCounter]){
-	    delete[] m_hits[counter].beg[layerCounter];
-	  }
-	}
+	      for(int layerCounter=0;layerCounter<36;layerCounter++){
+	          if(m_hits[counter].beg[layerCounter]){
+	              delete[] m_hits[counter].beg[layerCounter];
+	          }
+	      }
       }
     };
     inline TowerHits(const TowerHits &toCopy){
-      for(int counter=0;counter<16;counter++){
-	m_hits[counter].lcnt[0]=toCopy.m_hits[counter].lcnt[0];
-	m_hits[counter].lcnt[1]=toCopy.m_hits[counter].lcnt[1];
-	m_hits[counter].layerMaps[0]=toCopy.m_hits[counter].layerMaps[0];
-	m_hits[counter].layerMaps[1]=toCopy.m_hits[counter].layerMaps[1];
-	for(int layerCounter=0;layerCounter<36;layerCounter++){
-	  m_hits[counter].cnt[layerCounter]=toCopy.m_hits[counter].cnt[layerCounter];
-	  m_hits[counter].beg[layerCounter]=new short int[m_hits[counter].cnt[layerCounter]];
-	  memcpy(m_hits[counter].beg[layerCounter],toCopy.m_hits[counter].beg[layerCounter],m_hits[counter].cnt[layerCounter]*sizeof(short int));
-	}
-      }
+        for(int counter=0;counter<16;counter++){
+	        m_hits[counter].lcnt[0]=toCopy.m_hits[counter].lcnt[0];
+	        m_hits[counter].lcnt[1]=toCopy.m_hits[counter].lcnt[1];
+	        m_hits[counter].layerMaps[0]=toCopy.m_hits[counter].layerMaps[0];
+	        m_hits[counter].layerMaps[1]=toCopy.m_hits[counter].layerMaps[1];
+	        for(int layerCounter=0;layerCounter<36;layerCounter++){
+	            m_hits[counter].cnt[layerCounter]=toCopy.m_hits[counter].cnt[layerCounter];
+	           m_hits[counter].beg[layerCounter]=new short int[m_hits[counter].cnt[layerCounter]];
+	           memcpy(m_hits[counter].beg[layerCounter],toCopy.m_hits[counter].beg[layerCounter],m_hits[counter].cnt[layerCounter]*sizeof(short int));
+	        }
+        }
     };
     inline const towerRecord* get(){
       return m_hits;
     };
     inline void set(towerRecord* hits){
-      for(int counter=0;counter<16;counter++){
-	m_hits[counter].lcnt[0]=hits[counter].lcnt[0];
-	m_hits[counter].lcnt[1]=hits[counter].lcnt[1];
-	m_hits[counter].layerMaps[0]=hits[counter].layerMaps[0];
-	m_hits[counter].layerMaps[1]=hits[counter].layerMaps[1];
-	for(int layerCounter=0;layerCounter<36;layerCounter++){
-	  m_hits[counter].cnt[layerCounter]=hits[counter].cnt[layerCounter];
-	  if(m_hits[counter].beg[layerCounter]){
-	    delete[] m_hits[counter].beg[layerCounter];
-	  }
-	  m_hits[counter].beg[layerCounter]=new short int[m_hits[counter].cnt[layerCounter]];
-	  memcpy(m_hits[counter].beg[layerCounter],hits[counter].beg[layerCounter],m_hits[counter].cnt[layerCounter]*sizeof(short int));
-	}
-      }
+        for(int counter=0;counter<16;counter++){
+	        m_hits[counter].lcnt[0]=hits[counter].lcnt[0];
+	        m_hits[counter].lcnt[1]=hits[counter].lcnt[1];
+	        m_hits[counter].layerMaps[0]=hits[counter].layerMaps[0];
+	        m_hits[counter].layerMaps[1]=hits[counter].layerMaps[1];
+	        for(int layerCounter=0;layerCounter<36;layerCounter++){
+	            m_hits[counter].cnt[layerCounter]=hits[counter].cnt[layerCounter];
+	            if(m_hits[counter].beg[layerCounter]){
+	                delete[] m_hits[counter].beg[layerCounter];
+	            }
+	            m_hits[counter].beg[layerCounter]=new short int[m_hits[counter].cnt[layerCounter]];
+	            memcpy(m_hits[counter].beg[layerCounter],hits[counter].beg[layerCounter],m_hits[counter].cnt[layerCounter]*sizeof(short int));
+	        }
+        }
     };
     towerRecord m_hits[16];
   };
@@ -192,7 +192,29 @@ namespace OnboardFilterTds{
     void setCapture(const int xcapture[16], const int ycapture[16]);
     void setXY(const int xy00[16], const int xy11[16], const int xy22[16], const int xy33[16]);
     void setTmsk(int tmsk);
+
+	
+	//****TEMP
+        void setXlongest(const double x_report);
+		void setYlongest(const double y_report);
+	    void setXavg(const double xavg);
+		void setYavg(const double yavg);
+		void setXslopeL(const double xslopeL);
+		void setYslopeL(const double yslopeL);
+		void setXslopeAvg(const double xslopeAvg);
+		void setYslopeAvg(const double yslopeAvg);
+
+		double getXlongest() const;
+		double getYlongest() const;
+		double getXavg() const;
+		double getYavg() const;
+		double getXslopeL() const;
+        double getYslopeL() const;
+		double getXslopeAvg() const;
+		double getYslopeAvg() const;
+	//****TEMP
     
+
   private:
     ///Filter status code
     unsigned int m_status;
@@ -222,7 +244,15 @@ namespace OnboardFilterTds{
     int m_ycapture[16];
     int m_xy00[16],m_xy11[16],m_xy22[16],m_xy33[16];
     int m_tmsk;
-  };
+
+	//****TEMP
+	double m_x_report;  double m_y_report;
+	double m_xavg;      double m_yavg;
+	double m_xslopeL;   double m_yslopeL;
+	double m_xslopeAvg; double m_yslopeAvg;
+	//****TEMP
+  
+};
   
   // inline the public get methods for clients besides OnboardFilter.
   
@@ -398,7 +428,62 @@ namespace OnboardFilterTds{
   inline void FilterStatus::setTmsk(int tmsk){
     m_tmsk=tmsk;
   }
-  
+
+	//****TEMP
+		inline void FilterStatus::setXlongest(const double x_report){
+			m_x_report=x_report;
+		}
+		inline void FilterStatus::setYlongest(const double y_report){
+			m_y_report=y_report;
+		}
+		inline void FilterStatus::setXavg(const double xavg){
+			m_xavg=xavg;
+		}
+		inline void FilterStatus::setYavg(const double yavg){
+			m_yavg=m_yavg;
+		}
+
+		inline void FilterStatus::setXslopeL(const double xslopeL){
+			m_xslopeL=xslopeL;
+		}
+		inline void FilterStatus::setYslopeL(const double yslopeL){
+			m_yslopeL=yslopeL;
+		}
+		inline void FilterStatus::setXslopeAvg(const double xslopeAvg){
+			m_xslopeAvg=xslopeAvg;
+		}
+		inline void FilterStatus::setYslopeAvg(const double yslopeAvg){
+			m_yslopeAvg=yslopeAvg;
+		}
+
+		inline double FilterStatus::getXlongest() const{
+			return m_x_report;
+		}
+		inline double FilterStatus::getYlongest() const{
+			return m_y_report;
+		}
+		inline double FilterStatus::getXavg() const{
+			return m_xavg;
+		}
+		inline double FilterStatus::getYavg() const{
+			return m_yavg;
+		}
+		
+		inline double FilterStatus::getXslopeL() const{
+			return m_xslopeL;
+		}
+		inline double FilterStatus::getYslopeL() const{
+			return m_yslopeL;
+		}
+		inline double FilterStatus::getXslopeAvg() const{
+			return m_xslopeAvg;
+		}
+		inline double FilterStatus::getYslopeAvg() const{
+			return m_yslopeAvg;
+		}
+//****TEMP
+
+
   inline std::ostream& FilterStatus::fillStream(std::ostream &s) const{
     s<<"Filter Return Code: "<<m_status<<std::endl;
     s<<"Filter code for Energy in CAL: "<<m_calEnergy<<std::endl;
