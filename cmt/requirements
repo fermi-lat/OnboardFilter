@@ -6,9 +6,14 @@ use EbfWriter		*
 use GlastPolicy		*
 use IExternal		*
 use GlastSvc		*
+use ntupleWriterSvc	*
 
 apply_pattern packageShr
 apply_pattern package_include
+apply_pattern package_header
+apply_pattern library_Llinkopts library="OnboardFilterTds"
+
+library OnboardFilterTds -no_share FilterStatus.cxx
 
 library OnboardFilter *.cxx *.c Dll/*.cxx
 
