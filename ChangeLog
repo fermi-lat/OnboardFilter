@@ -1,5 +1,14 @@
 ------------------------------------------------------------
 User: golpa  Sat Aug 16 11:37:52 PDT 2003
+OnboardFilter/OnboardFilter
+
+Modified Files:
+	FilterStatus.h 
+Log Message:
+fixed compile errors
+    *
+------------------------------------------------------------
+User: golpa  Sat Aug 16 11:37:52 PDT 2003
 OnboardFilter/DFC
 
 Modified Files:
