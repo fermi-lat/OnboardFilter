@@ -1,4 +1,4 @@
-//$Header$
+//$Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/test/jobOptions.txt,v 1.1.1.1 2003/07/07 16:50:48 golpa Exp $
 
 
 // start with the basic program defined in Gleam
@@ -29,11 +29,11 @@ Output.Members = {};
 
 
 // append our alg 
-ApplicationMgr.DLLs += {"OnlineFilter","merit"};
+ApplicationMgr.DLLs += {"OnboardFilter","merit"};
 ApplicationMgr.TopAlg += 
 {
      "EbfWriter",
-     "OnlineFilter","meritAlg"
+     "OnboardFilter"
 };
 
 

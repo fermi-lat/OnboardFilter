@@ -1,4 +1,4 @@
-/** @mainpage package OnlineFilter
+/** @mainpage package OnboardFilter
  *
  * @section intro Introduction
  * This package provides drivers for the DFC code. This driver allows the DFC code to
