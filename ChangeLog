@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: golpa  Fri Aug 22 08:14:16 PDT 2003
+OnboardFilter/src
+
+Modified Files:
+	FilterExtendedDisplay.cxx FilterTrackDisplay.cxx 
+Log Message:
+Fixed windows compile errors
+    *
+------------------------------------------------------------
 User: golpa  Thu Aug 21 14:11:51 PDT 2003
 OnboardFilter/src
 
