@@ -1,4 +1,4 @@
-//$Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/test/jobOptions.txt,v 1.6 2004/07/12 17:37:47 golpa Exp $
+//$Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/test/jobOptions.txt,v 1.7 2004/07/12 19:47:29 golpa Exp $
 
 ApplicationMgr.DLLs+= { "GaudiAlg", "GaudiAud"};
 ApplicationMgr.ExtSvc += {"ChronoStatSvc"};
@@ -73,7 +73,7 @@ FluxAlg.source_name="muon_pencil_angle";
 //
 ApplicationMgr.DLLs +={ "TkrDigi", "CalDigi", "AcdDigi"  };
 Digitization.Members = {
-    "TkrSimpleDigiAlg",
+    "TkrDigiAlg",
     "CalDigiAlg",
     "AcdDigiAlg"};
 
