@@ -2,6 +2,7 @@
  * @file release.notes
  * @brief Package OnboardFilter
  * @verbatim
+ * v1r1p6 30-jan-2005  THB : (fix the fix: not clear how to initilize the structure TMR_usecs_nsecs
  * v1r1p5 30-jan-2005  THB : remove unit test for now, fix some uninitialized variables.
  * v1r1p4 01-Nov-2004   NG : Found and Fixed leak.
  * v1r1p3 25-Aug-2004   NG : FilterTracks no longer fails if there's no MC
