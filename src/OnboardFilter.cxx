@@ -4,7 +4,7 @@
  * @author JJRussell - russell@slac.stanford.edu
  * @author David Wren - dnwren@milkyway.gsfc.nasa.gov
  * @author Navid Golpayegani - golpa@milkyway.gsfc.nasa.gov
- * $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/OnboardFilter.cxx,v 1.14 2003/08/19 04:14:36 burnett Exp $
+ * $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/OnboardFilter.cxx,v 1.15 2003/08/21 19:21:34 golpa Exp $
  */
    
 #include <stdlib.h>
@@ -131,9 +131,9 @@ private:
      * @param yz The z-coordinates for hits 0,1, and Last as computed from
      *           the y projections
      */
-    void computeAngles(vector<double> x,vector <double> y,vector<double> xz,
-                       vector<double> yz,double &phi,double &phi_rad,
-                       double &theta,double &theta_rad);
+    void computeAngles(std::vector<double> x,std::vector <double> y,
+		       std::vector<double> xz,std::vector<double> yz,
+		       double &phi,double &phi_rad, double &theta,double &theta_rad);
   
     /**
      * Compute Length of a track
@@ -141,8 +141,8 @@ private:
      * @param theata_rad The Theta angle obtained by computeAngles() in radians
      * @param phi_rad The phi angle obtained by computeAngles() in radians
      */
-    void computeLength(vector<double> z, double theta_rad, double phi_rad,
-                       double &length, vector<double> &endPoint);
+    void computeLength(std::vector<double> z, double theta_rad, double phi_rad,
+                       double &length, std::vector<double> &endPoint);
     /**
      * Compute the extensions to the tracks
      * @param x 3 Element array containing the x coordinates
@@ -153,11 +153,11 @@ private:
      * @param extendLow 3 Element array that will contain the xyz of the extension
      * @param extendHigh 3 Element array that will contain the xyz of the extension
      */
-    void OnboardFilter::computeExtension(vector<double> x,vector<double> y,
-                                         vector<double> z, double phi_rad,
+    void OnboardFilter::computeExtension(std::vector<double> x,std::vector<double> y,
+                                         std::vector<double> z, double phi_rad,
                                          double theta_rad, 
-                                         vector<double> &extendLow,
-                                         vector<double> &extendHigh);
+                                         std::vector<double> &extendLow,
+                                         std::vector<double> &extendHigh);
     //Structures that control the Behaviour of the Filter Code
     Ctl m_ctl_buf;
     Ctl *m_ctl;
@@ -205,15 +205,14 @@ StatusCode OnboardFilter::initialize()
   //Set up GUI display
   IGuiSvc *guiSvc;
   if(!service("GuiSvc",guiSvc).isFailure()){
-
-  }
-  else{
-    log<<MSG::WARNING<<"No GuiSvc. Not displaying tracks"<<endreq;
     gui::DisplayControl& display = guiSvc->guiMgr()->display();
     gui::DisplayControl::DisplaySubMenu& fltrmenu = display.subMenu("OnboardFilter");
     //Add Display Objects Here
     fltrmenu.add(new FilterTrackDisplay(eventSvc()),"Tracks");
     fltrmenu.add(new FilterExtendedDisplay(eventSvc()),"Extended Tracks");
+  }
+  else{
+    log<<MSG::WARNING<<"No GuiSvc. Not displaying tracks"<<endreq;
   }
   return StatusCode::SUCCESS;
 }
@@ -491,14 +490,14 @@ StatusCode OnboardFilter::computeCoordinates(OnboardFilterTds::FilterStatus *sta
   for(int tower=0;tower<16;tower++){
     const OnboardFilterTds::projections *prjs=status->getProjection(tower);
     HepPoint3D point;
-    vector<double> x;
-    vector<double> y;
-    vector<double> xz;
-    vector<double> yz;
-    vector<double> zAvg;
-    vector<double> pointHigh;
-    vector<double> extendedLow;
-    vector<double> extendedHigh;
+    std::vector<double> x;
+    std::vector<double> y;
+    std::vector<double> xz;
+    std::vector<double> yz;
+    std::vector<double> zAvg;
+    std::vector<double> pointHigh;
+    std::vector<double> extendedLow;
+    std::vector<double> extendedHigh;
     //Loop over the x projections
     for(int xprj=0;xprj<prjs->xy[0];xprj++){
       //Get x,,z coordinates for hits 0 and 1
@@ -554,7 +553,7 @@ StatusCode OnboardFilter::computeCoordinates(OnboardFilterTds::FilterStatus *sta
       }
     }
   }
-  vector<OnboardFilterTds::track> tracks=status->getTracks();
+  std::vector<OnboardFilterTds::track> tracks=status->getTracks();
   double maxLength=0;
   unsigned int currMax;
   if(tracks.size()>0){
@@ -602,8 +601,8 @@ StatusCode OnboardFilter::computeCoordinates(OnboardFilterTds::FilterStatus *sta
   return StatusCode::SUCCESS;
 }
 
-void OnboardFilter::computeAngles(vector<double> x,vector<double> y,
-				  vector<double> xz,vector<double> yz,
+void OnboardFilter::computeAngles(std::vector<double> x,std::vector<double> y,
+				  std::vector<double> xz,std::vector<double> yz,
                                   double &phi,double &phi_rad,double &theta,
                                   double &theta_rad){
   const double pi = 3.14159265358979323846;
@@ -642,8 +641,8 @@ void OnboardFilter::computeAngles(vector<double> x,vector<double> y,
   phi=phi_rad*180/pi;
 }
 
-void OnboardFilter::computeLength(vector<double> z,double theta_rad,double phi_rad,
-				  double &length, vector<double> &endPoint){
+void OnboardFilter::computeLength(std::vector<double> z,double theta_rad,double phi_rad,
+				  double &length, std::vector<double> &endPoint){
   const double pi = 3.14159265358979323846;
   double t_v=z[2]-z[0];
   double t_h = t_v/tan(pi/2 - theta_rad);
@@ -653,10 +652,10 @@ void OnboardFilter::computeLength(vector<double> z,double theta_rad,double phi_r
   endPoint.push_back(z[2]);
 }
 
-void OnboardFilter::computeExtension(vector<double> x,vector<double> y,
-				     vector<double> z, double phi_rad, 
-				     double theta_rad, vector<double> &extendLow,
- 				     vector<double> &extendHigh){
+void OnboardFilter::computeExtension(std::vector<double> x,std::vector<double> y,
+				     std::vector<double> z, double phi_rad, 
+				     double theta_rad, std::vector<double> &extendLow,
+ 				     std::vector<double> &extendHigh){
   const double pi = 3.14159265358979323846;
   const double length=1000;
   extendLow.push_back(length*sin(theta_rad)*cos(phi_rad)+x[0]);
