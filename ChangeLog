@@ -1,4 +1,14 @@
 ------------------------------------------------------------
+User: dnwren  Thu Sep 16 09:29:09 PDT 2004
+OnboardFilter/src
+
+Modified Files:
+	FilterTracks.cxx 
+Log Message:
+
+Switched to improved track selection method
+    *
+------------------------------------------------------------
 User: dnwren  Thu Sep 16 09:29:08 PDT 2004
 OnboardFilter/OnboardFilter
 
