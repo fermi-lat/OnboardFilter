@@ -186,17 +186,17 @@ void FilterTracks::computeAngles(){
     double y_v = m_yz[0]-m_yz[1];
     double z_v = m_zAvg[0]-m_zAvg[1];
     double t_h_ave = 1;
-    if(x_v== 0 && y_v==0){
+    if(x_h == 0 && y_h==0){
         m_phi_rad=0;
         m_theta_rad=0;
     }
     else{
-        if(x_v ==0){
+        if(x_h ==0){
             m_phi_rad=m_pi/2;
             m_theta_rad=m_pi/2-atan(y_v/y_h);;
         }
         else{
-            if(y_v==0){
+            if(y_h==0){
                 m_phi_rad=0;
                 m_theta_rad=m_pi/2-atan(x_v/x_h);
             }
