@@ -1,4 +1,15 @@
 ------------------------------------------------------------
+User: dnwren  Mon Aug 16 10:59:59 PDT 2004
+OnboardFilter/OnboardFilter
+
+Modified Files:
+	FilterStatus.h FilterTracks.h 
+Log Message:
+Added a new track selection algorithm.  Changed computeAngles to accept parameters.
+
+
+    *
+------------------------------------------------------------
 User: golpa  Fri Aug 13 15:08:59 PDT 2004
 OnboardFilter/src
 
