@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: golpa  Fri Oct  3 12:18:55 PDT 2003
+OnboardFilter/src
+
+Modified Files:
+	FilterTracks.cxx 
+Log Message:
+Fixed windows compile issues
+    *
+------------------------------------------------------------
 User: golpa  Fri Oct  3 10:57:04 PDT 2003
 OnboardFilter/src
 
