@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: golpa  Mon Nov  1 12:26:10 PST 2004
+OnboardFilter/src
+
+Modified Files:
+	FilterAlg.cxx OnboardFilter.cxx 
+Log Message:
+Found memory leak
+    *
+------------------------------------------------------------
 User: dnwren  Thu Sep 16 09:29:09 PDT 2004
 OnboardFilter/src
 
