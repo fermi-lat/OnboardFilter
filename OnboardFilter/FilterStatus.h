@@ -203,6 +203,14 @@ namespace OnboardFilterTds{
 		void setYslopeL(const double yslopeL);
 		void setXslopeAvg(const double xslopeAvg);
 		void setYslopeAvg(const double yslopeAvg);
+		void setXfirst(const double long_firstanglex);
+		void setYfirst(const double long_firstangley);
+		void setXtower(const double xslopetower);
+		void setYtower(const double yslopetower);
+		void setXangleL(const double xangleL);
+		void setYangleL(const double yangleL);
+		void setXlongestB(const double xlongestB);
+		void setYlongestB(const double ylongestB);
 
 		double getXlongest() const;
 		double getYlongest() const;
@@ -212,6 +220,14 @@ namespace OnboardFilterTds{
         double getYslopeL() const;
 		double getXslopeAvg() const;
 		double getYslopeAvg() const;
+		double getXfirst() const;
+		double getYfirst() const;
+		double getXtower() const;
+		double getYtower() const;
+		double getXangleL() const;
+		double getYangleL() const;
+		double getXlongestB() const;
+		double getYlongestB() const;
 	//****TEMP
     
 
@@ -250,6 +266,10 @@ namespace OnboardFilterTds{
 	double m_xavg;      double m_yavg;
 	double m_xslopeL;   double m_yslopeL;
 	double m_xslopeAvg; double m_yslopeAvg;
+	double m_long_firstanglex; double m_long_firstangley;
+	double m_xslopetower; double m_yslopetower;
+	double m_xangleL;    double m_yangleL;
+	double m_xlongestB;  double m_ylongestB;
 	//****TEMP
   
 };
@@ -442,6 +462,12 @@ namespace OnboardFilterTds{
 		inline void FilterStatus::setYavg(const double yavg){
 			m_yavg=m_yavg;
 		}
+		inline void FilterStatus::setXfirst(const double long_firstanglex){
+			m_long_firstanglex=long_firstanglex;
+		}
+        inline void FilterStatus::setYfirst(const double long_firstangley){
+			m_long_firstangley=long_firstangley;
+		}
 
 		inline void FilterStatus::setXslopeL(const double xslopeL){
 			m_xslopeL=xslopeL;
@@ -454,6 +480,24 @@ namespace OnboardFilterTds{
 		}
 		inline void FilterStatus::setYslopeAvg(const double yslopeAvg){
 			m_yslopeAvg=yslopeAvg;
+		}
+		inline void FilterStatus::setXtower(const double xslopetower){
+			m_xslopetower=xslopetower;
+		}
+		inline void FilterStatus::setYtower(const double yslopetower){
+			m_yslopetower=yslopetower;
+		}
+		inline void FilterStatus::setXangleL(const double xangleL){
+			m_xangleL=xangleL;
+		}
+		inline void FilterStatus::setYangleL(const double yangleL){
+			m_yangleL=yangleL;
+		}
+		inline void FilterStatus::setXlongestB(const double xlongestB){
+			m_xlongestB=xlongestB;
+		}
+		inline void FilterStatus::setYlongestB(const double ylongestB){
+			m_ylongestB=ylongestB;
 		}
 
 		inline double FilterStatus::getXlongest() const{
@@ -480,6 +524,31 @@ namespace OnboardFilterTds{
 		}
 		inline double FilterStatus::getYslopeAvg() const{
 			return m_yslopeAvg;
+		}
+		inline double FilterStatus::getXtower() const{
+			return m_xslopetower;
+		}
+		inline double FilterStatus::getYtower() const{
+			return m_yslopetower;
+		}
+
+		inline double FilterStatus::getXfirst() const{
+			return m_long_firstanglex;
+		}
+		inline double FilterStatus::getYfirst() const{
+			return m_long_firstangley;
+		}
+		inline double FilterStatus::getXangleL() const{
+			return m_xangleL;
+		}
+		inline double FilterStatus::getYangleL() const{
+			return m_yangleL;
+		}
+		inline double FilterStatus::getXlongestB() const{
+			return m_xlongestB;
+		}
+		inline double FilterStatus::getYlongestB() const{
+			return m_ylongestB;
 		}
 //****TEMP
 
