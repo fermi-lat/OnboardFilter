@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: burnett  Sun Jan 30 13:24:48 PST 2005
+OnboardFilter/cmt
+
+Modified Files:
+	requirements 
+Log Message:
+fix linux error, undo fix to un-initialize varia
+    *
+------------------------------------------------------------
 TAG
 Tag name: v1r1p5, operation: add
 Package: OnboardFilter
