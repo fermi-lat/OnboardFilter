@@ -57,6 +57,12 @@
  *
  * @image html OnboardFilter.jpg
  * <hr>
+ * @section Properties Properties
+ * @param OnboardFilter.passThrough
+ *  Parameter to disable/enable "Pass through mode" of the filter
+ *  default value 0
+ * @param OnboardFilter.mask
+ * <hr>
  * @section jobOptions jobOptions
  * @include jobOptions.txt
  * <hr>
