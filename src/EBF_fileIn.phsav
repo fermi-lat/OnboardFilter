@@ -1,0 +1,21 @@
+#ifndef __EBF_fileIn_ph__
+#define __EBF_fileIn_ph__
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+EBF_file *EBF_dmap  (unsigned int *ebd);
+EBF_file *EBF_open (int fileSize);
+int EBF_read  (EBF_file *ebf);
+int EBF_close  (EBF_file *ebf);
+int EBF_free  (EBF_file *ebf);
+const unsigned int *EBF_edata  (const EBF_file *ebf);
+unsigned int EBF_esize  (const EBF_file *ebf);
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif
+

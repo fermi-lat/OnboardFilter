@@ -1,0 +1,29 @@
+#ifndef TMR_H_SX_XXX_XXX
+#define TMR_H_SX_XXX_XXX
+
+/*
+ *  ABSTRACT
+ *  --------
+ *  SUN implementation of the TMR facility. The implementation is based
+ *  of SUNs high resolution timer library.
+ *
+ *  USAGE
+ *  -----
+ *  See the documentation for the generic TMR facility.
+ *
+ *  HISTORY
+ *  -------
+ *  26.10.00 jjr - Created
+ */
+
+#include <sys/time.h>
+
+typedef hrtime_t TMR_tick;
+
+#define TMR_GET()                        gethrtime()
+#define TMR_TO_NSECS(_delta)                 _delta
+#define TMR_FORMAT                           "%6lld"
+#define TMR_DELTA(_beg, _end)          (_end - _beg)
+#define TMR_DELTA_IN_NSECS(_beg, _end) (_end - _beg)
+
+#endif

@@ -1,0 +1,91 @@
+#include "src/tmr.h"
+
+int TMR_initialize (void)
+/*
+   DESCRIPTION
+   -----------
+   Initializes the TMR parameter block. For SOLARIS, this is a noop
+
+   PARAMETERS
+   ----------
+         NONE
+
+   RETURNS
+   -------
+   Nothing
+*/
+{
+   return 0;
+} 
+
+
+
+TMR_tick TMR_nsecs_to_ticks (int nanoseconds)
+/*
+   DESCRIPTION
+   -----------
+   Convert a number of nanoseconds to ticks
+
+   PARAMETERS
+   ----------
+  nanoseconds: The number of nanoseconds to convert to ticks.
+
+   RETURNS
+   -------
+   The equivalent number of ticks
+*/
+{
+   TMR_tick ticks = nanoseconds;
+   return ticks;
+}
+
+
+unsigned int TMR_ticks_to_nsecs (TMR_tick ticks)
+/*
+   DESCRIPTION
+   -----------
+   Convert a number of ticks to nanoseconds. The units of the SUN High
+   Resolution timer are already in nanoseconds, so this is effectively
+   a NOOP except for the type conversion. One must be careful here, as
+   64 bits is being reduced to 32. 
+
+   PARAMETERS
+   ----------
+  nanoseconds: The number of nanoseconds to convert to ticks.
+
+   RETURNS
+   -------
+   The equivalent number of ticks
+*/
+{
+   return (unsigned int)ticks;
+} 
+
+
+   
+
+unsigned int TMR_frequency (void)
+/*
+    DESCRIPTION
+    -----------
+    Returns the frequency, in Hertz, of the processor clock. This is the
+    number of ticks/sec.
+
+    PARAMETERS
+    ----------
+          NONE
+
+    RETURNS
+    -------
+    The frequency in Hertz
+*/
+{   
+    return 1000000000;
+}
+
+
+
+
+
+
+

@@ -1,0 +1,58 @@
+//$Header$
+
+
+// start with the basic program defined in Gleam
+#include "$GLEAMROOT/src/basicOptions.txt"
+
+// this would run the GUI
+//#include "$GLEAMROOT/src/guiOptions.txt"
+
+//
+// The next three lines allow one to read a previously generated file
+//Generator.Members = {} ;                      // turn off generation
+//Digitization.Members = {"digiRootReaderAlg"}; // replace digi algs.
+//digiRootReaderAlg.digiRootFile="/nfs/farm/g/glast/u06/richard/WBA/AllGamma/IndividualRuns/digi_0000.root";
+
+
+//
+// this would write an ntuple
+//
+/// JJ: Commented this line out when build could not find the required shareable
+///
+// 
+//#include "$EBFWRITERROOT/src/test/ntuple.txt"
+
+// If you want mc, digi, and recon full ROOT files written
+// Comment out the following line
+Output.Members = {};
+
+
+
+// append our alg 
+ApplicationMgr.DLLs += {"OnlineFilter","merit"};
+ApplicationMgr.TopAlg += 
+{
+     "EbfWriter",
+     "OnlineFilter","meritAlg"
+};
+
+
+// If running simulation - specify what source to use
+// add the local specs to  the list of source library documents
+/////FluxSvc.source_lib += {"$(EBFWRITERROOT)/src/test/test_sources.xml"};
+FluxAlg.source_name="backgndmaxpdr";
+
+
+// Number of events to process
+ApplicationMgr.EvtMax = 100;
+
+meritAlg.rootFilename="filter.root";
+
+// Set output level threshold (2=DEBUG, 3=INFO, 4=WARNING, 5=ERROR, 6=FATAL )
+MessageSvc.OutputLevel      =6;
+
+//==============================================================
+//
+// End of job options file
+//
+//##############################################################

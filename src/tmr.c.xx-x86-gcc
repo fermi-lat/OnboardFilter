@@ -1,0 +1,186 @@
+#ifndef TMR_C_XX_X86_GCC
+#define TMR_C_XX_X86_GCC
+
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include "src/tmr.h"
+
+
+
+struct _TMR_parameters
+{
+    double      frequency;  /*!< Number of ticks in a second                 */
+    double nsecs_per_tick;  /*!< Number of nsecs/tick                        */
+};
+
+
+typedef struct _TMR_parameters TMR_parameters;
+static  struct _TMR_parameters TMR_Parameters = {0.0, 0.0};
+
+
+
+int TMR_initialize (void)
+/*
+   DESCRIPTION
+   -----------
+   Initializes the TMR parameter block. This is a one time call.
+
+   PARAMETERS
+   ----------
+         NONE
+
+   RETURNS
+   -------
+   Status
+*/
+{
+   TMR_parameters *pp = &TMR_Parameters;
+
+   FILE           *fp;
+   char   buf[BUFSIZ];
+   int          ncpus;
+   double         mhz;
+   double   frequency;
+
+  
+   /* Open the file with the CPU information */
+   if (NULL == (fp = fopen("/proc/cpuinfo", "r"))) return -1;
+  
+   ncpus =   0;
+   mhz   = 0.0;
+
+   /*
+    | Parse the file looking for the MHZ of the CPU.
+    | Subtle issue of what to do when have multiple CPUs with different
+    | clock speeds. Even worse, there is no synchronization between the
+    | two CPUs, what happens when if the task switches processors?
+   */
+   while (fgets(buf, sizeof buf, fp)) 
+   {
+       const char *ptr;
+       char       *end;
+       double   mhzLcl;
+
+       /* Is this the target line? */
+       if (strncmp(buf, "cpu MHz", 7)) continue;
+
+
+       /* Find the separating colon */
+       ptr = strchr (buf, ':');
+       if (ptr == NULL) return -2;
+
+
+       /* Skip over the colon, convert the string */
+       ptr   += 1;
+       mhzLcl = strtod(ptr, &end);
+       if (end == ptr) return -3;
+
+       if (ncpus++ == 0) 
+       {
+	   mhz    = mhzLcl;
+       }
+       else if (mhz != mhzLcl)
+       {
+            if (ncpus == 2) 
+                printf ("TMR_initialize: Multiple cpus with different clocks\n"
+                        "Clock 0 = %8.3f\n", mhz);
+
+            printf ("Clock %d = %8.3f\n", ncpus, mhzLcl);
+
+       }
+
+   }
+
+   /* If no information found */
+   if (ncpus == 0) return -4;
+
+
+   /* Change the frequency from MHz to Hz */
+   frequency          = 1000000 * mhz;
+   pp->frequency      = frequency;
+   pp->nsecs_per_tick = 1000000000/frequency;
+
+   printf ("TMR_initialize    : %d cpus\n"
+           "Frequency         : %10.3f Hz\n"
+           "Nseconds / tick   :      %8.3f nsecs\n",            
+            ncpus,
+            pp->frequency,
+            pp->nsecs_per_tick);
+
+   return 0;
+} 
+
+
+
+
+TMR_tick TMR_nsecs_to_ticks (int nanoseconds)
+/*
+   DESCRIPTION
+   -----------
+   Convert a number of nanoseconds to ticks
+
+   PARAMETERS
+   ----------
+  nanoseconds: The number of nanoseconds to convert into ticks.
+
+   RETURNS
+   -------
+   The equivalent number of ticks
+*/
+{
+   TMR_tick ticks;
+   TMR_parameters *pp = &TMR_Parameters;
+
+   ticks = nanoseconds * pp->frequency;
+   return ticks;
+}
+
+
+
+unsigned int TMR_ticks_to_nsecs (TMR_tick ticks)
+/*
+   DESCRIPTION
+   -----------
+   Convert a number of ticks into nanoseconds. 
+
+
+   PARAMETERS
+   ----------
+  nanoseconds: The number of nanoseconds to convert into ticks.
+
+   RETURNS
+   -------
+   The equivalent number of ticks
+*/
+{ 
+   TMR_parameters *pp = &TMR_Parameters;
+   return ticks * pp->nsecs_per_tick;
+}
+
+   
+
+unsigned int TMR_frequency (void)
+/*
+    DESCRIPTION
+    -----------
+    Returns the frequency, in Hertz, of the processor clock. This is the
+    number of ticks/sec.
+
+    PARAMETERS
+    ----------
+          NONE
+
+    RETURNS
+    -------
+    The frequency in Hertz
+*/
+{   
+    return TMR_Parameters.frequency;
+}
+
+#endif
+
+
+

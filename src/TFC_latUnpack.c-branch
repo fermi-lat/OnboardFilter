@@ -1,0 +1,717 @@
+#include "DFC/DFC_endianness.h"
+#include "DFC/TFC_latUnpack.h"
+#include "DFC/TFC_latRecord.h"
+#include "DFC/TFC_towerUnpack.h"
+#include "DFC/TFC_towerRecord.h"
+#include "DFC/EBF_directory.h"
+#include "DFC/EBF_tkr.h"
+#include "tmr.h"
+
+
+
+
+#include "ffs.h"
+
+#define TFC__stripToLen(_s, _x)   ((_s) + _x[((_s) >> 7) & 0xf])
+//#define TFC__stripToLen(_s, _x) (_s)
+
+
+#define INIT_XLAYERS(_lyrs, _accepts, _xlayers, _map, _layers, _topBit) \
+({                                                                   \
+   while (_accepts)                                                  \
+   {                                                                 \
+       int                 n;                                        \
+       int          layerNum;                                        \
+       TFC_towerLayer *layer;                                        \
+                                                                     \
+       n           = FFS (_accepts);                                 \
+      _accepts    &= ~(_topBit >> n);                                \
+       layerNum    = _map[n];                                        \
+       layer       = &_layers[layerNum];                             \
+     *_lyrs++      = layer;                                          \
+       layer->end  = layer->beg;                                     \
+      _xlayers    |= 1 << layerNum;                                  \
+   }                                                                 \
+                                                                     \
+   lyrs;                                                             \
+})
+
+
+#define INIT_YLAYERS(_lyrs, _accepts, _ylayers, _map, _layers, _topBit) \
+({                                                                   \
+   while (_accepts)                                                  \
+   {                                                                 \
+       int                 n;                                        \
+       int          layerNum;                                        \
+       TFC_towerLayer *layer;                                        \
+                                                                     \
+       n           = FFS (_accepts);                                 \
+      _accepts    &= ~(_topBit >> n);                                \
+       layerNum    = _map[n];                                        \
+       layer       = &_layers[layerNum];                             \
+     *_lyrs++      = layer;                                          \
+       layer->end  = layer->beg;                                     \
+      _ylayers    |= 1 << (layerNum - 18);                           \
+   }                                                                 \
+                                                                     \
+   lyrs;                                                             \
+})
+
+
+
+
+/* -----------------------------------------------------------------------*//*!
+   
+  \def   NSTORE(_strip, _beg, _prv, _cur, _lcnt, _layer, _lyrs, _done)
+  \brief Macro to process a strip address when starting a new cluster
+  \param _strip  The strip address to process
+  \param _beg    Set to the new strip address if this is not the last
+                 strip on the layer.
+  \param _prv    Set to the new strip address if this is not the last
+                 strip on the layer.
+  \param _cur    Current address to store the strip address.
+  \param _lcnt   Number of layers left to process.
+  \param _layer  The current TFC tower layer address
+  \param _lyrs   A stack of the TFC tower layer addresses.
+  \param _done   Target of a goto after taken when all strip addresses
+                 have been processed
+
+   This macro is used only when starting the construction of a new cluster.
+   If the strip address to be processed is not the last strip on a layer,
+   a new cluster is initialized by setting the beginning and ending of
+   the cluster to the strip address.
+   
+   If this is the last strip on a layer, the strip address is stored along
+   with the ending address of this layer. If there are more layers to
+   process, the address to store the new strip addresses is retrieved
+   and the cluster status is set to no cluster in progress by setting
+   the beginning cluster strip address to -1.
+
+   If there are no more layers to process the action indicated by \e _action
+   is taken. This is generally a \e break or \e goto statement.
+                                                                          */
+/* -----------------------------------------------------------------------*/
+#define NSTORE(_strip, _beg, _prv, _cur, _lcnt, _layer, _lyrs, _done,_No,_Po) \
+     {                                                                \
+          int strip = _strip;                                         \
+          int s = TFC__stripToLen (strip & 0x7ff, sXl);               \
+          if ((strip & (1 << 11)))                                    \
+          {                                                           \
+            /*                                                        \
+             | By definition, there is no cluster in progress, so,    \
+             | since this is the last strip on a layer, just store it \
+             | (after removing the end of layer bit) and commence     \
+             | the usual end of layer processing. A critical piece of \
+             | the end of layer processing is to set _beg to -1,      \
+             | indicating that there is no cluster currently being    \
+             | built.                                                 \
+            */                                                        \
+             _lcnt       -= 1;                                        \
+            *_cur++       = s;                                        \
+             _layer->end  = _cur;                                     \
+              if (_lcnt <= 0) goto _done;                             \
+             _layer       = *--_lyrs;                                 \
+             _cur         =  _layer->end;                             \
+             /* _beg         = -1;  */                                     \
+             goto _No;                                                \
+          }                                                           \
+          else                                                        \
+          {                                                           \
+             /*                                                       \
+              | By definition, there is no cluster in progress, so,   \
+              | since this is not the last strip on a layer, a new    \
+              | cluster is created.                                   \
+             */                                                       \
+             _prv = _beg = s;                                         \
+             goto _Po;                                                \
+          }                                                           \
+     }
+/* -----------------------------------------------------------------------*/
+
+
+
+/* -----------------------------------------------------------------------*//*!
+   
+  \def   PSTORE(_strip, _beg, _prv, _cur, _lcnt, _layer, _lyrs, _done)
+  \brief Macro to process a strip address when a cluster is being built
+  \param _strip  The strip address to process
+  \param _beg    Beginning strip address of the cluster.
+  \param _prv    Ending strip address of the cluster, i.e. the previous
+                 strip address.
+  \param _cur    Current address to store the strip address.
+  \param _lcnt   Number of layers left to process.
+  \param _layer  The current TFC tower layer address
+  \param _lyrs   A stack of the TFC tower layer addresses.
+  \param _done   Target of a goto after taken when all strip addresses
+                 have been processed
+
+   This macro is used only when a cluster is in the process of being built.
+   The parameters \a _beg and \a _prv indicate the beginning and ending
+   strip addresses of the current cluster.
+
+   A check is made to see if the new strip address to be stored is
+   contiguous the current cluster. If so the ending address of the cluster
+   is updated.
+
+   If the current cluster is not contiguous, there are two possible
+   reasons. The first is the obvious, they two strip addresses are not
+   contiguous. The second is that the new strip address is actually
+   at the end of a layer. If this is so. the check for being contiguous
+   is remade after stripping the layer end bit. If not, the old
+   cluster centroid is stored and a new one begun.
+                                                                          */
+/* -----------------------------------------------------------------------*/
+#define PSTORE(_strip, _beg, _prv, _cur, _lcnt, _layer, _lyrs, _done,_No,_Po)\
+     {                                                                \
+          int strip = _strip;                                         \
+          int s = TFC__stripToLen (strip & 0x7ff, sXl);               \
+                                                                      \
+          /*                                                          \
+           |  Check if this strip is at the end of a layer.           \
+          */                                                          \
+          if ((strip & (1 << 11)))                                    \
+          {                                                           \
+              _lcnt      -= 1;                                        \
+                                                                      \
+              /*                                                      \
+               |  If this strip is contiguous with the current        \
+               |  cluster, extend the cluster and store the centroid. \
+              */                                                      \
+              if (s - _prv <= 2)                                      \
+              {                                                       \
+                 *_cur++ = (_beg + s) >> 1;                           \
+              }                                                       \
+                                                                      \
+              /*                                                      \
+               |  This strip is not contiguous with the current       \
+               |  cluster, store the centroid of the current cluster. \
+               |  and then store the current strip.                   \
+              */                                                      \
+              else                                                    \
+              {                                                       \
+                 _cur[0] = (_beg + _prv) >> 1;                        \
+                 _cur[1] = s;                                         \
+                 _cur   += 2;                                         \
+              }                                                       \
+                                                                      \
+             /*                                                       \
+              |  Perform the standard end of layer processing.        \
+              |  Direct the flow to the code that processes the       \
+              |  next strip when there is no cluster in progress      \
+             */                                                       \
+              _layer->end = _cur;                                     \
+              if (_lcnt  <= 0) goto _done;                            \
+              _layer      = *--_lyrs;                                 \
+              _cur        =  _layer->end;                             \
+              /* _beg        = -1; */                                       \
+              goto _No;                                               \
+          }                                                           \
+                                                                      \
+          /*                                                          \
+           |  Not the end of a layer so check if this strip is        \
+           |  contiguous with the current cluster. If it is, then     \
+           |  update the current cluster's end point.                 \
+          */                                                          \
+          else if (s - _prv <= 2)                                     \
+          {                                                           \
+             _prv = s;                                                \
+             goto _Po;                                                \
+          }                                                           \
+                                                                      \
+          /*                                                          \
+           |  Current strip is not contiguous with the current        \
+           |  cluster, so store the current cluster and start a       \
+           |  new cluster.                                            \
+          */                                                          \
+          else                                                        \
+          {                                                           \
+              *_cur++ = (_beg + _prv) >> 1;                           \
+               _beg   =  _prv = s;                                    \
+               goto _Po;                                              \
+          }                                                           \
+                                                                      \
+     }
+
+
+#define STORE(_Ni,_Pi,                                                       \
+              _strip, _beg, _prv, _cur, _lcnt, _layer, _layers, _done,       \
+              _No,_Po)                                                       \
+                                                                             \
+_Ni: NSTORE(_strip, _beg, _prv, _cur, _lcnt, _layer, _layers, _done,_No,_Po);\
+_Pi: PSTORE(_strip, _beg, _prv, _cur, _lcnt, _layer, _layers, _done,_No,_Po);
+
+
+
+struct _LayerMaps
+{
+    unsigned char a2[8];
+    unsigned char a1[32];
+    unsigned char a0[32];
+};
+
+
+
+static const struct _LayerMaps Maps =
+{
+     { 35, 33, 31, 29, 27, 25, 23, 21 },
+     
+     { 19, 34, 32, 30, 28, 26, 24, 22,
+       20, 18, 35, 33, 31, 29, 27, 25,
+       23, 21, 19, 34, 32, 30, 28, 26,
+       24, 22, 20, 18, 17, 15, 13, 11
+     },
+     
+     {   9,  7,  5,  3,  1, 16, 14, 12,
+        10,  8,  6,  4,  2,  0, 17, 15,
+        13, 11,  9,  7,  5,  3,  1, 16,
+        14, 12, 10,  8,  6,  4,  2,  0 
+     }
+};
+
+
+#if DFC_C_ENDIANNESS == DFC_K_ENDIANNESS_BIG
+
+   typedef struct _TFC_2strips_bf
+   {
+       unsigned int     s1:12;
+       unsigned int     s0:12;
+       unsigned int accepts:8;
+   }
+   TFC_2strips_bf;
+
+#else
+
+   typedef struct _TFC_2strips_bf
+   {
+       unsigned int accepts:8;
+       unsigned int     s0:12;
+       unsigned int     s1:12;
+   }
+   TFC_2strips_bf;
+
+#endif
+
+
+#if DFC_C_ENDIANNESS == DFC_K_ENDIANNESS_BIG
+
+   typedef struct _TFC_8strips0_bf
+   {
+       unsigned int s2a: 8;
+       unsigned int s1 :12;
+       unsigned int s0 :12;
+   }
+   TFC_8strips0_bf;
+
+#else
+
+   typedef struct _TFC_8strips0_bf
+   {
+       unsigned int s0 :12;
+       unsigned int s1 :12;    
+       unsigned int s2a: 8;
+   }
+   TFC_8strips0_bf;
+
+#endif
+
+
+
+#if DFC_C_ENDIANNESS == DFC_K_ENDIANNESS_BIG
+
+   typedef struct _TFC_8strips1_bf
+   {
+       unsigned int s5a: 4;
+       unsigned int s4 :12;
+       unsigned int s3 :12;    
+       unsigned int s2b: 4;
+   }
+   TFC_8strips1_bf;
+
+#else
+
+   typedef struct _TFC_8strips1_bf
+   {
+       unsigned int s2b: 4;
+       unsigned int s3 :12;
+       unsigned int s4 :12;
+       unsigned int s5a: 4;
+   }
+   TFC_8strips1_bf;
+
+#endif
+
+
+
+#if DFC_C_ENDIANNESS == DFC_K_ENDIANNESS_BIG
+
+   typedef struct _TFC_8strips2_bf
+   {
+       unsigned int s7 :12;
+       unsigned int s6 :12;    
+       unsigned int s5b: 8;
+   }
+   TFC_8strips2_bf;
+
+#else
+
+
+   typedef struct _TFC_8strips2_bf
+   {
+       unsigned int s5b: 8;
+       unsigned int s6 :12;
+       unsigned int s7 :12;
+   }
+   TFC_8strips2_bf;
+
+#endif
+
+
+typedef union _TFC_2strips
+{
+    TFC_2strips_bf bf;
+    unsigned int   ui;
+}
+TFC_2strips;
+
+
+typedef union _TFC_8strips0
+{
+    TFC_8strips0_bf bf;
+    unsigned int    ui;
+}
+TFC_8strips0;
+
+
+typedef union _TFC_8strips1
+{
+    TFC_8strips1_bf bf;
+    unsigned int    ui;
+}
+TFC_8strips1;
+
+
+typedef union _TFC_8strips2
+{
+    TFC_8strips2_bf bf;
+    unsigned int    ui;
+}
+TFC_8strips2;
+
+
+
+
+int TFC_latUnpack (struct _TFC_latRecord       *tlr,
+                   const struct _EBF_directory *dir,
+                   int                         tmsk)
+{
+   const EBF_contributor *contributors;
+   short int                   *strips;
+   int                          twrMap;
+   unsigned int                 topBit;
+   
+
+   /*
+    | Limit towers to be unpacked to those requested, that exist and still
+    | need to be unpacked.
+   */
+   twrMap       = tlr->twrMap;
+   tmsk        &= EBF_DIRECTORY_TWRS_TKR (dir->ctids) & ~twrMap;
+   tlr->twrMap |= tmsk;
+   contributors = dir->contributors;
+   strips       = tlr->strips + tlr->stripCnt;
+   topBit       = 1 << 31;
+   
+   
+   do
+   {
+       int                          tower;
+       int                         calcnt;
+       int                            cnt;
+       const struct _EBF_tkr         *tkr;       
+       const EBF_contributor *contributor;
+       TFC_towerRecord               *ttr;
+
+       
+       /*
+        | Locate the first tower to unpack
+        | The tower number is used to locate the tracker data and the
+        | structure to unpack into.
+       */       
+       tower       = FFS (tmsk);
+       contributor = &contributors[tower];
+       ttr         = &tlr->twr[tower];
+       tmsk       &= ~(topBit >> tower);
+       cnt         = contributor->cnt;
+       calcnt      = contributor->calcnt;
+       tkr         = EBF__tkrLocate (contributor->ptr, cnt, calcnt);
+       cnt        -= calcnt;
+       ttr->id     = tower;
+       strips      = TFC_towerUnpack (ttr, strips, tkr, cnt);
+   }
+   while (tmsk);
+
+   return 0;
+}
+
+       
+
+short int *TFC_towerUnpack (struct _TFC_towerRecord *ttr,
+                            short int            *strips,
+                            const struct _EBF_tkr   *tkr,
+                            int                      cnt)
+{
+# define GAP 9 
+   static const unsigned char SxL[16] =
+   { 0, 0, 0,
+     1*GAP, 1*GAP, 1*GAP,
+     2*GAP, 2*GAP, 2*GAP,
+     3*GAP, 3*GAP, 3*GAP,
+     3*GAP, 3*GAP, 3*GAP
+   };
+ 
+ 
+   int  a0;
+   int  a1, a1x, a1y;
+   int  a2;
+   int  xL;
+   int  yL;
+   
+   TFC_2strips             dat;
+   int                    lcnt;
+   TFC_towerLayer      *layers;
+   TFC_towerLayer       *layer;
+   TFC_towerLayer       **lyrs;
+   TFC_towerLayer *lyrsBuf[72];
+
+   short int              *cur;
+   int                     beg;
+   int                     prv;
+   unsigned int            b31;
+   const unsigned int    *data;
+   TFC_8strips0             d0;
+   TFC_8strips1             d1;
+   TFC_8strips2             d2;
+   const unsigned char    *sXl;
+   
+
+   /*
+    |  Initialize a stack of the struck layers. This information is
+    |  gathered from the TKR accept list. It is filled in reverse
+    |  order because of the direction of the FFS function. Because
+    |  it is filled in reverse order from the way the TKR is readout,
+    |  it is processed in reverse order. That is, the last layer
+    |  entered into the array of layer numbers is the first one
+    |  processed, since it is the first one readout.
+   */
+   sXl    = SxL;
+   a0     = tkr->accepts[0];
+   a1     = tkr->accepts[1];
+   a1y    = a1 & 0xfffffff0;
+   a1x    = a1 & 0x0000000f;
+   dat.ui = tkr->accepts[2];
+   a2     = dat.bf.accepts;
+
+   xL     = 0;
+   yL     = 0;
+   b31    = (1 << 31);
+   layers = ttr->layers;
+   lyrs   = lyrsBuf;
+   
+   lyrs   = INIT_YLAYERS (lyrs, a2,  yL, (Maps.a2 - 24), layers, b31);
+   lyrs   = INIT_YLAYERS (lyrs, a1y, yL, Maps.a1       , layers, b31);
+   lyrs   = INIT_XLAYERS (lyrs, a1x, xL, Maps.a1       , layers, b31);
+   lyrs   = INIT_XLAYERS (lyrs, a0,  xL, Maps.a0       , layers, b31);
+   lcnt   = lyrs - lyrsBuf;
+
+
+   /*
+    | Initialize the tower structure with the beginning strip address
+    | and the x & y layer masks. Note that the layer masks are in the
+    | canonical order. Thus bit 0 represents layer 0, bit 1, layer 1,
+    | etc. This is because the track finding is done starting from the
+    | layers closest to the ACD top face, i.e. from the highest number
+    | layers.
+   */
+   ttr->layerMaps[0] = xL;
+   ttr->layerMaps[1] = yL;
+
+
+   /*
+    | The while loop is arranged so that it handles 3 words (8 strip
+    | addresses in a pass. This is the lowest harmonic of the 12 (the
+    | number of bits in a strip address) and 32, (the number of bits
+    | in a 32 bit word.)
+    |
+    | The loop is phased so that the first two strip addresses left in
+    | the last accept word are correctly processed. This means sticking
+    | the 32 bit pattern that has 8 bits, follow be 2 12 bit strip addresses
+    | at the beginning (this occurs in the TFC_8strips2 structure). After
+    | the shard is processed, a fresh set of 3 32 bit words is extracted
+    | and processed.
+    |
+    | The loop needs to have some context established. The current layer
+    | pointer and the current strip storage address must be established,
+    | along with a pointer the strip data. Finally the variable 'beg',
+    | indicating the beginning of the current cluster is initialized to -1,
+    | indicating no cluster is currently being built.
+   */
+   layer = *--lyrs;
+   cur   = layer->beg;
+   data  = &tkr->accepts[3] - 3;
+   d2.ui = dat.ui;
+   beg   = -1;
+   prv   = -1;
+
+   
+   /*   
+    | The loop is completed when all the layers, represented by
+    | lcnt, have been processed.
+   */ 
+   while (1)
+   {
+       STORE (N6, P6, d2.bf.s6, beg, prv, cur, lcnt, layer, lyrs, DONE, N7,P7);
+       STORE (N7, P7, d2.bf.s7, beg, prv, cur, lcnt, layer, lyrs, DONE, N0,P0);
+
+       /* Now on a even word boundary, decode 3 words or 8 strips worth. */
+     N0:
+       data +=  3;       
+       d0.ui = data[0];
+       d1.ui = data[1];
+       d2.ui = data[2];
+       NSTORE (d0.bf.s0, beg, prv, cur, lcnt, layer, lyrs, DONE, N1, P1);     
+
+     P0:
+       data +=  3;       
+       d0.ui = data[0];
+       d1.ui = data[1];
+       d2.ui = data[2];
+       PSTORE (d0.bf.s0, beg, prv, cur, lcnt, layer, lyrs, DONE, N1, P1);     
+       
+
+       STORE (N1,P1, d0.bf.s1, beg, prv, cur, lcnt, layer, lyrs, DONE, N2,P2);
+       STORE (N2,P2, ((d1.bf.s2b<<8)|d0.bf.s2a),
+                               beg, prv, cur, lcnt, layer, lyrs, DONE, N3,P3);
+       
+       STORE (N3,P3, d1.bf.s3, beg, prv, cur, lcnt, layer, lyrs, DONE, N4,P4);
+       STORE (N4,P4, d1.bf.s4, beg, prv, cur, lcnt, layer, lyrs, DONE, N5,P5);
+       STORE (N5,P5, ((d2.bf.s5b << 4) | d1.bf.s5a),
+                               beg, prv, cur, lcnt, layer, lyrs, DONE, N6,P6);
+   }
+
+   
+  DONE:
+   return strips + TFC_K_MAX_STRIPS_PER_TOWER;
+}
+/* ---------------------------------------------------------------------- */
+
+
+   
+
+/* ---------------------------------------------------------------------- *//*!
+
+  \fn     int TFC_latUnpackSizeof (void)
+  \brief  Returns the size, in bytes, of a TKR LAT record.
+  \return The size, in bytes, of a TKR LAT record.
+
+   This function should be called to determine the size of a \a tlr. This
+   allows the calling program to avoid including the structure definition
+   of a \a tlr.
+
+   After allocating a \a tlr, the structure should be initialized using
+   \a TFC_latInit().
+                                                                          */
+/* ---------------------------------------------------------------------- */
+int TFC_latUnpackSizeof (void)
+{
+   return sizeof (struct _TFC_latRecord);
+}
+/* ---------------------------------------------------------------------- */
+
+
+
+
+/* ---------------------------------------------------------------------- *//*!
+
+ \fn         void TFC_latUnpackInit (struct _TFC_latRecord *tlr)
+ \brief      Performs one time initialization of a Track LAT record.
+ \param  tlr Pointer to the structure to initialize
+
+  This function should be called only once to initialize the record. After
+  that, TFC_latRecordReset should be called to reset the structure before
+  each unpack.
+                                                                          */
+/* ---------------------------------------------------------------------- */
+void TFC_latUnpackInit (struct _TFC_latRecord *tlr)
+{
+   int              twrNum;
+   signed short int *strip;
+   TFC_towerRecord    *twr;
+
+   /*
+    | Initialize the global part of the structure
+   */
+   tlr->stripCnt = 0;
+   tlr->twrMap   = 0;
+
+
+   /*
+    | Loop over all the towers of the LAT, initializing their layer maps,
+    | both X and Y to empty, and then initialize their layer descriptors.
+   */
+   for (twrNum = 0, twr = tlr->twr, strip = tlr->strips;
+        twrNum < sizeof (tlr->twr) / sizeof (tlr->twr[0]);
+        twrNum++, twr++)
+   {
+       int          lyrNum;
+       TFC_towerLayer *lyr;
+       
+       twr->id           = twrNum;
+       twr->layerMaps[0] = 0;
+       twr->layerMaps[1] = 0;
+
+
+
+       /*
+        | Initialize the layer descriptors. This structure contains pointers
+        | to the beginning and ending of the unpacked strips. Technically
+        | only the beginning pointer needs to be initialized, but, for
+        | completeness, the ending pointer is also set. Note that once the
+        | beginning pointer is initialized, it need not be touched again.
+       */
+       for (lyrNum = 0, lyr = twr->layers;
+            lyrNum < sizeof (twr->layers) / sizeof (twr->layers[0]);
+            lyrNum++, lyr++)
+       {
+           lyr->beg = strip;
+           lyr->end = strip;
+           strip   += TFC_K_MAX_STRIPS_PER_LAYER;
+       }
+   }
+
+   return;
+}
+/* ---------------------------------------------------------------------- */
+
+
+
+
+
+/* ---------------------------------------------------------------------- *//*!
+
+ \fn         void TFC_latUnpackReset (struct _TFC_latRecord *tlr)
+ \brief      Resets the \a tlr record, preparing it to receive another
+             unpacked event.
+ \param  tlr Pointer to the structure to reset.
+
+  This function should be called prior to unpacking a new event. It
+  performs the minimal work needed to prepare the structure to receive
+  a new event.
+                                                                          */
+/* ---------------------------------------------------------------------- */
+void TFC_latUnpackReset (struct _TFC_latRecord *tlr)
+{
+   tlr->stripCnt = 0;
+   tlr->twrMap   = 0;
+   return;
+}
+/* ---------------------------------------------------------------------- */
