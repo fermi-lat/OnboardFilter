@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: golpa  Mon Aug 25 14:05:20 PDT 2003
+OnboardFilter/src
+
+Modified Files:
+	OnboardFilter.cxx 
+Log Message:
+Fixed SiliconPlaneGeometry errors
+    *
+------------------------------------------------------------
 User: golpa  Mon Aug 25 12:46:15 PDT 2003
 OnboardFilter/src
 
