@@ -104,7 +104,7 @@ namespace OnboardFilterTds{
     std::vector<double> exHighCoord;
     double length;
   };
-  
+
   struct projection{
     unsigned char       min; /*!< Beginning layer number of the projection */
     unsigned char       max; /*!< Ending    layer number of the projection */
@@ -112,18 +112,18 @@ namespace OnboardFilterTds{
     unsigned char     nhits; /*!< Number of hits assigned                  */
     short int      hits[18]; /*!< Hits assigned to proj                    */
   };
-  
+
   struct projections{
     unsigned short int curCnt[16]; /*!< Current number of projections in use   */
     unsigned short int  xy[16][2]; /*!< Count of X/Y projections               */
     projection prjs[1000];     /*!< List of projections                    */
   };
-  
+
   class FilterStatus : public DataObject{
   public:
     virtual ~FilterStatus();
-    
-    
+
+
     ///Return the statuscode of the filter
     inline unsigned int get() const;
     ///Returns the 16 most significant bits of the filter code
@@ -169,7 +169,7 @@ namespace OnboardFilterTds{
     // only this guy can create one, or modify it
     friend class OnboardFilter;
     FilterStatus();
-    
+
     ///Set the statuscode of the filter
     void set(const unsigned int code);
     ///Set the Energy in CAL
@@ -193,6 +193,7 @@ namespace OnboardFilterTds{
     void setXY(const int xy00[16], const int xy11[16], const int xy22[16], const int xy33[16]);
     void setTmsk(int tmsk);
     //****TEMP
+    void setSeperation2(const double sep2);
     void setXlongest(const double x_report);
     void setYlongest(const double y_report);
     void setXavg(const double xavg);
@@ -209,7 +210,8 @@ namespace OnboardFilterTds{
     void setYangleL(const double yangleL);
     void setXlongestB(const double xlongestB);
     void setYlongestB(const double ylongestB);
-    
+
+    double getSeperation2() const;
     double getXlongest() const;
     double getYlongest() const;
     double getXavg() const;
@@ -227,7 +229,7 @@ namespace OnboardFilterTds{
     double getXlongestB() const;
     double getYlongestB() const;
     //****TEMP
-    
+
   private:
     ///Filter status code
     unsigned int m_status;
@@ -251,13 +253,14 @@ namespace OnboardFilterTds{
     std::vector<track> m_tracks;
     ///Angular separation between best track and incomming particle
     double m_separation;
-    
+
     float m_layerEnergy[8];
     int m_xcapture[16];
     int m_ycapture[16];
     int m_xy00[16],m_xy11[16],m_xy22[16],m_xy33[16];
     int m_tmsk;
     //****TEMP
+    double m_seperation2;
     double m_x_report;  double m_y_report;
     double m_xavg;      double m_yavg;
     double m_xslopeL;   double m_yslopeL;
@@ -267,19 +270,19 @@ namespace OnboardFilterTds{
     double m_xangleL;    double m_yangleL;
     double m_xlongestB;  double m_ylongestB;
     //****TEMP
-    
+
   };
-  
+
   // inline the public get methods for clients besides OnboardFilter.
-  
+
   inline unsigned int FilterStatus::get() const{
     return m_status;
   }
-  
+
   inline unsigned int FilterStatus::getHigh() const{
     return m_status>>15;
   }
-  
+
   inline unsigned int FilterStatus::getLow() const{
     return m_status & 0x7FFF;
   }
@@ -291,7 +294,7 @@ namespace OnboardFilterTds{
   inline void FilterStatus::getAcdStatus(int *copy) const {
     memcpy(copy,m_acdStatus,sizeof(m_acdStatus)*16);
   }
-  
+
   inline const projections * FilterStatus::getProjection()const{
     return &m_prjs;
   }
@@ -304,61 +307,61 @@ namespace OnboardFilterTds{
   inline const int * FilterStatus::getLayers()const {
     return m_layers;
   }
-  
+
   inline std::vector<track> FilterStatus::getTracks()const{
     return m_tracks;
   }
-  
+
   inline double FilterStatus::getSeparation() const{
     return m_separation;
   }
-  
+
   inline bool FilterStatus::tracksExist() const{
     if(m_tracks.size()!=0)
       return true;
     return false;
   }
-  
+
   inline const int* FilterStatus::getXcapture() const{
     return m_xcapture;
   }
-  
+
   inline const int* FilterStatus::getYcapture() const{
     return m_ycapture;
   }
-  
+
   inline const float* FilterStatus::getLayerEnergy() const{
     return m_layerEnergy;
   }
-  
+
   inline const int* FilterStatus::getXY00() const{
     return m_xy00;
   }
-  
+
   inline const int* FilterStatus::getXY11() const{
     return m_xy11;
   }
-  
+
   inline const int* FilterStatus::getXY22() const{
     return m_xy22;
   }
-  
+
   inline const int* FilterStatus::getXY33() const{
     return m_xy33;
   }
-  
+
   inline int FilterStatus::getTmsk() const{
     return m_tmsk;
   }
-  
+
   inline int FilterStatus::getVetoWord() const{
     return m_vetoword;
   }
-  
+
   inline void FilterStatus::setVetoWord(const int vetoword){
     m_vetoword=vetoword;
   }
-  
+
   inline FilterStatus::FilterStatus(){
     m_status=0;
     m_calEnergy=0;
@@ -376,62 +379,62 @@ namespace OnboardFilterTds{
     m_separation=-1;
     m_tracks.clear();
   }
-  
+
   inline FilterStatus::~FilterStatus(){
   }
-  
+
   inline void FilterStatus::set(const unsigned int code){
     m_status=code;
   }
-  
+
   inline void FilterStatus::setCalEnergy(const int energy){
     m_calEnergy=(float)energy/4.;//must divide by 4 to get MeV units
   }
-  
+
   inline void FilterStatus::setTcids(const int ids){
     m_tcids=ids;
   }
-  
+
   inline void FilterStatus::setAcdMap(const int xz, const int yz, const int xy){
     m_acd_xz=xz;
     m_acd_yz=yz;
     m_acd_xy=xy;
   }
-  
+
   inline void FilterStatus::setAcdStatus(const int tower, const int status){
     if(tower<16)
       m_acdStatus[tower]=status;
   }
-  
+
   inline void FilterStatus::setLayers(const int *layerCode){
     for(int counter=0;counter<16;counter++)
       m_layers[counter]=layerCode[counter];
   }
-  
+
   inline void FilterStatus::setProjection(const projections &prjs){
     memcpy(&m_prjs, &prjs,sizeof(prjs));
   }
-  
+
   inline void FilterStatus::setSeparation(const double sep){
     m_separation=sep;
   }
-  
+
   inline void FilterStatus::setTrack(const track &newTrack){
     m_tracks.push_back(newTrack);
   }
-  
+
   inline void FilterStatus::setLayerEnergy(const int energy[8]){
     for(int counter=0;counter<8;counter++)
       m_layerEnergy[counter]=((float)energy[counter])/4.;//must divide by 4 to get MeV units
   }
-  
+
   inline void FilterStatus::setCapture(const int xcapture[16], const int ycapture[16]){
     for(int counter=0;counter<16;counter++){
       m_xcapture[counter]=xcapture[counter];
       m_ycapture[counter]=ycapture[counter];
     }
   }
-  
+
   inline void FilterStatus::setXY(const int xy00[16], const int xy11[16], const int xy22[16], const int xy33[16]){
     for(int counter=0;counter<16;counter++){
       m_xy00[counter]=xy00[counter];
@@ -440,11 +443,17 @@ namespace OnboardFilterTds{
       m_xy33[counter]=xy33[counter];
     }
   }
-  
+
   inline void FilterStatus::setTmsk(int tmsk){
     m_tmsk=tmsk;
   }
   //****TEMP
+  inline void FilterStatus::setSeperation2(const double sep2){
+    m_seperation2=sep2;
+  }
+  inline double FilterStatus::getSeperation2() const{
+    return m_seperation2;
+  }
   inline void FilterStatus::setXlongest(const double x_report){
     m_x_report=x_report;
   }
@@ -463,7 +472,7 @@ namespace OnboardFilterTds{
   inline void FilterStatus::setYfirst(const double long_firstangley){
     m_long_firstangley=long_firstangley;
   }
-  
+
   inline void FilterStatus::setXslopeL(const double xslopeL){
     m_xslopeL=xslopeL;
   }
@@ -494,7 +503,7 @@ namespace OnboardFilterTds{
   inline void FilterStatus::setYlongestB(const double ylongestB){
     m_ylongestB=ylongestB;
   }
-  
+
   inline double FilterStatus::getXlongest() const{
     return m_x_report;
   }
@@ -507,7 +516,7 @@ namespace OnboardFilterTds{
   inline double FilterStatus::getYavg() const{
     return m_yavg;
   }
-  
+
   inline double FilterStatus::getXslopeL() const{
     return m_xslopeL;
   }
@@ -526,7 +535,7 @@ namespace OnboardFilterTds{
   inline double FilterStatus::getYtower() const{
     return m_yslopetower;
   }
-  
+
   inline double FilterStatus::getXfirst() const{
     return m_long_firstanglex;
   }
@@ -552,12 +561,12 @@ namespace OnboardFilterTds{
     s<<"Filter code for Energy in CAL: "<<m_calEnergy<<std::endl;
     return s;
   }
-  
-  
+
+
   inline std::ostream& operator<<(std::ostream &s, const FilterStatus &obj){
     return obj.fillStream(s);
   }
-  
+
 }//namespace OnboradFilterTds
 
 
