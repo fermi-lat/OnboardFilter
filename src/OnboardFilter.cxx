@@ -133,9 +133,9 @@ Ctl;
 /* ---------------------------------------------------------------------- */
 
 
-class OnlineFilter:public Algorithm{
+class OnboardFilter:public Algorithm{
 public:
-  OnlineFilter(const std::string& name, ISvcLocator* pSvcLocator);
+  OnboardFilter(const std::string& name, ISvcLocator* pSvcLocator);
 
   //static void print_ctl (const Ctl *ctl);
   int countEvts  (const unsigned int *evts, int size);
@@ -157,19 +157,16 @@ private:
   std::string convertBase(unsigned int number);
   Ctl ctl_buf;
   Ctl *ctl;
-  INTupleWriterSvc *m_ntupleWriteSvc;
-  std::string m_tupleName;
 };
 
-static const AlgFactory<OnlineFilter>  Factory;
-const IAlgFactory& OnlineFilterFactory = Factory;
+static const AlgFactory<OnboardFilter>  Factory;
+const IAlgFactory& OnboardFilterFactory = Factory;
 
-StatusCode OnlineFilter::finalize(){
+StatusCode OnboardFilter::finalize(){
   return StatusCode::SUCCESS;
 }
 
-OnlineFilter::OnlineFilter(const std::string& name, ISvcLocator* pSvcLocator):Algorithm(name, pSvcLocator){
-  declareProperty("tupleName", m_tupleName="");
+OnboardFilter::OnboardFilter(const std::string& name, ISvcLocator* pSvcLocator):Algorithm(name, pSvcLocator){
 }
 
 /* ---------------------------------------------------------------------- *//*!
@@ -185,7 +182,7 @@ OnlineFilter::OnlineFilter(const std::string& name, ISvcLocator* pSvcLocator):Al
    with no parameters for its usage.
                                                                           */
 /* ---------------------------------------------------------------------- */  
-StatusCode OnlineFilter::initialize()
+StatusCode OnboardFilter::initialize()
 {
   MsgStream log(msgSvc(),name());
   log<< MSG::INFO << "Initializing Filter Settings"<<endreq;
@@ -201,18 +198,6 @@ StatusCode OnlineFilter::initialize()
   ctl_buf.esummary=0;
   ctl_buf.geometry=0;
   ctl    = &ctl_buf;
-  setProperties();
-  if(m_tupleName.empty())
-    log << MSG::INFO << "tupleName property not set. No ntuple output"<<endreq;
-  if(!m_tupleName.empty()){
-    if(service("ntupleWriterSvc",m_ntupleWriteSvc,true).isFailure()){
-      log << MSG::ERROR << "DFC failed to get the ntupleWriterSvc" << endreq;
-      return StatusCode::FAILURE;
-    }
-  }
-  if(!m_tupleName.empty()){
-    return m_ntupleWriteSvc->addItem(m_tupleName.c_str(),"FilterStatusCode",0);
-  }
   return StatusCode::SUCCESS;
 }
 /* ---------------------------------------------------------------------- */
@@ -229,7 +214,7 @@ StatusCode OnlineFilter::initialize()
                                                                           */
 /* ---------------------------------------------------------------------- */
 
-StatusCode OnlineFilter::execute()
+StatusCode OnboardFilter::execute()
 {
     TMR_tick                  beg;
     TMR_tick                  end;
@@ -369,10 +354,6 @@ StatusCode OnlineFilter::execute()
         
         esize   = *evt;
         status  = DFC_filter (dfcCtl, result, dfcEvt, evt, esize);
-	if(!m_tupleName.empty())
-	  m_ntupleWriteSvc->addItem(m_tupleName.c_str(),"FilterStatusCode",status);
-	std::cout<<"Filter status code: "<<(unsigned int)status<<" : " << convertBase(status)<<std::endl;
-	newStatus->set(status);
 
         if ((status & DFC_M_STATUS_VETOES) == 0)
             _DBG (printf("GLASTSIM EVENT = %9d (%9d) NOT REJECTED (%8.8x)\n",
@@ -400,6 +381,7 @@ StatusCode OnlineFilter::execute()
         DFC_filterComplete (dfcCtl, result, dfcEvt, evt, size);
         
         status = result->status;
+	newStatus->set(status);
 
         if (ctl->list && (result->status & DFC_M_STATUS_VETOES) == 0)
         {
@@ -431,6 +413,9 @@ StatusCode OnlineFilter::execute()
     
 
     EBF_free (ebf);
+    free(results);
+    free(dfcCtl);
+    free(dfcEvt);
     return StatusCode::SUCCESS;
 }
 /* ---------------------------------------------------------------------- */
@@ -446,7 +431,7 @@ StatusCode OnlineFilter::execute()
                                                                           */
 /* ---------------------------------------------------------------------- */
 /*
-  static void OnlineFilter::print_ctl (const Ctl *ctl)
+  static void OnboardFilter::print_ctl (const Ctl *ctl)
   {
   printf ("Input  file: %s\n",  ctl->ifile);
   
@@ -477,7 +462,7 @@ StatusCode OnlineFilter::execute()
   \return      The number of events in the event list.
                                                                           */
 /* ---------------------------------------------------------------------- */  
-int OnlineFilter::countEvts (const unsigned int *evts, int size)
+int OnboardFilter::countEvts (const unsigned int *evts, int size)
 {
     int nevts = 0;
  
@@ -495,7 +480,7 @@ int OnlineFilter::countEvts (const unsigned int *evts, int size)
 }
 /* ---------------------------------------------------------------------- */
 
-std::string OnlineFilter::convertBase(unsigned int number){
+std::string OnboardFilter::convertBase(unsigned int number){
   std::string output;
   int count=1;
   do{

@@ -1,5 +1,5 @@
 /** 
-* @file OnlineFilter_load.cxx
+* @file OnboardFilter_load.cxx
 * @brief This is needed for forcing the linker to load all components
 * of the library.
 *
@@ -10,6 +10,6 @@
 
 // There should be one entry for each component included in 
 // the library for this package.
-DECLARE_FACTORY_ENTRIES(OnlineFilter) {
-    DECLARE_ALGORITHM(OnlineFilter);
+DECLARE_FACTORY_ENTRIES(OnboardFilter) {
+    DECLARE_ALGORITHM(OnboardFilter);
 } 

@@ -1,4 +1,4 @@
-package OnlineFilter
+package OnboardFilter
 version v0
 
 use Event		*
@@ -10,7 +10,7 @@ use GlastSvc		*
 apply_pattern packageShr
 apply_pattern package_include
 
-library OnlineFilter *.cxx *.c Dll/*.cxx
+library OnboardFilter *.cxx *.c Dll/*.cxx
 
 private
 apply_pattern package_Cshlibflags
@@ -18,4 +18,4 @@ apply_pattern package_Cshlibflags
 public
 
 apply_pattern package_test
-set TESTJOBOPTIONS ${ONLINEFILTERROOT}/src/test/jobOptions.txt
+set TESTJOBOPTIONS ${ONBOARDFILTERROOT}/src/test/jobOptions.txt
