@@ -1,4 +1,14 @@
 ------------------------------------------------------------
+User: dnwren  Mon Aug 16 11:41:51 PDT 2004
+OnboardFilter/OnboardFilter
+
+Modified Files:
+	FilterStatus.h 
+Log Message:
+Fixed function and variable names.
+
+    *
+------------------------------------------------------------
 User: dnwren  Mon Aug 16 10:59:59 PDT 2004
 OnboardFilter/src
 
