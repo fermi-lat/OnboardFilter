@@ -34,7 +34,6 @@ FilterStatus::~FilterStatus(){
 }
 
 void FilterStatus::set(const unsigned int code){
-  std::cout<<"Setting FilterStatus in TDS to: "<<code<<std::endl;
   status=code;
 }
 

@@ -1,5 +1,5 @@
 /*------------------------------------------------------------------------
-| CVS $Id: DFC_filter.c,v 1.1.1.1 2003/07/07 16:50:48 golpa Exp $
+| CVS $Id: DFC_filter.c,v 1.2 2003/07/22 19:17:26 golpa Exp $
 +-------------------------------------------------------------------------*/
 
 
@@ -724,7 +724,7 @@ static int evaluateCal1 (const EBF_directory               *dir,
            if (isVetoed (status))
            {
                _DBG (printf ("REJECT on ratio\n"));
-               return status;
+               //return status;
            }
        }
        
@@ -1057,7 +1057,7 @@ int DFC_filter (struct _DFC_ctl         *dfc,
            {
                results->energy = -1;
                results->cal0   = TMR_GET();
-               return results->status = status | DFC_M_STATUS_VETOED;
+               //return results->status = status | DFC_M_STATUS_VETOED;
            }
        }
    }
@@ -1077,7 +1077,7 @@ int DFC_filter (struct _DFC_ctl         *dfc,
        {
            results->energy = -1;
            results->cal0   = TMR_GET();
-           return results->status = status | DFC_M_STATUS_VETOED;
+           //return results->status = status | DFC_M_STATUS_VETOED;
        }
    }
    
@@ -1114,7 +1114,7 @@ int DFC_filter (struct _DFC_ctl         *dfc,
        {
            results->status = status |= DFC_M_STATUS_VETOED;
            results->acd    = TMR_GET ();
-           return status;
+           //return status;
        }
 
        results->acd = TMR_GET();
@@ -1174,7 +1174,7 @@ int DFC_filter (struct _DFC_ctl         *dfc,
        {
            results->status = status |= DFC_M_STATUS_VETOED;
            results->atf    = TMR_GET();
-           return status;
+           //return status;
        }
 
        
@@ -1205,7 +1205,7 @@ int DFC_filter (struct _DFC_ctl         *dfc,
        {
            results->status = status |= DFC_M_STATUS_VETOED;
            results->cal1   = TMR_GET ();
-           return status;
+           //return status;
        }
 
        results->cal1 = TMR_GET ();       
