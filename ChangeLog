@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: golpa  Mon Jul 12 12:47:30 PDT 2004
+OnboardFilter/src/test
+
+Modified Files:
+	jobOptions.txt 
+Log Message:
+Removed windows characters
+    *
+------------------------------------------------------------
 User: golpa  Mon Jul 12 12:47:28 PDT 2004
 OnboardFilter/src/Dll
 
