@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: burnett  Fri Aug 15 14:17:15 PDT 2003
+OnboardFilter/cmt
+
+Modified Files:
+	requirements 
+Log Message:
+fix macros to build with appropriate symbols
+    *
+------------------------------------------------------------
 User: burnett  Fri Aug 15 14:02:29 PDT 2003
 OnboardFilter/cmt
 
