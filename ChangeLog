@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: golpa  Fri Jul 18 13:22:37 PDT 2003
+OnboardFilter/src
+
+Modified Files:
+	FilterStatus.cxx OnboardFilter.cxx 
+Log Message:
+Added Energy in CAL to the TDS
+    *
+------------------------------------------------------------
 User: golpa  Wed Jul 16 09:02:39 PDT 2003
 OnboardFilter/src/test
 
