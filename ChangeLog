@@ -1,5 +1,14 @@
 ------------------------------------------------------------
 User: burnett  Sun Aug 17 11:44:31 PDT 2003
+OnboardFilter/doc
+
+Modified Files:
+	release.notes 
+Log Message:
+Make all set methods private, accessible to OnboardFilter only. 
+    *
+------------------------------------------------------------
+User: burnett  Sun Aug 17 11:44:31 PDT 2003
 OnboardFilter/cmt
 
 Modified Files:
