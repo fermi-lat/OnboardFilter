@@ -11,7 +11,7 @@
 
    
 \verbatim
-    CVS $Id$
+    CVS $Id: AFC_latRecordPrint.c,v 1.2 2004/07/12 17:37:41 golpa Exp $
     
 \endverbatim
                                                                          */

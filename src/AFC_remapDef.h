@@ -8,7 +8,7 @@
   \brief  Defines the remapping structures to take one from electronics
           space to geographical space.
 \verbatim
-    CVS $Id$
+    CVS $Id: AFC_remapDef.h,v 1.2 2004/07/12 17:37:42 golpa Exp $
 \endverbatim
 
   \author JJRussell - russell@slac.stanford.edu   

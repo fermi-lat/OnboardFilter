@@ -5,7 +5,7 @@
    \author JJRussell - russell@slac.stanford.edu
 
 \verbatim
-   CVS $Id$
+   CVS $Id: DFC_filter.c,v 1.12 2004/07/12 17:37:43 golpa Exp $
 \endverbatim
 
                                                                           */

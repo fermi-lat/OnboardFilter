@@ -5,7 +5,7 @@
   \author JJRussell - russell@slac.stanford.edu
 
 \verbatim
-   CVS $Id$
+   CVS $Id: TFC_geometryStd.c,v 1.2 2004/07/12 17:37:44 golpa Exp $
 \endverbatim 
                                                                           */
 /* ---------------------------------------------------------------------- */

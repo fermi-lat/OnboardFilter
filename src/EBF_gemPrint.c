@@ -5,7 +5,7 @@
    \author JJRussell - russell@slac.stanford.edu
    
 \verbatim
-    CVS $Id$
+    CVS $Id: EBF_gemPrint.c,v 1.1 2004/07/12 18:09:12 golpa Exp $
     
 \endverbatim
                                                                          */
