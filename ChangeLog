@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: golpa  Fri Aug 22 14:00:45 PDT 2003
+OnboardFilter/src
+
+Modified Files:
+	OnboardFilter.cxx 
+Log Message:
+Fixed off-by-one bug
+    *
+------------------------------------------------------------
 User: golpa  Fri Aug 22 12:42:33 PDT 2003
 OnboardFilter/src
 
