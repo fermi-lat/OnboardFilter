@@ -1,4 +1,14 @@
 ------------------------------------------------------------
+User: burnett  Mon Aug 18 21:14:36 PDT 2003
+OnboardFilter/src
+
+Modified Files:
+	DFC_filter.c OnboardFilter.cxx TFC_acd.c 
+	TFC_projectionTowerFind.c 
+Log Message:
+bypass wired-in debug output
+    *
+------------------------------------------------------------
 User: burnett  Mon Aug 18 20:54:58 PDT 2003
 OnboardFilter/src
 
