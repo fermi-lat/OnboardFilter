@@ -1,5 +1,14 @@
 ------------------------------------------------------------
 User: golpa  Thu Sep  4 13:08:36 PDT 2003
+OnboardFilter/doc
+
+Modified Files:
+	release.notes 
+Log Message:
+Made passThrough option more intuitive
+    *
+------------------------------------------------------------
+User: golpa  Thu Sep  4 13:08:36 PDT 2003
 OnboardFilter/cmt
 
 Modified Files:
