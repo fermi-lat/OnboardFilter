@@ -1,28 +1,26 @@
 package OnboardFilter
 version v0r0p0
 
-use Event               *
 use EbfWriter           *
-use GlastPolicy         *
-use IExternal           *
-use GlastSvc            *
 
 apply_pattern packageShr
 apply_pattern package_include
 apply_pattern package_header
+
 apply_pattern library_Llinkopts library="OnboardFilterTds"
 
-macro_append cflags "" \
-   Linux "-DGLEAM"\
-   Win32 "/D "GLEAM"
+private
 
-macro_append cppflags "" \
-   Linux "-DGLEAM"\
-   Win32 "/D "GLEAM"
+macro OnboardFilter_cppflags "" \
+   Linux "-DGLEAM" -D__i382\
+   Win32 "/D "GLEAM /D__i386"
 
+macro OnboardFilter_cflags $(OnboardFilter_cppflags)
+
+macro headers "" WIN32 "*.h"
 library OnboardFilterTds -no_share FilterStatus.cxx
 
-library OnboardFilter *.cxx *.c Dll/*.cxx
+library OnboardFilter $(headers) *.cxx *.c Dll/*.cxx
 
 private
 apply_pattern package_Cshlibflags
