@@ -12,7 +12,8 @@
 #include "Event/TopLevel/Definitions.h"
 #include "Event/TopLevel/EventModel.h"
 
-//#include "TFC_projectionDef.h"
+#include "TkrUtil/ITkrGeometrySvc.h"
+
 /**
 * @class FilterStatus
 * @brief TDS for storing the information returned by the filter
@@ -23,25 +24,27 @@ class OnboardFilter;
 
 
 namespace OnboardFilterTds{
-    struct TFC_projection{
-        int           intercept; /*!< Intercept at the beginning layer         */
-        int               slope; /*!< Slope                                    */
-        int          acdTopMask; /*!< ACD top tile candidates                  */
-        int            acdXMask; /*!< ACD x facing candidates                  */
-        int            acdYMask; /*!< ACD y facing candidates                  */
-        unsigned char skirtMask; /*!< Mask of which skirt region prj strikes   */
+    struct track{
+      double phi_rad,theta_rad;
+      vector<double> lowCoord;
+      vector<double> highCoord;
+      vector<double> exLowCoord;
+      vector<double> exHighCoord;
+      double length;
+    };
+
+    struct projection{
         unsigned char       min; /*!< Beginning layer number of the projection */
         unsigned char       max; /*!< Ending    layer number of the projection */
-        unsigned char     nhits; /*!< Number of hits assigned                  */
         unsigned         layers; /*!< Bit mask representing the struck layers  */
+        unsigned char     nhits; /*!< Number of hits assigned                  */
         short int      hits[18]; /*!< Hits assigned to proj                    */
     };
 
-    struct TFC_projections{
-        unsigned short int maxCnt; /*!< Maximum number of projections available*/
+    struct projections{
         unsigned short int curCnt; /*!< Current number of projections in use   */
         unsigned short int  xy[2]; /*!< Count of X/Y projections               */
-        TFC_projection prjs[1000]; /*!< List of projections                    */
+        projection prjs[1000];     /*!< List of projections                    */
     };
 
 
@@ -75,7 +78,13 @@ namespace OnboardFilterTds{
         const int *getLayers()const ;
 
         ///Return the projections for a specific tower
-        std::vector<TFC_projection> getProjection(int tower)const ;
+        const projections *getProjection(int tower)const ;
+
+	///Return all available tracks
+        vector<track> getTracks()const;
+
+	///Return angular seperation between best track and incomming particle
+        double getSeperation() const;
 
         virtual std::ostream& fillStream(std::ostream &s) const;
         friend std::ostream& operator << (std::ostream &s, const FilterStatus &obj);
@@ -84,11 +93,7 @@ namespace OnboardFilterTds{
         friend class OnboardFilter;
     private:
         FilterStatus();
-        FilterStatus(const unsigned int code, const int energey=0,
-            const int ids=0, const int xz=0, const int yz=0,
-            const int xy=0, const int *acdstatus=NULL,
-            const int *layerCode=NULL,
-            const TFC_projections *projections=NULL);
+
         ///Set the statuscode of the filter
         void set(const unsigned int code);
 
@@ -98,7 +103,6 @@ namespace OnboardFilterTds{
         ///Set the Code specifying the towers with triggers or possible triggers
         void setTcids(const int ids);
 
-
         ///Set the ACD hit map results
         void setAcdMap(const int xz, const int yz, const int xy);
         ///Set the ACD faces intersected by projections
@@ -107,7 +111,12 @@ namespace OnboardFilterTds{
         ///Set what layers were hit in each tower
         void setLayers(const int *layerCode);
         ///Set the projection of a specific tower
-        void setProjection(const int tower,const TFC_projections projections);
+        void setProjection(const int tower,const projections projections);
+	
+	///Add a new track to the list of tracks
+	void setTrack(const track newTrack);
+
+        void setSeperation(const double sep);
 
         ///Filter status code
         unsigned int m_status;
@@ -124,7 +133,11 @@ namespace OnboardFilterTds{
         ///Layers hit in each tower
         int m_layers[16];
         ///Projections for the towers
-        std::vector<TFC_projection> m_prjs[16];
+        projections m_prjs[16];
+	///Tracks found for this event
+	vector<track> m_tracks;
+	///Angular seperation between best track and incomming particle
+	double m_seperation;
     };
 
     // inline the public get methods for clients besides OnboardFilter.
@@ -148,8 +161,8 @@ namespace OnboardFilterTds{
     inline void FilterStatus::getAcdStatus(int *copy) const {
         memcpy(copy,m_acdStatus,sizeof(m_acdStatus)*16);
     }
-    inline std::vector<TFC_projection> FilterStatus::getProjection(int tower)const{
-        return m_prjs[tower];
+    inline const projections * FilterStatus::getProjection(int tower)const{
+        return &m_prjs[tower];
     }
     inline int FilterStatus::getCalEnergy() const{
         return m_calEnergy;
@@ -161,6 +174,14 @@ namespace OnboardFilterTds{
         return m_layers;
     }
 
+    inline vector<track> FilterStatus::getTracks()const{
+      return m_tracks;
+    }
+
+    inline double FilterStatus::getSeperation() const{
+      return m_seperation;
+    }
+
     // the put methods, here for now
     inline FilterStatus::FilterStatus(){
       m_status=0;
@@ -170,39 +191,8 @@ namespace OnboardFilterTds{
       m_acd_xz=0;
       m_acd_yz=0;
       for(int counter=0;counter<16;counter++){
-		m_acdStatus[counter]=0;
-		m_layers[counter]=0;
-      }
-    }
-    inline FilterStatus::FilterStatus(const unsigned int code, const int energy,
-						   const int ids, const int xz, const int yz,
-						   const int xy, const int *acdstatus,
-						   const int *layerCode,
-						   const TFC_projections *projections){
-      m_status=code;
-      m_calEnergy=energy;
-      m_tcids=ids;
-      m_acd_xz=xz;
-      m_acd_xy=xy;
-      m_acd_yz=yz;
-      for(int counter=0;counter<16;counter++){
-		m_acdStatus[counter]=0;
-		m_layers[counter]=0;
-      }
-      if(acdstatus!=NULL){
-	for(int counter=0;counter<16;counter++)
-	  m_acdStatus[counter]=acdstatus[counter];
-      }
-      if(layerCode!=NULL){
-        for(int counter=0;counter<16;counter++)
-	  m_layers[counter]=layerCode[counter];
-      }
-      if(projections!=NULL){
-	for(int counter=0;counter<16;counter++){
-	  for(int trackCounter=0;trackCounter<projections[counter].curCnt;trackCounter++){
-	    m_prjs[counter].push_back(projections[counter].prjs[trackCounter]);
-	  }
-	}
+	m_acdStatus[counter]=0;
+	m_layers[counter]=0;
       }
     }
 
@@ -217,11 +207,9 @@ namespace OnboardFilterTds{
       m_calEnergy=energy;
     }
 
-
     inline void FilterStatus::setTcids(const int ids){
       m_tcids=ids;
     }
-
 
     inline void FilterStatus::setAcdMap(const int xz, const int yz, const int xy){
       m_acd_xz=xz;
@@ -229,28 +217,29 @@ namespace OnboardFilterTds{
       m_acd_xy=xy;
     }
 
-
-
     inline void FilterStatus::setAcdStatus(const int tower, const int status){
       if(tower<16)
         m_acdStatus[tower]=status;
     }
-
 
     inline void FilterStatus::setLayers(const int *layerCode){
       for(int counter=0;counter<16;counter++)
         m_layers[counter]=layerCode[counter];
     }
 
-
-    inline void FilterStatus::setProjection(const int tower,const TFC_projections prjs){
+    inline void FilterStatus::setProjection(const int tower,const projections prjs){
       if(tower<16){
-	m_prjs[tower].clear();
-	for(int counter=0;counter<prjs.curCnt;counter++)
-	  m_prjs[tower].push_back(prjs.prjs[counter]);
+	memcpy(&m_prjs[tower], &prjs,sizeof(prjs));
       }
     }
 
+    inline void FilterStatus::setTrack(const track newTrack){
+      m_tracks.push_back(newTrack);
+    }
+
+    inline void FilterStatus::setSeperation(const double sep){
+      m_seperation=sep;
+    }
 
     inline std::ostream& FilterStatus::fillStream(std::ostream &s) const{
       s<<"Filter Return Code: "<<m_status<<std::endl;
@@ -259,9 +248,9 @@ namespace OnboardFilterTds{
     }
 
 
-inline std::ostream& operator<<(std::ostream &s, const FilterStatus &obj){
-  return obj.fillStream(s);
-}
+    inline std::ostream& operator<<(std::ostream &s, const FilterStatus &obj){
+      return obj.fillStream(s);
+    }
 
 }//namespace OnboradFilterTds 
 

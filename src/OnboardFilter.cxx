@@ -4,12 +4,13 @@
  * @author JJRussell - russell@slac.stanford.edu
  * @author David Wren - dnwren@milkyway.gsfc.nasa.gov
  * @author Navid Golpayegani - golpa@milkyway.gsfc.nasa.gov
- * $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/OnboardFilter.cxx,v 1.13 2003/08/18 15:44:10 golpa Exp $
+ * $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/OnboardFilter.cxx,v 1.14 2003/08/19 04:14:36 burnett Exp $
  */
    
 #include <stdlib.h>
 #include <stdio.h>
 #include <errno.h>
+#include <math.h>
 
 #include "DFC/EBF_fileIn-Gleam.h"
 #include "DFC/EBF_fileOut.h"
@@ -42,10 +43,16 @@
 #include "GlastSvc/GlastDetSvc/IGlastDetSvc.h"
 
 #include "Event/TopLevel/EventModel.h"
+#include "Event/MonteCarlo/McParticle.h"
 #include "EbfWriter/Ebf.h"
 #include "OnboardFilter/FilterStatus.h"
 
-#include "ntupleWriterSvc/INTupleWriterSvc.h"
+//Gui display
+#include "gui/DisplayControl.h"
+#include "GuiSvc/IGuiSvc.h"
+#include "gui/GuiMgr.h"
+#include "FilterTrackDisplay.h"
+#include "FilterExtendedDisplay.h"
 
 #include <string.h>
 #ifdef   __linux
@@ -104,12 +111,54 @@ public:
     StatusCode execute();
     StatusCode finalize();
 private:
-	/**
-	 * Converts an integer into Binary representation
-	 * @param number The number to represent in Binary
-	 * @return A string represent the number in Binary
-	 */
+    /**
+     * Converts an integer into Binary representation
+     * @param number The number to represent in Binary
+     * @return A string represent the number in Binary
+     */
     std::string convertBase(unsigned int number);
+    /**
+     * Convert the projections stored in TDS into x,y,z coordinates
+     * @param status Pointer to the TDS object containing the projections
+     */
+    StatusCode computeCoordinates(OnboardFilterTds::FilterStatus *status);
+    /**
+     * Compute Angles for a given track
+     * @param x The x-coordinates for hits 0,1, and Last
+     * @param y The y-coordinates for hits 0,1, and Last
+     * @param xz The z-coordinates for hits 0,1, and Last as computed from 
+     *           the x projections
+     * @param yz The z-coordinates for hits 0,1, and Last as computed from
+     *           the y projections
+     */
+    void computeAngles(vector<double> x,vector <double> y,vector<double> xz,
+                       vector<double> yz,double &phi,double &phi_rad,
+                       double &theta,double &theta_rad);
+  
+    /**
+     * Compute Length of a track
+     * @param z The average z-coordinates 
+     * @param theata_rad The Theta angle obtained by computeAngles() in radians
+     * @param phi_rad The phi angle obtained by computeAngles() in radians
+     */
+    void computeLength(vector<double> z, double theta_rad, double phi_rad,
+                       double &length, vector<double> &endPoint);
+    /**
+     * Compute the extensions to the tracks
+     * @param x 3 Element array containing the x coordinates
+     * @param y 3 Element array containing the y coordinates
+     * @param z 3 Element array containing the average z coordinates
+     * @param phi_rad The phi angle of the track in radians
+     * @param theta_rad The theta angle of the track in raidans
+     * @param extendLow 3 Element array that will contain the xyz of the extension
+     * @param extendHigh 3 Element array that will contain the xyz of the extension
+     */
+    void OnboardFilter::computeExtension(vector<double> x,vector<double> y,
+                                         vector<double> z, double phi_rad,
+                                         double theta_rad, 
+                                         vector<double> &extendLow,
+                                         vector<double> &extendHigh);
+    //Structures that control the Behaviour of the Filter Code
     Ctl m_ctl_buf;
     Ctl *m_ctl;
 };
@@ -151,6 +200,20 @@ StatusCode OnboardFilter::initialize()
   TDS_variables.acd_xy=0;
   for(int counter=0;counter<16;counter++){
     TDS_variables.acdStatus[counter]=0;
+  }
+
+  //Set up GUI display
+  IGuiSvc *guiSvc;
+  if(!service("GuiSvc",guiSvc).isFailure()){
+
+  }
+  else{
+    log<<MSG::WARNING<<"No GuiSvc. Not displaying tracks"<<endreq;
+    gui::DisplayControl& display = guiSvc->guiMgr()->display();
+    gui::DisplayControl::DisplaySubMenu& fltrmenu = display.subMenu("OnboardFilter");
+    //Add Display Objects Here
+    fltrmenu.add(new FilterTrackDisplay(eventSvc()),"Tracks");
+    fltrmenu.add(new FilterExtendedDisplay(eventSvc()),"Extended Tracks");
   }
   return StatusCode::SUCCESS;
 }
@@ -324,6 +387,18 @@ StatusCode OnboardFilter::execute()
 			TDS_variables.acd_xy);
         for(int counter=0;counter<16;counter++){
           newStatus->setAcdStatus(counter,TDS_variables.acdStatus[counter]);
+	  OnboardFilterTds::projections prjs;
+	  prjs.curCnt=TDS_variables.prjs[counter].curCnt;
+	  prjs.xy[0]=TDS_variables.prjs[counter].xy[0];
+	  prjs.xy[1]=TDS_variables.prjs[counter].xy[1];
+	  for(int prjCounter=0;prjCounter<prjs.curCnt;prjCounter++){
+	    prjs.prjs[prjCounter].layers=TDS_variables.prjs[counter].prjs[prjCounter].layers;
+            prjs.prjs[prjCounter].min=TDS_variables.prjs[counter].prjs[prjCounter].min;
+            prjs.prjs[prjCounter].max=TDS_variables.prjs[counter].prjs[prjCounter].max;
+	    for(int hitCounter=0;hitCounter<18;hitCounter++)
+	      prjs.prjs[prjCounter].hits[hitCounter]=TDS_variables.prjs[counter].prjs[prjCounter].hits[hitCounter];
+	  }
+	  newStatus->setProjection(counter,prjs);
         }
         newStatus->setLayers(TDS_layers);
         log << MSG::INFO;
@@ -402,4 +477,193 @@ std::string OnboardFilter::convertBase(unsigned int number){
             output = " " + output;
     }
     return output;
+}
+
+StatusCode OnboardFilter::computeCoordinates(OnboardFilterTds::FilterStatus *status){
+  const double pi = 3.14159265358979323846;
+  ITkrGeometrySvc* tkrGeoSvc=0;
+  MsgStream log(msgSvc(),name());
+  if( service( "TkrGeometrySvc", tkrGeoSvc, true).isFailure() ) {
+    log << MSG::ERROR << "Couldn't set up TkrGeometrySvc!" << endreq;
+    return StatusCode::FAILURE;
+  }
+  //Loop over the towers
+  for(int tower=0;tower<16;tower++){
+    const OnboardFilterTds::projections *prjs=status->getProjection(tower);
+    HepPoint3D point;
+    vector<double> x;
+    vector<double> y;
+    vector<double> xz;
+    vector<double> yz;
+    vector<double> zAvg;
+    vector<double> pointHigh;
+    vector<double> extendedLow;
+    vector<double> extendedHigh;
+    //Loop over the x projections
+    for(int xprj=0;xprj<prjs->xy[0];xprj++){
+      //Get x,,z coordinates for hits 0 and 1
+      point=tkrGeoSvc->getStripPosition(tower,prjs->prjs[xprj].max,0,prjs->prjs[xprj].hits[0]);
+      x.push_back(point.x());
+      xz.push_back(point.z());
+      point=tkrGeoSvc->getStripPosition(tower, prjs->prjs[xprj].max, 0, prjs->prjs[xprj].hits[1]);
+      x.push_back(point.x());
+      xz.push_back(point.z());
+      //Loop over the y projections
+      for(int yprj=prjs->xy[1];yprj<prjs->xy[1]+prjs->xy[2];yprj++){
+	y.clear();
+	yz.clear();
+	if(prjs->prjs[xprj].max==prjs->prjs[yprj].max){
+	  point=tkrGeoSvc->getStripPosition(tower,prjs->prjs[yprj].max,1,prjs->prjs[yprj].hits[0]);
+	  y.push_back(point.y());
+	  yz.push_back(point.z());
+	  point=tkrGeoSvc->getStripPosition(tower,prjs->prjs[yprj].max,1,prjs->prjs[yprj].hits[1]);
+	  y.push_back(point.y());
+	  yz.push_back(point.z());
+	  unsigned char maxhits;
+	  if(prjs->prjs[xprj].nhits<prjs->prjs[yprj].nhits)
+	    maxhits=prjs->prjs[xprj].nhits;
+	  else
+	    maxhits=prjs->prjs[yprj].nhits;
+	  point=tkrGeoSvc->getStripPosition(tower,prjs->prjs[xprj].max,0,prjs->prjs[xprj].hits[maxhits]);
+	  x.push_back(point.x());
+	  xz.push_back(point.z());
+	  point=tkrGeoSvc->getStripPosition(tower,prjs->prjs[yprj].max,1,prjs->prjs[yprj].hits[maxhits]);
+	  y.push_back(point.y());
+	  yz.push_back(point.z());
+	  for(int counter=0;counter<3;counter++)
+	    zAvg.push_back((xz[counter]+yz[counter])/2);
+	  double phi,phi_rad;
+	  double theta,theta_rad;
+	  double length;
+	  computeAngles(x,y,xz,yz,phi,phi_rad,theta,theta_rad);
+	  computeLength(zAvg,theta_rad,phi_rad,length,pointHigh);
+	  computeExtension(x,y,zAvg,phi_rad,theta_rad, extendedLow, extendedHigh);
+	  //Draw here
+	  //Add track to TDS
+	  OnboardFilterTds::track newTrack;
+	  newTrack.phi_rad=phi_rad;
+	  newTrack.theta_rad=theta_rad;
+	  newTrack.lowCoord.push_back(x[0]);
+	  newTrack.lowCoord.push_back(y[0]);
+	  newTrack.lowCoord.push_back(zAvg[0]);
+	  newTrack.highCoord=pointHigh;
+	  newTrack.exLowCoord=extendedLow;
+	  newTrack.exHighCoord=extendedHigh;
+	  status->setTrack(newTrack);
+	}
+      }
+    }
+  }
+  vector<OnboardFilterTds::track> tracks=status->getTracks();
+  double maxLength=0;
+  unsigned int currMax;
+  if(tracks.size()>0){
+    for(unsigned int counter=0;counter<tracks.size();counter++){
+      if(tracks[counter].length>maxLength){
+	maxLength=tracks[counter].length;
+	currMax=counter;
+      }
+    }
+    //Obtain McZDir, McXDir, McYDir (copied from McValsTools.cxx)
+    SmartDataPtr<Event::McParticleCol> pMcParticle(eventSvc(), EventModel::MC::McParticleCol);
+    if(pMcParticle){
+      Event::McParticleCol::const_iterator pMCTrack1 = pMcParticle->begin();
+      HepLorentzVector Mc_p0 = (*pMCTrack1)->initialFourMomentum();
+      Vector Mc_t0 = Vector(Mc_p0.x(),Mc_p0.y(), Mc_p0.z()).unit();
+      double MC_xdir,MC_ydir,MC_zdir;
+      MC_xdir   = Mc_t0.x();
+      MC_ydir   = Mc_t0.y();
+      MC_zdir   = Mc_t0.z();
+      //Convert MC dir into theta and phi
+      double theta_mc=acos(-MC_zdir);
+      double phi_mc=acos(-MC_xdir);
+      double theta_rad_mc=theta_mc*pi/180;
+      double phi_rad_mc=phi_mc*pi/180;
+      //Compute angular seperation
+      double xone=sin(theta_rad_mc)*cos(phi_rad_mc);
+      double yone=sin(theta_rad_mc)*sin(phi_rad_mc);
+      double zone=cos(theta_rad_mc);
+      double xtwo=sin(tracks[currMax].theta_rad)*cos(tracks[currMax].phi_rad);
+      double ytwo=sin(tracks[currMax].theta_rad)*sin(tracks[currMax].phi_rad);
+      double ztwo=cos(tracks[currMax].theta_rad);
+      double dot_product=xone*xtwo+yone*ytwo+zone*ztwo;
+      double seperation_rad=acos(dot_product);
+      status->setSeperation(seperation_rad*180/pi);
+    }
+    else{
+      log<<MSG::ERROR <<"Unable to obtain McParticleCol from TDS"<<endreq;
+      return StatusCode::FAILURE;
+    }
+  }
+  else{
+    status->setSeperation(-1);
+    log<<MSG::INFO<<"No tracks found"<<endreq;
+  }
+  return StatusCode::SUCCESS;
+}
+
+void OnboardFilter::computeAngles(vector<double> x,vector<double> y,
+				  vector<double> xz,vector<double> yz,
+                                  double &phi,double &phi_rad,double &theta,
+                                  double &theta_rad){
+  const double pi = 3.14159265358979323846;
+  double x_h = x[1]-x[0];
+  double x_v = xz[0]-xz[1];
+  double y_h = y[1]-y[0];
+  double y_v = yz[0]-yz[1];
+  if(x_v== 0 && y_v==0){
+    phi_rad=0;
+    theta_rad=0;
+  }
+  else{
+    if(x_v ==0){
+      phi_rad=pi/2;
+      theta_rad=pi/2-atan(y_v/y_h);;
+    }
+    else{
+      if(y_v==0){
+	phi_rad=0;
+	theta_rad=pi/2-atan(x_v/x_h);
+      }
+      else{
+	if((x_h>0) && (y_h>0))
+	  phi_rad=atan(y_h/x_h);
+	else{
+	  if((x_h<0) && (y_h>0))
+	    phi_rad=pi/2-atan(y_h/x_h);
+	  else
+	    phi_rad=3*pi/2-atan(y_h/x_h);
+	}
+	theta_rad=pi/2 - atan(x_v/(x_h/cos(phi_rad)));
+      }
+    }
+  }
+  theta=theta_rad*180/pi;
+  phi=phi_rad*180/pi;
+}
+
+void OnboardFilter::computeLength(vector<double> z,double theta_rad,double phi_rad,
+				  double &length, vector<double> &endPoint){
+  const double pi = 3.14159265358979323846;
+  double t_v=z[2]-z[0];
+  double t_h = t_v/tan(pi/2 - theta_rad);
+  length=sqrt(t_v*t_v+t_h*t_h);
+  endPoint.push_back(t_h*cos(phi_rad));
+  endPoint.push_back(t_h*sin(phi_rad));
+  endPoint.push_back(z[2]);
+}
+
+void OnboardFilter::computeExtension(vector<double> x,vector<double> y,
+				     vector<double> z, double phi_rad, 
+				     double theta_rad, vector<double> &extendLow,
+ 				     vector<double> &extendHigh){
+  const double pi = 3.14159265358979323846;
+  const double length=1000;
+  extendLow.push_back(length*sin(theta_rad)*cos(phi_rad)+x[0]);
+  extendLow.push_back(length*sin(theta_rad)*sin(phi_rad)+y[0]);
+  extendLow.push_back(length*cos(theta_rad)+z[0]);
+
+  extendHigh.push_back(length*sin(theta_rad+pi/2)*cos(phi_rad)+x[2]);
+  extendHigh.push_back(length*sin(theta_rad+pi/2)*sin(phi_rad)+y[2]);
+  extendHigh.push_back(length*cos(theta_rad+pi/2)+z[2]);
 }

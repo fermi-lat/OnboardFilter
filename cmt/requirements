@@ -1,7 +1,8 @@
 package OnboardFilter
 version v0r1p1
-# $Header$
+# $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/cmt/requirements,v 1.12 2003/08/17 22:40:40 burnett Exp $
 use EbfWriter           *
+use TkrUtil             *
 
 apply_pattern packageShr
 apply_pattern package_include
