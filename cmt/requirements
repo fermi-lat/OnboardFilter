@@ -1,6 +1,8 @@
 package OnboardFilter
-version v0r6p2
+
+version v0r6p3
 # $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/cmt/requirements,v 1.27 2003/10/03 19:23:03 golpa Exp $
+
 use EbfWriter           *
 use TkrUtil             *
 use GuiSvc              *
@@ -17,7 +19,9 @@ macro OnboardFilter_cppflags "" \
 
 macro OnboardFilter_cflags $(OnboardFilter_cppflags)
 
-macro headers "" WIN32 "*.h"
+macro headers "" WIN32 "*.h"#the following prepend for local includes
+macro_prepend includes "-I ../src -I ../DFC  " WIN32 " /I ..\src  /I ..\DFC "
+
 
 macro_prepend includes "-I ../src " WIN32 " /I ..\src  "
 
