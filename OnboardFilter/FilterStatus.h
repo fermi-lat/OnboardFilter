@@ -2,6 +2,7 @@
 #define FILTER_STATUS_H
 
 #include <iostream>
+#include <vector>
 
 #include "GaudiKernel/Kernel.h"
 #include "GaudiKernel/StreamBuffer.h"
@@ -11,6 +12,7 @@
 #include "Event/TopLevel/Definitions.h"
 #include "Event/TopLevel/EventModel.h"
 
+#include "TFC_projectionDef.h"
 /**
  * @class FilterStatus
  * @brief TDS for storing the information returned by the filter
@@ -24,8 +26,9 @@ namespace OnboardFilterTds{
         FilterStatus();
         FilterStatus(const unsigned int code, const int energey=0,
 			         const int ids=0, const int xz=0, const int yz=0,
-					 const int xy=0, const int acdstatus=0,
-					 const int *layerCode=NULL);
+					 const int xy=0, const int *acdstatus=NULL,
+					 const int *layerCode=NULL,
+					 const TFC_projections *projections=NULL);
         virtual ~FilterStatus();
     
         ///Set the statuscode of the filter
@@ -57,14 +60,19 @@ namespace OnboardFilterTds{
         void getAcdMap(int &xz, int &yz, int &xy) const;
 
         ///Set the ACD faces intersected by projections
-        void setAcdStatus(const int status);
+        void setAcdStatus(const int tower, const int status);
         ///Return the ACD faces intersected by projections
-        int getAcdStatus() const;
+        void getAcdStatus(int *copy) const;
 
         ///Set what layers were hit in each tower
         void setLayers(const int *layerCode);
         ///Return what layers were hit in each tower
         int *getLayers();
+        
+		///Set the projection of a specific tower
+		void setProjection(const int tower,const TFC_projections projections);
+		///Return the projections for a specific tower
+		std::vector<TFC_projection> getProjection(const int tower);
 
         virtual std::ostream& fillStream(std::ostream &s) const;
         friend std::ostream& operator << (std::ostream &s, const FilterStatus &obj);
@@ -80,9 +88,22 @@ namespace OnboardFilterTds{
         int m_acd_yz;
         int m_acd_xy;
         ///ACD faces
-        int m_acdStatus;
+        int m_acdStatus[16];
         ///Layers hit in each tower
         int m_layers[16];
+		///Projections for the towers
+		std::vector<TFC_projection> m_prjs[16];
     };
+	inline unsigned int FilterStatus::get() const{
+		return m_status;
+	}
+
+	inline unsigned int FilterStatus::getHigh() const{
+		return m_status>>15;
+	}
+
+	inline unsigned int FilterStatus::getLow() const{
+		return m_status & 0x7FFF;
+	}
 };
 #endif
