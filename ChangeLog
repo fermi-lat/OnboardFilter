@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: golpa  Sun Feb  8 22:12:01 PST 2004
+OnboardFilter/src
+
+Modified Files:
+	DFC_filter.c TFC_projectionTowerFind.c 
+Log Message:
+various Improvements to filter
+    *
+------------------------------------------------------------
 User: golpa  Sun Feb  8 22:11:25 PST 2004
 OnboardFilter/OnboardFilter
 
