@@ -6,7 +6,6 @@ use EbfWriter		*
 use GlastPolicy		*
 use IExternal		*
 use GlastSvc		*
-use ntupleWriterSvc	*
 
 apply_pattern packageShr
 apply_pattern package_include
