@@ -21,7 +21,10 @@
 
 #include "windowsCompat.h"
 
-#define _DBG
+//#define _DBG
+#ifdef _DBG  // disable this -- THB
+# undef _DBG
+#endif
 #ifdef  _DBG
 
 #define PRINTF(args) printf args

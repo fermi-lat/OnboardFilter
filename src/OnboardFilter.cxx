@@ -4,7 +4,7 @@
  * @author JJRussell - russell@slac.stanford.edu
  * @author David Wren - dnwren@milkyway.gsfc.nasa.gov
  * @author Navid Golpayegani - golpa@milkyway.gsfc.nasa.gov
- * $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/OnboardFilter.cxx,v 1.12 2003/08/16 20:14:14 golpa Exp $
+ * $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/OnboardFilter.cxx,v 1.13 2003/08/18 15:44:10 golpa Exp $
  */
    
 #include <stdlib.h>
@@ -51,6 +51,7 @@
 #ifdef   __linux
 #include <getopt.h>
 #endif
+#include <iomanip>
 
 /**
  * Data structure defining the standard geometry used in the filtering process.
@@ -187,7 +188,6 @@ StatusCode OnboardFilter::execute()
         new OnboardFilterTds::FilterStatus;
     eventSvc()->registerObject("/Event/Filter/FilterStatus",newStatus);
 	
-	log << MSG::INFO << "Processing Event"<<endreq;
     /* Initialize the time base */
     TMR_initialize ();
 	
@@ -326,13 +326,18 @@ StatusCode OnboardFilter::execute()
           newStatus->setAcdStatus(counter,TDS_variables.acdStatus[counter]);
         }
         newStatus->setLayers(TDS_layers);
-		log<< MSG::INFO << "FilterStatus Code: "<<(unsigned int)status<<" : "
-			<<convertBase(status)<<endreq;
-        if (m_ctl->list && (result->status & DFC_M_STATUS_VETOES) == 0)
-        {
-            printf ("0000 %8d %8d\n", getMCsequence (evt, size), idx);
+        log << MSG::INFO;
+        if(log.isActive()) { 
+            log.stream()<< "FilterStatus Code: "
+                << std::setbase(16) << (unsigned int)status<<" : "
+                << convertBase(status);
+            if (m_ctl->list && (result->status & DFC_M_STATUS_VETOES) == 0)
+            {
+                //TODO: write this to the stream instead
+                printf ("0000 %8d %8d\n", getMCsequence (evt, size), idx);
+            }
         }
-
+        log << endreq;
         result = (struct _DFC_results   *)((char *)(result)+resultsSize);
         evt = (const unsigned int *)((char *)(evt)+size);
     }
@@ -340,7 +345,7 @@ StatusCode OnboardFilter::execute()
     
     nprocessed = nevts - nskip;
     DFC_resultsPrint (results, evtCnt, m_ctl->esummary);
-    
+#if 0 // disable this for now
     printf ("Elapsed Time: %10d / %5d = %7d nsecs\n",
             elapsed,
             nprocessed,
@@ -351,7 +356,7 @@ StatusCode OnboardFilter::execute()
         DFC_statisticsAccumulate (&statistics, results, evtCnt);
         DFC_statisticsPrint      (&statistics);
     }
-    
+#endif
     
 
     EBF_free (ebf);
