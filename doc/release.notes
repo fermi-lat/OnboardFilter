@@ -2,6 +2,7 @@
  * @file release.notes
  * @brief Package OnboardFilter
  * @verbatim
+ * v0r3p4 08-Sep-2003   NG : Track computation now stable
  * v0r3p3 04-Sep-2003   NG : Created Algorithm for track computation
  * v0r3p2 03-Sep-2003   NG : Added option to disable pass through mode
  * v0r3p1 29-Aug-2003   NG : Removed track computation from the code
