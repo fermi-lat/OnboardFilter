@@ -4,7 +4,7 @@
  * @author JJRussell - russell@slac.stanford.edu
  * @author David Wren - dnwren@milkyway.gsfc.nasa.gov
  * @author Navid Golpayegani - golpa@milkyway.gsfc.nasa.gov
- * $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/OnboardFilter.cxx,v 1.30 2003/09/04 20:08:36 golpa Exp $
+ * $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/OnboardFilter.cxx,v 1.31 2003/09/05 00:45:22 golpa Exp $
  */
    
 #include <stdlib.h>
@@ -140,7 +140,7 @@ StatusCode OnboardFilter::finalize(){
 OnboardFilter::OnboardFilter(const std::string& name, ISvcLocator* pSvcLocator)
 :Algorithm(name, pSvcLocator), m_rejected(0){
 
-    declareProperty("mask"     ,  m_mask=0xffffffff); // trigger mask: select bits for rejection
+    declareProperty("mask"     ,  m_mask=0); // trigger mask: select bits for rejection
     declareProperty("PassThrough", m_passThrough=1);
 }
 
