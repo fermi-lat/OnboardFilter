@@ -4,7 +4,7 @@
  * @author JJRussell - russell@slac.stanford.edu
  * @author David Wren - dnwren@milkyway.gsfc.nasa.gov
  * @author Navid Golpayegani - golpa@milkyway.gsfc.nasa.gov
- * $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/OnboardFilter.cxx,v 1.31 2003/09/05 00:45:22 golpa Exp $
+ * $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/OnboardFilter.cxx,v 1.32 2003/09/09 16:55:15 burnett Exp $
  */
    
 #include <stdlib.h>
@@ -148,7 +148,7 @@ StatusCode OnboardFilter::initialize()
 {
   MsgStream log(msgSvc(),name());
   setProperties();
-
+  passThrough=m_passThrough;
   log<< MSG::INFO << "Initializing Filter Settings"<<endreq;
   //Set up default values for the control structure
   m_ctl_buf.ifile="test.ebf";
