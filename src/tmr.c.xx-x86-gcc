@@ -115,10 +115,10 @@ int TMR_initialize (void)
        else if (mhz != mhzLcl)
        {
             if (ncpus == 2) 
-                printf ("TMR_initialize: Multiple cpus with different clocks\n"
-                        "Clock 0 = %8.3f\n", mhz);
+                //printf ("TMR_initialize: Multiple cpus with different clocks\n"
+                //        "Clock 0 = %8.3f\n", mhz);
 
-            printf ("Clock %d = %8.3f\n", ncpus, mhzLcl);
+            //printf ("Clock %d = %8.3f\n", ncpus, mhzLcl);
 
        }
 
@@ -133,12 +133,12 @@ int TMR_initialize (void)
    pp->frequency      = frequency;
    pp->nsecs_per_tick = 1000000000/frequency;
 
-   printf ("TMR_initialize    : %d cpus\n"
-           "Frequency         : %10.3f Hz\n"
-           "Nseconds / tick   :      %8.3f nsecs\n",            
-            ncpus,
-            pp->frequency,
-            pp->nsecs_per_tick);
+   //printf ("TMR_initialize    : %d cpus\n"
+   //        "Frequency         : %10.3f Hz\n"
+   //        "Nseconds / tick   :      %8.3f nsecs\n",            
+   //         ncpus,
+   //         pp->frequency,
+   //         pp->nsecs_per_tick);
 
    return 0;
 } 

@@ -162,17 +162,17 @@ int TMR_initialize (void)
    else
    {
        /* Unknown bus speed returned */
-       printf  ("TMR_initialize, unknown bus speed %d\n", busSpd);
+       //printf  ("TMR_initialize, unknown bus speed %d\n", busSpd);
        return -1;
    }
 
-   printf ("TMR_initialize\n"
-           "Bus speed         : %8d\n"
-           "Nominal  Frequency: %8d Hz\n"
-           "Nseconds / tick   : %8d nsecs\n",
-            busSpd,	
-            pp->frequency,
-            pp->nsecs_per_tick);
+   //printf ("TMR_initialize\n"
+   //        "Bus speed         : %8d\n"
+   //        "Nominal  Frequency: %8d Hz\n"
+   //        "Nseconds / tick   : %8d nsecs\n",
+   //         busSpd,	
+   //         pp->frequency,
+   //         pp->nsecs_per_tick);
 
    return 0;   
 } 
@@ -242,17 +242,17 @@ int TMR_initialize (void)
    else
    {
        /* Unknown bus speed returned */
-       printf  ("TMR_initialize, unknown bus speed %d\n", 4 * frequency);
+       //printf  ("TMR_initialize, unknown bus speed %d\n", 4 * frequency);
        return -1;
    }
 
-   printf ("TMR_initialize\n"
-           "Measured Frequency: %8d Hz\n"
-           "Nominal  Frequency: %8d Hz\n"
-           "Nseconds / tick   : %8d nsecs\n",
-            frequency,	
-            pp->frequency,
-            pp->nsecs_per_tick);
+   //printf ("TMR_initialize\n"
+   //        "Measured Frequency: %8d Hz\n"
+   //        "Nominal  Frequency: %8d Hz\n"
+   //        "Nseconds / tick   : %8d nsecs\n",
+   //         frequency,	
+   //         pp->frequency,
+   //         pp->nsecs_per_tick);
 
    return 0;   
 } 
