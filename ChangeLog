@@ -1,5 +1,14 @@
 ------------------------------------------------------------
 User: golpa  Fri Aug 15 15:01:55 PDT 2003
+OnboardFilter/cmt
+
+Modified Files:
+	requirements 
+Log Message:
+removed static library for TDS
+    *
+------------------------------------------------------------
+User: golpa  Fri Aug 15 15:01:55 PDT 2003
 OnboardFilter/src
 
 Modified Files:
