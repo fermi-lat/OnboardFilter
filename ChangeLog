@@ -1,5 +1,14 @@
 ------------------------------------------------------------
 User: burnett  Sat Aug 16 07:08:00 PDT 2003
+OnboardFilter/cmt
+
+Added Files:
+	.cvsignore 
+Log Message:
+clean up cvs update output
+    *
+------------------------------------------------------------
+User: burnett  Sat Aug 16 07:08:00 PDT 2003
 OnboardFilter
 
 Modified Files:
