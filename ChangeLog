@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: golpa  Fri Aug 13 15:08:57 PDT 2004
+OnboardFilter/OnboardFilter
+
+Modified Files:
+	FilterTracks.h 
+Log Message:
+Fixed spacing. Now uses M_PI from cmath. No longer returns failure when there's no MC
+    *
+------------------------------------------------------------
 User: golpa  Tue Aug 10 12:55:39 PDT 2004
 OnboardFilter/src
 
