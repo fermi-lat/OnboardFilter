@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: golpa  Mon Jul 12 10:37:47 PDT 2004
+OnboardFilter/src/Dll
+
+Modified Files:
+	OnboardFilter_dll.cxx OnboardFilter_load.cxx 
+Log Message:
+New version of Filter from JJ
+    *
+------------------------------------------------------------
 User: golpa  Mon Jul 12 10:37:46 PDT 2004
 OnboardFilter/src
 
