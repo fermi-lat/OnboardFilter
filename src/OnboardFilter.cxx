@@ -243,7 +243,7 @@ StatusCode OnboardFilter::execute()
     
     MsgStream log(msgSvc(),name());
     OnboardFilterTds::FilterStatus *newStatus=new OnboardFilterTds::FilterStatus;
-    eventSvc()->registerObject(EventModel::Filter::FilterStatus,newStatus);
+    eventSvc()->registerObject(OnboardFilterTds::Path,newStatus);
 
     log << MSG::INFO << "Processing Event"<<endreq;
     /* Initialize the time base */

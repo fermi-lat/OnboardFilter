@@ -15,18 +15,19 @@
  * @class FilterStatus
  * @brief TDS for storing the information returned by the filter
  */
-extern const CLID& CLID_FilterStatus;
+//extern const CLID& CLID_FilterStatus;
 
 
 namespace OnboardFilterTds{
+  static const std::string Path = EventModel::EventHeader + "/Filter" + "/FilterStats";
 
   class FilterStatus : public DataObject{
   public:
     FilterStatus();
     FilterStatus(const unsigned int code,const int energy=0);
     virtual ~FilterStatus();
-    static const CLID& classID() { return CLID_FilterStatus; }
-    virtual const CLID& clID() { return classID(); }
+//    static const CLID& classID() { return CLID_FilterStatus; }
+//    virtual const CLID& clID() { return classID(); }
     
     ///Set the statuscode of the filter
     void set(const unsigned int code);
