@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: golpa  Wed Aug  6 11:01:11 PDT 2003
+OnboardFilter/src
+
+Modified Files:
+	DFC_filter.c FilterStatus.cxx OnboardFilter.cxx 
+Log Message:
+More informative output
+    *
+------------------------------------------------------------
 User: golpa  Tue Aug  5 13:38:38 PDT 2003
 OnboardFilter/src
 
