@@ -1,11 +1,11 @@
 package OnboardFilter
-version v0r0
+version v0r0p0
 
-use Event		*
-use EbfWriter		*
-use GlastPolicy		*
-use IExternal		*
-use GlastSvc		*
+use Event               *
+use EbfWriter           *
+use GlastPolicy         *
+use IExternal           *
+use GlastSvc            *
 
 apply_pattern packageShr
 apply_pattern package_include
