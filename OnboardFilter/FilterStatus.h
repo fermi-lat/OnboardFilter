@@ -221,7 +221,7 @@ namespace OnboardFilterTds{
     }
 
     inline void FilterStatus::setCalEnergy(const int energy){
-      m_calEnergy=energy;
+      m_calEnergy=energy/4;
     }
 
     inline void FilterStatus::setTcids(const int ids){
