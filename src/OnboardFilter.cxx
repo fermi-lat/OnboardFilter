@@ -4,7 +4,7 @@
  * @author JJRussell - russell@slac.stanford.edu
  * @author David Wren - dnwren@milkyway.gsfc.nasa.gov
  * @author Navid Golpayegani - golpa@milkyway.gsfc.nasa.gov
- * $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/OnboardFilter.cxx,v 1.19 2003/08/22 21:00:45 golpa Exp $
+ * $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/OnboardFilter.cxx,v 1.20 2003/08/25 19:46:15 golpa Exp $
  */
    
 #include <stdlib.h>
@@ -501,7 +501,8 @@ StatusCode OnboardFilter::computeCoordinates(OnboardFilterTds::FilterStatus *sta
     std::vector<double> extendedHigh;
     //Loop over the x projections
     for(int xprj=0;xprj<prjs->xy[0];xprj++){
-      //Get x,,z coordinates for hits 0 and 1
+      //Get x,z coordinates for hits 0 and 1
+      log << MSG::DEBUG << "Obtaining X and XZ for hits 0 and 1" << endreq;
       point=tkrGeoSvc->getStripPosition(tower,prjs->prjs[xprj].max,0,prjs->prjs[xprj].hits[0]);
       x.push_back(point.x());
       xz.push_back(point.z());
@@ -513,6 +514,7 @@ StatusCode OnboardFilter::computeCoordinates(OnboardFilterTds::FilterStatus *sta
 	y.clear();
 	yz.clear();
 	if(prjs->prjs[xprj].max==prjs->prjs[yprj].max){
+	  log << MSG::DEBUG << "Obtaining Y and YZ for hits 0 and 1" << endreq;
 	  point=tkrGeoSvc->getStripPosition(tower,prjs->prjs[yprj].max,1,prjs->prjs[yprj].hits[0]);
 	  y.push_back(point.y());
 	  yz.push_back(point.z());
@@ -524,10 +526,11 @@ StatusCode OnboardFilter::computeCoordinates(OnboardFilterTds::FilterStatus *sta
 	    maxhits=prjs->prjs[xprj].nhits;
 	  else
 	    maxhits=prjs->prjs[yprj].nhits;
-	  point=tkrGeoSvc->getStripPosition(tower,prjs->prjs[xprj].max-maxhits-1,0,prjs->prjs[xprj].hits[maxhits-1]);
+	  log << MSG::DEBUG << "Obtaining X,Y,XZ,YZ for max hits"<<endreq;
+	  point=tkrGeoSvc->getStripPosition(tower,prjs->prjs[xprj].max-(maxhits-1),0,prjs->prjs[xprj].hits[maxhits-1]);
 	  x.push_back(point.x());
 	  xz.push_back(point.z());
-	  point=tkrGeoSvc->getStripPosition(tower,prjs->prjs[yprj].max-maxhits-1,1,prjs->prjs[yprj].hits[maxhits-1]);
+	  point=tkrGeoSvc->getStripPosition(tower,prjs->prjs[yprj].max-(maxhits-1),1,prjs->prjs[yprj].hits[maxhits-1]);
 	  y.push_back(point.y());
 	  yz.push_back(point.z());
 	  for(int counter=0;counter<3;counter++)
@@ -676,8 +679,8 @@ void OnboardFilter::computeLength(std::vector<double> x,std::vector<double> y, s
   double t_v=z[0]-z[2];
   double t_h = t_v*tan(pi - theta_rad);
   length=sqrt(t_v*t_v+t_h*t_h);
-  endPoint.push_back(t_h*cos(phi_rad));
-  endPoint.push_back(t_h*sin(phi_rad));
+  endPoint.push_back(t_h*cos(phi_rad) + x[0]);
+  endPoint.push_back(t_h*sin(phi_rad) + y[0]);
   endPoint.push_back(z[2]);
 }
 
