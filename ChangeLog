@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: golpa  Tue Aug 26 12:59:42 PDT 2003
+OnboardFilter/OnboardFilter
+
+Modified Files:
+	FilterStatus.h 
+Log Message:
+Added initialization of projections and tracks to constructor
+    *
+------------------------------------------------------------
 User: golpa  Tue Aug 26 08:32:45 PDT 2003
 OnboardFilter/doc
 
