@@ -24,13 +24,24 @@ class OnboardFilter;
 
 
 namespace OnboardFilterTds{
-    struct track{
-      double phi_rad,theta_rad;
-      std::vector<double> lowCoord;
-      std::vector<double> highCoord;
-      std::vector<double> exLowCoord;
-      std::vector<double> exHighCoord;
-      double length;
+    class track{
+    public:
+        inline track(){};
+        inline track(const track &copy){
+            lowCoord=copy.lowCoord;
+            highCoord=copy.highCoord;
+            exLowCoord=copy.exLowCoord;
+            exHighCoord=copy.exHighCoord;
+            length=copy.length;
+            phi_rad=copy.phi_rad;
+            theta_rad=copy.theta_rad;
+        };
+        double phi_rad,theta_rad;
+        std::vector<double> lowCoord;
+        std::vector<double> highCoord;
+        std::vector<double> exLowCoord;
+        std::vector<double> exHighCoord;
+        double length;
     };
 
     struct projection{
@@ -111,10 +122,10 @@ namespace OnboardFilterTds{
         ///Set what layers were hit in each tower
         void setLayers(const int *layerCode);
         ///Set the projection of a specific tower
-        void setProjection(const int tower,const projections projections);
+        void setProjection(const int tower,const projections &projections);
 	
 	///Add a new track to the list of tracks
-	void setTrack(const track newTrack);
+	void setTrack(const track &newTrack);
 
         void setSeperation(const double sep);
 
@@ -232,13 +243,13 @@ namespace OnboardFilterTds{
         m_layers[counter]=layerCode[counter];
     }
 
-    inline void FilterStatus::setProjection(const int tower,const projections prjs){
+    inline void FilterStatus::setProjection(const int tower,const projections &prjs){
       if(tower<16){
 	memcpy(&m_prjs[tower], &prjs,sizeof(prjs));
       }
     }
 
-    inline void FilterStatus::setTrack(const track newTrack){
+    inline void FilterStatus::setTrack(const track &newTrack){
       m_tracks.push_back(newTrack);
     }
 
