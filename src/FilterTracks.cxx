@@ -303,8 +303,5 @@ HepPoint3D FilterTracks::findStripPosition(ITkrGeometrySvc *tkrGeoSvc,int tower,
   incPoint/=numstrips;
   for(int counter=below;counter<stripId;counter++)
     pointBelow+=incPoint;
-  std::cout<<"Above: "<<pointAbove.x()<<" "<<pointAbove.y()<<" "<<pointAbove.z()<<endl;
-  std::cout<<"Below: "<<pointBelow.x()<<" "<<pointBelow.y()<<" "<<pointBelow.z()<<endl;
-  std::cout<<"Real : "<<incPoint.x()<<" "<<incPoint.y()<<" "<<incPoint.z()<<endl;
   return pointBelow;
 }
