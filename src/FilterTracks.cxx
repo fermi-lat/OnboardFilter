@@ -116,7 +116,7 @@ StatusCode FilterTracks::execute(){
                 currMax=counter;
             }
         }
-        log<<MSG::INFO<<"Using track "<<currMax<<" out of "<<tracks.size()<<endreq;
+        log<<MSG::DEBUG<<"Using track "<<currMax<<" out of "<<tracks.size()<<endreq;
         //Obtain McZDir, McXDir, McYDir (copied from McValsTools.cxx)
         SmartDataPtr<Event::McParticleCol> pMcParticle(eventSvc(),EventModel::MC::McParticleCol);
         if(pMcParticle){
