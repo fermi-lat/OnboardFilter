@@ -26,10 +26,10 @@ class OnboardFilter;
 namespace OnboardFilterTds{
     struct track{
       double phi_rad,theta_rad;
-      vector<double> lowCoord;
-      vector<double> highCoord;
-      vector<double> exLowCoord;
-      vector<double> exHighCoord;
+      std::vector<double> lowCoord;
+      std::vector<double> highCoord;
+      std::vector<double> exLowCoord;
+      std::vector<double> exHighCoord;
       double length;
     };
 
@@ -81,7 +81,7 @@ namespace OnboardFilterTds{
         const projections *getProjection(int tower)const ;
 
 	///Return all available tracks
-        vector<track> getTracks()const;
+        std::vector<track> getTracks()const;
 
 	///Return angular seperation between best track and incomming particle
         double getSeperation() const;
@@ -135,7 +135,7 @@ namespace OnboardFilterTds{
         ///Projections for the towers
         projections m_prjs[16];
 	///Tracks found for this event
-	vector<track> m_tracks;
+	std::vector<track> m_tracks;
 	///Angular seperation between best track and incomming particle
 	double m_seperation;
     };
@@ -174,7 +174,7 @@ namespace OnboardFilterTds{
         return m_layers;
     }
 
-    inline vector<track> FilterStatus::getTracks()const{
+    inline std::vector<track> FilterStatus::getTracks()const{
       return m_tracks;
     }
 
