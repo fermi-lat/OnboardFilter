@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: golpa  Mon Jul 12 12:47:28 PDT 2004
+OnboardFilter/src/Dll
+
+Modified Files:
+	OnboardFilter_dll.cxx OnboardFilter_load.cxx 
+Log Message:
+Removed windows characters
+    *
+------------------------------------------------------------
 User: golpa  Mon Jul 12 12:47:26 PDT 2004
 OnboardFilter/src
 
