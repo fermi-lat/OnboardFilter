@@ -1,5 +1,14 @@
 ------------------------------------------------------------
 User: golpa  Tue Jul 22 12:17:26 PDT 2003
+OnboardFilter/cmt
+
+Modified Files:
+	requirements 
+Log Message:
+Added more status codes into the TDS
+    *
+------------------------------------------------------------
+User: golpa  Tue Jul 22 12:17:26 PDT 2003
 OnboardFilter/OnboardFilter
 
 Modified Files:
