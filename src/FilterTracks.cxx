@@ -1242,19 +1242,19 @@ StatusCode FilterTracks::TrackSelect(){
             double ytwo=sin(m_theta_rad)*sin(m_phi_rad);
             double ztwo=cos(m_theta_rad);
             double dot_product=xone*xtwo+yone*ytwo+zone*ztwo;
-            double seperation_rad=acos(dot_product);
-			//if (seperation_rad > M_PI/2.)
-			//	seperation_rad = M_PI - seperation_rad; //we always assume that events come from "above"
-            status->setSeperation2(seperation_rad*180/M_PI);
+            double separation_rad=acos(dot_product);
+			//if (separation_rad > M_PI/2.)
+			//	separation_rad = M_PI - separation_rad; //we always assume that events come from "above"
+            status->setSeparation2(separation_rad*180/M_PI);
         }
         else{
             log<<MSG::ERROR <<"Unable to obtain McParticleCol from TDS"<<endreq;
-            status->setSeperation2(-1.0);
+            status->setSeparation2(-1.0);
         }
 	  }//if tower_exists (that has an x and y pair starting in the highest layer hit
-	  else status->setSeperation2(-1.0);
+	  else status->setSeparation2(-1.0);
     }//if (xcount && ycount)
-	else status->setSeperation2(-1.0);
+    else status->setSeparation2(-1.0);
 
 	return StatusCode::SUCCESS;
 

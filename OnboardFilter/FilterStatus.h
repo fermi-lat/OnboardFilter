@@ -193,7 +193,7 @@ namespace OnboardFilterTds{
     void setXY(const int xy00[16], const int xy11[16], const int xy22[16], const int xy33[16]);
     void setTmsk(int tmsk);
     //****TEMP
-    void setSeperation2(const double sep2);
+    void setSeparation2(const double sep2);
     void setXlongest(const double x_report);
     void setYlongest(const double y_report);
     void setXavg(const double xavg);
@@ -211,7 +211,7 @@ namespace OnboardFilterTds{
     void setXlongestB(const double xlongestB);
     void setYlongestB(const double ylongestB);
 
-    double getSeperation2() const;
+    double getSeparation2() const;
     double getXlongest() const;
     double getYlongest() const;
     double getXavg() const;
@@ -260,7 +260,7 @@ namespace OnboardFilterTds{
     int m_xy00[16],m_xy11[16],m_xy22[16],m_xy33[16];
     int m_tmsk;
     //****TEMP
-    double m_seperation2;
+    double m_separation2;
     double m_x_report;  double m_y_report;
     double m_xavg;      double m_yavg;
     double m_xslopeL;   double m_yslopeL;
@@ -448,11 +448,11 @@ namespace OnboardFilterTds{
     m_tmsk=tmsk;
   }
   //****TEMP
-  inline void FilterStatus::setSeperation2(const double sep2){
-    m_seperation2=sep2;
+  inline void FilterStatus::setSeparation2(const double sep2){
+    m_separation2=sep2;
   }
-  inline double FilterStatus::getSeperation2() const{
-    return m_seperation2;
+  inline double FilterStatus::getSeparation2() const{
+    return m_separation2;
   }
   inline void FilterStatus::setXlongest(const double x_report){
     m_x_report=x_report;
