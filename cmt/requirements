@@ -1,6 +1,6 @@
 package OnboardFilter
-version v0r1
-
+version v0r1p1
+# $Header$
 use EbfWriter           *
 
 apply_pattern packageShr
