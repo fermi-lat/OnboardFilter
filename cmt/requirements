@@ -12,6 +12,16 @@ apply_pattern package_include
 apply_pattern package_header
 apply_pattern library_Llinkopts library="OnboardFilterTds"
 
+macro_append cflags "" \
+   Linux "-DGLEAM"\
+   Win32 "/D "GLEAM"\
+   VC7   "/D "GLEAM"
+
+macro_append cppflags "" \
+   Linux "-DGLEAM"\
+   Win32 "/D "GLEAM"\
+   VC7   "/D "GLEAM"
+
 library OnboardFilterTds -no_share FilterStatus.cxx
 
 library OnboardFilter *.cxx *.c Dll/*.cxx

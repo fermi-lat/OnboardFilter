@@ -60,6 +60,9 @@ int TFC_triggerFill (const struct _EBF_directory *dir,
            
            /* Keep track of the XY coincidences */
            xy = xcapture & ycapture;
+#ifdef GLEAM
+           TDS_layers[cid-EBF_K_CID_TWR]=xy;
+#endif
 
            /* Anything interesting ? */
            if (xcapture & ycapture)

@@ -1,5 +1,5 @@
 /*------------------------------------------------------------------------
-| CVS $Id$
+| CVS $Id: DFC_filter.c,v 1.1.1.1 2003/07/07 16:50:48 golpa Exp $
 +-------------------------------------------------------------------------*/
 
 
@@ -64,8 +64,6 @@
 #include "TFC_projectionDef.h"
 #include "TFC_acd.h"
 #include "TFC_skirt.h"
-
-
 
 /* ---------------------------------------------------------------------- *//*!
 
@@ -1039,6 +1037,11 @@ int DFC_filter (struct _DFC_ctl         *dfc,
    acd_xz  = glt->acd.vetoes[EBF_K_GLT_ACD_VETO_XZ];
    acd_yz  = glt->acd.vetoes[EBF_K_GLT_ACD_VETO_YZ];
    acd_xy  = glt->acd.vetoes[EBF_K_GLT_ACD_VETO_XY];   
+#ifdef GLEAM
+   TDS_variables.acd_xz=acd_xz;
+   TDS_variables.acd_yz=acd_yz;
+   TDS_variables.acd_xy=acd_xy;
+#endif
    status |= classifyAcd (acd_xy, acd_xz, acd_yz);
 
 
@@ -1278,7 +1281,9 @@ int DFC_filter (struct _DFC_ctl         *dfc,
 
    }
    
-    
+   if(isVetoed (status)){
+     status |= DFC_M_STATUS_VETOED;
+   } 
    return results->status = status;
 }
 /* ---------------------------------------------------------------------- */
@@ -1363,7 +1368,9 @@ int DFC_filterComplete (struct _DFC_ctl         *ctl,
         
         
         tcids = TFC_triggerFill  (dir, trgs);
-
+#ifdef GLEAM
+	TDS_variables.tcids=tcids;
+#endif
         //dir.contributors[EBF_K_CID_GLT].ptr);
         
         
@@ -1525,7 +1532,9 @@ static unsigned int latFilter  (TFC_latRecord *tlr,
                                        acd_xy,
                                        acd_xz,
                                        acd_yz);
-           
+#ifdef GLEAM
+           TDS_variables.acdStatus=acdStatus;
+#endif
            
            
            /* Check if have any matches */
