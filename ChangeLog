@@ -1,4 +1,32 @@
 ------------------------------------------------------------
+User: golpa  Mon Jul 12 10:15:50 PDT 2004
+OnboardFilter/DFC
+
+Modified Files:
+	AFC_latRecord.h AFC_latRecordPrint.h AFC_latUnpack.h BFP.h 
+	BTD.h BTE.h BTE_display.h CFC_constants.h CFC_constantsPrint.h 
+	CFC_latEnergySum.h CFC_latRawRecord.h CFC_latRawRecordPrint.h 
+	CFC_latRawUnpack.h CFC_latRecord.h CFC_latRecordPrint.h 
+	CFC_latThreshold.h CFC_latUnpack.h CFC_logData.h 
+	CFC_towerPrint.h CFC_towerRawRecord.h 
+	CFC_towerRawRecordPrint.h CFC_towerRawUnpack.h 
+	CFC_towerRecord.h CFC_towerRecordPrint.h CFC_towerSum.h 
+	CFC_towerUnpack.h DFC_ctl.h DFC_ctlSysDef.h DFC_display.h 
+	DFC_endianness.h DFC_filter.h DFC_latRecord.h DFC_latUnpack.h 
+	DFC_ss.h DFC_statistics.h DFC_status.h EBF_acd.h 
+	EBF_acdConstants.h EBF_cid.h EBF_directory.h 
+	EBF_directoryPrint.h EBF_fileIn-Gleam.h EBF_fileOut.h 
+	EBF_hdr.h EBF_locate.h EBF_tem.h EBF_tkr.h LCB.h 
+	TFC_geometryPrint.h TFC_latRecord.h TFC_latRecordPrint.h 
+	TFC_latUnpack.h TFC_projectionPrint.h 
+	TFC_projectionTowerFind.h TFC_stripDef.h TFC_towerRecord.h 
+	TFC_towerRecordPrint.h TFC_towerUnpack.h TFC_triggerFill.h 
+Removed Files:
+	DFC_results.h EBF_glt.h EBF_gltPrint.h 
+Log Message:
+New version of Filter from JJ
+    *
+------------------------------------------------------------
 User: golpa  Mon Mar 22 07:39:38 PST 2004
 OnboardFilter/doc
 
