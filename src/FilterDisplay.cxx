@@ -36,7 +36,7 @@ void FilterTrackDisplay::update(){
         set_line_style(SOLID_LINE);
         setColor("green");
         std::vector<OnboardFilterTds::track> tracks=status->getTracks();
-        for(int counter=0;counter<tracks.size();counter++){
+        for(unsigned int counter=0;counter<tracks.size();counter++){
              moveTo(tracks[counter].lowCoord[0],tracks[counter].lowCoord[1],
                     tracks[counter].lowCoord[2]);
              lineTo(tracks[counter].highCoord[0],tracks[counter].highCoord[1],
@@ -56,7 +56,7 @@ void FilterExtendedDisplay::update(){
         set_line_style(DOTTED_LINE);
         setColor("green");
         std::vector<OnboardFilterTds::track> tracks=status->getTracks();
-        for(int counter=0;counter<tracks.size();counter++){
+        for(unsigned int counter=0;counter<tracks.size();counter++){
             moveTo(tracks[counter].exLowCoord[0],tracks[counter].exLowCoord[1],
 	           tracks[counter].exLowCoord[2]);
             lineTo(tracks[counter].lowCoord[0],tracks[counter].lowCoord[1],
