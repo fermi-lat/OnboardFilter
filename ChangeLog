@@ -1,4 +1,14 @@
 ------------------------------------------------------------
+User: golpa  Tue Sep  9 11:48:23 PDT 2003
+OnboardFilter/src
+
+Modified Files:
+	FilterExtendedDisplay.cxx FilterTrackDisplay.cxx 
+	OnboardFilter.cxx 
+Log Message:
+Fixed track display problem in windows
+    *
+------------------------------------------------------------
 User: burnett  Tue Sep  9 09:56:33 PDT 2003
 OnboardFilter/doc
 
