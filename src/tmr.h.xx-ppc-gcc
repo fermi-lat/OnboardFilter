@@ -1,22 +1,39 @@
 #ifndef TMR_H_XX_PPC_GCC
 #define TMR_H_XX_PPC_GCC
 
+
+/* ----------------------------------------------------------------------- *//*!
+
+  \file   tmr.h.xx-ppc-gcc
+  \brief  Provides the implementation of the timing macros on the PowerPCs
+          using a GCC compiler.
+  \author JJRussell - russell@slac.stanford.edu
+
+\verbatim
+  CVS $Id
+\endverbatim
+
+  \b ABSTRACT \n
+     -------- \n
+     PPC implementation of the TMR facility. The implementation is based of
+     PPC time register. The implementation also depends on the GCC compiler,
+     since it uses the GCC asm facility to access this register. Because this
+     routine tries to accurately time very short events (>.5usecs) it must be
+     implemented with very low overhead, Therefore, the implementatin is fairly
+     simple minded resulting in a limitation of this not being able to time
+     to time long events. The definition of long is ~ 2**32*60nsecs = ~257 secs.
+     If you are timing things that long, the normal system clock is a better
+     choice.
+
+  \b USAGE \n
+     ----- \n
+     See the documentation for the generic TMR facility.
+                                                                           */
+/* ----------------------------------------------------------------------- */
+
 /*
  *  ABSTRACT
  *  --------
- *  PPC implementation of the TMR facility. The implementation is based of
- *  PPC time register. The implementation also depends on the GCC compiler,
- *  since it uses the GCC asm facility to access this register. Because this
- *  routine tries to accurately time very short events (>.5usecs) it must be
- *  implemented with very low overhead, Therefore, the implementatin is fairly
- *  simple minded resulting in a limitation of this not being able to time
- *  to time long events. The definition of long is ~ 2**32*60nsecs = ~257 secs.
- *  If you are timing things that long, the normal system clock is a better
- *  choice.
- *
- *  USAGE
- *  -----
- *  See the documentation for the generic TMR facility.
  *
  *  HISTORY
  *  -------

@@ -3,7 +3,6 @@
 
 
 
-
 /* ---------------------------------------------------------------------- *//*!
    
    \file   TFC_triggerForm.h
@@ -32,6 +31,15 @@
 #include "../src/ffs.h"
 #include "../DFC/EBF_tkr.h"
 #include "../src/TFC_trigger.h"
+
+
+/* ---------------------------------------------------------------------- *//*!
+
+  \def   TFC_TRIGGER_PRINT
+  \brief If defined, then the internal debugging macro TFC_TRIGGER_PRINTF
+         is activated.
+                                                                          */
+/* ---------------------------------------------------------------------- */
 
 
 
@@ -111,7 +119,7 @@ extern "C" {
   \param _even    Variable to receive the remapped even layers
   \param _odd     Variable to receive the remapped odd  layers
   \param _e       The designator of the even layer to remap (0,2,4,6,8,A,C,E,G)
-  \param _od      The designator of the odd  layer to remap (1,3,5,7,9,B,D,F,H)
+  \param _o       The designator of the odd  layer to remap (1,3,5,7,9,B,D,F,H)
 
    This differs from TFC_TRG_REMAP in that it initializes \a _even and
    _odd. This macro, together with TFC_TRG_REMAP allow TFC__triggerRemap
@@ -131,7 +139,7 @@ extern "C" {
   \param _even    Variable to receive the remapped even layers
   \param _odd     Variable to receive the remapped odd  layers
   \param _e       The designator of the even layer to remap (0,2,4,6,8,A,C,E,G)
-  \param _od      The designator of the odd  layer to remap (1,3,5,7,9,B,D,F,H)
+  \param _o       The designator of the odd  layer to remap (1,3,5,7,9,B,D,F,H)
 
   
    This differs from TFC_TRG_REMAP_INIT in that it believes that \a _even
@@ -142,22 +150,28 @@ extern "C" {
                                                                           */
 /* ---------------------------------------------------------------------- */
 
-#ifdef VXWORKS
+#if  defined(VXWORKS) && 0
 
-#define TFC_TRG_REMAP_INIT(_trigger, _even, _odd, _e, _o)              \
-   asm volatile                                                        \
-       (" rlwinm %0,%2,(EBF_TKR_K_LEFT_BIT_L ## _e+OFFSET_EVEN+1)%32,  \
-                        31-EBF_TKR_L ## _e, 31-EBF_TKR_K_L ## _e)      \
-          rlwinm %1,%2,(EBF_TKR_K_LEFT_BIT_L ## _o+OFFSET_ODD +1)%32,  \
-                        31-EBF_TKR_K_L ## _o, 31-EBF_TKR_K_L ## _o)"   \
-        : "=r"(_even), "=r"(_odd) : "r"(_trigger)); 
+/*
+ | Jan 23, 2004, removed %32 on (EBF_TKR_K_LEFT_BIT_L ## _e & _o)
+ | The new assembler apparently does not like this. They are 
+ | unnecessary and, in retrospect, probably not the right thing to
+ | do. They must have no effect and if they did, the code is wrong
+*/
+#define TFC_TRG_REMAP_INIT(_trigger, _even, _odd, _e, _o)                 \
+   asm volatile                                                           \
+       (" rlwinm %0,%2,(EBF_TKR_K_LEFT_BIT_L ## _e+OFFSET_EVEN+1),        \
+                       (31-EBF_TKR_K_L ## _e), (31-EBF_TKR_K_L ## _e))\n  \
+          rlwinm %1,%2,(EBF_TKR_K_LEFT_BIT_L ## _o+OFFSET_ODD +1),        \
+                       (31-EBF_TKR_K_L ## _o), (31-EBF_TKR_K_L ## _o))"   \
+        : "=r"(_even), "=r"(_odd) : "r"(_trigger));
 
 #define TFC_TRG_REMAP(_trigger, _even, _odd, _e, _o)                   \
    asm volatile                                                        \
-       (" rlwini %0,%2,(EBF_TKR_K_LEFT_BIT_L ## _e+OFFSET_EVEN+1)%32,  \
-                        31-EBF_TKR_K_L ## _e, 31-EBF_TKR_K_L ## _e)    \
-          rlwini %1,%2,(EBF_TKR_K_LEFT_BIT_L ## _o+OFFSET_ODD +1)%32,  \
-                        31-EBF_TKR_K_L ## _o, 31-EBF_TKR_K_L ## _o)"   \
+       (" rlwimi %0,%2,(EBF_TKR_K_LEFT_BIT_L ## _e+OFFSET_EVEN+1),     \
+                       (31-EBF_TKR_K_L ## _e), (31-EBF_TKR_K_L ## _e))    \
+          rlwimi %1,%2,(EBF_TKR_K_LEFT_BIT_L ## _o+OFFSET_ODD +1),     \
+                       (31-EBF_TKR_K_L ## _o), (31-EBF_TKR_K_L ## _o))"   \
         :               "=r"(_even), "=r"(_odd)                        \
         : "r"(_trigger), "0"(_even), "1"(_odd));
 
@@ -179,16 +193,16 @@ _odd  |=  ((((_trigger)>>(EBF_TKR_K_RIGHT_BIT_L ## _o + OFFSET_ODD )) & 1) \
 #endif
     
 /* ---------------------------------------------------------------------- */
-static inline int TFC__triggerRemap     (int trigger);
+static __inline int TFC__triggerRemap     (int trigger);
 
-static inline int TFC__trigger7of8Form (unsigned int x,
+static __inline int TFC__trigger7of8Form (unsigned int x,
                                         unsigned int y,
                                         unsigned int xy012,
                                         unsigned int xy013,
                                         unsigned int xy023,
                                         unsigned int xy123);
 
-static inline int TFC__triggerForm     (unsigned int x,
+static __inline int TFC__triggerForm     (unsigned int x,
                                         unsigned int y);
 /* ---------------------------------------------------------------------- */
 
@@ -445,8 +459,8 @@ static int TFC__triggerForm (unsigned int x, unsigned int y)
        x =         13579bdfh02468aceg
        y =         13579bdfh02468aceg
        
-      xt   = (x & 0x1ff) | ((x & (0x1ff << 9) << 7));
-      yt   = (y & 0x1ff) | ((y & (0x1ff << 9) << 7));      
+      xt   = (x & 0x1ff) | ((x & (0x1ff << 9)) << 7));
+      yt   = (y & 0x1ff) | ((y & (0x1ff << 9)) << 7));      
       
       xt  = 13579bdfh.......02468aceg
       xt  = 13579bdfh.......02468aceg

@@ -1,16 +1,13 @@
-/*------------------------------------------------------------------------
-| CVS $Id
-+-------------------------------------------------------------------------*/
-
-
-
 /* ---------------------------------------------------------------------- *//*!
    
-   \file   CFC_latThreshold.h
+   \file   CFC_latThreshold.c
    \brief  Determines whether the energy in the CAL exceeds the specified
            threshold.
    \author JJRussell - russell@slac.stanford.edu
 
+\verbatim
+    CVS $Id
+\endverbatim 
                                                                          */
 /* --------------------------------------------------------------------- */
 
@@ -27,7 +24,7 @@ extern "C" {
 #endif    
 
     
-static inline int getEnergy (unsigned int data, const CFC_logConstants *gp);
+static __inline int getEnergy (unsigned int data, const CFC_logConstants *gp);
 
     
 #ifdef __cplusplus
@@ -45,7 +42,7 @@ static inline int getEnergy (unsigned int data, const CFC_logConstants *gp);
   \return     The energy of both ends.
                                                                           */
 /* ---------------------------------------------------------------------- */  
-static inline int getEnergy (unsigned int data, const CFC_logConstants *gp)
+static __inline int getEnergy (unsigned int data, const CFC_logConstants *gp)
 {
     CFC_logData            log;
     const CFC_logConstant  *rA;
@@ -141,7 +138,7 @@ int CFC_latThreshold (const struct _EBF_directory    *dir,
        tower       = FFS (cids);
        contributor = contributors + tower;
        gpLayer     = gp + CFC_K_LOGS_PER_TOWER * tower;
-       cids       &= ~(0x80000000 >> tower);
+       cids        = FFS_eliminate (cids, tower);
        data        = EBF__calLocate (contributor->ptr);
        counts      = *data++;
 

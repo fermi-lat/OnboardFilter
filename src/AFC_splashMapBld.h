@@ -1,10 +1,6 @@
 #ifndef AFC_SPLASHMAPBLD_H
 #define AFC_SPLASHMAPBLD_H
 
-/*------------------------------------------------------------------------
-| CVS $Id
-+-------------------------------------------------------------------------*/
-
 
 
 /* ---------------------------------------------------------------------- *//*!
@@ -12,6 +8,10 @@
    \file  AFC_splashMapBld.h
    \brief Macros to help build a Splash Veto Map 
    \author JJRussell - russell@slac.stanford.edu
+
+\verbatim
+   CVS $Id
+\endverbatim
 
     This file should only be included when building a splash veto map.
                                                                           */
@@ -30,9 +30,9 @@ extern "C" {
 
    In the end, this macro produces an initialization consisting of 2
    hex numbers. These numbers could have been typed in directly or
-   produced with the aid of 3 program. The tact taken here was to provide
+   produced with the aid of C program. The tact taken here was to provide
    a macro which directly initialized the data, but did it in a fashion
-   that the intent was pictorially obvious.
+   that was pictorially obvious.
 
    For example, the following snippet is a possible initialization of
    the near and far neighbors of TOP tile 0.
@@ -116,3 +116,4 @@ extern "C" {
 
 
 #endif
+

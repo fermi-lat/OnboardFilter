@@ -1,34 +1,34 @@
-/*------------------------------------------------------------------------
-| CVS $Id
-+-------------------------------------------------------------------------*/
-
-
-
 /* ---------------------------------------------------------------------- *//*!
-   
-   \file   TFC_acd.h
+
+   \file   TFC_acd.c
    \brief  Routines to project XY projections to the ACD faces
    \author JJRussell - russell@slac.stanford.edu
+
+\verbatim
+
+ CVS $Id$
+\endverbatim
 
                                                                          */
 /* --------------------------------------------------------------------- */
 
-
-#include <stdio.h>
+//#define   EDM_USE
+#include "DFC/EDM.h"
 #include "TFC_acd.h"
 #include "TFC_projectionDef.h"
 #include "TFC_geometryDef.h"
 
-#include "windowsCompat.h"
 
-//#define _DBG
-#ifdef _DBG  // disable this -- THB
-# undef _DBG
-#endif
-#ifdef  _DBG
 
-#define PRINTF(args) printf args
-#define DBG(_statement)  _statement
+/* --------------------------------------------------------------------- */
+#ifndef CMX_DOXYGEN
+/* --------------------------------------------------------------------- */
+
+
+
+EDM_CODE (
+
+EDM_level TFC_Acd_edm = EDM_K_DEBUG;
 
 static    int  prjAcd_TopTitlePrint (void);
 
@@ -40,108 +40,113 @@ static    void printAcdCoincidence  (int                       which,
                                      int                 coincidence);
 
 
-#else
-#define PRINTF(args)
-#define DBG(_statement)
+)
+
+
+/* --------------------------------------------------------------------- */
 #endif
+/* --------------------------------------------------------------------- */
 
 
-static unsigned int findAcdSideMask (int                        z,
-                                     const short int      *zSides);
+static unsigned int findAcdSideMask   (int                        z,
+				       const short int      *zSides);
 
-static unsigned int findAcdTopMask  (int                      acdTop,
-                                     unsigned int           template,
-                                     int                      amount,
-                                     const short int          *edges);
+static unsigned int findAcdTopMask    (int                      acdTop,
+				       unsigned int           template,
+				       int                      amount,
+				       const short int          *edges);
 
-static inline int projectXYtoAcdTop (TFC_projection             *prj,
-                                     int                     towerId,
-                                     int                      offset,
-                                     int                       width,
-                                     int                    template,
-                                     int                 shiftAmount,
-                                     const short int          *toAcd,
-                                     const short int          *edges);
+static __inline int projectXYtoAcdTop (TFC_projection             *prj,
+				       int                     towerId,
+				       int                      offset,
+				       int                       width,
+				       int                    template,
+				       int                 shiftAmount,
+				       const short int          *toAcd,
+				       const short int          *edges);
 
-static inline   int projectXYMtoAcd (TFC_projection             *prj,
-                                     int                   zposition,
-                                     int                  toAcdPlane,
-                                     int                      deltaZ,
-                                     const short int         *zSides,
-                                     int                     towerId);
+static __inline int projectXYMtoAcd   (TFC_projection             *prj,
+				       int                   zposition,
+				       int                  toAcdPlane,
+				       int                      deltaZ,
+				       const short int         *zSides,
+				       int                     towerId);
 
-static inline   int projectXYPtoAcd (TFC_projection             *prj,
-                                     int                   zposition,
-                                     int                   towerEdge,
-                                     int                  toAcdPlane,
-                                     int                      deltaZ,
-                                     const short int         *zSides,
-                                     int                     towerId);
+static __inline int projectXYPtoAcd   (TFC_projection             *prj,
+				       int                   zposition,
+				       int                   towerEdge,
+				       int                  toAcdPlane,
+				       int                      deltaZ,
+				       const short int         *zSides,
+				       int                     towerId);
 
-static inline   int projectXYStoAcd (int                   zposition,
-                                     int                  toAcdPlane,
-                                     int                      deltaZ,
-                                     int                     deltaXY,
-                                     const short             *zSides);
-
-
-static         int prjAcd_Top       (struct _TFC_projection     *prj,
-                                     int                        xCnt,
-                                     int                        yCnt,
-                                     const struct _TFC_geometry *geo,
-                                     int                     towerId);
-
-static         int prjAcd_XM        (struct _TFC_projection     *prj,
-                                     int                        xCnt,
-                                     int                        yCnt,
-                                     const struct _TFC_geometry *geo,
-                                     int                     towerId);
-
-static         int prjAcd_XP        (struct _TFC_projection     *prj,
-                                     int                        xCnt,
-                                     int                        yCnt,
-                                     const struct _TFC_geometry *geo,
-                                     int                     towerId);
+static __inline int projectXYStoAcd   (int                   zposition,
+				       int                  toAcdPlane,
+				       int                      deltaZ,
+				       int                     deltaXY,
+				       const short int         *zSides);
 
 
-static         int prjAcd_YM        (struct _TFC_projection     *prj,
-                                     int                        xCnt,
-                                     int                        yCnt,
-                                     const struct _TFC_geometry *geo,
-                                     int                     towerId);
+static         int prjAcd_Top         (TFC_projection             *prj,
+				       int                        xCnt,
+				       int                        yCnt,
+				       const TFC_geometry         *geo,
+				       int                     towerId);
 
-static         int prjAcd_YP        (struct _TFC_projection     *prj,
-                                     int                        xCnt,
-                                     int                        yCnt,
-                                     const struct _TFC_geometry *geo,
-                                     int                     towerId);
+static         int prjAcd_XM          (TFC_projection             *prj,
+				       int                        xCnt,
+				       int                        yCnt,
+				       const TFC_geometry         *geo,
+				       int                     towerId);
 
-static         int prjAcd_XMS       (struct _TFC_projection     *prj,
-                                     int                        xCnt,
-                                     int                        yCnt,
-                                     const struct _TFC_geometry *geo,
-                                     int                     towerId);
-
-static         int prjAcd_XPS       (struct _TFC_projection     *prj,
-                                     int                        xCnt,
-                                     int                        yCnt,
-                                     const struct _TFC_geometry *geo,
-                                     int                     towerId);
-
-static         int prjAcd_YMS       (struct _TFC_projection     *prj,
-                                     int                        xCnt,
-                                     int                        yCnt,
-                                     const struct _TFC_geometry *geo,
-                                     int                     towerId);
-
-static         int prjAcd_YPS       (struct _TFC_projection     *prj,
-                                     int                        xCnt,
-                                     int                        yCnt,
-                                     const struct _TFC_geometry *geo,
-                                     int                     towerId);
+static         int prjAcd_XP          (TFC_projection             *prj,
+				       int                        xCnt,
+				       int                        yCnt,
+				       const TFC_geometry         *geo,
+				       int                     towerId);
 
 
+static         int prjAcd_YM          (TFC_projection             *prj,
+				       int                        xCnt,
+				       int                        yCnt,
+				       const TFC_geometry         *geo,
+				       int                     towerId);
 
+static         int prjAcd_YP          (TFC_projection             *prj,
+				       int                        xCnt,
+				       int                        yCnt,
+				       const TFC_geometry         *geo,
+				       int                     towerId);
+
+static         int prjAcd_XMS         (TFC_projection             *prj,
+				       int                        xCnt,
+				       int                        yCnt,
+				       const TFC_geometry         *geo,
+				       int                     towerId);
+
+static         int prjAcd_XPS         (TFC_projection             *prj,
+				       int                        xCnt,
+				       int                        yCnt,
+				       const TFC_geometry         *geo,
+				       int                     towerId);
+
+static         int prjAcd_YMS         (TFC_projection             *prj,
+				       int                        xCnt,
+				       int                        yCnt,
+				       const TFC_geometry         *geo,
+				       int                     towerId);
+
+static         int prjAcd_YPS         (TFC_projection             *prj,
+				       int                        xCnt,
+				       int                        yCnt,
+				       const TFC_geometry         *geo,
+				       int                     towerId);
+
+
+
+/* --------------------------------------------------------------------- */
+#ifndef CMX_DOXYGEN  /* These are internal only definitions              */
+/* --------------------------------------------------------------------- */
 
 /*
  | ACD_X_TEMPLATE marks off the possible ACD top tile hits for X row 0
@@ -149,42 +154,118 @@ static         int prjAcd_YPS       (struct _TFC_projection     *prj,
  |
  | The templates for the other rows can be generated by left shifting the
  | X template by 1 and the Y template by 5.
-*/ 
+*/
 #define ACD_X_TEMPLATE    (1 << (4*5)) | (1 << (3*5)) | (1 << (2*5)) \
                         | (1 << (1*5)) | (1 << (0*5))
 #define ACD_X_SHIFT_AMOUNT 1
 #define ACD_Y_TEMPLATE    (0x1f)
 #define ACD_Y_SHIFT_AMOUNT 5
 
-#define ACD_V_PRJ_XM  0
-#define ACD_V_PRJ_XP  1
-#define ACD_V_PRJ_YM  2
-#define ACD_V_PRJ_YP  3
-#define ACD_V_PRJ_TOP 4
-#define ACD_V_PRJ_XMS 5
-#define ACD_V_PRJ_XPS 6
-#define ACD_V_PRJ_YMS 7
-#define ACD_V_PRJ_YPS 8
-
-#define ACD_M_PRJ_XM  (1 << ACD_V_PRJ_XM )
-#define ACD_M_PRJ_XP  (1 << ACD_V_PRJ_XP )
-#define ACD_M_PRJ_YM  (1 << ACD_V_PRJ_YM )
-#define ACD_M_PRJ_YP  (1 << ACD_V_PRJ_YP )
-#define ACD_M_PRJ_TOP (1 << ACD_V_PRJ_TOP)
-#define ACD_M_PRJ_XMS (1 << ACD_V_PRJ_XMS)
-#define ACD_M_PRJ_XPS (1 << ACD_V_PRJ_XPS)
-#define ACD_M_PRJ_YMS (1 << ACD_V_PRJ_YMS)
-#define ACD_M_PRJ_YPS (1 << ACD_V_PRJ_YPS)
+/* --------------------------------------------------------------------- */
+#endif
+/* --------------------------------------------------------------------- */
 
 
 
+
+/* --------------------------------------------------------------------- *//*!
+
+  \enum  _ACD_V_prj
+  \brief Bit offset used to construct the ACD dispatch mask
+									 *//*!
+  \typedef ACD_V_prj
+  \brief   Typedef for enum \e _ACD_V_prj
+
+   See ACD_M_prj for further details
+									 */
+/* --------------------------------------------------------------------- */
+typedef enum _ACD_V_prj
+{
+  ACD_V_PRJ_XM  =  0,  /*!< Project to XM  plane                        */
+  ACD_V_PRJ_XP  =  1,  /*!< Project to XP  plane                        */
+  ACD_V_PRJ_YM  =  2,  /*!< Project to YM  plane                        */
+  ACD_V_PRJ_YP  =  3,  /*!< Project to YP  plane                        */
+  ACD_V_PRJ_TOP =  4,  /*!< Project to TOP plane                        */
+  ACD_V_PRJ_XMS =  5,  /*!< Project ot XM  plane after skipping a tower */
+  ACD_V_PRJ_XPS =  6,  /*!< Project ot XP  plane after skipping a tower */
+  ACD_V_PRJ_YMS =  7,  /*!< Project ot YM  plane after skipping a tower */
+  ACD_V_PRJ_YPS =  8   /*!< Project ot YP  plane after skipping a tower */
+}
+ACD_V_prj;
+/* --------------------------------------------------------------------- */
+
+
+
+/* --------------------------------------------------------------------- *//*!
+
+  \enum  _ACD_M_prj
+  \brief Bit mask used to construct the ACD dispatch mask
+									 *//*!
+  \typedef ACD_M_prj
+  \brief   Typedef for enum \e _ACD_M_prj
+
+   For a given set of struck ACD tiles, one can construct a mask of
+   which planes should ever be checked. When a track projection is found,
+   the projection type (X or Y) and tower can be used to further limit
+   the scope of the check.
+
+   The obvious things appear here, check X-,X+, Y-,Y+ and the TOP planes.
+   There also exists an additional set of masks used to extend the
+   search when the projection is very shallow. In these cases, it is
+   possible that only 2 layers where hit in the tower that is
+   juxtaposition to the struck ACD tiles. It is very possible that
+   the projection was not successfully extrapolated into the that tower
+   and the additional hits where missed. To cover this case, projections
+   with very shallow slopes are allowed to be projected all the way
+   through a tower to an ACD side plane. These are the ACD_M_PRJ_xxS
+   enumerations.
+									 */
+/* --------------------------------------------------------------------- */
+typedef enum _ACD_M_prj
+{
+   ACD_M_PRJ_XM  = (1 << ACD_V_PRJ_XM ), /*!< Project to XM  plane       */
+   ACD_M_PRJ_XP  = (1 << ACD_V_PRJ_XP ), /*!< Project to XP  plane       */
+   ACD_M_PRJ_YM  = (1 << ACD_V_PRJ_YM ), /*!< Project to YM  plane       */
+   ACD_M_PRJ_YP  = (1 << ACD_V_PRJ_YP ), /*!< Project to YP  plane       */
+   ACD_M_PRJ_TOP = (1 << ACD_V_PRJ_TOP), /*!< Project to TOP plane       */
+   ACD_M_PRJ_XMS = (1 << ACD_V_PRJ_XMS), /*!< Project to XM  plane (skip)*/
+   ACD_M_PRJ_XPS = (1 << ACD_V_PRJ_XPS), /*!< Project to XP  plane (skip)*/
+   ACD_M_PRJ_YMS = (1 << ACD_V_PRJ_YMS), /*!< Project to YM  plane (skip)*/
+   ACD_M_PRJ_YPS = (1 << ACD_V_PRJ_YPS)  /*!< Project to YP  plane (skip)*/
+}
+ACD_M_prj;
+/* --------------------------------------------------------------------- */
+
+
+
+
+/* ---------------------------------------------------------------------- *//*!
+
+  \struct _AcdDispatchCtl
+  \brief   Provides a set of 16 masks, one per tower, indicating which of
+           the 5 ACD planes this tower interfaces to.
+									  *//*!
+  \typedef AcdDispatchCtl
+  \brief   Typedef for struct \e _AcdDispatchCtl
+									  */
+/* ---------------------------------------------------------------------- */
 typedef struct _AcdDispatchCtl
 {
-    unsigned short int masks[16];
+    unsigned short int masks[16];  /*!< Masks, by tower, of which ACD
+    		 		        planes this tower interfaces to   */
 }
 AcdDispatchCtl;
+/* ---------------------------------------------------------------------- */
 
 
+
+/* ---------------------------------------------------------------------- *//*!
+
+  \var   AcdDispatchCtl AcdDispatch
+  \brief Static, readonly structure indicating which ACD planes each
+         tower interfaces with.
+									  */
+/* ---------------------------------------------------------------------- */
 static const AcdDispatchCtl AcdDispatch =
 {
    {  /* Controls which projections are permitted for which towers */
@@ -192,17 +273,17 @@ static const AcdDispatchCtl AcdDispatch =
       ACD_M_PRJ_TOP | ACD_M_PRJ_YM  | ACD_M_PRJ_XMS,    /* Tower 1 */
       ACD_M_PRJ_TOP | ACD_M_PRJ_YM  | ACD_M_PRJ_XPS,    /* Tower 2 */
       ACD_M_PRJ_TOP | ACD_M_PRJ_YM  | ACD_M_PRJ_XP,     /* Tower 3 */
-      
+
       ACD_M_PRJ_TOP | ACD_M_PRJ_XM  | ACD_M_PRJ_YMS,    /* Tower 4 */
       ACD_M_PRJ_TOP | ACD_M_PRJ_XMS | ACD_M_PRJ_YMS,    /* Tower 5 */
       ACD_M_PRJ_TOP | ACD_M_PRJ_XPS | ACD_M_PRJ_YMS,    /* Tower 6 */
       ACD_M_PRJ_TOP | ACD_M_PRJ_XP  | ACD_M_PRJ_YMS,    /* Tower 7 */
-      
+
       ACD_M_PRJ_TOP | ACD_M_PRJ_XM  | ACD_M_PRJ_YPS,    /* Tower 8 */
       ACD_M_PRJ_TOP | ACD_M_PRJ_XMS | ACD_M_PRJ_YPS,    /* Tower 9 */
       ACD_M_PRJ_TOP | ACD_M_PRJ_XPS | ACD_M_PRJ_YPS,    /* Tower a */
       ACD_M_PRJ_TOP | ACD_M_PRJ_XP  | ACD_M_PRJ_YPS,    /* Tower b */
-      
+
       ACD_M_PRJ_TOP | ACD_M_PRJ_YP  | ACD_M_PRJ_XM,     /* Tower c */
       ACD_M_PRJ_TOP | ACD_M_PRJ_YP  | ACD_M_PRJ_XMS,    /* Tower d */
       ACD_M_PRJ_TOP | ACD_M_PRJ_YP  | ACD_M_PRJ_XPS,    /* Tower e */
@@ -220,9 +301,10 @@ static const AcdDispatchCtl AcdDispatch =
                                            const short int *zSides)
   \brief     Translates a Z position into a mask which represents the row
              of ACD tiles associated with that Z
-         
-  \param z   The z position in units of TFC_Z_ABS_SCALE_FACTOR
-  \return    A mask representing the ACD associated with \a z.
+
+  \param z      The z position in units of TFC_Z_ABS_SCALE_FACTOR
+  \param zSides The z positions of the side tiles
+  \return       A mask representing the ACD associated with \a z.
                                                                           */
 /* ---------------------------------------------------------------------- */
 static unsigned int findAcdSideMask (int                   z,
@@ -237,7 +319,7 @@ static unsigned int findAcdSideMask (int                   z,
    return 0;
 }
 /* ---------------------------------------------------------------------- */
-       
+
 
 
 
@@ -248,7 +330,7 @@ static unsigned int findAcdSideMask (int                   z,
                                           unsigned int       template,
                                           int                  amount,
                                           const short int      *edges)
-  \brief          Translates a X/Y position into a mask which represents 
+  \brief          Translates a X/Y position into a mask which represents
                   the row or column of ACD top tiles associated with that
                   X/Y position.
   \param acdTop   The X/Y position a the Z of the ACD top face of tiles.
@@ -256,20 +338,22 @@ static unsigned int findAcdSideMask (int                   z,
   \param amount   The amount to shift the template mask if the row or
                   column is not 0. This will be 1 for X (columns) and
                   5 for Y (rows).
-  \return    A mask representing the ACD tiles associated with \a acdTop.
+  \param edges    The edges of the tiles in this row/col
+  \return         A mask representing the ACD tiles associated with
+                  \a acdTop.
                                                                           */
-/* ---------------------------------------------------------------------- */   
+/* ---------------------------------------------------------------------- */
 static unsigned int findAcdTopMask (int                  acdTop,
                                     unsigned int       template,
                                     int                  amount,
                                     const short int      *edges)
 {
    int mask = 0;
-   
+
    if (acdTop >= edges[0])
    {
        mask = template;
-       
+
        if (acdTop >= edges[1])
        {
            mask <<= amount;
@@ -291,7 +375,7 @@ static unsigned int findAcdTopMask (int                  acdTop,
    }
 
    return mask;
-   
+
 }
 /* ---------------------------------------------------------------------- */
 
@@ -308,14 +392,15 @@ static unsigned int findAcdTopMask (int                  acdTop,
                               int        shiftAmount,
                               const short int *toAcd,
                               const short int *edges)
-                              
+
   \brief Projects an X/Y projects to the top face of the ACD and computes
-         the mask of which possible ACD tiles. 
-  
+         the mask of which possible ACD tiles.
+
   \param prj         The projection
   \param towerId     The tower number. (Used only for diagnostic messages.)
   \param offset      The offset of this tower's local coordinate system from
                      the absolute coordinate system.
+  \param width       UNUSED
   \param template    The template for the ACD mask. This template is valid
                      if the row/col is 0.
   \param shiftAmount The shift amount to apply to the template mask
@@ -326,14 +411,14 @@ static unsigned int findAcdTopMask (int                  acdTop,
                      ordered from the most negative to most positive edge.
                                                                           */
 /* ---------------------------------------------------------------------- */
-static inline int projectXYtoAcdTop (TFC_projection      *prj,
-                                     int              towerId,
-                                     int               offset,
-                                     int                width,
-                                     int             template,
-                                     int          shiftAmount,
-                                     const short int   *toAcd,
-                                     const short int   *edges)
+static __inline int projectXYtoAcdTop (TFC_projection      *prj,
+				       int              towerId,
+				       int               offset,
+				       int                width,
+				       int             template,
+				       int          shiftAmount,
+				       const short int   *toAcd,
+				       const short int   *edges)
 {
     int topLayerNum;
     int  acdTopMask;
@@ -341,8 +426,8 @@ static inline int projectXYtoAcdTop (TFC_projection      *prj,
     acdTopMask  = 0;
     topLayerNum = prj->max;
 
-    PRINTF ((" %3d %3d", towerId, topLayerNum));
-    
+    EDM_DEBUGPRINTF ((TFC_Acd_edm, " %3d %3d", towerId, topLayerNum));
+
     /*
      | Do the projection if the track starts in a layer close to the ACD
      | top face.
@@ -351,7 +436,7 @@ static inline int projectXYtoAcdTop (TFC_projection      *prj,
     {
         int    acdPrj;
         int    acdTop;
-        int     slope;        
+        int     slope;
         int intercept;
 
         /*
@@ -365,20 +450,22 @@ static inline int projectXYtoAcdTop (TFC_projection      *prj,
         acdPrj    = toAcd[topLayerNum];
         acdTop    = intercept + offset
                   + (acdPrj*slope) / TFC_Z_ACD_TOP_TO_TKR_SCALE_FACTOR;
-        
-        acdTopMask  = findAcdTopMask (acdTop, template, shiftAmount, edges);
-                
-        PRINTF ((" %9d + %6d + %9d * %5d =  %6d %8.8x",
-                prj->intercept,
-                offset,
-                acdPrj,
-                slope,
-                acdTop,
-                acdTopMask));
-    }
 
-    PRINTF (("\n"));
-    
+        acdTopMask  = findAcdTopMask (acdTop, template, shiftAmount, edges);
+
+        EDM_DEBUGPRINTF ((TFC_Acd_edm,
+			  " %9d + %6d + %9d * %5d =  %6d %8.8x\n",
+			  prj->intercept,
+			  offset,
+			  acdPrj,
+			  slope,
+			  acdTop,
+			  acdTopMask));
+    }
+    else EDM_DEBUGPRINTF ((TFC_Acd_edm,
+			   " top most layer must be at >= layer 8\n"));
+
+
     return acdTopMask;
 }
 /* ---------------------------------------------------------------------- */
@@ -388,6 +475,7 @@ static inline int projectXYtoAcdTop (TFC_projection      *prj,
 
 
 /* ---------------------------------------------------------------------- *//*!
+
   \fn    int projectXYMtoAcd (TFC_projection     *prj,
                               int           zposition,
                               int          toAcdPlane,
@@ -395,13 +483,14 @@ static inline int projectXYtoAcdTop (TFC_projection      *prj,
                               const short int *zSides,
                               int             towerId)
 
-                                   
+
   \brief Projects an X or Y track projection to the X-/Y- face
   \param prj        The track projection
   \param zposition  Starting z position
   \param toAcdPlane Distance from the strip 0 of the tracker to the ACD plane
                     in units of the strip pitch.
   \param deltaZ     Distance between the top and bottom hit planes
+  \param zSides     The z positions of the side tiles
   \param towerId    The tower number. This is currently only used in
                     diagnostic messages.
 
@@ -413,21 +502,21 @@ static inline int projectXYtoAcdTop (TFC_projection      *prj,
    width of the tower (in strips).
                                                                           */
 /* ---------------------------------------------------------------------- */
-static inline int projectXYMtoAcd (TFC_projection *prj,
-                                   int       zposition,
-                                   int      toAcdPlane,
-                                   int          deltaZ,
-                                   const short *zSides,
-                                   int         towerId)
+static __inline int projectXYMtoAcd (TFC_projection     *prj,
+				     int           zposition,
+				     int          toAcdPlane,
+				     int              deltaZ,
+				     const short int *zSides,
+				     int             towerId)
 {
    int  mask;
    int slope;
 
    mask  = 0;
    slope = prj->slope;
-   PRINTF ((" %3d %3d %5d", towerId, prj->max, slope));
+   EDM_DEBUGPRINTF ((TFC_Acd_edm, " %3d %3d %5d", towerId, prj->max, slope));
 
-   
+
    /*
     | The slope of the track must be negative to consider this projection
     | for exiting the left/lower edge of the tower.
@@ -451,8 +540,8 @@ static inline int projectXYMtoAcd (TFC_projection *prj,
        topHit  = prj->hits[0];
        deltaXY = topHit - prj->hits[2];
        check   = topHit + deltaXY;
-       
-       PRINTF ((" %6d < %6d", check, 0));
+
+       EDM_DEBUGPRINTF ((TFC_Acd_edm, " %6d < %6d", check, 0));
 
        /*
         | Demand not only that the projection be heading towards the
@@ -462,8 +551,8 @@ static inline int projectXYMtoAcd (TFC_projection *prj,
        if (check < 0)
        {
            int z;
-           
-           
+
+
            /*
             | Project to the left/lower edge finding the Z associated
             | with the intersection point. Translate the Z into a
@@ -472,29 +561,28 @@ static inline int projectXYMtoAcd (TFC_projection *prj,
            toAcdPlane -= topHit;
            z           = zposition + toAcdPlane * deltaZ / deltaXY;
            mask        = findAcdSideMask (z, zSides);
-           
-           PRINTF ((" %6d + (%5d*%5d) / %6d =%6d %8.8x",
-                    zposition / TFC_Z_ABS_SCALE_FACTOR,
-                    toAcdPlane,
-                    deltaZ, 
-                    deltaXY,
-                    z / TFC_Z_ABS_SCALE_FACTOR,
-                    mask));
+
+           EDM_DEBUGPRINTF ((TFC_Acd_edm,
+			     " %6d + (%5d*%5d) / %6d =%6d %8.8x\n",
+			     zposition,
+			     toAcdPlane,
+			     deltaZ,
+			     deltaXY,
+			     z,
+			     mask));
 
        }
        else
        {
-           PRINTF ((" Not off the tower"));
+           EDM_DEBUGPRINTF ((TFC_Acd_edm, " Not off the tower\n"));
        }
    }
    else
    {
-       PRINTF ((" Wrong slope"));
+       EDM_DEBUGPRINTF ((TFC_Acd_edm, " Wrong slope\n"));
    }
-   
 
-   PRINTF (("\n"));
-          
+
    return mask;
 }
 /* ---------------------------------------------------------------------- */
@@ -511,7 +599,7 @@ static inline int projectXYMtoAcd (TFC_projection *prj,
                               int              deltaZ,
                               const short int *zSides,
                               int             towerId)
-                                   
+
   \brief Projects an X or Y track projection to the X+/Y_ face
   \param prj        The track projection
   \param zposition  Starting z position
@@ -519,6 +607,7 @@ static inline int projectXYMtoAcd (TFC_projection *prj,
   \param toAcdPlane Distance from the strip 0 of the tracker to the ACD plane
                     in units of the strip pitch.
   \param deltaZ     Distance between the top and bottom hit planes
+  \param zSides     The z positions of the side tiles
   \param towerId    The tower number. This is currently only used in
                     diagnostic messages.
 
@@ -530,23 +619,23 @@ static inline int projectXYMtoAcd (TFC_projection *prj,
    width of the tower (in strips).
                                                                           */
 /* ---------------------------------------------------------------------- */
-static inline int projectXYPtoAcd (TFC_projection     *prj,
-                                   int           zposition,
-                                   int           towerEdge,
-                                   int          toAcdPlane,
-                                   int              deltaZ,
-                                   const short int *zSides,
-                                   int             towerId)
+static __inline int projectXYPtoAcd (TFC_projection     *prj,
+				     int           zposition,
+				     int           towerEdge,
+				     int          toAcdPlane,
+				     int              deltaZ,
+				     const short int *zSides,
+				     int             towerId)
 {
    int  mask;
    int slope;
 
-   
+
    mask  = 0;
    slope = prj->slope;
-   PRINTF ((" %3d %3d %5d", towerId, prj->max, slope));
+   EDM_DEBUGPRINTF ((TFC_Acd_edm, " %3d %3d %5d", towerId, prj->max, slope));
 
-   
+
    /*
     | The slope of the track must be negative to consider this projection
     | for exiting the left/lower edge of the tower.
@@ -569,9 +658,9 @@ static inline int projectXYPtoAcd (TFC_projection     *prj,
        topHit  = prj->hits[0];
        deltaXY = topHit - prj->hits[2];
        check   = topHit + deltaXY;
-       
-       PRINTF ((" %6d > %6d", check, towerEdge));
-       
+
+       EDM_DEBUGPRINTF ((TFC_Acd_edm, " %6d > %6d", check, towerEdge));
+
        /*
         | Demand not only that the projection be heading towards the
         | right/high edge of the tower, but also that it leave the tower
@@ -584,28 +673,27 @@ static inline int projectXYPtoAcd (TFC_projection     *prj,
            toAcdPlane -= topHit;
            z           = zposition + toAcdPlane * deltaZ / deltaXY;
            mask        = findAcdSideMask (z, zSides);
-           
-           PRINTF ((" %6d + (%5d*%5d) / %6d =%6d %8.8x",
-                    zposition / TFC_Z_ABS_SCALE_FACTOR,
-                    toAcdPlane,
-                    deltaZ,
-                    deltaXY,
-                    z / TFC_Z_ABS_SCALE_FACTOR,
-                    mask));
+
+           EDM_DEBUGPRINTF ((TFC_Acd_edm,
+			     " %6d + (%5d*%5d) / %6d =%6d %8.8x\n",
+			     zposition,
+			     toAcdPlane,
+			     deltaZ,
+			     deltaXY,
+			     z,
+			     mask));
        }
        else
        {
-           PRINTF ((" Not off the tower"));
+           EDM_DEBUGPRINTF ((TFC_Acd_edm, " Not off the tower\n"));
        }
    }
    else
    {
-       PRINTF ((" Wrong slope"));
+       EDM_DEBUGPRINTF ((TFC_Acd_edm, " Wrong slope\n"));
    }
-   
 
-   PRINTF (("\n"));
-   
+
    return mask;
 }
 
@@ -615,13 +703,14 @@ static inline int projectXYPtoAcd (TFC_projection     *prj,
 
 
 /* ---------------------------------------------------------------------- *//*!
+
   \fn    int projectXYStoAcd (int           zposition,
                               int          toAcdPlane,
                               int              deltaZ,
-                              int             deltaXY,  
+                              int             deltaXY,
                               const short int *zSides)
 
-                                   
+
   \brief Projects an X or Y track projection to an ACD face.
   \param zposition  Starting z position
   \param toAcdPlane Distance from the top strip hit of the track to the ACD
@@ -629,18 +718,19 @@ static inline int projectXYPtoAcd (TFC_projection     *prj,
   \param deltaZ     Distance between the top and bottom hit planes. This
                     should always be twice the nominal Z layer separation.
   \param deltaXY    Distance between the top and bottom hits.
+  \param zSides     The z positions of the side tiles
   \return           A mask of possible side tiles coincidences.
 
                                                                           */
 /* ---------------------------------------------------------------------- */
-static inline int projectXYStoAcd (int           zposition,
-                                   int          toAcdPlane,
-                                   int              deltaZ,
-                                   int             deltaXY,
-                                   const short int *zSides)
+static __inline int projectXYStoAcd (int           zposition,
+				     int          toAcdPlane,
+				     int              deltaZ,
+				     int             deltaXY,
+				     const short int *zSides)
 {
    int    mask = 0;
-   
+
    /*
     | The slope of the track must be greater than the approximate slope of
     | the width of a tracker module / 2 layers. This means that there is
@@ -650,7 +740,7 @@ static inline int projectXYStoAcd (int           zposition,
    if (deltaXY > 2*1536/3)
    {
        int z;
-       
+
        /*
         | Project to the left/lower edge finding the Z associated
         | with the intersection point. Translate the Z into a
@@ -658,24 +748,25 @@ static inline int projectXYStoAcd (int           zposition,
        */
        z     = zposition + toAcdPlane * deltaZ / deltaXY;
        mask  = findAcdSideMask (z, zSides);
-       
-       PRINTF (("                 %6d + (%5d*%5d) / %6d =%6d %8.8x",
-                zposition / TFC_Z_ABS_SCALE_FACTOR,
-                toAcdPlane,
-                deltaZ, 
-                deltaXY,
-                z / TFC_Z_ABS_SCALE_FACTOR,
-                mask));
+
+       EDM_DEBUGPRINTF ((TFC_Acd_edm,
+			"                 %6d + (%5d*%5d) / %6d =%6d %8.8x\n",
+			zposition,
+			toAcdPlane,
+			deltaZ,
+			deltaXY,
+			z,
+			mask));
 
    }
    else
    {
-       PRINTF (("Slope too small"));
+       EDM_DEBUGPRINTF (
+           (TFC_Acd_edm,
+	    " Slope too small to consider skip tower type projection\n"));
    }
-   
 
-   PRINTF (("\n"));
-          
+
    return mask;
 }
 /* ---------------------------------------------------------------------- */
@@ -684,11 +775,11 @@ static inline int projectXYStoAcd (int           zposition,
 
 /* ---------------------------------------------------------------------- *//*!
 
-  \fn int TFC_acdProjectTemplate (int acd_top, int acd_x, int acd_y)
+  \fn int TFC_acdProjectTemplate (int acd_x, int acd_y, int acd_z)
   \brief  Builds a template dispatch mask for this event.
-  \param  acd_top  The bit mask of struck top  ACD tiles.
-  \param  acd_x    The bit mask of struck X+/- ACD tiles.
-  \param  acd_y    The bit mask of struck Y+/- ACD tiles.  
+  \param  acd_x    The bit mask of struck X+/-    ACD tiles.
+  \param  acd_y    The bit mask of struck Y+/-    ACD tiles.
+  \param  acd_z    The bit mask of struck Z (top) ACD tiles.
   \returns         The template dispatch mask for this event.
 
   The dispatch mask is a bit mask of the possible ACD projections to
@@ -697,13 +788,13 @@ static inline int projectXYStoAcd (int           zposition,
   is broken out since this is a global property of the event. It is computed
   once, then used for each tower that has found projections.
                                                                           */
-/* ---------------------------------------------------------------------- */   
-int TFC_acdProjectTemplate (int acd_top, int acd_x, int acd_y)
+/* ---------------------------------------------------------------------- */
+int TFC_acdProjectTemplate (int acd_x, int acd_y, int acd_z)
 {
    int dispatch = 0;
- 
+
    /* Build the faces to check base on the struck tiles */
-   if (acd_top                    ) dispatch |= ACD_M_PRJ_TOP; 
+   if (acd_z                      ) dispatch |= ACD_M_PRJ_TOP;
    if ((acd_x    & 0xffff0000)>>16) dispatch |= ACD_M_PRJ_XP | ACD_M_PRJ_XPS;
    if ((acd_y    & 0xffff0000)>>16) dispatch |= ACD_M_PRJ_YP | ACD_M_PRJ_YPS;
    if ((acd_x    & 0x0000ffff)    ) dispatch |= ACD_M_PRJ_XM | ACD_M_PRJ_XMS;
@@ -711,9 +802,9 @@ int TFC_acdProjectTemplate (int acd_top, int acd_x, int acd_y)
 
    return dispatch;
 }
-/* ---------------------------------------------------------------------- */  
+/* ---------------------------------------------------------------------- */
 
-  
+
 
 
 /* ---------------------------------------------------------------------- *//*!
@@ -724,9 +815,9 @@ int TFC_acdProjectTemplate (int acd_top, int acd_x, int acd_y)
                           const struct _TFC_geometry *geo,
                           int                     towerId,
                           int                    dispatch,
-                          int                     acd_top,
                           int                       acd_x,
-                          int                       acd_y)
+                          int                       acd_y,
+                          int                       acd_z)
   \brief  Projects the track projections to the ACD faces and looks for
           an match with a stuck ACD tile.
   \param  prj      The list of projections
@@ -734,38 +825,41 @@ int TFC_acdProjectTemplate (int acd_top, int acd_x, int acd_y)
                    projections are X projections.
   \param  yCnt     The number of y projections. The next  \a yCnt
                    projections are Y projections.
+  \param  geo      The geometry of the LAT. This is used to do the
+                   projections, defining where various boundaries are
+                   from the perspective of the TKR.
   \param  towerId  The tower id of these projections
   \param  dispatch A bit mask of the possible projections to try based
                    on the struck ACD tile. This must be consistent
-                   with \a acd_top, \a acd_x and \a acd_y.
-  \param  acd_top  A bit mask of the struck ACD TOP face tiles.
-  \param  acd_x    A bit mask of the struck ACD X   face tiles.
-  \param  acd_y    A bit mask of the struck ACD Y   face tiles.
+                   with \a acd_z, \a acd_x and \a acd_y.
+  \param  acd_x    A bit mask of the struck ACD X       face tiles.
+  \param  acd_y    A bit mask of the struck ACD Y       face tiles.
+  \param  acd_z    A bit mask of the struck ACD Z (TOP) face tiles.
   \return          The first coincidence with one of faces. The upper 4
                    bits indicate which face (0=Top, 1=X-, 2=X+, 3=Y-, 4=Y+)
                                                                           */
-/* ---------------------------------------------------------------------- */  
+/* ---------------------------------------------------------------------- */
 int TFC_acdProject   (struct _TFC_projection        *prj,
                       int                           xCnt,
                       int                           yCnt,
                       const struct _TFC_geometry    *geo,
                       int                        towerId,
                       int                       dispatch,
-                      int                        acd_top,
                       int                          acd_x,
-                      int                          acd_y)
+                      int                          acd_y,
+                      int                          acd_z)
 {
    /* Limit which faces to check based on the tower */
    dispatch &= AcdDispatch.masks[towerId];
 
-   
+
    /* If no projections available, eliminate from the dispatch mask */
    if (xCnt == 0)
    {
        dispatch &= ~(ACD_M_PRJ_XM  | ACD_M_PRJ_XP  |
                      ACD_M_PRJ_XMS | ACD_M_PRJ_XPS | ACD_M_PRJ_TOP);
    }
-   
+
    if (yCnt == 0)
    {
        dispatch &= ~(ACD_M_PRJ_YM  | ACD_M_PRJ_YP  |
@@ -773,27 +867,37 @@ int TFC_acdProject   (struct _TFC_projection        *prj,
    }
 
 
-   
+
    /* If must project to the ACD TOP FACE */
    if (dispatch & ACD_M_PRJ_TOP)
    {
        int mask        = prjAcd_Top (prj, xCnt, yCnt, geo, towerId);
-       int coincidence = mask & acd_top;
-       DBG (printAcdCoincidence (ACD_V_PRJ_TOP, acd_top, mask, coincidence));
+       int coincidence = mask & acd_z;
+
+       EDM_CODE (printAcdCoincidence (ACD_V_PRJ_TOP,
+				      acd_z,
+				      mask,
+				      coincidence));
+
        if (coincidence) return (ACD_V_PRJ_TOP << 28) | coincidence;
    }
 
-   
+
    /* If must project to the ACD X- FACE */
    if (dispatch & ACD_M_PRJ_XM )
    {
        int mask        = prjAcd_XM  (prj, xCnt, yCnt, geo, towerId);
        int xm          = acd_x & 0xffff;
        int coincidence = mask & xm;
-       DBG (printAcdCoincidence (ACD_V_PRJ_XM, xm, mask, coincidence));       
+
+       EDM_CODE (printAcdCoincidence (ACD_V_PRJ_XM,
+				      xm,
+				      mask,
+				      coincidence));
+
        if (coincidence) return (ACD_V_PRJ_XM << 28) | coincidence;
    }
-       
+
 
    /* If must project to the ACD X+ FACE */
    if (dispatch & ACD_M_PRJ_XP )
@@ -801,7 +905,12 @@ int TFC_acdProject   (struct _TFC_projection        *prj,
        int mask        = prjAcd_XP  (prj, xCnt, yCnt, geo, towerId);
        int xp          = (unsigned int)acd_x >> 16;
        int coincidence = mask & xp;
-       DBG (printAcdCoincidence (ACD_V_PRJ_XP, xp, mask, coincidence));
+
+       EDM_CODE (printAcdCoincidence (ACD_V_PRJ_XP,
+				      xp,
+				      mask,
+				      coincidence));
+
        if (coincidence)  return (ACD_V_PRJ_XP << 28) | coincidence;
    }
 
@@ -812,7 +921,12 @@ int TFC_acdProject   (struct _TFC_projection        *prj,
        int mask        = prjAcd_YM  (prj, xCnt, yCnt, geo, towerId);
        int ym          = acd_y & 0xffff;
        int coincidence = mask & ym;
-       DBG (printAcdCoincidence (ACD_V_PRJ_YM, ym, mask, coincidence));
+
+       EDM_CODE (printAcdCoincidence (ACD_V_PRJ_YM,
+				      ym,
+				      mask,
+				      coincidence));
+
        if (coincidence) return (ACD_V_PRJ_YM << 28) | coincidence;
    }
 
@@ -821,10 +935,15 @@ int TFC_acdProject   (struct _TFC_projection        *prj,
    if (dispatch & ACD_M_PRJ_YP )
    {
        int mask        = prjAcd_YP  (prj, xCnt, yCnt, geo, towerId);
-       int yp          = (unsigned int)acd_y >> 16;       
+       int yp          = (unsigned int)acd_y >> 16;
        int coincidence = mask & yp;
-       DBG (printAcdCoincidence (ACD_V_PRJ_YP, yp, mask, coincidence));
-       if (coincidence)  return (ACD_V_PRJ_YP << 28) | coincidence;
+
+       EDM_CODE (printAcdCoincidence (ACD_V_PRJ_YP,
+				      yp,
+				      mask,
+				      coincidence));
+
+       if (coincidence)   return (ACD_V_PRJ_YP << 28) | coincidence;
    }
 
 
@@ -832,20 +951,29 @@ int TFC_acdProject   (struct _TFC_projection        *prj,
    if (dispatch & ACD_M_PRJ_XMS)
    {
        int mask        = prjAcd_XMS (prj, xCnt, yCnt, geo, towerId);
-       int xm          = acd_x & 0xffff;       
+       int xm          = acd_x & 0xffff;
        int coincidence = mask & xm;
-       DBG (printAcdCoincidence (ACD_V_PRJ_XM, xm, mask, coincidence));
+
+       EDM_CODE (printAcdCoincidence (ACD_V_PRJ_XM,
+				      xm,
+				      mask,
+				      coincidence));
+
        if (coincidence) return (ACD_V_PRJ_XM << 28) | coincidence;
    }
-       
+
 
    /* If must project to the ACD X+ FACE, skip one tower */
    if (dispatch & ACD_M_PRJ_XPS)
    {
        int mask        = prjAcd_XPS (prj, xCnt, yCnt, geo, towerId);
-       int xp          = (unsigned int)acd_x >> 16;       
+       int xp          = (unsigned int)acd_x >> 16;
        int coincidence = mask & xp;
-       DBG (printAcdCoincidence (ACD_V_PRJ_XP, xp, mask, coincidence));
+       EDM_CODE (printAcdCoincidence (ACD_V_PRJ_XP,
+				      xp,
+				      mask,
+				      coincidence));
+
        if (coincidence)  return (ACD_V_PRJ_XP << 28) | coincidence;
    }
 
@@ -854,9 +982,13 @@ int TFC_acdProject   (struct _TFC_projection        *prj,
    if (dispatch & ACD_M_PRJ_YMS)
    {
        int mask        = prjAcd_YMS (prj, xCnt, yCnt, geo, towerId);
-       int ym          = acd_y & 0xffff;       
+       int ym          = acd_y & 0xffff;
        int coincidence = mask & ym;
-       DBG (printAcdCoincidence (ACD_V_PRJ_YM, ym, mask, coincidence));
+       EDM_CODE (printAcdCoincidence (ACD_V_PRJ_YM,
+				      ym,
+				      mask,
+				      coincidence));
+
        if (coincidence) return (ACD_V_PRJ_YM << 28) | coincidence;
    }
 
@@ -865,13 +997,18 @@ int TFC_acdProject   (struct _TFC_projection        *prj,
    if (dispatch & ACD_M_PRJ_YPS)
    {
        int mask        = prjAcd_YPS (prj, xCnt, yCnt, geo, towerId);
-       int yp          = (unsigned int)acd_y >> 16;       
+       int yp          = (unsigned int)acd_y >> 16;
        int coincidence = mask & yp;
-       DBG (printAcdCoincidence (ACD_V_PRJ_YP, yp, mask, coincidence));
-       if (coincidence)  return (ACD_V_PRJ_YP << 28) | coincidence;
+
+       EDM_CODE (printAcdCoincidence (ACD_V_PRJ_YP,
+				      yp,
+				      mask,
+				      coincidence));
+
+       if (coincidence)   return (ACD_V_PRJ_YP << 28) | coincidence;
    }
 
-   
+
    return 0;
 }
 /* ---------------------------------------------------------------------- */
@@ -882,29 +1019,34 @@ int TFC_acdProject   (struct _TFC_projection        *prj,
 
 
 /* ---------------------------------------------------------------------- *//*!
-   
-  \fn   int prjAcd_Top (struct _TFC_projection        *prj,
-                        int                           xCnt,
-                        int                           yCnt,
-                        const struct _TFC_geometry    *geo,
-                        int                        towerId)
-  \brief Loops through the list of projections and checks for coincidences
-         with the TOP ACD face.
+
+  \fn   int prjAcd_Top (TFC_projection         *prj,
+                        int                    xCnt,
+                        int                    yCnt,
+                        const TFC_geometry     *geo,
+                        int                 towerId)
+  \brief  Loops through the list of projections and checks for coincidences
+          with the TOP ACD face.
+  \return A mask of possible ACD TOP tile coincidences.
+
   \param prj     The list of projections
   \param xCnt    The number of X projections
   \param yCnt    The number of Y projections
+  \param  geo    The geometry of the LAT. This is used to do the
+                 projections, defining where various boundaries are
+                 from the perspective of the TKR.
   \param towerId The tower number. Used only for diagnostic messages.
-  \return        A mask of possible ACD TOP tile coincidences.
+
                                                                           */
 /* ---------------------------------------------------------------------- */
-static int prjAcd_Top (TFC_projection                *prj,
-                       int                           xCnt,
-                       int                           yCnt,
-                       const struct _TFC_geometry    *geo,
-                       int                        towerId)
+static int prjAcd_Top (TFC_projection        *prj,
+                       int                   xCnt,
+                       int                   yCnt,
+                       const TFC_geometry    *geo,
+                       int                towerId)
 {
-    DBG (int  printTitle = 1;)
-        
+    EDM_CODE (int  printTitle = 1;)
+
     int         row;
     int         col;
     int      offset;
@@ -913,22 +1055,22 @@ static int prjAcd_Top (TFC_projection                *prj,
     int    tkrWidth;
 
 
-    
+
     /*
      | Project the X track projections to the top face of the ACD
      | A bit mask of candidate tiles is formed. This will be a column
      | of Y tiles.
     */
     col         = (towerId & 0x3);
-    offset      = geo->tkr.twr.xy[0].offsets[col]; 
-    tkrWidth    = geo->tkr.xyWidths[0];       
+    offset      = geo->tkr.twr.xy[0].offsets[col];
+    tkrWidth    = geo->tkr.xyWidths[0];
     acdTopMaskX = 0;
     while (--xCnt >= 0)
     {
         int mask;
 
-        DBG (if (printTitle) printTitle = prjAcd_TopTitlePrint ());
-        
+        EDM_CODE (if (printTitle) printTitle = prjAcd_TopTitlePrint ());
+
         mask = projectXYtoAcdTop (prj,
                                   towerId,
                                   offset,
@@ -948,16 +1090,16 @@ static int prjAcd_Top (TFC_projection                *prj,
      | A bit mask of candidate tiles is formed. This will be a row
      | of X tiles.
     */
-    row         = (towerId >> 2) & 0x3;    
+    row         = (towerId >> 2) & 0x3;
     offset      = geo->tkr.twr.xy[1].offsets[row];
-    tkrWidth    = geo->tkr.xyWidths[0];    
+    tkrWidth    = geo->tkr.xyWidths[0];
     acdTopMaskY = 0;
     while (--yCnt >= 0)
     {
         int mask;
-        
-        DBG (if (printTitle) printTitle = prjAcd_TopTitlePrint ());
-        
+
+        EDM_CODE (if (printTitle) printTitle = prjAcd_TopTitlePrint ());
+
         mask = projectXYtoAcdTop (prj,
                                   towerId,
                                   offset,
@@ -971,7 +1113,7 @@ static int prjAcd_Top (TFC_projection                *prj,
         prj++;
     }
 
-    
+
     /*
      | Return the coincidence of the X and Y candidate tiles.
      | If non-zero, the caller can either use this to reject the event,
@@ -988,42 +1130,46 @@ static int prjAcd_Top (TFC_projection                *prj,
 
 
 /* ---------------------------------------------------------------------- *//*!
-   
-  \fn   int prjAcd_XM (struct _TFC_projection       *prj,
-                       int                          xCnt,
-                       int                          yCnt,
-                       const struct _TFC_geometry   *geo,
-                       int                       towerId)
+
+  \fn   int prjAcd_XM (TFC_projection        *prj,
+                       int                   xCnt,
+                       int                   yCnt,
+                       const TFC_geometry    *geo,
+                       int                towerId)
   \brief Loops through the list of X projections and checks for coincidences
          with the X- ACD face.
   \param prj     The list of projections
   \param xCnt    The number of X projections
   \param yCnt    The number of Y projections
+  \param geo     The geometry of the LAT. This is used to do the
+                 projections, defining where various boundaries are
+                 from the perspective of the TKR.
   \param towerId The tower number. Used only for diagnostic messages.
   \return        A mask of possible ACD X- tile coincidences.
                                                                           */
 /* ---------------------------------------------------------------------- */
-static int prjAcd_XM  (struct _TFC_projection       *prj,
-                       int                          xCnt,
-                       int                          yCnt,
-                       const struct _TFC_geometry   *geo,
-                       int                       towerId)
+static int prjAcd_XM  (TFC_projection        *prj,
+                       int                   xCnt,
+                       int                   yCnt,
+                       const TFC_geometry    *geo,
+                       int                towerId)
 {
-    DBG (int printTitle = 1;)
-    
+    EDM_CODE (int printTitle = 1;)
+
     int acdMask    = 0;
     int toAcdFace  = geo->acd.xySides[0] - geo->tkr.twr.xy[0].offsets[0];
     int     deltaZ = geo->acd.zNominal;
-    
 
-    
+
+
     while (--xCnt >= 0)
     {
         int mask;
 
-        DBG (if (printTitle) printTitle = prjAcd_XYtitlePrint (ACD_V_PRJ_XM));
-        
-        
+        EDM_CODE (if (printTitle)
+		      printTitle = prjAcd_XYtitlePrint (ACD_V_PRJ_XM));
+
+
         mask = projectXYMtoAcd (prj,
                                 geo->tkr.twr.xy[0].z[prj->max],
                                 toAcdFace,
@@ -1044,41 +1190,45 @@ static int prjAcd_XM  (struct _TFC_projection       *prj,
 
 
 /* ---------------------------------------------------------------------- *//*!
-   
-  \fn   int prjAcd_XP (struct _TFC_projection     *prj,
-                       int                        xCnt,
-                       int                        yCnt,
-                       const struct _TFC_geometry *geo,
-                       int                     towerId)
+
+  \fn   int prjAcd_XP (TFC_projection        *prj,
+                       int                   xCnt,
+                       int                   yCnt,
+                       const TFC_geometry    *geo,
+                       int                towerId)
   \brief Loops through the list of X projections and checks for coincidences
          with the X+ ACD face.
   \param prj     The list of projections
   \param xCnt    The number of X projections
   \param yCnt    The number of Y projections
+  \param geo     The geometry of the LAT. This is used to do the
+                 projections, defining where various boundaries are
+                 from the perspective of the TKR.
   \param towerId The tower number. Used only for diagnostic messages.
   \return        A mask of possible ACD X+ tile coincidences.
                                                                           */
 /* ---------------------------------------------------------------------- */
-static int prjAcd_XP  (struct _TFC_projection     *prj,
-                       int                        xCnt,
-                       int                        yCnt,
-                       const struct _TFC_geometry *geo,
-                       int                     towerId)
+static int prjAcd_XP  (TFC_projection        *prj,
+                       int                   xCnt,
+                       int                   yCnt,
+                       const TFC_geometry    *geo,
+                       int                towerId)
 {
-    DBG (int printTitle = 1;)
-        
+    EDM_CODE (int printTitle = 1;)
+
     int acdMask    = 0;
     int toAcdFace  = geo->acd.xySides[1] - geo->tkr.twr.xy[0].offsets[3];
     int towerWidth = geo->tkr.xyWidths[0];
     int     deltaZ = geo->acd.zNominal;
-    
-    
+
+
     while (--xCnt >= 0)
     {
         int mask;
-        
-        DBG (if (printTitle) printTitle = prjAcd_XYtitlePrint (ACD_V_PRJ_XP));
-        
+
+        EDM_CODE (if (printTitle)
+		      printTitle = prjAcd_XYtitlePrint (ACD_V_PRJ_XP));
+
         mask = projectXYPtoAcd (prj,
                                 geo->tkr.twr.xy[0].z[prj->max],
                                 towerWidth,
@@ -1101,41 +1251,45 @@ static int prjAcd_XP  (struct _TFC_projection     *prj,
 
 
 /* ---------------------------------------------------------------------- *//*!
-   
-  \fn   int prjAcd_YM (struct _TFC_projection     *prj,
-                       int                        xCnt,
-                       int                        yCnt,
-                       const struct _TFC_geometry *geo,                       
-                       int                     towerId)
+
+  \fn   int prjAcd_YM (TFC_projection        *prj,
+                       int                   xCnt,
+                       int                   yCnt,
+                       const TFC_geometry    *geo,
+                       int                towerId)
   \brief Loops through the list of Y projections and checks for coincidences
          with the Y- ACD face.
   \param prj     The list of projections
   \param xCnt    The number of X projections
   \param yCnt    The number of Y projections
+  \param geo     The geometry of the LAT. This is used to do the
+                 projections, defining where various boundaries are
+                 from the perspective of the TKR.
   \param towerId The tower number. Used only for diagnostic messages.
   \return        A mask of possible ACD Y- tile coincidences.
                                                                           */
 /* ---------------------------------------------------------------------- */
-static int prjAcd_YM  (struct _TFC_projection     *prj,
-                       int                        xCnt,
-                       int                        yCnt,
-                       const struct _TFC_geometry *geo,                       
-                       int                     towerId)
+static int prjAcd_YM  (TFC_projection        *prj,
+                       int                   xCnt,
+                       int                   yCnt,
+                       const TFC_geometry    *geo,
+                       int                towerId)
 {
-    DBG (int printTitle = 1;)
-    
+    EDM_CODE (int printTitle = 1;)
+
     int acdMask    = 0;
     int toAcdFace  = geo->acd.xySides[2] - geo->tkr.twr.xy[1].offsets[0];
     int     deltaZ = geo->acd.zNominal;
-    
-    
+
+
     prj += xCnt;
     while (--yCnt >= 0)
     {
         int mask;
 
-        DBG (if (printTitle) printTitle = prjAcd_XYtitlePrint (ACD_V_PRJ_YM));
-        
+        EDM_CODE (if (printTitle)
+		      printTitle = prjAcd_XYtitlePrint (ACD_V_PRJ_YM));
+
         mask = projectXYMtoAcd (prj,
                                 geo->tkr.twr.xy[1].z[prj->max],
                                 toAcdFace,
@@ -1156,40 +1310,44 @@ static int prjAcd_YM  (struct _TFC_projection     *prj,
 
 
 /* ---------------------------------------------------------------------- *//*!
-   
-  \fn   int prjAcd_YP (struct _TFC_projection     *prj,
-                       int                        xCnt,
-                       int                        yCnt,
-                       const struct _TFC_geometry *geo,                       
-                       int                     towerId)
+
+  \fn   int prjAcd_YP (TFC_projection        *prj,
+                       int                   xCnt,
+                       int                   yCnt,
+                       const TFC_geometry    *geo,
+                       int                towerId)
   \brief Loops through the list of Y projections and checks for coincidences
          with the Y+ ACD face.
   \param prj     The list of projections
   \param xCnt    The number of X projections
   \param yCnt    The number of Y projections
+  \param geo     The geometry of the LAT. This is used to do the
+                 projections, defining where various boundaries are
+                 from the perspective of the TKR.
   \param towerId The tower number. Used only for diagnostic messages.
   \return        A mask of possible ACD Y+ tile coincidences.
                                                                           */
 /* ---------------------------------------------------------------------- */
-static int prjAcd_YP  (struct _TFC_projection     *prj,
-                       int                        xCnt,
-                       int                        yCnt,
-                       const struct _TFC_geometry *geo,                       
-                       int                     towerId)
+static int prjAcd_YP  (TFC_projection        *prj,
+                       int                   xCnt,
+                       int                   yCnt,
+                       const TFC_geometry    *geo,
+                       int                towerId)
 {
-    DBG (int printTitle = 1;)
+    EDM_CODE (int printTitle = 1;)
     int acdMask    = 0;
     int toAcdFace  = geo->acd.xySides[3] - geo->tkr.twr.xy[1].offsets[3];
     int towerWidth = geo->tkr.xyWidths[1];
     int     deltaZ = geo->acd.zNominal;
-    
-    prj += xCnt;    
+
+    prj += xCnt;
     while (--yCnt >= 0)
     {
         int mask;
 
-        DBG (if (printTitle) printTitle = prjAcd_XYtitlePrint (ACD_V_PRJ_YP));
-        
+        EDM_CODE (if (printTitle)
+		      printTitle = prjAcd_XYtitlePrint (ACD_V_PRJ_YP));
+
         mask = projectXYPtoAcd (prj,
                                 geo->tkr.twr.xy[1].z[prj->max],
                                 towerWidth,
@@ -1210,17 +1368,20 @@ static int prjAcd_YP  (struct _TFC_projection     *prj,
 
 
 /* ---------------------------------------------------------------------- *//*!
-   
-  \fn   int prjAcd_XMS (struct _TFC_projection       *prj,
-                        int                          xCnt,
-                        int                          yCnt,
-                        const struct _TFC_geometry   *geo,
-                        int                       towerId)
+
+  \fn   int prjAcd_XMS (TFC_projection        *prj,
+                        int                   xCnt,
+                        int                   yCnt,
+                        const TFC_geometry    *geo,
+                        int                towerId)
   \brief Loops through the list of X projections and checks for coincidences
-         with the X- ACD face. 
+         with the X- ACD face.
   \param prj     The list of projections
   \param xCnt    The number of X projections
   \param yCnt    The number of Y projections
+  \param geo     The geometry of the LAT. This is used to do the
+                 projections, defining where various boundaries are
+                 from the perspective of the TKR.
   \param towerId The tower number. Used only for diagnostic messages.
   \return        A mask of possible ACD X- tile coincidences.
 
@@ -1230,18 +1391,18 @@ static int prjAcd_YP  (struct _TFC_projection     *prj,
   small.
                                                                           */
 /* ---------------------------------------------------------------------- */
-static int prjAcd_XMS  (struct _TFC_projection       *prj,
-                        int                          xCnt,
-                        int                          yCnt,
-                        const struct _TFC_geometry   *geo,
-                        int                       towerId)
+static int prjAcd_XMS  (TFC_projection        *prj,
+                        int                   xCnt,
+                        int                   yCnt,
+                        const TFC_geometry    *geo,
+                        int                towerId)
 {
-    DBG (int printTitle =  1;)
+    EDM_CODE (int printTitle =  1;)
     int acdMask    =  0;
     int toAcdFace  =  geo->acd.xySides[0] - geo->tkr.twr.xy[0].offsets[1];
     int     deltaZ = -geo->acd.zNominal;
-    
-    
+
+
     while (--xCnt >= 0)
     {
         int    mask;
@@ -1254,14 +1415,16 @@ static int prjAcd_XMS  (struct _TFC_projection       *prj,
         deltaXY = botHit - topHit;
 
 
-        DBG (if (printTitle) printTitle = prjAcd_XYtitlePrint (ACD_V_PRJ_XM));
-        PRINTF ((" %3d %3d %5d", towerId, prj->max, deltaXY));
-        
-        
+        EDM_CODE (if (printTitle)
+		      printTitle = prjAcd_XYtitlePrint (ACD_V_PRJ_XMS));
+        EDM_DEBUGPRINTF((TFC_Acd_edm,
+			 " %3d %3d %5d", towerId, prj->max, deltaXY));
+
+
         mask = projectXYStoAcd (geo->tkr.twr.xy[0].z[prj->max],
                                 toAcdFace - topHit,
                                 deltaZ,
-                                deltaXY,                                
+                                deltaXY,
                                 geo->acd.zSides);
         acdMask      |= mask;
         prj->acdXMask = mask;
@@ -1275,33 +1438,36 @@ static int prjAcd_XMS  (struct _TFC_projection       *prj,
 
 
 /* ---------------------------------------------------------------------- *//*!
-   
-  \fn   int prjAcd_XPS (struct _TFC_projection     *prj,
-                        int                        xCnt,
-                        int                        yCnt,
-                        const struct _TFC_geometry *geo,
-                        int                     towerId)
+
+  \fn   int prjAcd_XPS (TFC_projection        *prj,
+                        int                   xCnt,
+                        int                   yCnt,
+                        const TFC_geometry    *geo,
+                        int                towerId)
   \brief Loops through the list of X projections and checks for coincidences
          with the X+ ACD face.
   \param prj     The list of projections
   \param xCnt    The number of X projections
   \param yCnt    The number of Y projections
+  \param geo     The geometry of the LAT. This is used to do the
+                 projections, defining where various boundaries are
+                 from the perspective of the TKR.
   \param towerId The tower number. Used only for diagnostic messages.
   \return        A mask of possible ACD X+ tile coincidences.
                                                                           */
 /* ---------------------------------------------------------------------- */
-static int prjAcd_XPS (struct _TFC_projection     *prj,
-                       int                        xCnt,
-                       int                        yCnt,
-                       const struct _TFC_geometry *geo,
-                       int                     towerId)
+static int prjAcd_XPS (TFC_projection        *prj,
+                       int                   xCnt,
+                       int                   yCnt,
+                       const TFC_geometry    *geo,
+                       int                towerId)
 {
-    DBG (int printTitle = 1;)
- 
+    EDM_CODE (int printTitle = 1;)
+
     int acdMask    = 0;
     int toAcdFace  = geo->acd.xySides[1] - geo->tkr.twr.xy[0].offsets[2];
     int     deltaZ = geo->acd.zNominal;
- 
+
     while (--xCnt >= 0)
     {
         int    mask;
@@ -1314,14 +1480,16 @@ static int prjAcd_XPS (struct _TFC_projection     *prj,
         deltaXY = topHit - botHit;
 
 
-        DBG (if (printTitle) printTitle = prjAcd_XYtitlePrint (ACD_V_PRJ_XP));
-        PRINTF ((" %3d %3d %5d", towerId, prj->max, deltaXY));        
+        EDM_CODE (if (printTitle)
+		      printTitle = prjAcd_XYtitlePrint (ACD_V_PRJ_XPS));
+        EDM_DEBUGPRINTF((TFC_Acd_edm,
+			 " %3d %3d %5d", towerId, prj->max, deltaXY));
 
-        
+
         mask = projectXYStoAcd (geo->tkr.twr.xy[0].z[prj->max],
                                 toAcdFace - topHit,
                                 deltaZ,
-                                deltaXY,                                
+                                deltaXY,
                                 geo->acd.zSides);
 
         acdMask      |= mask;
@@ -1339,33 +1507,36 @@ static int prjAcd_XPS (struct _TFC_projection     *prj,
 
 
 /* ---------------------------------------------------------------------- *//*!
-   
-  \fn   int prjAcd_YMS (struct _TFC_projection     *prj,
-                        int                        xCnt,
-                        int                        yCnt,
-                        const struct _TFC_geometry *geo,                       
-                        int                     towerId)
+
+  \fn   int prjAcd_YMS (TFC_projection        *prj,
+                        int                   xCnt,
+                        int                   yCnt,
+                        const TFC_geometry    *geo,
+                        int                towerId)
   \brief Loops through the list of Y projections and checks for coincidences
          with the Y- ACD face.
   \param prj     The list of projections
   \param xCnt    The number of X projections
   \param yCnt    The number of Y projections
+  \param geo     The geometry of the LAT. This is used to do the
+                 projections, defining where various boundaries are
+                 from the perspective of the TKR.
   \param towerId The tower number. Used only for diagnostic messages.
   \return        A mask of possible ACD Y- tile coincidences.
                                                                           */
 /* ---------------------------------------------------------------------- */
-static int prjAcd_YMS  (struct _TFC_projection     *prj,
-                        int                        xCnt,
-                        int                        yCnt,
-                        const struct _TFC_geometry *geo,                       
-                        int                     towerId)
+static int prjAcd_YMS  (TFC_projection        *prj,
+                        int                   xCnt,
+                        int                   yCnt,
+                        const TFC_geometry    *geo,
+                        int                towerId)
 {
-    DBG (int printTitle =  1;)
-    
+    EDM_CODE (int printTitle =  1;)
+
     int acdMask    =  0;
     int toAcdFace  =  geo->acd.xySides[2] - geo->tkr.twr.xy[1].offsets[1];
     int     deltaZ = -geo->acd.zNominal;
-    
+
     prj += xCnt;
     while (--yCnt >= 0)
     {
@@ -1378,15 +1549,17 @@ static int prjAcd_YMS  (struct _TFC_projection     *prj,
         botHit  = prj->hits[2];
         deltaXY = botHit - topHit;
 
-        
-        DBG (if (printTitle) printTitle = prjAcd_XYtitlePrint (ACD_V_PRJ_YM));
-        PRINTF ((" %3d %3d %5d", towerId, prj->max, deltaXY));
-        
-        
+
+        EDM_CODE (if (printTitle)
+                      printTitle = prjAcd_XYtitlePrint (ACD_V_PRJ_YMS));
+        EDM_DEBUGPRINTF((TFC_Acd_edm,
+			 " %3d %3d %5d", towerId, prj->max, deltaXY));
+
+
         mask = projectXYStoAcd (geo->tkr.twr.xy[1].z[prj->max],
                                 toAcdFace - topHit,
                                 deltaZ,
-                                deltaXY,                                
+                                deltaXY,
                                 geo->acd.zSides);
 
         acdMask      |= mask;
@@ -1403,35 +1576,38 @@ static int prjAcd_YMS  (struct _TFC_projection     *prj,
 
 
 /* ---------------------------------------------------------------------- *//*!
-   
-  \fn   int prjAcd_YPS (struct _TFC_projection     *prj,
-                        int                        xCnt,
-                        int                        yCnt,
-                        const struct _TFC_geometry *geo,                       
-                        int                     towerId)
+
+  \fn   int prjAcd_YPS (TFC_projection        *prj,
+                        int                   xCnt,
+                        int                   yCnt,
+                        const TFC_geometry    *geo,
+                        int                towerId)
   \brief Loops through the list of Y projections and checks for coincidences
          with the Y+ ACD face.
   \param prj     The list of projections
   \param xCnt    The number of X projections
   \param yCnt    The number of Y projections
+  \param geo     The geometry of the LAT. This is used to do the
+                 projections, defining where various boundaries are
+                 from the perspective of the TKR.
   \param towerId The tower number. Used only for diagnostic messages.
   \return        A mask of possible ACD Y+ tile coincidences.
                                                                           */
 /* ---------------------------------------------------------------------- */
-static int prjAcd_YPS  (struct _TFC_projection    *prj,
-                       int                        xCnt,
-                       int                        yCnt,
-                       const struct _TFC_geometry *geo,                       
-                       int                     towerId)
+static int prjAcd_YPS  (TFC_projection        *prj,
+                        int                   xCnt,
+                        int                   yCnt,
+                        const TFC_geometry    *geo,
+                        int                towerId)
 {
-    DBG (int printTitle = 1;)
-    
+    EDM_CODE (int printTitle = 1;)
+
     int acdMask    = 0;
     int toAcdFace  = geo->acd.xySides[3] - geo->tkr.twr.xy[1].offsets[2];
     int     deltaZ = geo->acd.zNominal;
 
 
-    prj += xCnt;    
+    prj += xCnt;
     while (--yCnt >= 0)
     {
         int mask;
@@ -1444,15 +1620,17 @@ static int prjAcd_YPS  (struct _TFC_projection    *prj,
         deltaXY = topHit - botHit;
 
 
-        DBG (if (printTitle) printTitle = prjAcd_XYtitlePrint (ACD_V_PRJ_YP));
-        PRINTF ((" %3d %3d %5d", towerId, prj->max, deltaXY));
-        
+        EDM_CODE (if (printTitle)
+                      printTitle = prjAcd_XYtitlePrint (ACD_V_PRJ_YPS));
+        EDM_DEBUGPRINTF((TFC_Acd_edm,
+			 " %3d %3d %5d", towerId, prj->max, deltaXY));
+
         mask = projectXYStoAcd (geo->tkr.twr.xy[1].z[prj->max],
                                 toAcdFace - topHit,
                                 deltaZ,
-                                deltaXY,                                
+                                deltaXY,
                                 geo->acd.zSides);
-        
+
         acdMask      |= mask;
         prj->acdYMask = mask;
         prj++;
@@ -1467,21 +1645,22 @@ static int prjAcd_YPS  (struct _TFC_projection    *prj,
 
 
 
-#ifdef _DBG
+#ifdef EDM_USE
 /* ---------------------------------------------------------------------- *//*!
 
   \fn     int prjAcd_TopTitlePrint (void)
   \brief  Diagnostic routine to print the title line when projecting to
           ACD TOP face.
-  \retval 0          
+  \retval 0
                                                                           */
 /* ---------------------------------------------------------------------- */
 static int prjAcd_TopTitlePrint (void)
 {
-    printf ("\n"
+    EDM_DEBUGPRINTF ((TFC_Acd_edm,
+   "\n"
    " Project to ACD TOP TILES\n"
    " Twr Lyr Intercept + Offset + projection * slope = At Acd    Tiles\n"
-   " --- --- ---------   ------   ----------   -----   ------ --------\n");
+   " --- --- ---------   ------   ----------   -----   ------ --------\n"));
 
     return 0;
 }
@@ -1493,7 +1672,7 @@ static int prjAcd_TopTitlePrint (void)
 
 /* ---------------------------------------------------------------------- *//*!
 
-  \fn      int prjAcd_XYTitlePrint (int which)
+  \fn      int prjAcd_XYtitlePrint (int which)
   \brief       Diagnostic routine to print the title line when projecting
                to an ACD XY face.
   \param which Which face (X- = 0, X+ = 1, Y- = 2, Y+ = 3
@@ -1502,15 +1681,19 @@ static int prjAcd_TopTitlePrint (void)
 /* ---------------------------------------------------------------------- */
 static int prjAcd_XYtitlePrint (int which)
 {
-    static const char Names[4][4] = { " X-", " X+", " Y-", " Y+"};
- 
-    printf ("\n"
+    static const char Names[9][4] = { " X-", " X+", " Y-", " Y+",
+                                      "***", /* Top not used here */
+                                      "XS-", "XS+", "YS-", "YS+"};
+
+    EDM_DEBUGPRINTF ((
+	     TFC_Acd_edm,
+            "\n"
             " Project to ACD %s TILES\n"
             " Twr Lyr Slope   Exit     Edge  Z-Tkr + (dxAcd *  dZ) /    dx "
             " = Z Acd    Tiles\n"
             " --- --- ----- ------   ------ ------   -------------   ------"
             " ------- --------\n",
-            Names[which]);
+            Names[which]));
 
     return 0;
 }
@@ -1540,13 +1723,14 @@ static void printAcdCoincidence (int       which,
                                  int coincidence)
 {
     static const char Names[5][4] = { " X-", " X+", " Y-", " Y+", "TOP" };
- 
-    printf (" %s %s %8.8x & %8.8x = %8.8x\n",
-            Names[which],
-            coincidence ? "REJECT" : "ACCEPT",
-            mask,
-            tiles,
-            coincidence);
+
+    EDM_INFOPRINTF ((TFC_Acd_edm,
+		     " %s %s %8.8x & %8.8x = %8.8x\n",
+		     Names[which],
+		     coincidence ? "REJECT" : "ACCEPT",
+		     mask,
+		     tiles,
+		     coincidence));
 
     return;
 }

@@ -141,13 +141,13 @@ void DFC_statisticsAccumulate (DFC_statistics              *stats,
     
         
         /* Figure out which energy bin this event is in  */  
-        if       (energy <                     0 ) ebin = 0; // Unknown
-        else if  (energy < CFC_MEV_TO_LEU (   10)) ebin = 1; // 0  -     10 MEV
-        else if  (energy < CFC_MEV_TO_LEU (  300)) ebin = 2; // 10 -    300 MEV
-        else if  (energy < CFC_MEV_TO_LEU (  350)) ebin = 3; // 300 -   350 MEV
-        else if  (energy < CFC_MEV_TO_LEU (  500)) ebin = 4; // 350 -   500 MEV
-        else if  (energy < CFC_MEV_TO_LEU ( 5000)) ebin = 5; // 500 -  5000 MEV
-        else                                       ebin = 6; // > 5 GEV
+        if       (energy <=                     0 ) ebin = 0; // Unknown
+        else if  (energy <= CFC_MEV_TO_LEU (   10)) ebin = 1; // 0  -    10 MEV
+        else if  (energy <= CFC_MEV_TO_LEU (  300)) ebin = 2; // 10 -   300 MEV
+        else if  (energy <= CFC_MEV_TO_LEU (  350)) ebin = 3; // 300 -  350 MEV
+        else if  (energy <= CFC_MEV_TO_LEU (  500)) ebin = 4; // 350 -  500 MEV
+        else if  (energy <= CFC_MEV_TO_LEU ( 5000)) ebin = 5; // 500 - 5000 MEV
+        else                                        ebin = 6; // > 5 GEV
 
         
         /* Count the bits */
@@ -158,8 +158,8 @@ void DFC_statisticsAccumulate (DFC_statistics              *stats,
                 /* All statistics */
                 stats->cnts[idx].energy[ebin]++;
 
-                /* Only the survivors */
-                if ((status & DFC_M_STATUS_VETOED) == 0)
+                /* Only the survivors to the tracking stage */
+                if ((status & DFC_M_STATUS_TKR) != 0)
                     stats->cnts[idx+64].energy[ebin]++;
             }
             
@@ -169,7 +169,7 @@ void DFC_statisticsAccumulate (DFC_statistics              *stats,
         
         /* Distribution of all events */
         stats->cnts[STAT_K_ALL].energy[ebin]++;
-        if ((status & DFC_M_STATUS_VETOED) == 0)
+        if ((status & DFC_M_STATUS_TKR) != 0)
             stats->cnts[STAT_K_ALL + 64].energy[ebin]++;
                 
         
@@ -177,7 +177,7 @@ void DFC_statisticsAccumulate (DFC_statistics              *stats,
         if (!(status & (DFC_M_STATUS_ACD_TOP | DFC_M_STATUS_ACD_SIDE)))
         {
             stats->cnts[STAT_K_ACD_NO_TILES].energy[ebin]++;
-            if ((status & DFC_M_STATUS_VETOED) == 0)
+            if ((status & DFC_M_STATUS_TKR) != 0)
                 stats->cnts[STAT_K_ACD_NO_TILES + 64].energy[ebin]++;
         }
 
@@ -185,7 +185,7 @@ void DFC_statisticsAccumulate (DFC_statistics              *stats,
         if (!(status & (DFC_M_STATUS_ACD_TOP | DFC_M_STATUS_ACD_SIDE_FILTER)))
         {
             stats->cnts[STAT_K_ACD_NO_FILTER_TILES].energy[ebin]++;
-            if ((status & DFC_M_STATUS_VETOED) == 0)
+            if ((status & DFC_M_STATUS_TKR) != 0)
                 stats->cnts[STAT_K_ACD_NO_FILTER_TILES + 64].energy[ebin]++;
         }
 
@@ -193,7 +193,7 @@ void DFC_statisticsAccumulate (DFC_statistics              *stats,
         if ((status & (DFC_M_STATUS_ACD_TOP | DFC_M_STATUS_ACD_SIDE_FILTER)))
         {
             stats->cnts[STAT_K_ACD_FILTER_TILES].energy[ebin]++;
-            if ((status & DFC_M_STATUS_VETOED) == 0)
+            if ((status & DFC_M_STATUS_TKR) != 0)
                 stats->cnts[STAT_K_ACD_FILTER_TILES + 64].energy[ebin]++;
         }
 
@@ -208,7 +208,7 @@ void DFC_statisticsAccumulate (DFC_statistics              *stats,
             if (status & DFC_M_STATUS_ZBOTTOM)
                 stats->cnts[STAT_K_CAL_LO_ONLY_ZBOTTOM].energy[ebin]++;
             
-            if ((status & DFC_M_STATUS_VETOED) == 0)
+            if ((status & DFC_M_STATUS_TKR) != 0)
             {
                 if (status & DFC_M_STATUS_ZBOTTOM)
                    stats->cnts[STAT_K_CAL_LO_ONLY_ZBOTTOM + 64].energy[ebin]++;
@@ -223,13 +223,13 @@ void DFC_statisticsAccumulate (DFC_statistics              *stats,
         if ((status & DFC_M_STATUS_VETOES))
         {
            stats->cnts[STAT_K_ANY_VETOES].energy[ebin]++;
-            if ((status & DFC_M_STATUS_VETOED) == 0)
+            if ((status & DFC_M_STATUS_TKR) != 0)
                 stats->cnts[STAT_K_ANY_VETOES + 64].energy[ebin]++;
         }
         else
         {
            stats->cnts[STAT_K_NO_VETOES].energy[ebin]++;
-            if ((status & DFC_M_STATUS_VETOED) == 0)
+            if ((status & DFC_M_STATUS_TKR) != 0)
                 stats->cnts[STAT_K_NO_VETOES + 64].energy[ebin]++;
         }
         
@@ -316,8 +316,8 @@ void DFC_statisticsPrint (const DFC_statistics *stats)
       "Cal<350Mev + V Tile",   /* 27 */
       "Cal 0 Energy + Tile",   /* 28 */            
       "ACD Splash Veto 0..",   /* 29 */
-      "NoCalLo + V Tile...",   /* 30 */      
-      "Vetoed.............",   /* 31 */
+      "NoCalLo + V Tile...",   /* 30 */
+      "Vetoed.............",   /* 31 */      
       "ALL................",   /* 32 */      
       "ACD =0 Tiles Hit...",   /* 33 */
       "ACD =0 Veto Tiles..",   /* 34 */
@@ -378,7 +378,6 @@ void DFC_statisticsPrint (const DFC_statistics *stats)
       ORDER_K_NEW_LINE,
       
       /* What's vetoed, whats being passed on to the next stage */
-      DFC_V_STATUS_VETOED,
       DFC_V_STATUS_TKR   
    };
 

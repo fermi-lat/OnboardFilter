@@ -26,6 +26,30 @@ extern "C" {
 
 /* ---------------------------------------------------------------------- *//*!
 
+  \struct _DFC_resultTemSizes
+  \brief   The total size and sizes of the TEM record components
+									  *//*!
+  \typedef DFC_resultTemSizes
+  \brief   Typedef for struct \a DFC_resultTemSizes
+
+   Note that because of LCB padding the total size of the TEM record
+   is not necessarily the sum of the TKR and CAL contributions.
+									  */
+/* ---------------------------------------------------------------------- */
+typedef  struct _DFC_resultTemSizes
+{
+   unsigned int tem;  /*!< Size of the TEM record                         */
+   unsigned int cal;  /*!< Size of the CAL record                         */
+   unsigned int tkr;  /*!< Size of the TKR record                         */
+}
+DFC_resultTemSizes;
+/* ---------------------------------------------------------------------- */
+
+
+
+
+/* ---------------------------------------------------------------------- *//*!
+
   \struct _DFC_resultSizes
   \brief   Describes the event-by-event sizes of the contributions
                                                                           *//*!
@@ -35,19 +59,14 @@ extern "C" {
 /* ---------------------------------------------------------------------- */
 typedef struct _DFC_resultSizes
 {
-    unsigned int evt;                /*!< Total size (in bytes)           */
-    unsigned int glt;                /*!< Size of each contributor        */
-    unsigned int acd;                /*!< Size of the ACD                 */
-    
-    struct
-    {
-        unsigned int tem;            /*!< Size of the TEM record          */
-        unsigned int cal;            /*!< Size of the CAL record          */
-        unsigned int tkr;            /*!< Size of the TKR record          */
-    }
-    tem[16];
+    unsigned int           evt; /*!< Total size (in bytes)                */
+    unsigned int           gem; /*!< Size of the GEM                      */
+    unsigned int           acd; /*!< Size of the ACD                      */
+    DFC_resultTemSizes tem[16]; /*!< Sizes of TEM records by tower        */
 }
 DFC_resultSizes;
+/* ---------------------------------------------------------------------- */
+
     
           
 
@@ -68,7 +87,7 @@ typedef struct _DFC_results
     int   tkrSize;  /*!< TKR size in strips hit                           */
     
     DFC_resultSizes
-            sizes;  /*< Various sizes of the contributors                 */
+            sizes;  /*!< Sizes of the contributors                        */
     int    energy;  /*!< Total energy in the calorimeter                  */
     TMR_tick  beg;  /*!< Beginning time of the analysis                   */
     TMR_tick cal0;  /*!< Ending    time of the CAL analysis, phase 0      */

@@ -29,41 +29,42 @@
 #define  DD_DD " %2.2s %2.2s "
 
 
-#define DISPLAY "\n\
-                               "D"\n\
-                                |\n\
-                "l"-------------+---------------"r"\n\
-                 |                               |\n\
-        "l"------+------"r"             "l"------+------"r"\n\
-         |               |               |               |\n\
-    "l"--+--"r"     "l"--+--"r"     "l"--+--"r"     "l"--+--"r"\n\
-     |       |       |       |       |       |       |       |\n\
-  "D_x_D" "D_x_D" "D_x_D" "D_x_D" "D_x_D" "D_x_D" "D_x_D" "D_x_D"\n\
-  "DD_DD" "DD_DD" "DD_DD" "DD_DD" "DD_DD" "DD_DD" "DD_DD" "DD_DD"\n\
-"
+#define DISPLAY "\n"                                                      \
+"                               "D"\n"                                    \
+"                                |\n"                                     \
+"                "l"-------------+---------------"r"\n"                   \
+"                 |                               |\n"                    \
+"        "l"------+------"r"             "l"------+------"r"\n"           \
+"         |               |               |               |\n"            \
+"    "l"--+--"r"     "l"--+--"r"     "l"--+--"r"     "l"--+--"r"\n"       \
+"     |       |       |       |       |       |       |       |\n"        \
+"  "D_x_D" "D_x_D" "D_x_D" "D_x_D" "D_x_D" "D_x_D" "D_x_D" "D_x_D"\n"     \
+"  "DD_DD" "DD_DD" "DD_DD" "DD_DD" "DD_DD" "DD_DD" "DD_DD" "DD_DD"\n"
+
 
 /* ---------------------------------------------------------------------- *//*!
-      \def   C(_c, _w, _s)
-      \brief Local macro to extract a single bit from w and display it
 
-      \param _c  2-entry lookup array giving the display character for
-                 the bit (one-entry for the bit=0, one for the bit=1)
-      \param _w  The 32 bit word to extract the bit from
-      \param _s  The right shift needed to locate the bit to display
-      \return    The character to display
+  \def   C(_c, _w, _s)
+  \brief Local macro to extract a single bit from w and display it
+
+  \param _c  2-entry lookup array giving the display character for
+             the bit (one-entry for the bit=0, one for the bit=1)
+  \param _w  The 32 bit word to extract the bit from
+  \param _s  The right shift needed to locate the bit to display
+  \return    The character to display
                  
                                                                           *//*!
-      \def   S(_c, _w, _s)
-      \brief Local macro to extract a pair of bits from w and display them
+  \def   S(_c, _w, _s)
+  \brief Local macro to extract a pair of bits from w and display them
 
-      \param _c  4-entry lookup array giving the display characters for
-                 the pair of bits (one-entry for each of the 4 possible
-                 values of the pair of bits.
-      \param _w  The 32 bit word to extract the bit from
-      \param _s  The right shift needed to locate the lower bit of the
-                 pair of bits to display
-      \return    Pointer to the array of the pair of characters to
-                 display.
+  \param _c  4-entry lookup array giving the display characters for
+             the pair of bits (one-entry for each of the 4 possible
+             values of the pair of bits.
+  \param _w  The 32 bit word to extract the bit from
+  \param _s  The right shift needed to locate the lower bit of the
+             pair of bits to display
+  \return    Pointer to the array of the pair of characters to
+             display.
                                                                           */
 /* ---------------------------------------------------------------------- */
 #define C(_c, _w, _s) _c[(_w >> _s) & 1]

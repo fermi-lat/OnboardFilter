@@ -1,14 +1,12 @@
-/*------------------------------------------------------------------------
-| CVS $Id
-+-------------------------------------------------------------------------*/
-
-
-
 /* ---------------------------------------------------------------------- *//*!
    
    \file  TFC_latRecordPrint.c
    \brief Prints an ASCII display of the TKR LAT tracker data.
    \author JJRussell - russell@slac.stanford.edu
+
+\verbatim
+    CVS $Id
+\endverbatim
                                                                           */
 /* ---------------------------------------------------------------------- */
 
@@ -30,6 +28,9 @@ extern "C" {
 void printStrips (int                       layer,
                   const struct _TFC_towerLayer *x,
                   const struct _TFC_towerLayer *y);
+
+static int outputTots (int left, int hiLo, const unsigned char *tots);
+    
 
     
 #if 0    
@@ -102,7 +103,7 @@ void TFC_latRecordPrint (const struct _TFC_latRecord *tlr,
         | 3. Compute address of the TKR tower record.
        */
        tower   = FFS (twrMap);
-       twrMap &= ~(0x80000000 >> tower);
+       twrMap  = FFS_eliminate (twrMap, tower);
        twr     = twrs + tower;
 
        TFC_towerRecordPrint (twr);
@@ -134,7 +135,7 @@ void TFC_towerRecordPrint  (const struct _TFC_towerRecord *ttr)
 
    /* Print the tower header line */
    printf ("\n%1.1X.L| X map = 0x%5.5x                     | Y map = 0x%5.5x"
-           "         TOWER %1.1x \n",
+           "               TOWER %1.1x\n",
            ttr->id,
            xmap,
            ymap,
@@ -160,7 +161,7 @@ void TFC_towerRecordPrint  (const struct _TFC_towerRecord *ttr)
        int layer;
 
        n     = FFS (map);            /* Get the next set bit         */
-       bit   = 0x80000000 >> n;      /* Convert to a bit mask        */
+       bit   = FFS_mask (n);         /* Convert to a bit mask        */
        map  &= ~bit;                 /* Eliminate from the input map */
        layer = 31 - n;               /* Convert to a layer number    */
 
@@ -210,8 +211,8 @@ void printStrips (int                       layer,
 
 
    /* Get the count and beginning address of the strip for both X and Y */
-   xcnt = x ? (xcur = x->beg,  x->end - xcur) : (xcur = NULL, 0);
-   ycnt = y ? (ycur = y->beg,  y->end - ycur) : (ycur = NULL, 0);   
+   xcnt = x ? (xcur = x->beg,  x->end - xcur) : (xcur = NULL, -2);
+   ycnt = y ? (ycur = y->beg,  y->end - ycur) : (ycur = NULL, -2);   
 
    /*
     | 
@@ -253,8 +254,15 @@ void printStrips (int                       layer,
        {
            col += printf (" %4d", *xcur++ & 0x7ff);
        }
+
+       /* If have exhausted the strips and enough space, output TOTs */
+       if (xcnt == -1 && (col <= 40 - 8))
+       {
+           col += outputTots (40 - col, x->hiLo, x->tots);
+           xcnt = -2;
+       }
            
-                   
+       
        /* Move to the middle of the page */
        if ( (n = 40 - col) > 0) col += printf ("%*c", n, ' ');
        col += printf (" |");
@@ -275,6 +283,14 @@ void printStrips (int                       layer,
        }
 
        
+       /* If have exhausted the strips and enough space, output TOTs */
+       if (ycnt == -1 && (col <= 80 - 8))
+       {
+           col += outputTots (80 - col, y->hiLo, y->tots);
+           ycnt = -2;
+       }
+
+       
        printf ("\n");
        
        
@@ -287,3 +303,29 @@ void printStrips (int                       layer,
    
    return;
 }
+
+
+/* ---------------------------------------------------------------------- *//*!
+
+  \fn     int outputTots (int left, int hiLo, const unsigned char *tots)
+
+  \brief         Prints an ASCII display of the TOTs
+  \param  left   Number of columns before the left margin
+  \param  hiLo   A bit mask indicating which TOT(s) are valid, must 0,1,2,3
+  \param  tots   The array of (potentially) 2 TOTs
+  \return        The number of columns used to print
+                                                                          */
+/* ---------------------------------------------------------------------- */
+static int outputTots (int left, int hiLo, const unsigned char *tots)
+{
+    int n;
+    left -= 8;
+    if      (hiLo == 0) n = 0;
+    else if (hiLo == 1) n = printf ("%*c [%2.2x,  ]",    left, ' ', tots[0]);
+    else if (hiLo == 2) n = printf ("%*c [  ,%2.2x]",    left, ' ', tots[1]);
+    else                n = printf ("%*c [%2.2x,%2.2x]", left, ' ', tots[0],
+                                                                    tots[1]);
+
+    return n;
+}
+/* ---------------------------------------------------------------------- */

@@ -1,3 +1,21 @@
+#ifndef TMR_C_SX_XXX_XXX
+#define TMR_C_SX_XXX_XXX
+
+/*----------------------------------------------------------------------- *//*!
+
+    \file   tmr.c.sx-xxx-xxx
+    \brief  Provides the implementation of the timing routines on a SUN
+            platform.
+    \author JJRussell - russell@slac.stanford.edu
+
+\verbatim
+
+CVS $Id
+\endverbatim
+									  */
+/*----------------------------------------------------------------------- */
+
+
 #include "src/tmr.h"
 
 int TMR_initialize (void)
@@ -51,7 +69,7 @@ unsigned int TMR_ticks_to_nsecs (TMR_tick ticks)
 
    PARAMETERS
    ----------
-  nanoseconds: The number of nanoseconds to convert to ticks.
+        ticks: The number of ticks to convert
 
    RETURNS
    -------
@@ -59,6 +77,29 @@ unsigned int TMR_ticks_to_nsecs (TMR_tick ticks)
 */
 {
    return (unsigned int)ticks;
+} 
+
+
+TMR_usecs_nsecs TMR_ticks_to_usecs_nsecs (TMR_tick ticks)
+/*
+   DESCRIPTION
+   -----------
+   Convert a number of ticks to microsecs and nanoseconds.
+
+
+   PARAMETERS
+   ----------
+        ticks: The number of ticks to convert
+
+   RETURNS
+   -------
+   The equivalent number of ticks
+*/
+{
+   TMR_usecs_nsecs un;
+   un.usecs = ticks / 1000;
+   un.nsecs = ticks - un.usecs * 1000;	
+   return un;
 } 
 
 
@@ -83,9 +124,4 @@ unsigned int TMR_frequency (void)
     return 1000000000;
 }
 
-
-
-
-
-
-
+#endif

@@ -1,3 +1,20 @@
+/*----------------------------------------------------------------------- *//*!
+
+    \file   tmr.c
+    \brief  Provides a set of timing routines
+    \author JJRussell - russell@slac.stanford.edu
+
+\verbatim
+
+CVS $Id
+\endverbatim
+
+    This file merely acts as clearinghouse for the correct platform/compiler
+    dependent implementation
+									  */
+/*----------------------------------------------------------------------- */
+
+
 #if   defined (TMR_USE_GENERIC)
 
 #   include "src/tmr.c.xx-xxx-xxx"

@@ -37,8 +37,8 @@ extern "C" {
                                      int hi_limit, int hi_status)
 
   \brief Checks that the ratio of num/den is between the specified limits
-  \param num  The numerator
-  \param den  The denominator
+  \param num       The numerator
+  \param den       The denominator
   \param lo_limit  The lo limit of the ratio, in units of 1024
   \param lo_status The status value to return if <= the low limit.
   \param hi_limit  The hi limit of the ratio, in units of 1024
@@ -50,7 +50,7 @@ extern "C" {
    and/or 1025 to effectively disable the checks.
                                                                          */
 /* --------------------------------------------------------------------- */    
-static inline int CFC__ratioCheck (int num,      int den,
+static __inline int CFC__ratioCheck (int num,      int den,
                                    int lo_limit, int lo_status,
                                    int hi_limit, int hi_status);
 /* --------------------------------------------------------------------- */    

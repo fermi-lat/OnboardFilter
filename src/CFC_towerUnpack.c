@@ -1,15 +1,12 @@
-/*------------------------------------------------------------------------
-| CVS $Id
-+-------------------------------------------------------------------------*/
-
-
-
 /* ---------------------------------------------------------------------- *//*!
    
    \file   CFC_towerUnpack.c
    \brief  Unpacks the calorimeter record for one tower.
    \author JJRussell - russell@slac.stanford.edu
 
+\verbatim
+    CVS $Id
+\endverbatim
                                                                          */
 /* --------------------------------------------------------------------- */
 
@@ -21,9 +18,7 @@
 #include "DFC/CFC_towerRecord.h"
 #include "DFC/CFC_towerUnpack.h"
 
-#include "windowsCompat.h"
-
-static inline int convert (int val, int ped, int gain);
+static __inline int convert (int val, int ped, int gain);
 
 
 /* ---------------------------------------------------------------------- *//*!
@@ -40,7 +35,7 @@ static inline int convert (int val, int ped, int gain);
    convert an ADC value to an energy in LEUs (at one time 1 LEU = 1/4 MEV).
                                                                           */
 /* ---------------------------------------------------------------------- */
-static int convert (int val, int ped, int gain)
+static __inline int convert (int val, int ped, int gain)
 {
    return  ((val - ped) * gain + CFC_K_GAIN_PER_LEU/2) / CFC_K_GAIN_PER_LEU;
 }

@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------- *//*!
    
-   \file  BTE.c
+   \file  BTD.c
    \brief Binary Tree Encoding routines
    \author JJRussell - russell@slac.stanford.edu
 
@@ -8,7 +8,6 @@
 
 \verbatim
     CVS $Id
-
 \endverbatim
                                                                          */
 /* --------------------------------------------------------------------- */
@@ -17,11 +16,24 @@
 #include "ffs.h"
 #include "DFC/BTD.h"
 
+#ifndef CMX_DOXYGEN
 #define LKUP(_0, _10, _11)  (_10 << 0) | (_11 << 2) | (_0 << 4)
-
+#endif
            
 
+/* --------------------------------------------------------------------- *//*!
 
+  \fn     unsigned int BTD_wordDecode  (unsigned int      w,
+                                        unsigned int scheme,
+                                        int          *nbits)
+ \brief   Decodes the bits in \a w according to \a scheme
+ \return  The decoded word
+
+ \param      w   The encoded bits
+ \param scheme   The encoding scheme
+ \param  nbits   Returns the number of bits decoded.
+								         */
+/* --------------------------------------------------------------------- */
 extern unsigned int BTD_wordDecode  (unsigned int w,
                                      unsigned int scheme,
                                      int         *nbits)
@@ -181,7 +193,7 @@ extern unsigned int BTD_wordDecode  (unsigned int w,
    *nbits = n;
    return o;
 }
-
+/* --------------------------------------------------------------------- */
    
        
    

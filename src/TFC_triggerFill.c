@@ -1,3 +1,21 @@
+/* ---------------------------------------------------------------------- *//*!
+   
+   \file   TFC_triggerFill.c
+   \brief  The implementation of the TFC_triggerFill routine. 
+
+   \author JJRussell - russell@slac.stanford.edu
+
+\verbatim
+
+ CVS $Id
+\endverbatim 
+
+   The trigger fill routine calculates the 3-in-a-row trigger mask for
+   each tower.
+                                                                          */
+/* ---------------------------------------------------------------------- */
+
+
 #include "DFC/EBF_directory.h"
 #include "DFC/TFC_triggerFill.h"
 #include "DFC/EBF_cid.h"
@@ -16,8 +34,8 @@
                   contain a mask of the towers with only a 4/4
                   possibility.
 
-   This routine will fill in the remaining tracker tower triggers, ie
-   those not completed so far. 
+   This routine will fill in the tracker tower trigger mask for each of
+   the 16 towers. 
                                                                           */
 /* ---------------------------------------------------------------------- */
 int TFC_triggerFill (const struct _EBF_directory *dir,

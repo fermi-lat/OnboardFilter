@@ -5,8 +5,7 @@
    \author JJRussell - russell@slac.stanford.edu
 
 \verbatim
-
- CVS $Id$
+    CVS $Id$
 \endverbatim 
                                                                           */
 /* ---------------------------------------------------------------------- */
@@ -17,7 +16,8 @@
 #include "DFC/AFC_latUnpack.h"
 #include "AFC_remapDef.h"
 
-
+/* This is all internal stuff, no need to publically document */
+#ifndef CMX_DOXYGEN  
 #define XZM   0
 #define XZP  16
 #define YZM  32
@@ -375,22 +375,24 @@ const AFC_remap AFC_Remap =
 };
 
 
-static inline unsigned int remap (unsigned int list,
-                            const unsigned char *rma);
+static __inline unsigned int remap (unsigned int  list,
+                              const unsigned char *rma);
 
 
 /* ---------------------------------------------------------------------- *//*!
  
-  @fn    unsigned int remap (unsigned int list, const unsigned char *rma)
-  @brief Remaps the members in \e list according the remap array \e rma
+  \fn     unsigned int remap (unsigned int list, const unsigned char *rma)
+  \brief  Remaps the members in \e list according the remap array \e rma
+  \return The remapped list
 
-  @param list The list to remap
-  @param rma  The remap array. This array is index by a bit number and
+  \param list The list to remap
+  \param rma  The remap array. This array is index by a bit number and
               returns the remapped bit number
-  @return     The remapped list
+
                                                                           */
 /* ---------------------------------------------------------------------- */
-static unsigned int remap (unsigned int list, const unsigned char *rma)
+static __inline unsigned int remap (unsigned int  list, 
+                              const unsigned char *rma)
 {
     unsigned int rlist = 0;
 
@@ -398,12 +400,13 @@ static unsigned int remap (unsigned int list, const unsigned char *rma)
     while (list)
     {
         int bit = FFS (list);            /* Locate the set bit            */
-        list   &= ~ (0x80000000 >> bit); /* Eliminate from consideration  */
+        list    = FFS_eliminate(list, bit);/* Eliminate from consideration*/
         rlist  |= (1 << rma[bit]);       /* Accumulate remap mask         */
     }
     
     return rlist;
 }
+#endif
 /* ---------------------------------------------------------------------- */
 
 
@@ -414,17 +417,19 @@ static unsigned int remap (unsigned int list, const unsigned char *rma)
 
 /* ---------------------------------------------------------------------- *//*!
 
-  @fn     int AFC_latUnpack (AFC_latRecord             *acd,
-                              const unsigned short int *data)
-  @brief  Unpacks an ACD record from the AEM into a standard structure
+  \fn     int AFC_latUnpack (struct _AFC_latRecord     *acd,
+                             const unsigned short int *data)
+  \brief  Unpacks an ACD record from the AEM into a standard structure
+  \return Status. The only failure is if more than 18 PHAs are found
+                  to be present on an given FREE board.
 
-  @param  acd    Pointer to the data structure to receive the unpacked
+  \param  acd    Pointer to the data structure to receive the unpacked
                  data
-  @param  data   Pointer to the AEM data
-  @return        Status
+  \param  data   Pointer to the AEM data
+
                                                                           */
 /* ---------------------------------------------------------------------- */
-int AFC_latUnpack (AFC_latRecord *acd, const unsigned short int *data)
+int AFC_latUnpack (struct _AFC_latRecord *acd, const unsigned short int *data)
 {
 
    int                 side;
@@ -543,7 +548,7 @@ int AFC_latUnpack (AFC_latRecord *acd, const unsigned short int *data)
                    if (naccept)
                    {
                        int chn  = FFS (naccept);
-                       naccept &= ~(0x80000000 >> chn); 
+                       naccept  = FFS_eliminate (naccept, chn);
                        phas[rmb->rmc[chn]] = w & ~0x2000;
                        // printf ("phas[%2.2x] = %4.4x\n", rmb->rmc[chn],
                        //                             phas[rmb->rmc[chn]]);

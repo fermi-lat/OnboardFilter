@@ -1,6 +1,3 @@
-/*------------------------------------------------------------------------
-| CVS $Id
-+-------------------------------------------------------------------------*/
 
 
 
@@ -10,11 +7,15 @@
    \brief Implementation to get the size the data structure needed to hold
           an unpacked LAT event
    \author JJRussell - russell@slac.stanford.edu
+
+\verbatim
+
+CVS $id
+\endverbatim
                                                                           */
 /* ---------------------------------------------------------------------- */
 
 
-#include "DFC/EBF_glt.h"
 #include "DFC/DFC_latRecord.h"
 #include "DFC/DFC_latUnpack.h"
 #include "DFC/CFC_latUnpack.h"
@@ -54,7 +55,20 @@ int DFC_latRecordSizeof (void)
 
 
 
+/* ---------------------------------------------------------------------- *//*!
 
+  \fn     int DFC_latRecordUnpack (struct _DFC_latRecord  *dlr,
+                                   const unsigned int     *evt,
+                                   const struct _DFC_ctl  *ctl)
+  \brief  Convenience routine to fill in the DFC_latRecord
+  \return Status
+
+  \param  dlr  The Data LAT record to fill
+  \param  evt  The event to unpack
+  \param  ctl  The parameters containing information to do the unpacking,
+               \e e.g. CAL calibration constants
+									  */ 
+/* ---------------------------------------------------------------------- */
 int DFC_latRecordUnpack (struct _DFC_latRecord  *dlr,
                          const unsigned int     *evt,
                          const struct _DFC_ctl  *ctl)
@@ -66,3 +80,4 @@ int DFC_latRecordUnpack (struct _DFC_latRecord  *dlr,
 
    return 0;
 }
+/* ---------------------------------------------------------------------- */

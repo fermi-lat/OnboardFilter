@@ -1,6 +1,3 @@
-
-
-
 /* ---------------------------------------------------------------------- *//*!
    
    \file   CFC_towerRawUnpack.c
@@ -8,10 +5,10 @@
            conversion is performed.
    \author JJRussell - russell@slac.stanford.edu
 
-\verbatim
+   \verbatim
 
-   CVS $Id
-\endverbatim   
+CVS $Id
+   \endverbatim   
 
                                                                          */
 /* --------------------------------------------------------------------- */
@@ -26,13 +23,13 @@
 
 /* ---------------------------------------------------------------------- *//*!
 
-  \fn int *CFC_towerRawUnpack (struct _CFC_towerRecord      *ctr,
-                               short int                   *phas,
-                               const unsigned int          *data)
+  ]fn unsigned short int *CFC_towerRawUnpack (struct _CFC_towerRawRecord *ctr,
+	                                      unigned short int          *phas,
+					      const unsigned int         *data)
 
   \brief Unpacks the CAL data from 1 tower into a Cal Tower Raw Record (ctr)
   \param  ctr The CTR data structure to fill
-  \param  dst The destination array for the CAL ADC/PHA values
+  \param phas The destination array for the CAL ADC/PHA values
   \param data The CAL data
   \return     The next CAL pha location to be stored
 
@@ -40,9 +37,9 @@
    a fully unpacked, but not energy calibrated CAL tower.
                                                                           */
 /* ---------------------------------------------------------------------- */
-unsigned short int *CFC_towerRawUnpack (struct _CFC_towerRawRecord   *ctr,
-                                        unsigned short int          *phas,
-                                        const unsigned int         *data)
+unsigned short int *CFC_towerRawUnpack (struct _CFC_towerRawRecord  *ctr,
+					unsigned short int         *phas,
+					const unsigned int         *data)
 {
    unsigned int         counts;
    int                layerNum;

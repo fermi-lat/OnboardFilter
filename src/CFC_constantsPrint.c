@@ -25,20 +25,20 @@
 /* ---------------------------------------------------------------------- *//*!
  
   \fn        void CFC_constantsPrint (const struct _CFC_logConstants *gp,
-                                      int                          count)
+                                      int                            cnt)
   \brief     Prints the specified number of CAL log constants.
   \param  gp The  array of log constants to print.
   \param cnt The number of log constants to print.
                                                                           */
 /* ---------------------------------------------------------------------- */
-void CFC_constantsPrint (const struct _CFC_logConstants *gp, int count)
+void CFC_constantsPrint (const struct _CFC_logConstants *gp, int cnt)
 {
     int log;
  
     printf (" Log  GA0   PA0   GA1   PA1   GA2   PA2   GA3   PA3\n"
             " --- ----  ----  ----  ----  ----  ----  ----  ----\n");
     
-    for (log = 0; log < count; log++)
+    for (log = 0; log < cnt; log++)
     {
         printf (" %3d %5d %5d %5d %5d %5d %5d %5d %5d\n",
                 log,

@@ -1,9 +1,3 @@
-/*------------------------------------------------------------------------
-| CVS $Id
-+-------------------------------------------------------------------------*/
-
-
-
 /* ---------------------------------------------------------------------- *//*!
    
    \file   TFC_projectionPrint.c
@@ -11,11 +5,17 @@
            These routines are for diagnostic and debugging purposes only.
    \author JJRussell - russell@slac.stanford.edu
 
+\verbatim
+
+    CVS $id
+\endverbatim    
+
                                                                          */
 /* --------------------------------------------------------------------- */
 
 
 #include <stdio.h>
+#include "ffs.h"
 #include "TFC_projectionDef.h"
 
 
@@ -28,17 +28,28 @@ static void printProjections (const TFC_projection *prj,
 /* ---------------------------------------------------------------------- *//*!
 
   \fn void TFC_projectionsPrint (const struct _TFC_projections  *prjs,
-                                 int                          towerId)
-  \brief Prints an ASCII dump of the projections for the specified tower
+                                 unsigned int                  twrMsk)
+  \brief Prints an ASCII dump of the projections for the specified towers
   
   \param prjs     The list of projections for the specified tower
-  \param towerId  The tower id associated with this list of projections
+  \param twrMsk   The list of towers to print, left justified, 
+                  MSB = Tower 0.
                                                                           */
 /* ---------------------------------------------------------------------- */
-extern void TFC_projectionsPrint (const struct _TFC_projections  *prjs,
-                                  int                          towerId)
+void TFC_projectionsPrint (const struct _TFC_projections  *prjs,
+                           unsigned int                  twrMsk)
 {
-    printProjections (prjs->prjs, prjs->xy[0], prjs->xy[1], towerId);
+    /* If all requested, limit to those that actually have info */
+    if (twrMsk == -1) twrMsk  = prjs->twrMsk << 16;
+    else              twrMsk &= 0xffff0000;
+    while (twrMsk)
+    {
+      int towerId = FFS (twrMsk);
+      const TFC_projectionDir *dir = prjs->dir + towerId;
+      twrMsk = FFS_eliminate (twrMsk, towerId);
+      printProjections (prjs->prjs + dir->idx, dir->xCnt, dir->yCnt, towerId);
+    }
+
     return;
 }
 /* ---------------------------------------------------------------------- */
@@ -96,8 +107,17 @@ static void printProjections (const TFC_projection *prj,
            int                 ncol;
            int               layers;
            const signed short *hits;
+           int                slope;
            
-              
+           /* 
+            | Note that the slope is the difference of the first and
+            | third hit, or in the parlance of the track finding,
+            | the top and bot hits. This makes comparing projections
+            | that span the boundaries easier.
+	   */
+           layer     = prj->max;
+           hits      = prj->hits;
+           slope     = hits[0] - hits[2];
            nmargin = printf ("%c  %2d:%2d  %8.8x %5d %9d %5d %8.8x",
                              which,
                              prj->min,
@@ -105,12 +125,10 @@ static void printProjections (const TFC_projection *prj,
                              prj->layers,
                              prj->nhits,
                              prj->intercept,
-                             prj->slope,
+                             slope,
                              prj->acdTopMask);
            
            which  = ' ';
-           layer  = prj->max;
-           hits   = prj->hits;
            ncol   = nmargin;
 
            /* Push the maximum layer to the most significant bit */

@@ -19,14 +19,13 @@
 #include "DFC/CFC_constants.h"
 #include "DFC/CFC_towerSum.h"
 
-#include "windowsCompat.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif    
 
     
-static inline int getEnergy (unsigned int data, const CFC_logConstants *gp);
+static __inline int getEnergy (unsigned int data, const CFC_logConstants *gp);
 
     
 #ifdef __cplusplus
@@ -44,7 +43,7 @@ static inline int getEnergy (unsigned int data, const CFC_logConstants *gp);
   \return     The energy of both ends.
                                                                           */
 /* ---------------------------------------------------------------------- */  
-static inline int getEnergy (unsigned int data, const CFC_logConstants *gp)
+static __inline int getEnergy (unsigned int data, const CFC_logConstants *gp)
 {
     CFC_logData            log;
     const CFC_logConstant  *rA;

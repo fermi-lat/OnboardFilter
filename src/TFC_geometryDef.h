@@ -2,19 +2,15 @@
 #define TFC_GEOMETRYDEF_H
 
 
-
-/*------------------------------------------------------------------------
-| CVS $Id
-+-------------------------------------------------------------------------*/
-
-
-
 /* ---------------------------------------------------------------------- *//*!
    
-   \file   TFC_geometryDef.h
-   \brief  Defines the tower geometry used in track finding
-   \author JJRussell - russell@slac.stanford.edu
+  \file   TFC_geometryDef.h
+  \brief  Defines the tower geometry used in track finding
+  \author JJRussell - russell@slac.stanford.edu
 
+\verbatim
+   CVS $Id  
+\endverbatim
                                                                          */
 /* --------------------------------------------------------------------- */
 
@@ -22,6 +18,200 @@
 #ifdef __cplusplus
 extern "C" {
 #endif    
+
+
+/* --------------------------------------------------------------------- *//*!
+
+  \enum   _TFC_tagtype
+  \brief   Enumerates the types of geometries
+									 *//*!
+  \typedef TFC_tagtype
+  \brief   Typedef for enum \e _TFC_tagtype
+									 */
+/* --------------------------------------------------------------------- */
+typedef enum _TFC_tagtype
+{
+  TFC_K_TAGTYPE_LAT   = 0,/*!< Geometry is associated with LAT date data */
+  TFC_K_TAGTYPE_GLEAM = 1 /*!< Geometry is associated with GLEAM MC data */
+}
+TFC_tagtype;
+/* --------------------------------------------------------------------- */
+
+
+
+/* --------------------------------------------------------------------- *//*!
+
+  \struct  _TFC_tagcmt
+  \brief    Identifies the geometry in terms of an offline CMT tag
+            version
+									 *//*!
+  \typedef  TFC_tagcmt
+  \brief    Typedef for struct \e _TFC_tagcmt
+
+   The geometry is tagged with 4 identifying numbers. 3 are the offline
+   CMT tag corresponding to the \e version, the \e revision and the 
+   \e patch. In addition a fourth number is added indicating whether 
+   this is a GLEAM Monte Carlo geometry or whether it is an geometry
+   to be derived from the actual detector. 
+									 */
+/* --------------------------------------------------------------------- */
+typedef struct _TFC_tagcmt
+{
+  unsigned char    patch; /*!< The CMT patch number                      */
+  unsigned char revision; /*!< The CMT revision number                   */
+  unsigned char  version; /*!< The CMT version number                    */
+  unsigned char     type; /*!< The geometry type, 0 = actual, 1 = GLEAM  */
+}
+TFC_tagcmt;
+/* --------------------------------------------------------------------- */
+
+
+
+
+
+/* --------------------------------------------------------------------- *//*!
+
+  \def   TFC_TAGCMT(_type, _version, _revision, _patch)
+  \brief Provides a C state suitable for initializing a TFC_tagcmt 
+         structure.
+
+  \param _type     The geometry type, \e i.e. one of TFC_K_TAGTYPE_LAT or
+                   TFC_K_TAGTYPE_GLEAM.
+  \param _version  The CMT version number
+  \param _revision The CMT revision number
+  \param _patch    The CMT patch number
+									 */
+/* --------------------------------------------------------------------- */
+#define TFC_TAGCMT(_type, _version, _revision, _patch) \
+                 { _patch, _revision, _version, _type }
+/* --------------------------------------------------------------------- */
+
+
+
+
+/* --------------------------------------------------------------------- *//*!
+
+ \struct _TFC_tagdate
+ \brief   A tag field giving an approximate date of birth of this 
+          geometry
+								         *//*!
+ \typedef TFC_tagdate
+ \brief   Typedef for struct \e _TFC_tagdate.
+
+  This date is meant to be used as a loose indication of the date this
+  geometry came into being. To that end, the resolution is deliberately
+  rather broad, \e i.e. a day.
+									 */
+/* --------------------------------------------------------------------- */
+typedef struct _TFC_tagdate
+{
+  unsigned char       day;  /*!< The day                                 */
+  unsigned char     month;  /*!< The month                               */
+  unsigned short int year;  /*!< The year                                */
+}
+TFC_tagdate;
+/* --------------------------------------------------------------------- */
+
+
+
+
+/* --------------------------------------------------------------------- *//*!
+
+ \def   TFC_TAGDATE(_month, _day, _year)
+ \brief Provides a C statement suitable for initializing a TFC_tagdate
+        structure.
+
+ \param _month  The month of the year (1-12)
+ \param _day    The day of the month
+ \param _year   The year, \e e.g. 2004
+									 */
+/* --------------------------------------------------------------------- */
+#define TFC_TAGDATE(_month, _day, _year) { _day, _month, _year }
+/* --------------------------------------------------------------------- */
+
+
+
+
+
+/* --------------------------------------------------------------------- *//*!
+
+  \struct _TFC_tagdates
+  \brief   A series of dates associated with this geometry
+									 *//*!
+  \typedef TFC_tagdates
+  \brief   Typedef for struct \e _TFC_tagdates
+
+  								         */
+/* --------------------------------------------------------------------- */
+typedef struct _TFC_tagdates
+{
+  TFC_tagdate creation;  /*!< The approximate creation date              */
+  TFC_tagdate revision;  /*!< The approximate date of the last revision  */
+}
+TFC_tagdates;
+/* --------------------------------------------------------------------- */
+
+
+
+
+/* --------------------------------------------------------------------- *//*!
+  \struct _TFC_tag
+  \brief   A series identifying numbers that 'tags' this geometry.
+									 *//*!
+  \typedef TFC_tag
+  \brief   Typedef for struct \e _TFC_tag
+
+   This structure includes four basic identifiers
+
+     -# Overall Id
+     -# The CMT tag
+     -# The approximate date this geometry was created
+     -# The approximate date of the last revision
+
+   The overall id is meant to uniquely identify a given geometry.  For
+   an example, see the file TFC_geoIds.h for the current collection of 
+   such ids.
+
+   The two dates are \b not CVS dates. These are dates which the author
+   of the geometry hand enters. As a result, these dates need not
+   correspond to the date the geometry was committed to FSW code. Rather
+   it should indicate when the geometry was bonafided be the offline. 
+									 */
+/* --------------------------------------------------------------------- */
+typedef struct _TFC_tag
+{
+  unsigned int   id;  /*!< Overall identifier, should be unique among
+                           all geometries                                */
+  TFC_tagcmt    cmt;  /*!< The identifying CMT tag                       */
+  TFC_tagdates date;  /*!< The identifying dates                         */
+}
+TFC_tag;
+/* --------------------------------------------------------------------- */
+
+
+
+
+/* --------------------------------------------------------------------- *//*!
+
+  \def   TFC_TAG(_id, _cmt, _creation, _revision)
+  \brief Initializes the TFC_tag structure
+
+  \param  _id      A small integer which uniquely identifies this
+                   geometry.
+  \param _cmt      The data structure giving the CMT tag. The usual
+                   method is to use the macro TFC_TAGCMT().
+  \param _creation The data structure giving the creation date. The
+                   usual method is to use the macro TFC_TAGDATE().
+  \param _revision The data structure giving the last revision date.
+                   The usual method is to use the macro TFC_TAGDATE().
+									 */
+/* --------------------------------------------------------------------- */
+#define TFC_TAG(_id, _cmt, _creation, _revision) \
+               {_id, _cmt, {_creation,_revision} }
+/* --------------------------------------------------------------------- */
+
+
+
 
 /* --------------------------------------------------------------------- *//*!
 
@@ -107,6 +297,7 @@ TFC_geometryTower;
 /* --------------------------------------------------------------------- */
 typedef struct _TFC_geometryTkr
 {
+    unsigned int  stripPitch;  /*!< Pitch of a strip in um               */
     int          zfindMaxMin;  /*!< Geometric factor used when initially
                                     finding projections. This is a
                                     packed number giving two numbers
@@ -120,8 +311,8 @@ typedef struct _TFC_geometryTkr
                                     for the two configuration of the
                                     stagger, ie projecting when the seed
                                     pair have maximum/minimum separation */
-    short int    xyWidths[2];  /*!< Width of tower in strips X/Y         */
-    TFC_geometryTower    twr;  /*!< The XY and Z edges of the TKR        */
+    unsigned short xyWidths[2]; /*!< Width of tower in strips X/Y        */
+    TFC_geometryTower      twr; /*!< The XY and Z edges of the TKR       */
 }
 TFC_geometryTkr;
 /* --------------------------------------------------------------------- */
@@ -146,8 +337,10 @@ typedef struct _TFC_geometryAcd
     int                        zNominal; /*!< TKR spacing in abs units   */
     short int              xTopEdges[6]; /*!< X edges of the top tiles   */
     short int              yTopEdges[6]; /*!< Y edges of the top tiles   */
-    short int            xSideYedges[6]; /*!< Y edges of X side tiles    */
-    short int            ySideXedges[6]; /*!< X edges of Y side tiles    */
+    short int           xmSideYedges[6]; /*!< Y edges of X- side tiles   */
+    short int           xpSideYedges[6]; /*!< Y edges of X+ side tiles   */
+    short int           ymSideXedges[6]; /*!< X edges of Y- side tiles   */
+    short int           ypSideXedges[6]; /*!< X edges of Y+ side tiles   */
     short int                 zSides[6]; /*!< Side row Z boundaries      */
     int                      xySides[4]; /*!< X-/+, Y-/+                 */
     unsigned short int xProjections[18]; /*!< From layer X -> ACD top    */
@@ -199,6 +392,7 @@ TFC_geometrySkirt;
 /* --------------------------------------------------------------------- */
 typedef struct _TFC_geometry
 {
+    TFC_tag             tag;  /*!< The identifying tag fields            */
     TFC_geometryTkr     tkr;  /*!< The Tracker geometry                  */
     TFC_geometryAcd     acd;  /*!< The ACD     geometry                  */
     TFC_geometrySkirt skirt;  /*!< The Skirt   geometry                  */
@@ -452,7 +646,8 @@ TFC_geometry;
   \e TKR_Z_EXTEND_SCALE is purely an internal helper macro.
                                                                          */
 /* --------------------------------------------------------------------- */
-#define TFC_Z_EXTEND_SCALE(_z) (((_z) * TFC_Z_EXTEND_SCALE_FACTOR))
+#define TFC_Z_EXTEND_SCALE(_zratio)                                      \
+        (((_zratio) * TFC_Z_EXTEND_SCALE_FACTOR))
 
 #define TFC_Z_EXTEND_MAX(_nominal, _delta)                                \
         ((int)(TFC_Z_EXTEND_SCALE(((_nominal) + (_delta))  /              \
@@ -622,21 +817,22 @@ TFC_geometry;
   \return         The scaled Z ratio.
                                                                          *//*!
   \def    TFC_SKIRT_PROJECTION(_skirt_mm, _tkr_top0_mm, _tkr_top1_mm)
-  \brief  Produces the scaled ratio between the skirt plane from TKR TOP
-          distance and the TKR TOP to TKR TOP - 1 distance.
+  \brief  Produces the scaled ratio between the skirt plane from TKR BOTTOM
+          distance and the TKR BOTTOM to TKR BOTTOM + 1 distance.
 
   \param _skirt_mm      The absolute Z position of the skirt plane in mm.
   \param _tkr_top0_mm   The absolute Z position of the nearest TKR plane in mm.
-  \param _tkr_top1_mm   The absolute Z position of the next TKR plane in mm.
+  \param _tkr_top1_mm   The absolute Z position of the next furtherest
+                        TKR plane in mm.
   \return               The scaled ratio
                                                                          */
 /* --------------------------------------------------------------------- */
-#define TFC_Z_TKR_TO_SKIRT_SCALE(_z)                                      \
-        ((int)(((_z) * TFC_Z_TKR_TO_SKIRT_SCALE_FACTOR) + 0.5))
+#define TFC_Z_TKR_TO_SKIRT_SCALE(_zratio)                                \
+        ((int)(((_zratio) * TFC_Z_TKR_TO_SKIRT_SCALE_FACTOR) + 0.5))
 
-#define TFC_SKIRT_PROJECTION(_skirt_mm, _tkr_top0_mm, _tkr_top1_mm)   \
-        TFC_Z_TKR_TO_SKIRT_SCALE (((_tkr_top0_mm) - (_skirt_mm)) /     \
-                                  ((_tkr_top0_mm) - (_tkr_top1_mm)))
+#define TFC_SKIRT_PROJECTION(_skirt_mm, _tkr_top0_mm, _tkr_top1_mm)      \
+        TFC_Z_TKR_TO_SKIRT_SCALE (((_tkr_top0_mm) - (_skirt_mm)) /       \
+                                  ((_tkr_top1_mm) - (_tkr_top0_mm)))
 
 
 #ifdef __cplusplus

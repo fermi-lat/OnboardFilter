@@ -32,7 +32,7 @@
 #include <stdio.h>
 #include "DFC/BTE.h"
 
-#include "windowsCompat.h"
+#ifndef CMX_DOXYGEN
 
 #ifdef BTE_DEBUG
 #define PRINTF(args)  printf args
@@ -40,11 +40,13 @@
 #define PRINTF(args)
 #endif
 
+#endif
 
-static inline unsigned int encode (unsigned int e,
-                                   unsigned int w,
-                                   unsigned int p1,
-                                   unsigned int p3);
+
+static __inline unsigned int encode (unsigned int e,
+				     unsigned int w,
+				     unsigned int p1,
+				     unsigned int p3);
 
 /* --------------------------------------------------------------------- *//*!
 
@@ -52,7 +54,7 @@ static inline unsigned int encode (unsigned int e,
                               unsigned int w,
                               unsigned int p1,
                               unsigned int p3)
-  \brief Encodes the input word \w into the output word e.
+  \brief Encodes the input word \a w into the output word \a e.
 
   \param e   The current encoded word
   \param w   The new set of 32 bits to add
@@ -61,7 +63,7 @@ static inline unsigned int encode (unsigned int e,
 
   The routine encodes 2 bits at a time, extracting the 2 bits from the
   2 most significant bits of the input word \e w. These 2 bits are
-  compared to \p1. If they are equal, a single bit, 0, is loaded into
+  compared to \a p1. If they are equal, a single bit, 0, is loaded into
   the LSB of the output word and the output word is shifted left 1 bit.
   If these 2 are equal to \e p3, an encoding pattern of 2 bits is shifted
   into the LSB of the output word. If the pattern is 0, no bits are
@@ -116,10 +118,10 @@ static unsigned int encode (unsigned int e,
          pattern returning a 32 bit output word. The algorithm is such
          that at most 32 bits are used.
          
-  \w            The original 32-bit word that is to be encoded
-  \p            The higher level binary tree pattern word. This is
+  \param w      The original 32-bit word that is to be encoded
+  \param p      The higher level binary tree pattern word. This is
                 generally computed by calling BTE_wordPrepare().
-  \scheme_size  The encoding scheme to be used and the encoded size.
+  \param scheme_size  The encoding scheme to be used and the encoded size.
                 This is generally computed by BTE_wordSize (). The
                 scheme is one of
 
@@ -165,7 +167,7 @@ unsigned int BTE_wordEncode (unsigned int w,
 
 
 
-/* --------------------------------------------------------------------- *//*
+/* --------------------------------------------------------------------- *//*!
 
   \fn    unsigned int BTE_wordPrepare (unsigned int w)
   \brief Prepares a pattern word which includes all but the lowest level

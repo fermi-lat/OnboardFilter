@@ -33,8 +33,8 @@ extern "C" {
 
     
 /* ---------------------------------------------------------------------- */
-static inline int TFC__triggerSorted7of8Form(int x, int y, int xy00, int xy01);
-static inline int TFC__triggerSortedForm    (int x, int y);
+static __inline int TFC__triggerSorted7of8Form(int x, int y, int xy00, int xy01);
+static __inline int TFC__triggerSortedForm    (int x, int y);
 /* ---------------------------------------------------------------------- */
 
 

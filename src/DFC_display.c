@@ -10,8 +10,7 @@
     nothing to publish these internal details.
 
 \verbatim
-
-  CVS $Id
+   CVS $Id
 \endverbatim
     
                                                                           */
@@ -19,14 +18,17 @@
 
 
 #include <stdio.h>
+#include <string.h>
 #include "ffs.h"
 #include "DFC/DFC_display.h"
 #include "DFC/EBF_cid.h"
-#include "DFC/EBF_glt.h"
+#include "DFC/EBF_gem.h"
 #include "DFC/EBF_tkr.h"
 #include "DFC/EBF_locate.h"
 #include "DFC/EBF_directory.h"
 
+#include "DFC/DFC_ss.h"
+#include "DFC/EBF_gemPrint.h"
 #include "DFC/DFC_latRecord.h"
 #include "DFC/CFC_latRecordPrint.h"
 #include "DFC/TFC_latRecordPrint.h"
@@ -89,6 +91,9 @@ extern "C" {
 32                                                     +-+-+-+-+
 \* ------------------------------------------------------------------------- */
 
+
+/*  This is all internal stuff, no need to publically document */
+#ifndef CMX_DOXYGEN
 
 /*
  | Define the ASCII characters used for making boxes
@@ -673,7 +678,9 @@ struct _HitMap
     struct _HitMapTkr tkr;          /* Where the TKR hits go          */  
 };
 
+#endif
 
+ 
 static void displayAcd      (unsigned char                *d,
                              const struct _HitMapAcd    *hit,
                              const struct _SymSetAcd    *sym,
@@ -713,28 +720,64 @@ static void printAcd        (int    acd_top,
 
 
 
+/* ---------------------------------------------------------------------- *//*!
 
+   \fn void DFC_display (const struct _DFC_latRecord *dlr,
+                         unsigned int                opts)
+   \brief      Displays the specified event
+   \param dlr  Pointer to the unpacked event to be displayed.
+   \param opts Bit mask of what to display. This is chosen from DFC_M_SS_xxx.
+                                                                          */
 /* ---------------------------------------------------------------------- */
-void DFC_display (struct _DFC_latRecord *dlr)
+void DFC_display (const struct _DFC_latRecord *dlr, unsigned int opts)
 {
-   const EBF_glt *glt;
+   if (opts)
+   {
+      unsigned int sequence;
+      unsigned int       mc;
 
-   printf ("List of CTIDS: %8.8x\n", dlr->dir.ctids);
+      sequence = EBF_SEQUENCE (dlr->dir.contributors[EBF_K_CID_EVT].ptr);
+      mc       = dlr->dir.contributors[EBF_K_CID_GEM].ptr[0x0d];
 
-   glt = (const EBF_glt *)dlr->dir.contributors[EBF_K_CID_GLT].ptr;   
-   CFC_latRecordPrint (&dlr->cal, -1);
-   TFC_latRecordPrint (&dlr->tkr, -1);
-   DFC_displayDir  (0, &dlr->dir);
+      printf ("\n"
+	      "NEW EVENT Sequence # = %8u(0x%5.5x) MC # = %8u(0x%8.8x)\n"
+              "========= ============================== "
+              "===========================\n\n",
+	      sequence, sequence,
+	      mc,       mc);
+
+
+   }
+
+   if (opts & DFC_M_SS_GEM) 
+      EBF_gemPrint ((const EBF_gem *)dlr->dir.contributors[EBF_K_CID_GEM].ptr);   
+   if (opts & DFC_M_SS_TKR) TFC_latRecordPrint   (&dlr->tkr, -1);
+   if (opts & DFC_M_SS_ACD) DFC_displayAcdTkrDir (0,  &dlr->dir);
+   if (opts & DFC_M_SS_CAL) CFC_latRecordPrint   (&dlr->cal, -1);
 
    return;
 }
 /* ---------------------------------------------------------------------- */
+
    
 
+/* ---------------------------------------------------------------------- *//*!
 
+  \fn  void DFC_displayAcdTkrDir (unsigned int               style,
+                                  const struct _EBF_directory *dir)
+                            
+  \brief         Draws a display of the TKR layer hit mask and the struck
+                 ACD tiles using only ASCII characters. 
+  \param   style Display style, 0 = plain, 1 = fancy
+  \param     dir The directory of event contributors.
 
-
-void  DFC_displayDir (unsigned int style, const struct _EBF_directory *dir)
+   This routine displays the tracker and ACD data using the event data
+   as the source. The tower data for each TKR is taken as the coincidence
+   of the X and Y of the layer end OR of the accept list. The ACD data
+   is from the veto list in the GEM block.
+                                                                          */
+/* ---------------------------------------------------------------------- */
+void  DFC_displayAcdTkrDir (unsigned int style, const struct _EBF_directory *dir)
 {
    const EBF_contributor *contributors;
    int                          xy[16];
@@ -748,6 +791,7 @@ void  DFC_displayDir (unsigned int style, const struct _EBF_directory *dir)
 
    // printf ("Contributors = %8.8x\n", tids);
    
+   memset (xy, 0, sizeof (xy));
    
    /* Loop over all towers that may have tracker data */
    while (tids)
@@ -763,8 +807,8 @@ void  DFC_displayDir (unsigned int style, const struct _EBF_directory *dir)
         | Find the next tower with tracker hits and then eliminate it
         | from further consideration
        */
-       cid   = FFS (tids);
-       tids &= ~(0x80000000 >> cid);
+       cid  = FFS (tids);
+       tids = FFS_eliminate (tids, cid);
 
        /* Locate the TEM contributor and its tracker data */
        contributor = &contributors[cid];
@@ -786,15 +830,15 @@ void  DFC_displayDir (unsigned int style, const struct _EBF_directory *dir)
    acd_y   = 0;
 
 
-   /* Is there an GLT contribution?  */
-   if (dir->cids & (0x80000000 >> EBF_K_CID_GLT))
+   /* Is there a GEM contribution?  */
+   if (dir->cids & EBF_M_CID_GEM)
    {
-       const EBF_glt *glt;
+       const EBF_gem *gem;
 
-       glt     = (const EBF_glt *)dir->contributors[EBF_K_CID_GLT].ptr;
-       acd_top = glt->acd.vetoes[EBF_K_GLT_ACD_VETO_XY];
-       acd_x   = glt->acd.vetoes[EBF_K_GLT_ACD_VETO_YZ];
-       acd_y   = glt->acd.vetoes[EBF_K_GLT_ACD_VETO_XZ];
+       gem     = (const EBF_gem *)dir->contributors[EBF_K_CID_GEM].ptr;
+       acd_top = gem->acd.vetoes[EBF_K_GEM_ACD_VETO_XY];
+       acd_x   = gem->acd.vetoes[EBF_K_GEM_ACD_VETO_YZ];
+       acd_y   = gem->acd.vetoes[EBF_K_GEM_ACD_VETO_XZ];
    }
    
    
@@ -803,14 +847,33 @@ void  DFC_displayDir (unsigned int style, const struct _EBF_directory *dir)
    return;
    
 }
+/* ---------------------------------------------------------------------- */
 
 
 
-void  DFC_displayAcdTkr (unsigned int  style,
-                         const int   tkr[16],
-                         int         acd_top,
-                         int           acd_x,
-                         int           acd_y)
+/* ---------------------------------------------------------------------- *//*!
+
+  \fn   void DFC_displayAcdTkr (unsigned int         style,
+                                const unsigned int tkr[16],
+                                unsigned int       acd_top,
+                                unsigned int         acd_x,
+                                unsigned int         acd_y)
+  \brief         Draws a display of the TKR layer hit mask and the struck
+                 ACD tiles using only ASCII characters.
+  \param   style Display style, 0 = plain, 1 = fancy        
+  \param     tkr An array of the 16 towers layer hit pattern (18 bits)
+  \param acd_top A bit mask of the struck 25 top ACD tiles
+  \param   acd_x A bit mask of the struck X side tiles, upper 16 bits are
+                 X+ mask, the lower 16 are the X- mask 
+  \param   acd_y A bit mask of the struck Y side tiles, upper 16 bits are
+                 Y+ mask, the lower 16 are the Y- mask
+                                                                          */
+/* ---------------------------------------------------------------------- */
+void  DFC_displayAcdTkr (unsigned int           style,
+                         const unsigned int   tkr[16],
+                         unsigned int         acd_top,
+                         unsigned int           acd_x,
+                         unsigned int           acd_y)
 {
    /*
     | Defines the Outline Set, define the set composing the template outline
@@ -1277,6 +1340,7 @@ static void translate (unsigned char       *d,
                         int                    acd_y)
 
   \brief         Displays the tracker layer hit patterns
+  \param d       The display character for a hit layer
   \param hit     A structure indicating where the hits should be placed
                  in the display.
   \param sym     A structure defining the hit display symbols
@@ -1376,6 +1440,7 @@ static void fillAcdWideTile (unsigned char                *d,
                         const struct _SymSetTkr *sym,
                         const int            tkr[16])
   \brief     Displays the tracker layer hit patterns
+  \param d   The display character for a hit layer
   \param hit A structure indicating where the hits should be placed in
              the display.
   \param sym A structure defining the hit display symbols
