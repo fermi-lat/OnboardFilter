@@ -1,0 +1,69 @@
+// -----------------------------------------------------------------------------
+// CVS $Id$
+// -----------------------------------------------------------------------------
+//
+//
+// Interface Definition File
+//
+//
+//      Package: DFC
+// Constituuent: EBF
+//
+// -----------------------------------------------------------------------------
+
+// -----------------------------------------------------------------------------
+// Original Version
+// -----------------------------------------------------------------------------
+DFC_ebf_0.0
+{
+   global:
+
+//      EBF_swap
+//      --------
+       EBF_swap32;
+       EBF_swap32_lclXbig;
+       EBF_swap32_lclXlittle;
+
+       EBF_swap16;
+       EBF_swap16_lclXbig;
+       EBF_swap16_lclXlittle;
+
+       EBF_swap32N;
+       EBF_swap32_lclXbigN;
+       EBF_swap32_lclXlittleN;
+
+       EBF_swap16N;
+       EBF_swap16_lclXbigN;
+       EBF_swap16_lclXlittleN;
+
+
+//      EBF_directoryPrint
+//      ------------------
+       EBF_dirPrint;
+       EBF_acdPrint;
+       EBF_calPrint;
+       EBF_tkrPrint;
+       EBF_trgPrint;
+       EBF_twrPrint;
+       EBF_gltPrint;
+
+//      EBF_fileIn
+//      ----------
+       EBF_open;
+       EBF_dmap;
+       EBF_read;
+       EBF_free;
+       EBF_close;
+       EBF_esize;
+       EBF_edata;
+
+//      EBF_fileOut
+//     ------------
+       EBF_create;
+       EBF_write;
+       EBF_oclose;
+
+   local:
+       *
+       ;
+};

@@ -1,0 +1,61 @@
+// -----------------------------------------------------------------------------
+// CVS $Id: cmx.cid.template,v 1.1 2002/04/26 23:54:15 apw Exp $
+// -----------------------------------------------------------------------------
+//
+// CMX interface definition file (.cid)
+//
+//     Package: DFC
+// Constituent: dfc
+//
+// -----------------------------------------------------------------------------
+
+DFC_dfc_0.0
+{
+    global:
+         AFC_splash;
+         AFC_SplashMap1x1;
+
+         AFC_latUnpack;
+
+         BTD_wordDecode;
+
+         BTE_wordEncode;
+         BTE_wordPrepare;
+         BTE_wordSize;
+
+         DFC_ctlInit; 
+         DFC_ctlSizeof;
+         DFC_ctlSysLocate;
+         DFC_ctlCfcLocate;
+         DFC_ctlTfcLocate;
+
+
+         DFC_filter;
+         DFC_filterComplete;
+
+         DFC_latRecordInit;
+         DFC_latRecordSizeof;
+         DFC_latRecordUnpack; 
+
+         CFC_latUnpack;
+         CFC_latUnpackSizeof;
+
+         CFC_latRawUnpack;
+         CFC_latRawUnpackSizeof;
+
+         EBF_directoryCompose;
+
+         TFC_GeometryStd;
+
+	 TFC_latUnpackInit;
+         TFC_latUnpack;
+         TFC_triggerFill;
+
+         TMR_initialize;
+         TMR_nsecs_to_ticks;
+         TMR_ticks_to_nsecs;
+         TMR_frequency;
+
+     local:
+         *;
+};
