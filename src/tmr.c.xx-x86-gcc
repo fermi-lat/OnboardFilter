@@ -114,7 +114,7 @@ int TMR_initialize (void)
        }
        else if (mhz != mhzLcl)
        {
-            if (ncpus == 2) 
+            //if (ncpus == 2) 
                 //printf ("TMR_initialize: Multiple cpus with different clocks\n"
                 //        "Clock 0 = %8.3f\n", mhz);
 
