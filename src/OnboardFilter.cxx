@@ -242,7 +242,7 @@ StatusCode OnboardFilter::execute()
     const struct _DFC_ctlCfc *cfc;
     
     MsgStream log(msgSvc(),name());
-    Event::FilterStatus *newStatus=new Event::FilterStatus;
+    OnboardFilterTds::FilterStatus *newStatus=new OnboardFilterTds::FilterStatus;
     eventSvc()->registerObject(EventModel::Filter::FilterStatus,newStatus);
 
     log << MSG::INFO << "Processing Event"<<endreq;
@@ -382,6 +382,7 @@ StatusCode OnboardFilter::execute()
         
         status = result->status;
 	newStatus->set(status);
+	newStatus->setCalEnergy(result->energy);
 
         if (ctl->list && (result->status & DFC_M_STATUS_VETOES) == 0)
         {

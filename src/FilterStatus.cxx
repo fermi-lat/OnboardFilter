@@ -1,14 +1,14 @@
 #include "OnboardFilter/FilterStatus.h"
 
-using namespace Event;
+using namespace OnboardFilterTds;
 
 FilterStatus::FilterStatus(){
   status=0;
 }
 
-FilterStatus::FilterStatus(const unsigned int code){
-  std::cout<<"Setting FilterStatus in TDS to: "<<code<<std::endl;
+FilterStatus::FilterStatus(const unsigned int code, const int energy){
   status=code;
+  CalEnergy=energy;
 }
 
 FilterStatus::~FilterStatus(){
@@ -31,8 +31,17 @@ unsigned int FilterStatus::getHigh() const{
   return status>>15;
 }
 
+void FilterStatus::setCalEnergy(const int energy){
+  CalEnergy=energy;
+}
+
+int FilterStatus::getCalEnergy(){
+  return CalEnergy;
+}
+
 inline std::ostream& FilterStatus::fillStream(std::ostream &s) const{
   s<<"Filter Return Code: "<<status<<std::endl;
+  s<<"Filter code for Energy in CAL: "<<CalEnergy<<std::endl;
   return s;
 }
 
