@@ -2,6 +2,7 @@
  * @file release.notes
  * @brief Package OnboardFilter
  * @verbatim
+ * v0r0p1 16-Aug-2003     Cleaned up requirements file. Ready to add to GR
  * v0r0p0 12-Aug-2003     Clean up code for Code review
  * v0r0   19-Jul-2003     Stores more information in TDS
  *        09-Jul-2003     Renamed package
