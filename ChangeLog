@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: burnett  Mon Aug 18 20:54:58 PDT 2003
+OnboardFilter/src
+
+Modified Files:
+	mainpage.h 
+Log Message:
+make the table of filter bits more readable
+    *
+------------------------------------------------------------
 User: golpa  Mon Aug 18 08:54:47 PDT 2003
 OnboardFilter/src
 
