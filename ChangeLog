@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: golpa  Fri Jul 23 08:58:11 PDT 2004
+OnboardFilter/OnboardFilter
+
+Modified Files:
+	FilterStatus.h FilterTracks.h 
+Log Message:
+Added David's code to write hits. And fixed CshLib problem.Tagging v1r1p0
+    *
+------------------------------------------------------------
 User: golpa  Mon Jul 19 20:06:16 PDT 2004
 OnboardFilter/doc
 
