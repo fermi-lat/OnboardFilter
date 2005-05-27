@@ -400,7 +400,7 @@ StatusCode OnboardFilter::execute()
     /* If not quiet mode, print the statistics */
     //if (rto->quiet == 0) statisticsPrint (results, evtCnt);
 
-    if(m_mask!=0 && (m_mask & (status >> 15)) !=0){
+    if(m_mask!=0 && (m_mask & (results->status >> 15)) !=0){
       this->setFilterPassed(false);
       m_rejected++;
     }
