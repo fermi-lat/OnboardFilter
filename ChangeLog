@@ -1,5 +1,14 @@
 ------------------------------------------------------------
 User: burnett  Fri May 27 16:05:19 PDT 2005
+OnboardFilter/doc
+
+Modified Files:
+	release.notes 
+Log Message:
+fix logic to make filter cut.
+    *
+------------------------------------------------------------
+User: burnett  Fri May 27 16:05:19 PDT 2005
 OnboardFilter/cmt
 
 Modified Files:
