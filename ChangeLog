@@ -1,4 +1,15 @@
 ------------------------------------------------------------
+User: mcenery  Wed Aug 17 20:29:20 PDT 2005
+OnboardFilter/src
+
+Modified Files:
+	CFC_constants.c 
+Log Message:
+Alter constants to be closer to the new ideal flight mode (the
+current Gleam default).
+
+    *
+------------------------------------------------------------
 TAG
 Tag name: v1r1p7, operation: add
 Package: OnboardFilter
