@@ -52,10 +52,10 @@
   \brief  Upper limit, in MeV of the range A 3 ADC
                                                                           */
 /* ---------------------------------------------------------------------- */
-#define CFC_K_LIMIT_RNGA0    205
-#define CFC_K_LIMIT_RNGA1   1640
-#define CFC_K_LIMIT_RNGA2  13123
-#define CFC_K_LIMIT_RNGA3 104986
+#define CFC_K_LIMIT_RNGA0    143
+#define CFC_K_LIMIT_RNGA1   1033
+#define CFC_K_LIMIT_RNGA2  10087
+#define CFC_K_LIMIT_RNGA3  81235
 /* ---------------------------------------------------------------------- */
 
 
@@ -78,10 +78,10 @@
 
                                                                           */
 /* ---------------------------------------------------------------------- */
-#define CFC_K_PEDESTAL_RNGA0    100  
-#define CFC_K_PEDESTAL_RNGA1    100
-#define CFC_K_PEDESTAL_RNGA2    100
-#define CFC_K_PEDESTAL_RNGA3    100
+#define CFC_K_PEDESTAL_RNGA0    510  
+#define CFC_K_PEDESTAL_RNGA1    210
+#define CFC_K_PEDESTAL_RNGA2    510
+#define CFC_K_PEDESTAL_RNGA3    210
 /* ---------------------------------------------------------------------- */
 
 
@@ -103,10 +103,10 @@
   \brief  Upper limit, in MeV of the range B 3 ADC
                                                                           */
 /* ---------------------------------------------------------------------- */
-#define CFC_K_LIMIT_RNGB0    205
-#define CFC_K_LIMIT_RNGB1   1640
-#define CFC_K_LIMIT_RNGB2  13123
-#define CFC_K_LIMIT_RNGB3 104986
+#define CFC_K_LIMIT_RNGB0    143
+#define CFC_K_LIMIT_RNGB1   1033
+#define CFC_K_LIMIT_RNGB2  10087
+#define CFC_K_LIMIT_RNGB3  81235
 /* ---------------------------------------------------------------------- */
 
 
@@ -128,10 +128,10 @@
 
                                                                           */
 /* ---------------------------------------------------------------------- */
-#define CFC_K_PEDESTAL_RNGB0    100
-#define CFC_K_PEDESTAL_RNGB1    100
-#define CFC_K_PEDESTAL_RNGB2    100
-#define CFC_K_PEDESTAL_RNGB3    100
+#define CFC_K_PEDESTAL_RNGB0    510
+#define CFC_K_PEDESTAL_RNGB1    210
+#define CFC_K_PEDESTAL_RNGB2    510
+#define CFC_K_PEDESTAL_RNGB3    210
 /* ---------------------------------------------------------------------- */
 
 
