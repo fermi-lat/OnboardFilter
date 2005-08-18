@@ -2,6 +2,7 @@
  * @file release.notes
  * @brief Package OnboardFilter
  * @verbatim
+ * v1r1p8 18-aug-2005  THB : adjust CAL thresholds (by Julie)
  * v1r1p7 26-may-2005  THB : re-enable filtering, which was broken by the JJ import for v1r0
  * v1r1p6 30-jan-2005  THB : (fix the fix: not clear how to initilize the structure TMR_usecs_nsecs
  * v1r1p5 30-jan-2005  THB : remove unit test for now, fix some uninitialized variables.
