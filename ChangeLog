@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: burnett  Thu Aug 18 07:17:02 PDT 2005
+OnboardFilter/cmt
+
+Modified Files:
+	requirements 
+Log Message:
+New patch tag using Julie's change of CAL constants
+    *
+------------------------------------------------------------
 User: mcenery  Wed Aug 17 20:29:20 PDT 2005
 OnboardFilter/src
 
