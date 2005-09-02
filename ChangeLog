@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: hughes  Fri Sep  2 11:41:04 PDT 2005
+OnboardFilter/DFC
+
+Removed Files:
+	ABD.h 
+Log Message:
+Move to current flight software.
+    *
+------------------------------------------------------------
 TAG
 Tag name: v1r1p8, operation: add
 Package: OnboardFilter
