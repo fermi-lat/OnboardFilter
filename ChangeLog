@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: hughes  Fri Sep  2 11:44:26 PDT 2005
+OnboardFilter/src
+
+Removed Files:
+	ATF_filter.h 
+Log Message:
+move to current flight software
+    *
+------------------------------------------------------------
 User: hughes  Fri Sep  2 11:44:25 PDT 2005
 OnboardFilter/src
 
