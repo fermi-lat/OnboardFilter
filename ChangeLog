@@ -3,6 +3,15 @@ User: hughes  Fri Sep  2 11:44:27 PDT 2005
 OnboardFilter/src
 
 Removed Files:
+	BTREE.c 
+Log Message:
+move to current flight software
+    *
+------------------------------------------------------------
+User: hughes  Fri Sep  2 11:44:27 PDT 2005
+OnboardFilter/src
+
+Removed Files:
 	BTE_display.c 
 Log Message:
 move to current flight software
