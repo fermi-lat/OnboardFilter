@@ -1,0 +1,308 @@
+// jobOptions to read EM LDF, run recon and produce merit NTuple, digi ROOT
+//  and recon ROOT
+//___________________________________________________________________
+
+//  The file has 3 major sections:
+//   1.  Declare DLLs and services (other than conversion services)
+//   2.  Define sequences for event loop
+//   3.  Declare conversion services.  Declare properties associated 
+//       with a particular algorithm or service, 
+//___________________________________________________________________
+//
+// 1.  DLLs and SERVICES:
+
+ApplicationMgr.DLLs+= { "GaudiAlg", "GaudiAud"};
+ApplicationMgr.ExtSvc += {"ChronoStatSvc"};
+
+ApplicationMgr.DLLs += {"GlastSvc"};
+ApplicationMgr.ExtSvc += { "GlastDetSvc"};
+
+// Use the LDF converter service to read in LDF files
+// commented out reh 6/11/05
+// ApplicationMgr.DLLs += {"LdfConverter", "EventIntegrity"};
+
+
+// ----------------------------
+//  Digitization
+//
+ApplicationMgr.DLLs +={ "TkrDigi", "CalDigi", "AcdDigi"  };
+
+
+// ----------------------------
+//  Generation or input
+//
+ApplicationMgr.DLLs +={ "G4Generator","G4Propagator"};
+ApplicationMgr.ExtSvc += {"G4GeometrySvc"};
+
+ApplicationMgr.ExtSvc = { 
+    "GlastEventSelector/EventSelector" , 
+    "EventCnvSvc"
+    };
+
+ApplicationMgr.DLLs += {"EbfWriter", "OnboardFilter"};
+
+
+//
+ApplicationMgr.ExtSvc += { "GlastPropagatorSvc" };
+
+ApplicationMgr.DLLs +={ "Trigger"};
+
+ApplicationMgr.DLLs +={ 
+    "CalibSvc",
+    "CalRecon", "CalUtil", "TkrUtil",
+    "TkrRecon",
+    "AcdRecon"
+    };
+
+
+//          tracker
+// -------------------------------------------
+ApplicationMgr.ExtSvc   += { "TkrGeometrySvc"};
+ApplicationMgr.ExtSvc   += { "TkrInitSvc"};
+
+// -------------------------------------------
+// Calorimeter services
+//
+ApplicationMgr.Dlls += {"CalXtalResponse"};
+#include "$CALXTALRESPONSEROOT/src/defaultOptions.txt"
+
+
+ApplicationMgr.ExtSvc += {"CalibDataSvc"};
+ApplicationMgr.ExtSvc += {"CalibMySQLCnvSvc", "CalibXmlCnvSvc" };
+
+// ----------------------------
+//   Atwood's tuple and merit
+//
+ApplicationMgr.DLLs += {"AnalysisNtuple", "ntupleWriterSvc", "merit"};
+ApplicationMgr.ExtSvc += {"RootTupleSvc"};
+
+// Setup OUTPUT
+ApplicationMgr.DLLs +={ "RootIo" }; 
+ApplicationMgr.ExtSvc += { "RootIoSvc" };
+
+AuditorSvc.Auditors = {"ChronoAuditor"};
+
+
+// 2.  SEQUENCING
+// ----------------------------
+//  a structure for the topalg, using sequencer steps
+
+ApplicationMgr.TopAlg = {
+      "Sequencer/Top" };
+
+// Even if something fails (sets filter false), we still want the rest 
+// of Top to execute. In particular, we still want ouput.  In practice,
+// it's only EventIntegrityAlg (member of Trigger) that might do 
+// this.
+Top.StopOverride = true;
+
+//the top sequence loop
+Top.Members={
+    "FluxAlg", 
+    "G4Generator",
+    "Sequencer/CalibrationUpdate",
+    "Sequencer/Digitization",
+    "Sequencer/EventDisplay",
+    "Sequencer/Triggered",
+    "Sequencer/Output"};
+//    "UserAlg" };
+    
+// FluxAlg branch for "TimeTicks"
+//Top.BranchMembers = {"FluxAlg", "ExposureAlg"};
+
+Digitization.Members = { 
+    "TkrDigiAlg", 
+    "CalDigiAlg", 
+    "AcdDigiAlg"};
+
+// the sequence that is triggered
+// Removed FilterTracks since it uses MC data
+Triggered.Members={
+    "Sequencer/Trigger",
+    "Sequencer/Filter",
+    "Sequencer/Reconstruction",
+    "Sequencer/RecoDisplay"};
+
+Trigger.Members += {"EbfWriter", 
+                    "OnboardFilter"};
+Filter.Members += {"FilterAlg"};
+
+// ----------------------------
+//   Reconstruction
+Reconstruction.Members={ 
+      "Sequencer/Cal1", 
+      "Sequencer/Tkr",
+      "Sequencer/Cal2",
+      "Sequencer/TkrIter",
+      "Sequencer/Acd"
+      };
+
+Cal1.Members = { 
+      "CalXtalRecAlg", 
+      "CalClustersAlg/first"
+      };
+Tkr.Members = {
+      "TkrReconAlg/FirstPass"
+      };
+Cal2.Members = {
+      "CalClustersAlg/second"
+      };
+TkrIter.Members = {
+      "TkrReconAlg/Iteration"
+      };
+Acd.Members = {"AcdReconAlg"};
+
+//Output.Members = {"digiRootWriterAlg"};
+Output.Members = {
+    "digiRootWriterAlg",
+    "reconRootWriterAlg",
+    "meritAlg"	
+};
+
+// 3.  Conversion, persistency stuff and remaining simple parameter settings
+//------------------------------------
+
+//  Generation or input
+//
+G4Generator.defaultCutValue=0.7; 
+G4Generator.defaultTkrCutValue=0.1;
+G4Generator.defaultCalCutValue=0.7;
+
+#include "$FLUXSVCROOT/src/defaultOptions.txt"
+
+// Append (or replace) the list of source library documents
+FluxSvc.source_lib += {"$(G4GENERATORROOT)/src/test/test_sources.xml"};
+//FluxSvc.source_lib += {"./my_sources.xml"};
+FluxAlg.sources={"all_gamma"};
+
+// add in CRflux option
+ApplicationMgr.DLLs +={ "CRflux" };
+FluxSvc.source_lib += {
+    "$(CRFLUXROOT)/xml/source_library.xml"};
+
+// Persistency and conversion 
+//
+EventPersistencySvc.CnvServices = {"EventCnvSvc"};
+
+DetectorPersistencySvc.CnvServices += {"CalibMySQLCnvSvc"};
+DetectorPersistencySvc.CnvServices += {"CalibXmlCnvSvc"};
+
+
+// ----------------------------
+//  Geometry definition
+//
+GlastDetSvc.topVolume="LAT"; 
+GlastDetSvc.visitorMode="recon";
+//GlastDetSvc.xmlfile     = "$(XMLGEODBSROOT)/xml/latAssembly/2TowerSegVols.xml";
+GlastDetSvc.xmlfile="$(XMLGEODBSROOT)/xml/flight/flightSegVols.xml";
+GlastDetSvc.visitorMode  = "recon";
+
+// ----------------------------
+//  onboard filter 
+//
+// Veto mode
+//OnboardFilter.mask=65535; 
+//OnboardFilter.PassThrough=0; 
+//
+// Pass through mode
+OnboardFilter.mask=0; 
+OnboardFilter.PassThrough=1; 
+//
+// FilterAlg (NOTE: FilterAlg only runs in pass-through mode
+//                   to obtain the same results as OnboardFilter
+//                   you need to run OnboardFilter in pass-through mode also
+FilterAlg.evaluateCal1=1;
+FilterAlg.evaluateAcdUncomment1=1;
+FilterAlg.UseGleamTileGeometry=1;
+//            EbfWriter
+// -------------------------------------------
+
+
+// Set Max size of EBF event (Default is 0x10000=65536...too small for fullEncode Files)
+//                           (For Full Encode use0x20000=131072...techically too big for LCB))
+EbfWriter.MaxEvtSize=65536;
+EbfWriter.LdfFormat=false;
+
+// Set Flag for Creating/Writing FES Files
+// 0 = No FES output  1 = Generate FES Files
+EbfWriter.FESFiles=0;
+EbfWriter.FESVersion=2;
+
+// Set Encoding Flags (Debugging Datasets)
+// -1 = No Encoding (Use GLEAM Evt) 0 = Give Empty Cont. 1 = Full Enode 2 = Sparse Encode
+EbfWriter.TkrEncode=-1;
+EbfWriter.CalEncode=-1;
+EbfWriter.ReadFile=0;
+EbfWriter.WriteEbf=false;
+EbfWriter.StoreOnTds=true;
+EbfWriter.LdfFormat=false;
+
+EbfWriter.FileName="AllGamma_0003_0005_V2p9_all";
+
+
+//            calibration
+// -------------------------------------------
+// CalibDataSvc properties 
+CalibDataSvc.CalibTimeSource="data";
+
+// Following values would all be set by default anyway 
+// Storage type of 14 corresponds to MYSQL
+CalibDataSvc.CalibInstrumentName = "LAT";
+CalibDataSvc.CalibStorageType = 14;
+CalibDataSvc.CalibRootName = "Calib";
+// Flavor "vanilla" is always present. Other desired flavors go in list
+// CalibDataSvc.CalibFlavorList = {"ideal"};
+
+second.OutputLevel=5;  // since this guy generates INFO lines
+
+EventSelector.Instrument = "LAT";
+
+// NO filtering using TriggerAlg
+// set trigger mask to process every event
+TriggerAlg.mask = 0;
+
+// Setup INPUT
+EventSelector.StorageType = "NONE";
+EventSelector.Input = "NONE";
+
+
+
+RootTupleSvc.filename  = "test_allgamma.root";
+RootTupleSvc.treename  = "MeritTuple_digi";
+meritAlg.EventTreeName = "MeritTuple_digi"; //  = default value in meritAlg
+
+// Include display.txt when running the GUI
+//#include "$LATINTEGRATIONROOT/src/display.txt"
+//ApplicationMgr.Runable =   "RootIoSvc";
+
+
+// Output DIGI file name
+digiRootWriterAlg.digiRootFile   = "test_allgama_digi.root";
+
+// Output RECON file name
+reconRootWriterAlg.reconRootFile = "test_allgama_recon.root";
+
+// define tree to insert user stuff into: could be MeritTuple or Exposure for current trees.
+//UserAlg.treeName="user";
+//UserAlg.tdsSource=0;
+
+mcRootWriterAlg.OutputLevel=3;
+digiRootWriterAlg.OutputLevel=3;
+reconRootWriterAlg.OutputLevel=3;
+ToolSvc.OutputLevel=3;    // too verbose in debug
+CalClustersAlg.OutputLevel=4; // too much info
+TkrClusFirst.OutputLevel=4;
+CalDigiAlg.OutputLevel=4;
+TkrAlignmentSvc.OutputLevel=4;
+TkrGeometrySvc.OutputLevel=4;
+EbfWriter.OutputLevel=4;
+ToolSvc.LastLayerCorrTool.OutputLevel=4; 
+ToolSvc.OutputLevel=4;
+CalXtalRecAlg.OutputLevel=4;
+
+// Set output level threshold (2=DEBUG, 3=INFO, 4=WARNING, 5=ERROR, 6=FATAL )
+MessageSvc.OutputLevel = 3;
+
+ApplicationMgr.EvtMax  = 100;
+
+
