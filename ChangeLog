@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: hughes  Fri Sep  2 11:44:34 PDT 2005
+OnboardFilter/src
+
+Removed Files:
+	HEAP.c 
+Log Message:
+move to current flight software
+    *
+------------------------------------------------------------
 User: hughes  Fri Sep  2 11:44:33 PDT 2005
 OnboardFilter/src
 
