@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: hughes  Fri Sep  2 11:44:15 PDT 2005
+OnboardFilter/DFC
+
+Removed Files:
+	AWE.h 
+Log Message:
+move to current flight software
+    *
+------------------------------------------------------------
 User: hughes  Fri Sep  2 11:44:14 PDT 2005
 OnboardFilter/DFC
 
