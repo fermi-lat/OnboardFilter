@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: hughes  Fri Sep  2 11:44:38 PDT 2005
+OnboardFilter/src
+
+Removed Files:
+	tmr.c.vx-ppc-gcc 
+Log Message:
+move to current flight software
+    *
+------------------------------------------------------------
 User: hughes  Fri Sep  2 11:44:37 PDT 2005
 OnboardFilter/src
 
