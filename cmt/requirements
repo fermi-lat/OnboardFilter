@@ -1,0 +1,48 @@
+package OnboardFilter
+
+version v1r1p4
+# $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/cmt/requirements,v 1.38 2004/11/01 20:29:29 golpa Exp $
+
+author Navid Golpayegani <golpa@milkyway.gsfc.nasa.gov>
+
+use EbfWriter           *
+use TkrUtil             *
+use GuiSvc              *
+
+apply_pattern packageShr
+apply_pattern package_include
+apply_pattern package_header
+
+private
+
+macro OnboardFilter_cppflags "" \
+   Linux "-DGLEAM -D__i386 -DEFC_FILTER  -D__unix__"\
+   WIN32 "/D GLEAM /D__i386"
+
+macro OnboardFilter_cflags $(OnboardFilter_cppflags)
+
+macro headers "" WIN32 "*.h"#the following prepend for local includes
+macro_prepend includes "-I ../src -I ../flight/EFC -I ../flight/EDS -I ../flight/EDS/src -I ../flight/EFC/src " 
+WIN32 " /I ..\src  /I ..\flight\EFC /I ..\flight\EDS /I ..\flight\EDS\src /I ..\flight\EFC\src "
+
+
+library OnboardFilter $(headers) *.cxx *.c Dll/*.cxx ../flight/EFC/src/A*.c ../flight/EFC/src/E*.c ../flight/EFC/src/T*.c ../flight/EDS/src/E*.c ../flight/EDS/src/T*.c ../flight/EDS/src/io/E*.c ../flight/EDS/src/io/L*.c 
+
+# use this only for the test. TODO: make it cleaner
+apply_pattern package_Cshlibflags
+private
+use TkrRecon       * -no_auto_imports
+use FluxSvc        * -no_auto_imports
+use TkrDigi        * -no_auto_imports
+use AcdDigi        * -no_auto_imports
+use CalDigi        * -no_auto_imports
+use Trigger        * -no_auto_imports
+use CalUtil        * -no_auto_imports
+use CalRecon       * -no_auto_imports
+use AcdRecon       * -no_auto_imports
+use RootIo         * -no_auto_imports
+
+public
+
+apply_pattern package_test
+set TESTJOBOPTIONS ${ONBOARDFILTERROOT}/src/test/jobOptions.txt
