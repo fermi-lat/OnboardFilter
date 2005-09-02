@@ -3,6 +3,15 @@ User: hughes  Fri Sep  2 11:44:28 PDT 2005
 OnboardFilter/src
 
 Removed Files:
+	CFC_latUnpack.c 
+Log Message:
+move to current flight software
+    *
+------------------------------------------------------------
+User: hughes  Fri Sep  2 11:44:28 PDT 2005
+OnboardFilter/src
+
+Removed Files:
 	CFC_latThreshold.c 
 Log Message:
 move to current flight software
