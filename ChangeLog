@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: hughes  Fri Sep  2 11:44:32 PDT 2005
+OnboardFilter/src
+
+Removed Files:
+	EBF_directory.c 
+Log Message:
+move to current flight software
+    *
+------------------------------------------------------------
 User: hughes  Fri Sep  2 11:44:31 PDT 2005
 OnboardFilter/src
 
