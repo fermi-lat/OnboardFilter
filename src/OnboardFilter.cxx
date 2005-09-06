@@ -6,7 +6,7 @@
    
 \verbatim
 
-  CVS $Id$
+  CVS $Id: OnboardFilter.cxx,v 1.44 2005/09/02 19:10:09 hughes Exp $
 \endverbatim
     
                                                                           */
@@ -120,7 +120,7 @@
 
 
 #ifndef         AFC_SPLASHMAP_TD
-#define         ATF_SPLASHMAP_TD
+#define         AFC_SPLASHMAP_TD
 typedef struct _AFC_splashMap AFC_splashMap;
 #endif
 
