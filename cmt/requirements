@@ -1,7 +1,7 @@
 package OnboardFilter
 
-version v1r1p4
-# $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/cmt/requirements,v 1.38 2004/11/01 20:29:29 golpa Exp $
+version v2r0
+# $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/cmt/requirements,v 1.44 2005/09/02 19:45:43 hughes Exp $
 
 author Navid Golpayegani <golpa@milkyway.gsfc.nasa.gov>
 
@@ -21,12 +21,22 @@ macro OnboardFilter_cppflags "" \
 
 macro OnboardFilter_cflags $(OnboardFilter_cppflags)
 
-macro headers "" WIN32 "*.h"#the following prepend for local includes
-macro_prepend includes "-I ../src -I ../flight/EFC -I ../flight/EDS -I ../flight/EDS/src -I ../flight/EFC/src " 
-WIN32 " /I ..\src  /I ..\flight\EFC /I ..\flight\EDS /I ..\flight\EDS\src /I ..\flight\EFC\src "
+#the following prepend for local includes
+macro_prepend includes "-I ../src -I ../flight/EFC -I ../flight/EDS -I ../flight/EDS/src -I ../flight/EFC/src " \
+     WIN32 " /I ..\src  /I ..\flight\EFC /I ..\flight\EDS /I ..\flight\EDS\src /I ..\flight\EFC\src "
 
 
-library OnboardFilter $(headers) *.cxx *.c Dll/*.cxx ../flight/EFC/src/A*.c ../flight/EFC/src/E*.c ../flight/EFC/src/T*.c ../flight/EDS/src/E*.c ../flight/EDS/src/T*.c ../flight/EDS/src/io/E*.c ../flight/EDS/src/io/L*.c 
+macro headers "" WIN32 "*.h"
+
+library OnboardFilter \
+ -s=../OnboardFilter $(headers)\
+ -s=../src $(headers) *.cxx \
+ -s=DLL *.cxx\
+ -s=../flight/EFC/src $(headers) A*.c E*.c T*.c \
+ -s=../flight/EDS/EDS/io $(headers) \ 
+ -s=../flight/EDS/EDS/impl $(headers) \ 
+ -s=../flight/EDS/src $(headers) E*.c T*.c \
+ -s=../flight/EDS/src/io $(headers) E*.c L*.c 
 
 # use this only for the test. TODO: make it cleaner
 apply_pattern package_Cshlibflags
