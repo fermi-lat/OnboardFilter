@@ -1,7 +1,7 @@
 package OnboardFilter
 
 version v2r0
-# $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/cmt/requirements,v 1.44 2005/09/02 19:45:43 hughes Exp $
+# $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/cmt/requirements,v 1.45 2005/09/06 16:42:28 burnett Exp $
 
 author Navid Golpayegani <golpa@milkyway.gsfc.nasa.gov>
 
@@ -17,7 +17,7 @@ private
 
 macro OnboardFilter_cppflags "" \
    Linux "-DGLEAM -D__i386 -DEFC_FILTER  -D__unix__"\
-   WIN32 "/D GLEAM /D__i386"
+   WIN32 "/D GLEAM /D__i386 /DEFC_FILTER  -D_WIN32"
 
 macro OnboardFilter_cflags $(OnboardFilter_cppflags)
 
