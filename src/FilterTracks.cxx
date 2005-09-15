@@ -438,7 +438,8 @@ StatusCode FilterTracks::MultipleScattering(){
 
       double old_longest_x = 0;
 	  double old_longest_y = 0;
-	  double disp_one_t, disp_one_b, disp_two_t, disp_two_b, proj_two_b, proj_two_t,
+//	  double proj_two_b;
+	  double disp_one_t, disp_one_b, disp_two_t, disp_two_b, proj_two_t,
 		  bottomhit, tophit, xcompare, xsum_comparison, longest_xcompare, long_firstanglex,
 		  ycompare, ysum_comparison, longest_ycompare, xmax, xmin, long_firstangley,
 		  ymax, ymin, xcompareBottom, ycompareBottom, longest_xcompareBottom, longest_ycompareBottom;
