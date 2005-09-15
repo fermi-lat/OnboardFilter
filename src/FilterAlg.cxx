@@ -1137,7 +1137,7 @@ unsigned int FilterAlg::tkrFilter  (const GammaCfgTkr          *cfg,
    {
        int                  tower;
        EDR_tkrTower          *ttr;
-       int     tkrStatus;
+//       int     tkrStatus;
        TFC_projectionDir     *dir;
        
        tower = FFS (tmsk);

@@ -6,7 +6,7 @@
    
 \verbatim
 
-  CVS $Id: OnboardFilter.cxx,v 1.44 2005/09/02 19:10:09 hughes Exp $
+  CVS $Id: OnboardFilter.cxx,v 1.45 2005/09/06 20:39:57 burnett Exp $
 \endverbatim
     
                                                                           */
@@ -31,7 +31,7 @@
 
 
 //#define EFC_DFILTER
-#define EFC_FILTER
+//#define EFC_FILTER
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -41,6 +41,8 @@
 //#include "EFC_ss.h"
 #include "filter_rto.h"
 #include "EFC/EFC_edsFw.h"
+#include "AFC_splash.h"
+#include "AFC_splashMapDef.h"
 
 #include "EFC/EFC_gammaResultsPrint.h"
 #include "EFC/EFC_gammaStatsPrint.h"
@@ -111,6 +113,8 @@
 
 #include "OnboardFilter/FilterStatus.h"
 #include "OnboardFilter/OnboardFilterTDS.h"
+#include "ATF_shadowedTowers2x2.h"
+#include "AFC_splashMap1x1.h"
 
 
 /* --------------------------------------------------------------------- */
@@ -427,7 +431,7 @@ int OnboardFilter::rtoFill (FilterRto *rto)
    extern int     optind;
    extern char   *optarg;
    const char     *ofile;
-   char                c;
+//   char                c;
    int           nevents;
    int            nprint;
    int             nskip;
@@ -598,7 +602,7 @@ StatusCode OnboardFilter::execute()
     int                       ievts;
     int                       isize;
     int                       nevts;
-         unsigned int              resultCnt;
+//         unsigned int              resultCnt;
     int                    nresults;
 
     eventCount++;
@@ -1155,7 +1159,7 @@ void  OnboardFilter::fillTDS(FilterCtx *ctx,EDS_fwIxb *ixb,const EBF_dir *dir)
    int                         tids;
    int                         tcids;
    EFC_gammaResult *result;
-   int              status;
+//   int              status;
    EDR_tkr                   *tkr;
    EDR_tkrTower          *ttrs;
 
@@ -1192,9 +1196,9 @@ void  OnboardFilter::fillTDS(FilterCtx *ctx,EDS_fwIxb *ixb,const EBF_dir *dir)
          const TFC_projectionDir *dir = prjs->dir + towerId;
 
 
-       int                  tower;
+//       int                  tower;
        EDR_tkrTower          *ttr;
-       unsigned int     tkrStatus;
+//       unsigned int     tkrStatus;
 //       TFC_projectionDir     *dir;
        
        ttr   = ttrs + towerId;
@@ -1827,9 +1831,9 @@ void OnboardFilter::statisticsAltPrint (const EFC_gammaResult  *beg,
 /* ---------------------------------------------------------------------- */
 void  OnboardFilter::printElapsed (TMR_tick beg, TMR_tick end, int n)
 {
-   unsigned int      eticks;
-   TMR_usecs_nsecs  elapsed;  /* Total elapsed time                       */
-   TMR_usecs_nsecs nelapsed;  /* Normalized (by event count) elapsed time */
+//   unsigned int      eticks;
+//   TMR_usecs_nsecs  elapsed;  /* Total elapsed time                       */
+//   TMR_usecs_nsecs nelapsed;  /* Normalized (by event count) elapsed time */
 
 
    return;
@@ -1850,7 +1854,7 @@ void  OnboardFilter::printElapsed (TMR_tick beg, TMR_tick end, int n)
 void OnboardFilter::printRaw (unsigned int *pdata,
 		      int psize)
 {
-   int         pcktseq;
+//   int         pcktseq;
    int        idy  = 0;
    int        nout = 8;
 
