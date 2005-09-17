@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: hughes  Sat Sep 17 09:12:48 PDT 2005
+OnboardFilter/cmt
+
+Modified Files:
+	requirements 
+Log Message:
+added line so other packages get the correct include path
+    *
+------------------------------------------------------------
 User: hughes  Thu Sep 15 10:46:11 PDT 2005
 OnboardFilter/src
 
