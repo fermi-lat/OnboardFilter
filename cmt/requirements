@@ -1,9 +1,9 @@
 package OnboardFilter
 
-version v2r0
-# $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/cmt/requirements,v 1.47 2005/09/15 17:43:57 hughes Exp $
+version v2r0p1
+# $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/cmt/requirements,v 1.48 2005/09/17 16:12:48 hughes Exp $
 
-author Navid Golpayegani <golpa@milkyway.gsfc.nasa.gov>
+author Richard Hughes <HUGHES@mps.ohio-state.edu>
 
 use EbfWriter           *
 use TkrUtil             *
