@@ -2,6 +2,7 @@
  * @file release.notes
  * @brief Package OnboardFilter
  * @verbatim
+ * v2r0p1 21-sep-2005  THB : (Richard Hughes) EBF_stream.c fix
  * v2r0   03-sep-2005  THB : Major reorganization (by Richard Hughes), including new filter code
  * v1r1p8 18-aug-2005  THB : adjust CAL thresholds (by Julie)
  * v1r1p7 26-may-2005  THB : re-enable filtering, which was broken by the JJ import for v1r0
