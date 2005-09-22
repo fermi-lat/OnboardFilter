@@ -1,4 +1,14 @@
 ------------------------------------------------------------
+User: mcenery  Thu Sep 22 15:33:26 PDT 2005
+OnboardFilter/src
+
+Modified Files:
+      Tag: GlastRelease-v7r0p3
+	CFC_constants.c 
+Log Message:
+
+    *
+------------------------------------------------------------
 TAG
 Tag name: GlastRelease-v7r0p3, operation: add
 Package: OnboardFilter
