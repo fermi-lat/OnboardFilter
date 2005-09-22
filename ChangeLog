@@ -1,5 +1,14 @@
 ------------------------------------------------------------
 User: hughes  Thu Sep 22 08:38:53 PDT 2005
+OnboardFilter/doc
+
+Modified Files:
+	release.notes 
+Log Message:
+changes for FilterTracks; default is not to run
+    *
+------------------------------------------------------------
+User: hughes  Thu Sep 22 08:38:53 PDT 2005
 OnboardFilter/OnboardFilter
 
 Modified Files:
