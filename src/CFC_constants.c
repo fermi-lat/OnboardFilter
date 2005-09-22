@@ -52,10 +52,10 @@
   \brief  Upper limit, in MeV of the range A 3 ADC
                                                                           */
 /* ---------------------------------------------------------------------- */
-#define CFC_K_LIMIT_RNGA0    143
-#define CFC_K_LIMIT_RNGA1   1033
-#define CFC_K_LIMIT_RNGA2  10087
-#define CFC_K_LIMIT_RNGA3  81235
+#define CFC_K_LIMIT_RNGA0    131
+#define CFC_K_LIMIT_RNGA1   1135
+#define CFC_K_LIMIT_RNGA2   8888
+#define CFC_K_LIMIT_RNGA3  78766
 /* ---------------------------------------------------------------------- */
 
 
@@ -103,10 +103,10 @@
   \brief  Upper limit, in MeV of the range B 3 ADC
                                                                           */
 /* ---------------------------------------------------------------------- */
-#define CFC_K_LIMIT_RNGB0    143
-#define CFC_K_LIMIT_RNGB1   1033
-#define CFC_K_LIMIT_RNGB2  10087
-#define CFC_K_LIMIT_RNGB3  81235
+#define CFC_K_LIMIT_RNGB0    131
+#define CFC_K_LIMIT_RNGB1   1135
+#define CFC_K_LIMIT_RNGB2   8888
+#define CFC_K_LIMIT_RNGB3  78766
 /* ---------------------------------------------------------------------- */
 
 
