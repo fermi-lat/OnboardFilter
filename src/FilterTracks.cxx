@@ -7,6 +7,7 @@ const IAlgFactory& FilterTracksFactory = Factory;
 FilterTracks::FilterTracks(const std::string& name, ISvcLocator* pSvcLocator)
 :Algorithm(name, pSvcLocator){
 
+    declareProperty("Run",     m_run = 0);
     declareProperty("UseNumHits",     m_usenumhits = 0);
 	declareProperty("WriteHits",      m_writehits = 0);
 	declareProperty("Scattering",     m_scattering = 0);
@@ -48,6 +49,7 @@ StatusCode FilterTracks::finalize(){
 }
 
 StatusCode FilterTracks::execute(){
+  if (m_run == 0) return StatusCode::SUCCESS;
   MsgStream log(msgSvc(),name());
   log<<MSG::DEBUG<<"execute()"<<endreq;
   ITkrGeometrySvc *tkrGeoSvc=NULL;
