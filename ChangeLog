@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: hughes  Thu Sep 22 08:38:53 PDT 2005
+OnboardFilter/OnboardFilter
+
+Modified Files:
+	FilterTracks.h 
+Log Message:
+changes for FilterTracks; default is not to run
+    *
+------------------------------------------------------------
 User: hughes  Thu Sep 22 07:21:38 PDT 2005
 OnboardFilter/src
 
