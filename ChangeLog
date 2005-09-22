@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: hughes  Thu Sep 22 07:21:37 PDT 2005
+OnboardFilter/OnboardFilter
+
+Modified Files:
+	FilterStatus.h 
+Log Message:
+create tds even if ebf is not present
+    *
+------------------------------------------------------------
 TAG
 Tag name: v2r0p1, operation: add
 Package: OnboardFilter
