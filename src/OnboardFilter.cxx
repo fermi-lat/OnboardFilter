@@ -6,7 +6,7 @@
    
 \verbatim
 
-  CVS $Id: OnboardFilter.cxx,v 1.45 2005/09/06 20:39:57 burnett Exp $
+  CVS $Id: OnboardFilter.cxx,v 1.46 2005/09/15 17:46:11 hughes Exp $
 \endverbatim
     
                                                                           */
@@ -627,8 +627,14 @@ StatusCode OnboardFilter::execute()
     }
     
     MsgStream log(msgSvc(),name());
-
-
+//
+// Make the tds objects
+    OnboardFilterTds::TowerHits *hits = new OnboardFilterTds::TowerHits;
+    eventSvc()->registerObject("/Event/Filter/TowerHits",hits);
+    OnboardFilterTds::FilterStatus *newStatus=new OnboardFilterTds::FilterStatus;
+    eventSvc()->registerObject("/Event/Filter/FilterStatus",newStatus);
+//
+// Check for ebf on tds
     SmartDataPtr<EbfWriterTds::Ebf> ebfData(eventSvc(),"/Event/Filter/Ebf");
     if(!ebfData){
 //      log<<MSG::ERROR<<"Unable to retrieve ebf data from TDS"<<endreq;
@@ -636,10 +642,6 @@ StatusCode OnboardFilter::execute()
     }
 
 
-    OnboardFilterTds::TowerHits *hits = new OnboardFilterTds::TowerHits;
-    eventSvc()->registerObject("/Event/Filter/TowerHits",hits);
-    OnboardFilterTds::FilterStatus *newStatus=new OnboardFilterTds::FilterStatus;
-    eventSvc()->registerObject("/Event/Filter/FilterStatus",newStatus);
 
 
     /* Set the diagnostic message/print levels */
@@ -853,7 +855,7 @@ StatusCode OnboardFilter::execute()
 
 
     newStatus->set(results->status);
-    newStatus->setCalEnergy(results->stageEnergy & EFC_GAMMA_STAGE_M_ENERGY);
+    newStatus->setStageEnergy(results->stageEnergy);
     newStatus->setGemThrTkr(myFilterInfo.thrTkr);
     newStatus->setGemCalHiLo(myFilterInfo.calHiLo);
     newStatus->setGemCondsumCno(myFilterInfo.condsumCno);
@@ -867,7 +869,6 @@ StatusCode OnboardFilter::execute()
     newStatus->setGemDiscarded(myFilterInfo.discarded);
     newStatus->setGemPrescaled(myFilterInfo.prescaled);
     newStatus->setGemSent(myFilterInfo.sent);
-    newStatus->set(results->status);
     newStatus->setTcids(TDS_variables.tcids);
     newStatus->setAcdMap(TDS_variables.acd_xz,TDS_variables.acd_yz,TDS_variables.acd_xy);
     newStatus->setLayerEnergy(TDS_variables.layerEnergy);
