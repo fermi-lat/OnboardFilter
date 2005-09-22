@@ -3,7 +3,7 @@
  * @brief Algorithm to compute tracks from the Filter's projections
  * @author Navid Golpayeagani - golpa@milkyway.gsfc.nasa.gov
  * @author David Wren - dnwren@milkyway.gsfc.nasa.gov
- * $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/OnboardFilter/FilterTracks.h,v 1.8 2004/09/16 16:29:08 dnwren Exp $
+ * $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/OnboardFilter/FilterTracks.h,v 1.10 2005/09/02 19:08:29 hughes Exp $
  */
 
 #ifndef _FILTER_TRACKS_H_
@@ -120,6 +120,7 @@ class FilterTracks : public Algorithm{
   double m_theta, m_theta_rad;
   double m_length;
 
+  int m_run;
   int m_usenumhits;
   int m_writehits;
   int m_scattering;
