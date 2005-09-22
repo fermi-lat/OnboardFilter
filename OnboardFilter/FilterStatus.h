@@ -15,6 +15,7 @@
 #include "TkrUtil/ITkrGeometrySvc.h"
 #include "EFC/TFC_projectionDef.h"
 #include "EDS/EDR_tkr.h"
+#include "EFC/EFC_gammaStatus.h"
 
 /**
  * @class FilterStatus
@@ -121,6 +122,7 @@ namespace OnboardFilterTds{
     unsigned int getLow() const;
     ///Returns the value stored in CalEnergy
     float getCalEnergy() const;
+    int getStageEnergy() const;
     ///Return the Code specifying the towers with triggers or possible triggers
     int getTcids() const;
     ///Return the ACD hit map results
@@ -163,7 +165,7 @@ namespace OnboardFilterTds{
     ///Set the statuscode of the filter
     void set(const unsigned int code);
     ///Set the Energy in CAL
-    void setCalEnergy(const int energy);
+    void setStageEnergy(const int energy);
     ///Set the Code specifying the towers with triggers or possible triggers
     void setTcids(const int ids);
     ///Set the ACD hit map results
@@ -263,7 +265,7 @@ namespace OnboardFilterTds{
     ///Filter status code
     unsigned int m_status;
     ///Energy in CAL
-    float m_calEnergy;
+    int m_stageEnergy;
     ///Towers with triggers
     int m_tcids;
 
@@ -395,7 +397,10 @@ namespace OnboardFilterTds{
     return &m_tkr;
   }
   inline float FilterStatus::getCalEnergy() const{
-    return m_calEnergy;
+    return (float)((m_stageEnergy & EFC_GAMMA_STAGE_M_ENERGY)/4.0);
+  }
+  inline int FilterStatus::getStageEnergy() const{
+    return m_stageEnergy;
   }
   inline int FilterStatus::getTcids()const{
     return m_tcids;
@@ -460,7 +465,7 @@ namespace OnboardFilterTds{
 
   inline FilterStatus::FilterStatus(){
     m_status=0;
-    m_calEnergy=0;
+    m_stageEnergy=0;
     m_tcids=0;
     m_acd_xy=0;
     m_acd_xz=0;
@@ -482,8 +487,8 @@ namespace OnboardFilterTds{
     m_status=code;
   }
 
-  inline void FilterStatus::setCalEnergy(const int energy){
-    m_calEnergy=(float)energy/4.;//must divide by 4 to get MeV units
+  inline void FilterStatus::setStageEnergy(const int stageEnergy){
+    m_stageEnergy=stageEnergy;//must divide by 4 to get MeV units
   }
 
   inline void FilterStatus::setTcids(const int ids){
@@ -714,7 +719,7 @@ namespace OnboardFilterTds{
 
   inline std::ostream& FilterStatus::fillStream(std::ostream &s) const{
     s<<"Filter Return Code: "<<m_status<<std::endl;
-    s<<"Filter code for Energy in CAL: "<<m_calEnergy<<std::endl;
+    s<<"Filter code for StageEnergy in CAL: "<<m_stageEnergy<<std::endl;
     return s;
   }
 
