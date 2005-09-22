@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: hughes  Thu Sep 22 07:21:38 PDT 2005
+OnboardFilter/src
+
+Modified Files:
+	OnboardFilter.cxx 
+Log Message:
+create tds even if ebf is not present
+    *
+------------------------------------------------------------
 User: hughes  Thu Sep 22 07:21:37 PDT 2005
 OnboardFilter/OnboardFilter
 
