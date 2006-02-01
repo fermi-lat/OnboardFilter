@@ -1,4 +1,5 @@
 #include "OnboardFilter/FilterAlg.h"
+#include "CLHEP/Geometry/Transform3D.h"
 
 static const AlgFactory<FilterAlg> Factory;
 const IAlgFactory& FilterAlgFactory = Factory;
@@ -846,7 +847,7 @@ int FilterAlg::ACDProject(ITkrGeometrySvc *tkrGeoSvc,int tower, const OnboardFil
       //log << MSG::WARNING << "Failed to retrieve Shape by Id - probably invalid volId" << endreq;
       return 89;
     }
-    HepTransform3D transform;
+    HepGeom::Transform3D transform;
     sc = m_glastDetSvc->getTransform3DByID(volId, &transform);
     if (sc.isFailure() ) {
       log << MSG::WARNING << "Failed to get transformation" << endreq;
