@@ -294,7 +294,7 @@ double FilterTracks::GetMCAngles(double track_theta_rad, double track_phi_rad,
     SmartDataPtr<Event::McParticleCol> pMcParticle(eventSvc(),EventModel::MC::McParticleCol);
     if(pMcParticle){
       Event::McParticleCol::const_iterator pMCTrack1 = pMcParticle->begin();
-      HepLorentzVector Mc_p0 = (*pMCTrack1)->initialFourMomentum();
+      CLHEP::HepLorentzVector Mc_p0 = (*pMCTrack1)->initialFourMomentum();
       Vector Mc_t0 = Vector(Mc_p0.x(),Mc_p0.y(), Mc_p0.z()).unit();
       double MC_xdir,MC_ydir,MC_zdir;
       MC_xdir   = Mc_t0.x();
