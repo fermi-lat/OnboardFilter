@@ -2,7 +2,7 @@
  * @file release.notes
  * @brief Package OnboardFilter
  * @verbatim
- * v2r0p3 02-feb-2006  THB : EBR_srtream.c fix for non-SLAC windows
+ * v2r0p4 04-feb-2006  THB : EBR_srtream.c fix for non-SLAC windows
  * v2r0p2 22-sep-2005  REH : fixes for FilterTracks
  * v2r0p1 21-sep-2005  THB : (Richard Hughes) EBF_stream.c fix
  * v2r0   03-sep-2005  THB : Major reorganization (by Richard Hughes), including new filter code
