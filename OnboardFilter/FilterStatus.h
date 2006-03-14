@@ -15,8 +15,8 @@
 #include "TkrUtil/ITkrGeometrySvc.h"
 #include "EFC/TFC_projectionDef.h"
 #include "EDS/EDR_tkr.h"
-#include "EFC/EFC_gammaStatus.h"
-
+#include "EFC/GFC_status.h"
+#include "OnboardFilter/LogInfoDef.h"
 /**
  * @class FilterStatus
  * @brief TDS for storing the information returned by the filter
@@ -122,6 +122,9 @@ namespace OnboardFilterTds{
     unsigned int getLow() const;
     ///Returns the value stored in CalEnergy
     float getCalEnergy() const;
+    const int getNumLogsHit() const;
+    const LogInfo* getLogInfo() const;
+    int getEbfSize() const;
     int getStageEnergy() const;
     ///Return the Code specifying the towers with triggers or possible triggers
     int getTcids() const;
@@ -165,7 +168,9 @@ namespace OnboardFilterTds{
     ///Set the statuscode of the filter
     void set(const unsigned int code);
     ///Set the Energy in CAL
+    ///Set the Energy in CAL          
     void setStageEnergy(const int energy);
+    void setEbfSize(const int ids);
     ///Set the Code specifying the towers with triggers or possible triggers
     void setTcids(const int ids);
     ///Set the ACD hit map results
@@ -182,6 +187,8 @@ namespace OnboardFilterTds{
     void setTrack(const track &newTrack);
     void setSeparation(const double sep);
     void setLayerEnergy(const int energy[8]);
+    void setLogData(int num, LogInfo tempLogData[]);
+
     void setCapture(const int xcapture[16], const int ycapture[16]);
     void setXY(const int xy00[16], const int xy11[16], const int xy22[16], const int xy33[16]);
     void setTmsk(int tmsk);
@@ -269,6 +276,7 @@ namespace OnboardFilterTds{
     ///Towers with triggers
     int m_tcids;
 
+   int m_ebfsize;
     ///Gem info
    int m_gem_thrTkr;  
    int m_gem_calHiLo;  
@@ -283,8 +291,10 @@ namespace OnboardFilterTds{
    int m_gem_discarded; 
    int m_gem_prescaled; 
    int m_gem_sent;
+    LogInfo m_logData[16*8*12];    // 16 towers * 8 layers * 12 logs
 
 
+   int m_numLogsHit;
     ///ACD hit map
     int m_acd_xz;
     int m_acd_yz;
@@ -397,13 +407,16 @@ namespace OnboardFilterTds{
     return &m_tkr;
   }
   inline float FilterStatus::getCalEnergy() const{
-    return (float)((m_stageEnergy & EFC_GAMMA_STAGE_M_ENERGY)/4.0);
+    return (float)((m_stageEnergy & GFC_STAGE_M_ENERGY)/4.0);
   }
   inline int FilterStatus::getStageEnergy() const{
     return m_stageEnergy;
   }
   inline int FilterStatus::getTcids()const{
     return m_tcids;
+  }
+  inline int FilterStatus::getEbfSize()const{
+    return m_ebfsize;
   }
   inline const int * FilterStatus::getLayers()const {
     return m_layers;
@@ -430,7 +443,14 @@ namespace OnboardFilterTds{
   inline const int* FilterStatus::getYcapture() const{
     return m_ycapture;
   }
-
+   
+     inline const int FilterStatus::getNumLogsHit() const{
+         return m_numLogsHit;
+           }
+     inline const LogInfo* FilterStatus::getLogInfo() const{
+         return m_logData;
+           }
+           
   inline const float* FilterStatus::getLayerEnergy() const{
     return m_layerEnergy;
   }
@@ -467,9 +487,11 @@ namespace OnboardFilterTds{
     m_status=0;
     m_stageEnergy=0;
     m_tcids=0;
+    m_ebfsize=0;
     m_acd_xy=0;
     m_acd_xz=0;
     m_acd_yz=0;
+    m_numLogsHit = 0;
     for(int counter=0;counter<16;counter++){
       m_acdStatus[counter]=0;
       m_layers[counter]=0;
@@ -489,6 +511,10 @@ namespace OnboardFilterTds{
 
   inline void FilterStatus::setStageEnergy(const int stageEnergy){
     m_stageEnergy=stageEnergy;//must divide by 4 to get MeV units
+  }
+
+  inline void FilterStatus::setEbfSize(const int ebfsize){
+    m_ebfsize = ebfsize;
   }
 
   inline void FilterStatus::setTcids(const int ids){
@@ -574,7 +600,14 @@ namespace OnboardFilterTds{
     for(int counter=0;counter<8;counter++)
       m_layerEnergy[counter]=((float)energy[counter])/4.;//must divide by 4 to get MeV units
   }
-
+   
+   inline void FilterStatus::setLogData(int num, LogInfo tempLogData[]){
+      m_numLogsHit = num;
+      for (int i=0; i<num; i++) {
+         m_logData[i] = tempLogData[i];
+      }
+   }
+                   
   inline void FilterStatus::setCapture(const int xcapture[16], const int ycapture[16]){
     for(int counter=0;counter<16;counter++){
       m_xcapture[counter]=xcapture[counter];

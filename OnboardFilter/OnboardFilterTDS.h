@@ -15,6 +15,7 @@
 /* ---------------------------------------------------------------------- */
 
 #include "EFC/TFC_projectionDef.h"
+#include "OnboardFilter/LogInfoDef.h"
 
 
 
@@ -32,6 +33,8 @@ extern "C" {
     int layerMaps[2];
     struct towerLayer layers[36];
   };
+  
+  
   typedef struct _TDS_Info{
     int tcids;
     int acd_xz;
@@ -41,9 +44,12 @@ extern "C" {
     //TFC_projections prjs[16];
     TFC_projections prjs;
     EDR_tkr         tkr;
+//    int logMap[16][8];
     int xCnt[16];
     int yCnt[16];
     int layerEnergy[8];
+    int numLogsHit;
+    LogInfo logData[16*8*12];    // 16 towers * 8 layers * 12 logs
     int xy00[16];
     int xy11[16];
     int xy22[16];
@@ -52,6 +58,8 @@ extern "C" {
     int ycapture[16];
     struct towerRecord hits[16];
     int tmsk;
+    int status;
+    unsigned int stageEnergy;
   }TDS_Info;
   TDS_Info TDS_variables;
 
