@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: hughes  Tue Mar 14 12:41:27 PST 2006
+OnboardFilter/src
+
+Removed Files:
+	FilterAlg_projectionFind.cxx FilterAlg_skirt.cxx 
+Log Message:
+remove old OnboardFilter wrapper code
+    *
+------------------------------------------------------------
 User: hughes  Tue Mar 14 05:51:15 PST 2006
 OnboardFilter/OnboardFilter
 
