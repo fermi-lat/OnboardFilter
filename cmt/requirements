@@ -1,7 +1,6 @@
 package OnboardFilter
-
 version v2r0p4
-# $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/cmt/requirements,v 1.50 2006/02/03 04:01:37 burnett Exp $
+# $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/cmt/requirements,v 1.51 2006/02/05 20:23:46 burnett Exp $
 
 author Richard Hughes <HUGHES@mps.ohio-state.edu>
 
@@ -14,29 +13,62 @@ apply_pattern package_include
 apply_pattern package_header
 
 private
+use GlastSvc v*
+use facilities v*
 
 macro OnboardFilter_cppflags "" \
-   Linux "-DGLEAM -D__i386 -DEFC_FILTER  -D__unix__"\
+   Linux "-DGLEAM -D__i386 -DEFC_FILTER -DMSG_ST -D__unix__  -DWUT_IMPLEMENTATION_PX "\
    WIN32 "/D GLEAM /D__i386 /DEFC_FILTER  /D_WIN32"
+
+#    -nostdinc -I/usr/local/gcc-3.2.3/lib/gcc-lib/i686-pc-linux-gnu/3.2.3/include -I/usr/include"\
 
 macro OnboardFilter_cflags $(OnboardFilter_cppflags)
 
+macro_append cpplinkflags Linux "-ldl -lpthread" WIN32 ""
 #the following prepend for local includes
-macro_prepend includes "-I ../src -I ../flight/EFC -I ../flight/EDS -I ../flight/EDS/src -I ../flight/EFC/src " \
+macro_prepend includes "-I ../src -I ../flight/EFC -I ../flight/EDS  -I../flight/MPP_DB -I ../flight/EDS/src -I ../flight/EFC/src -I../flight/CMX -I../flight/MSG_DB -I../flight/CPU_DB -I../flight/MSG -I../flight/MDB -I../flight/CMX/src -I../flight/CDM -I../flight/CDM/src -I../flight/RFC_DB -I../flight/GFC_DB -I../flight/CAL_DB  -I../flight/EFC_DB  -I../flight/GEO_DB -I../flight/PBS -I../flight/PBS_DB -I../flight/PBI -I../flight/EDS_DB " \
      WIN32 " /I ..\src  /I ..\flight\EFC /I ..\flight\EDS /I ..\flight\EDS\src /I ..\flight\EFC\src "
 
 
 macro headers "" WIN32 "*.h"
 
+
+library cal_db_pedestals \
+ -s=../flight/CGB_DB/src $(headers) CAL_DB_pedestals.c
+
+library cal_db_gains \
+ -s=../flight/CGB_DB/src $(headers) CAL_DB_gains.c
+
+library cal_db_pedestals_flight \
+ -s=../flight/CPP_DB/src $(headers) CAL_DB_pedestals.c
+
+library cal_db_gains_flight \
+ -s=../flight/CPG_DB/src $(headers) CAL_DB_gains.c
+
+
 library OnboardFilter \
  -s=../OnboardFilter $(headers)\
- -s=../src $(headers) *.cxx \
+ -s=../src *.cxx \
  -s=../src/Dll *.cxx \
- -s=../flight/EFC/src $(headers) A*.c E*.c T*.c \
+ -s=../flight/EFC/src $(headers) A*.c E*.c T*.c *cab.c \
  -s=../flight/EDS/EDS/io $(headers) \ 
  -s=../flight/EDS/EDS/impl $(headers) \ 
+ -s=../flight/CDM/src $(headers) C*.c \
+ -s=../flight/CPU_DB/src $(headers) C*.c \
+ -s=../flight/CMX/src $(headers) C*.c \
+ -s=../flight/MSG/src $(headers) M*.c \
+ -s=../flight/MDB/src $(headers) M*.c \
+ -s=../flight/EDS_DB/src $(headers) E*.c \
+ -s=../flight/GEO_DB/src $(headers) G*.c  *cab.c \
+ -s=../flight/GFC_DB/src $(headers) G*.c *cab.c\
+ -s=../flight/RFC_DB/src $(headers) R*.c *cab.c\
+ -s=../flight/GGF_DB/src $(headers) G*.c \
+ -s=../flight/PBS/src $(headers) *.c \
  -s=../flight/EDS/src $(headers) E*.c T*.c \
- -s=../flight/EDS/src/io $(headers) E*.c L*.c 
+ -s=../flight/EDS/src/io $(headers) E*.c L*.c \
+ -x=\CAL_DB_pedestals\ \
+ -x=\CAL_DB_gains\
+ 
 
 # use this only for the test. TODO: make it cleaner
 apply_pattern package_Cshlibflags
@@ -60,7 +92,7 @@ use CRflux         * -no_auto_imports
 
 public
 
-
+#set LD_LIBRARY_PATH ${ONBOARDFILTERROOT}/rh9_gcc32
 
 apply_pattern package_test
 set TESTJOBOPTIONS ${ONBOARDFILTERROOT}/src/test/jobOptions.txt
