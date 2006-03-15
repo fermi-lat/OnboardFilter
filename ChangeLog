@@ -1,4 +1,27 @@
 ------------------------------------------------------------
+TAG
+Tag name: v3r0, operation: add
+Package: OnboardFilter
+User: hughes  Wed Mar 15 12:34:39 2006
+Files:
+  OnboardFilter/.cvsignore  1.2
+  OnboardFilter/ChangeLog  1.474
+  OnboardFilter/OnboardFilter/FilterAlg.h  1.5
+  OnboardFilter/OnboardFilter/FilterTracks.h  1.11
+  OnboardFilter/OnboardFilter/filter_rto.h  1.1
+  OnboardFilter/OnboardFilter/OnboardFilterTDS.h  1.2
+  OnboardFilter/OnboardFilter/FilterStatus.h  1.31
+  OnboardFilter/OnboardFilter/FilterAlgTds.h  1.5
+  OnboardFilter/OnboardFilter/FilterDisplay.h  1.5
+  OnboardFilter/OnboardFilter/LogInfoDef.h  1.1
+  OnboardFilter/cmt/.cvsignore  1.2
+  OnboardFilter/cmt/requirements  1.53
+  OnboardFilter/cmt/Makefile  1.4
+  OnboardFilter/doc/release.notes  1.41
+  OnboardFilter/doc/OnboardFilter.jpg  1.2
+
+    *
+------------------------------------------------------------
 User: hughes  Wed Mar 15 12:33:12 PST 2006
 OnboardFilter/cmt
 
