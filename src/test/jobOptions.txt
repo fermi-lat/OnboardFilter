@@ -1,201 +1,127 @@
-// jobOptions to read EM LDF, run recon and produce merit NTuple, digi ROOT
-//  and recon ROOT
-//___________________________________________________________________
 
-//  The file has 3 major sections:
-//   1.  Declare DLLs and services (other than conversion services)
-//   2.  Define sequences for event loop
-//   3.  Declare conversion services.  Declare properties associated 
-//       with a particular algorithm or service, 
-//___________________________________________________________________
+//##############################################################
 //
-// 1.  DLLs and SERVICES:
+// Job options file for Gleam job
+
+//#include "basicOptions.txt"
+//##############################################################
+//
+// basic Job options file for a Gleam execution
+// $Header: /nfs/slac/g/glast/ground/cvs/Gleam/src/basicOptions.txt,v 1.79 2005/11/09 06:48:25 heather Exp $
+
+// primary DLLs, including auditor 
 
 ApplicationMgr.DLLs+= { "GaudiAlg", "GaudiAud"};
 ApplicationMgr.ExtSvc += {"ChronoStatSvc"};
-
-ApplicationMgr.DLLs += {"GlastSvc"};
-ApplicationMgr.ExtSvc += { "GlastDetSvc"};
-
-// Use the LDF converter service to read in LDF files
-// commented out reh 6/11/05
-// ApplicationMgr.DLLs += {"LdfConverter", "EventIntegrity"};
-
+AuditorSvc.Auditors = {"ChronoAuditor"};
 
 // ----------------------------
-//  Digitization
+// setup basic event loop stuff
 //
-ApplicationMgr.DLLs +={ "TkrDigi", "CalDigi", "AcdDigi"  };
-
-
-// ----------------------------
-//  Generation or input
-//
-ApplicationMgr.DLLs +={ "G4Generator","G4Propagator"};
-ApplicationMgr.ExtSvc += {"G4GeometrySvc"};
-
 ApplicationMgr.ExtSvc = { 
     "GlastEventSelector/EventSelector" , 
     "EventCnvSvc"
     };
 
-ApplicationMgr.DLLs += {"EbfWriter", "OnboardFilter"};
+EventPersistencySvc.CnvServices = {"EventCnvSvc"};
+EventSelector.Input = "NONE";
 
 
-//
-ApplicationMgr.ExtSvc += { "GlastPropagatorSvc" };
-
-ApplicationMgr.DLLs +={ "Trigger"};
-
-ApplicationMgr.DLLs +={ 
-    "CalibSvc",
-    "CalRecon", "CalUtil", "TkrUtil",
-    "TkrRecon",
-    "AcdRecon"
-    };
-
-
-//          tracker
-// -------------------------------------------
-ApplicationMgr.ExtSvc   += { "TkrGeometrySvc"};
-ApplicationMgr.ExtSvc   += { "TkrInitSvc"};
-
-// -------------------------------------------
-// Calorimeter services
-//
-ApplicationMgr.Dlls += {"CalXtalResponse"};
-#include "$CALXTALRESPONSEROOT/src/defaultOptions.txt"
-
-
-ApplicationMgr.ExtSvc += {"CalibDataSvc"};
-ApplicationMgr.ExtSvc += {"CalibMySQLCnvSvc", "CalibXmlCnvSvc" };
-
-// ----------------------------
-//   Atwood's tuple and merit
-//
-ApplicationMgr.DLLs += {"AnalysisNtuple", "ntupleWriterSvc", "merit"};
-ApplicationMgr.ExtSvc += {"RootTupleSvc"};
-
-// Setup OUTPUT
-ApplicationMgr.DLLs +={ "RootIo" }; 
-ApplicationMgr.ExtSvc += { "RootIoSvc" };
-
-AuditorSvc.Auditors = {"ChronoAuditor"};
-
-
-// 2.  SEQUENCING
 // ----------------------------
 //  a structure for the topalg, using sequencer steps
 
 ApplicationMgr.TopAlg = {
       "Sequencer/Top" };
 
-// Even if something fails (sets filter false), we still want the rest 
-// of Top to execute. In particular, we still want ouput.  In practice,
-// it's only EventIntegrityAlg (member of Trigger) that might do 
-// this.
-Top.StopOverride = true;
-
 //the top sequence loop
 Top.Members={
+    "Sequencer/Generator"};
+
+Generator.Members = {
     "FluxAlg", 
+    "PointInfoAlg",
     "G4Generator",
     "Sequencer/CalibrationUpdate",
     "Sequencer/Digitization",
     "Sequencer/EventDisplay",
-    "Sequencer/Triggered",
-    "Sequencer/Output"};
-//    "UserAlg" };
+    "Sequencer/Triggered" };
     
-// FluxAlg branch for "TimeTicks"
-//Top.BranchMembers = {"FluxAlg", "ExposureAlg"};
+// FluxAlg branch for "TimeTicks" 
+// (note that if you override Members, this must be too)
+Generator.BranchMembers = {"FluxAlg", "ExposureAlg"};
 
-Digitization.Members = { 
-    "TkrDigiAlg", 
-    "CalDigiAlg", 
-    "AcdDigiAlg"};
-
-// the sequence that is triggered
-// Removed FilterTracks since it uses MC data
+// the sequence that is triggered with data
 Triggered.Members={
     "Sequencer/Trigger",
-    "Sequencer/Filter",
     "Sequencer/Reconstruction",
-    "Sequencer/RecoDisplay"};
-
-Trigger.Members += {"EbfWriter", 
-                    "OnboardFilter"};
-Filter.Members += {"FilterAlg"};
+    "Sequencer/RecoDisplay",
+    "Sequencer/Output" };
 
 // ----------------------------
-//   Reconstruction
-Reconstruction.Members={ 
-      "Sequencer/Cal1", 
-      "Sequencer/Tkr",
-      "Sequencer/Cal2",
-      "Sequencer/TkrIter",
-      "Sequencer/Acd"
-      };
-
-Cal1.Members = { 
-      "CalXtalRecAlg", 
-      "CalClustersAlg/first"
-      };
-Tkr.Members = {
-      "TkrReconAlg/FirstPass"
-      };
-Cal2.Members = {
-      "CalClustersAlg/second"
-      };
-TkrIter.Members = {
-      "TkrReconAlg/Iteration"
-      };
-Acd.Members = {"AcdReconAlg"};
-
-//Output.Members = {"digiRootWriterAlg"};
-Output.Members = {
-    "digiRootWriterAlg",
-    "reconRootWriterAlg",
-    "meritAlg"	
-};
-
-// 3.  Conversion, persistency stuff and remaining simple parameter settings
-//------------------------------------
-
-//  Generation or input
+//  Geometry definition
 //
-G4Generator.defaultCutValue=0.7; 
-G4Generator.defaultTkrCutValue=0.1;
-G4Generator.defaultCalCutValue=0.7;
+ApplicationMgr.DLLs += {"GlastSvc"};
+ApplicationMgr.ExtSvc += { "GlastDetSvc"};
+GlastDetSvc.topVolume="LAT"; 
+GlastDetSvc.xmlfile="$(XMLGEODBSROOT)/xml/flight/flightSegVols.xml";
+GlastDetSvc.visitorMode="recon";
+
+// ----------------------------
+//  Randoms definition
+//
+ApplicationMgr.ExtSvc += { "GlastRandomSvc"};
+
+// ----------------------------
+//  Generation and simulation
+//
+//  get the parameters for simulation -- misnamed the file :-(
+#include "$G4GENERATORROOT/src/basicOptions.txt"
+ApplicationMgr.DLLs +={ "G4Propagator"};
 
 #include "$FLUXSVCROOT/src/defaultOptions.txt"
-
-// Append (or replace) the list of source library documents
-FluxSvc.source_lib += {"$(G4GENERATORROOT)/src/test/test_sources.xml"};
-//FluxSvc.source_lib += {"./my_sources.xml"};
-FluxAlg.sources={"all_gamma"};
+FluxAlg.source_name="default";
 
 // add in CRflux option
 ApplicationMgr.DLLs +={ "CRflux" };
 FluxSvc.source_lib += {
     "$(CRFLUXROOT)/xml/source_library.xml"};
 
-// Persistency and conversion 
+//-----------------------------
+// These algorithms run before digitization or reconstruction
 //
-EventPersistencySvc.CnvServices = {"EventCnvSvc"};
-
-DetectorPersistencySvc.CnvServices += {"CalibMySQLCnvSvc"};
-DetectorPersistencySvc.CnvServices += {"CalibXmlCnvSvc"};
+CalibrationUpdate.Members={
+    "TkrCalibAlg"     // found in TkrUtil
+    };
 
 
 // ----------------------------
-//  Geometry definition
+//  Digitization
 //
-GlastDetSvc.topVolume="LAT"; 
-GlastDetSvc.visitorMode="recon";
-//GlastDetSvc.xmlfile     = "$(XMLGEODBSROOT)/xml/latAssembly/2TowerSegVols.xml";
-GlastDetSvc.xmlfile="$(XMLGEODBSROOT)/xml/flight/flightSegVols.xml";
-GlastDetSvc.visitorMode  = "recon";
+ApplicationMgr.DLLs +={ "TkrDigi", "CalDigi", "AcdDigi"  };
+Digitization.Members = { 
+    "TkrDigiAlg", 
+    "CalDigiAlg", 
+    "AcdDigiAlg"
+    };
+//CalDigiAlg.RangeType="4Range";
+
+// ----------------------------
+//  Trigger calculation
+//
+ApplicationMgr.DLLs +={ "Trigger"};
+ApplicationMgr.ExtSvc += { "LivetimeSvc"};
+Trigger.Members = {"TriggerAlg"};
+TriggerAlg.mask = -1; // all bits on by default: reject if none set (e.g., missed)
+
+// ----------------------------
+//  onboard filter 
+//
+ApplicationMgr.DLLs += {"EbfWriter", "OnboardFilter"};
+//ApplicationMgr.DLLs += {"EbfWriter"};
+Trigger.Members += {"EbfWriter","OnboardFilter"};
+//Triggered.Members += {"FilterTracks","FilterAlg"};
+OnboardFilter.mask=0; // all bits off by default: no rejection
+
 
 // ----------------------------
 //  onboard filter 
@@ -207,85 +133,111 @@ GlastDetSvc.visitorMode  = "recon";
 // Pass through mode
 OnboardFilter.mask=0; 
 OnboardFilter.PassThrough=1; 
+OnboardFilter.FileNameFilter="$ONBOARDFILTERROOT/rh9_gcc32/libOnboardFilter.so"; 
+OnboardFilter.FileNamePeds="$ONBOARDFILTERROOT/rh9_gcc32/libcal_db_pedestals.so"; 
+OnboardFilter.FileNameGains="$ONBOARDFILTERROOT/rh9_gcc32/libcal_db_gains.so"; 
+//OnboardFilter.FileNamePeds="$ONBOARDFILTERROOT/rh9_gcc32/libcal_db_pedestals_flight.so"; 
+//OnboardFilter.FileNameGains="$ONBOARDFILTERROOT/rh9_gcc32/libcal_db_gains_flight.so"; 
+
+
+// ----------------------------
+//   Reconstruction
 //
-// FilterAlg (NOTE: FilterAlg only runs in pass-through mode
-//                   to obtain the same results as OnboardFilter
-//                   you need to run OnboardFilter in pass-through mode also
-FilterAlg.evaluateCal1=1;
-FilterAlg.evaluateAcdUncomment1=1;
-FilterAlg.UseGleamTileGeometry=1;
-//            EbfWriter
+ApplicationMgr.ExtSvc += { "GlastPropagatorSvc" };
+
+ApplicationMgr.DLLs +={ 
+    "CalRecon", "CalUtil", 
+    "TkrRecon", "TkrUtil"
+    };
+Reconstruction.Members={ 
+    "Sequencer/Cal1", 
+    "Sequencer/Tkr",
+    "Sequencer/Cal2",
+    "Sequencer/TkrIter",
+    "Sequencer/Acd"
+    };
+
+// First pass of Cal Recon - full recon...
+Cal1.Members = { 
+    "CalXtalRecAlg",
+    "CalClustersAlg/first",
+    "CalMipFinderAlg", 
+    "CalEventEnergyAlg/RawEnergy"
+    };
+
+// First pass of Tkr Recon
+Tkr.Members = {
+    "TkrReconAlg/FirstPass"
+    };
+
+// Second pass of Cal Recon - energy corrections only
+Cal2.Members = {
+    "CalEventEnergyAlg/second"
+    };
+TkrIter.Members = {
+    "TkrReconAlg/Iteration"
+    };
+
 // -------------------------------------------
+//          tracker services
+//
+ApplicationMgr.ExtSvc   += { "TkrGeometrySvc"};
+ApplicationMgr.ExtSvc   += { "TkrInitSvc"};
 
+// this fixes a HE track pattern recognition problem
+// *** it should be done in TkrRecon ***
+TkrFilterFirst.FilterToolName="TkrCalFilterTool";
 
-// Set Max size of EBF event (Default is 0x10000=65536...too small for fullEncode Files)
-//                           (For Full Encode use0x20000=131072...techically too big for LCB))
-EbfWriter.MaxEvtSize=65536;
-EbfWriter.LdfFormat=false;
-
-// Set Flag for Creating/Writing FES Files
-// 0 = No FES output  1 = Generate FES Files
-EbfWriter.FESFiles=0;
-EbfWriter.FESVersion=2;
-
-// Set Encoding Flags (Debugging Datasets)
-// -1 = No Encoding (Use GLEAM Evt) 0 = Give Empty Cont. 1 = Full Enode 2 = Sparse Encode
-EbfWriter.TkrEncode=-1;
-EbfWriter.CalEncode=-1;
-EbfWriter.ReadFile=0;
-EbfWriter.WriteEbf=false;
-EbfWriter.StoreOnTds=true;
-EbfWriter.LdfFormat=false;
-
-EbfWriter.FileName="AllGamma_0003_0005_V2p9_all";
-
-
-//            calibration
 // -------------------------------------------
-// CalibDataSvc properties 
-CalibDataSvc.CalibTimeSource="data";
-
-// Following values would all be set by default anyway 
-// Storage type of 14 corresponds to MYSQL
-CalibDataSvc.CalibInstrumentName = "LAT";
-CalibDataSvc.CalibStorageType = 14;
-CalibDataSvc.CalibRootName = "Calib";
-// Flavor "vanilla" is always present. Other desired flavors go in list
-// CalibDataSvc.CalibFlavorList = {"ideal"};
-
-second.OutputLevel=5;  // since this guy generates INFO lines
-
-EventSelector.Instrument = "LAT";
-
-// NO filtering using TriggerAlg
-// set trigger mask to process every event
-TriggerAlg.mask = 0;
-
-// Setup INPUT
-EventSelector.StorageType = "NONE";
-EventSelector.Input = "NONE";
+//  Calibration sevices
+//
+#include "$CALIBSVCROOT/src/defaultOptions.txt"
 
 
-
-RootTupleSvc.filename  = "test_allgamma.root";
-RootTupleSvc.treename  = "MeritTuple_digi";
-meritAlg.EventTreeName = "MeritTuple_digi"; //  = default value in meritAlg
-
-// Include display.txt when running the GUI
-//#include "$LATINTEGRATIONROOT/src/display.txt"
-//ApplicationMgr.Runable =   "RootIoSvc";
+// -------------------------------------------
+//  Calorimeter services
+//
+ApplicationMgr.Dlls += {"CalXtalResponse"};
+#include "$CALXTALRESPONSEROOT/src/defaultOptions.txt"
 
 
-// Output DIGI file name
-digiRootWriterAlg.digiRootFile   = "test_allgama_digi.root";
+// ----------------------------
+//   ACD recon
+//
+ApplicationMgr.DLLs += {"AcdUtil", "AcdRecon"};
+Acd.Members = {"AcdReconAlg"};
 
-// Output RECON file name
-reconRootWriterAlg.reconRootFile = "test_allgama_recon.root";
+// Try to get those damn CT variables in the ntuple
+ClassifyAlg.TreeName="MeritTuple";
+ClassifyAlg.InfoPath="/usr/products/Glast/GlastRelease_v7r3p20/GlastClassify/v3r2/xml/";
+ClassifyAlg.xmlFileName="DC2_Analysis.xml";
 
-// define tree to insert user stuff into: could be MeritTuple or Exposure for current trees.
-//UserAlg.treeName="user";
-//UserAlg.tdsSource=0;
 
+// ----------------------------
+//   Atwood's tuple and merit
+//
+ApplicationMgr.DLLs +=   {"AnalysisNtuple", "ntupleWriterSvc", "merit"};
+ApplicationMgr.ExtSvc += {"RootTupleSvc"};
+AnalysisNtupleAlg.tupleName = "MeritTuple";
+Triggered.Members +=     { "AnalysisNtupleAlg","meritAlg", "ClassifyAlg", "FT1Alg","glastNtuple" };
+glastNtuple.tupleName="myGlast.root";
+
+//-------------------------------------
+//   Merit configuration --  (use defaults)
+
+// ---------------------------- 
+//   Output
+//
+ApplicationMgr.DLLs +={"RootIo"}; 
+Output.Members = {     
+    "FhSetAlg",
+    "mcRootWriterAlg", 
+    "digiRootWriterAlg", 
+    "reconRootWriterAlg"};
+
+ApplicationMgr.DLLs += {"glastNtuple"};
+
+// output levels, including suppression to allow debug, info
 mcRootWriterAlg.OutputLevel=3;
 digiRootWriterAlg.OutputLevel=3;
 reconRootWriterAlg.OutputLevel=3;
@@ -299,10 +251,78 @@ EbfWriter.OutputLevel=4;
 ToolSvc.LastLayerCorrTool.OutputLevel=4; 
 ToolSvc.OutputLevel=4;
 CalXtalRecAlg.OutputLevel=4;
-
+AcdReconAlg.OutputLevel=4; // suppress INFO complaint about no tracks
+    
 // Set output level threshold (2=DEBUG, 3=INFO, 4=WARNING, 5=ERROR, 6=FATAL )
 MessageSvc.OutputLevel = 3;
 
-ApplicationMgr.EvtMax  = 100;
+//==============================================================
+//
+// End of job options file
+//
+//##############################################################
+
+
+
+// Comment out this below to turn off GUI
+//#include "$GLEAMROOT/src/guiOptions.txt"
+
+
+// Use the standard sources
+//FluxAlg.source_name="muon_pencil_angle";
+FluxSvc.source_lib += {"./my_sources.xml"};
+//FluxAlg.sources={"back", "briantick1s"};
+//FluxAlg.sources={"briantick1s"};
+//FluxAlg.sources={"all_gamma"};
+//FluxAlg.source_name="gamma_1_gev_normal";
+FluxSvc.source_lib  += {"/scratch/kuehn/osc/kold_GlastRelease_v7r3p3/DataChallenge/v2r7/xml/datachallenge_library.xml"};
+
+FluxAlg.sources ={"CrProtonMix"};
+FluxAlg.sources+={"CrElectronMix"};
+FluxAlg.sources+={"CrPositronMix"};
+FluxAlg.sources+={"CrAlpha"};
+FluxAlg.sources+={"CrHeavyIon"};
+FluxAlg.sources+={"Earth10"};
+FluxAlg.sources+={"clock"};
+
+
+// Set the number of events
+ApplicationMgr.EvtMax  = 200;
+Output.Members = {"mcRootWriterAlg", "digiRootWriterAlg", "reconRootWriterAlg"};
+
+
+// Set Max size of EBF event (Default is 0x10000=65536...too small for full Encode Files)
+//                           (For Full Encode use 0x20000=131072...techically too big for LCB))
+EbfWriter.MaxEvtSize=65536;
+EbfWriter.WriteEbf=true;
+EbfWriter.StoreOnTds=true;
+EbfWriter.LdfFormat=false;
+
+// Set Flag for Creating/Writing FES Files
+// 0 = No FES output  1 = Generate FES Files
+EbfWriter.FESFiles=0;
+EbfWriter.FESVersion=2;
+
+// Set Encoding Flags (Debugging Datasets)
+// -1 = No Encoding (Use GLEAM Evt) 0 = Give Empty Cont. 1 = Full Enode 2 = Sparse Encode
+EbfWriter.TkrEncode=-1;
+EbfWriter.CalEncode=-1;
+EbfWriter.ReadFile=0;
+
+
+// Setup the output file names
+FesExposure.FileName="BackAvg_v8r0_V2p13_Attitude";
+EbfWriter.FileName="BackAvg_v8r0_V2p13";
+EbfWriter.FileDesc="Made with GLEAM v8r0";
+mcRootWriterAlg.mcRootFile="mc_BackAvg_v8r0_V2p13.root";
+digiRootWriterAlg.digiRootFile="digi_BackAvg_v8r0_V2p13.root";
+reconRootWriterAlg.ReconRootFile="reco_BackAvg_v8r0_V2p13.root";
+RootTupleSvc.filename="rTuple_BackAvg_v8r0_V2p13.root";
+
+//==============================================================
+//
+// End of job options file
+//
+//##############################################################
 
 
