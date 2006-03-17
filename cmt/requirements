@@ -1,6 +1,6 @@
 package OnboardFilter
 version v3r0
-# $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/cmt/requirements,v 1.52 2006/03/14 03:05:30 hughes Exp $
+# $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/cmt/requirements,v 1.53 2006/03/15 20:33:11 hughes Exp $
 
 author Richard Hughes <HUGHES@mps.ohio-state.edu>
 
@@ -32,7 +32,6 @@ macro_prepend includes "-I ../src -I ../flight/EFC -I ../flight/EDS  -I../flight
 
 macro headers "" WIN32 "*.h"
 
-
 library cal_db_pedestals \
  -s=../flight/CGB_DB/src $(headers) CAL_DB_pedestals.c
 
@@ -40,10 +39,10 @@ library cal_db_gains \
  -s=../flight/CGB_DB/src $(headers) CAL_DB_gains.c
 
 library cal_db_pedestals_flight \
- -s=../flight/CPP_DB/src $(headers) CAL_DB_pedestals.c
+ -s=../flight/CPP_DB/src $(headers) CAL_DB_pedestals_flight.c
 
 library cal_db_gains_flight \
- -s=../flight/CPG_DB/src $(headers) CAL_DB_gains.c
+ -s=../flight/CPG_DB/src $(headers) CAL_DB_gains_flight.c
 
 
 library OnboardFilter \
