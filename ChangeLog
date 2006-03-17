@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: hughes  Fri Mar 17 08:04:12 PST 2006
+OnboardFilter/cmt
+
+Modified Files:
+	requirements 
+Log Message:
+updated reuqirements file for flight peds/gains
+    *
+------------------------------------------------------------
 TAG
 Tag name: v3r0, operation: add
 Package: OnboardFilter
