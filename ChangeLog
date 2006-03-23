@@ -1,4 +1,20 @@
 ------------------------------------------------------------
+User: usher  Thu Mar 23 11:00:40 PST 2006
+OnboardFilter/src
+
+Modified Files:
+      Tag: GR-v7r3p20-newext
+	FilterAlg.cxx FilterAlgTds.cxx FilterAlg_acd.h 
+	FilterDisplay.cxx FilterStatus.cxx FilterTracks.cxx 
+	OnboardFilter.cxx 
+Added Files:
+      Tag: GR-v7r3p20-newext
+	FilterAlg_projectionFind.cxx FilterAlg_projectionFind.h 
+	FilterAlg_skirt.cxx FilterAlg_skirt.h 
+Log Message:
+Trying to bring the branched OBF into line with v2r0p4 for new GR
+    *
+------------------------------------------------------------
 User: usher  Thu Mar 23 11:00:38 PST 2006
 OnboardFilter/src/Dll
 
