@@ -21,21 +21,23 @@
 #include "GlastSvc/GlastDetSvc/IGlastDetSvc.h"
 
 #include "Event/Digi/AcdDigi.h"
+#include "EFC_gammaCtlDef.h"
+#include "EDS/ECR_cal.h"
 
 #include <string>
 
 #include "OnboardFilter/FilterStatus.h"
 #include "OnboardFilter/FilterAlgTds.h"
 
-#include "DFC/TFC_geos.h"//need access to the Filter Geometry!
-#include "DFC/TFC_geometryPrint.h"
-#include "DFC/TFC_geoIds.h"
+#include "EFC/TFC_geos.h"//need access to the Filter Geometry!
+#include "EFC/TFC_geometryPrint.h"
+#include "EFC/TFC_geoIds.h"
 #include "TFC_geometryDef.h"
-#include "FilterAlg_acd.h"
+//#include "FilterAlg_acd.h"
 
 extern const struct _TFC_geometry *TFC_Geos[];
 
-using namespace OnboardFilterTds;
+//using namespace OnboardFilterTds;
 
 class FilterAlg : public Algorithm{
 public:
@@ -44,6 +46,9 @@ public:
    StatusCode execute();
    StatusCode finalize();
 private:
+int CFC__ratioLayerCheck (int num,      int den,
+                                 int lo_limit, int lo_status,
+                                 int hi_limit, int hi_status);
    ///Does some manipulations on filter data to
    ///create some local variables.
    void CreateLocals();
@@ -98,6 +103,9 @@ private:
 
    ///Sets a veto bit.
    void setVeto(int m_veto);
+   
+   ///Checks if veto requested
+   int isVetoed (unsigned int status, unsigned int vetoes);
 
    ///Counts all the tiles hit in the acd words.
    ///Returns the count of tiles hit.
@@ -118,8 +126,15 @@ private:
    ///Alg that does the track finding and projecting
    ///to the ACD and skirt region.
    ///Potentially sets TKR_EQ_0, TKR_TOP, TKR_ROW01, TKR_ROW02, TKR_SKRIT
-   void tkrFilter(ITkrGeometrySvc *tkrGeoSvc);
-
+   unsigned int tkrFilter  (const GammaCfgTkr          *cfg,
+                                unsigned int             energy,
+                                unsigned int              acd_x,
+                                unsigned int              acd_y,
+                                unsigned int              acd_z,
+				unsigned int             vetoes,
+				EDR_tkr                    *tlr,
+				TFC_projections           *prjs);
+            
    ///Takes 2 and 3 in a row word, splits it up, and compacts it,
    ///creating a list of towers that have either a 2 or 3 in a row.
    ///Returns the word with towers to look at.
@@ -138,50 +153,15 @@ private:
    ///Does the projection finding for the tower
    ///projections is filled in.
    ///void findProjections(int tower, prjs& projections);
-
-   ///Does the tile-track matching
-   ///Fills in the first tile that's hit
-   int ACDProject(ITkrGeometrySvc *tkrGeoSvc,int tower, const projections *prj);
-
    ///Converts an an acd tile id to face, row and column representation
    void convertId(int rowtile, int face, int &r_row, int &r_col);
 
-   ///Creates a list of rows and columns to look at in the acd
-   void createTileList(int face, int row, int col, int rowlist[], int collist[]);
 
    ///From a tile number and face, reconstructs a tile number from 0 to 88
    ///Returns this tile number between 0 and 88
    int reconstructTileNumber(int tile, short face);
 
    ///Loops over the projections and does the track-tile matching
-   ///Returns the first tile that is intersected by 2 projections
-   int projectionLoop(int prjcnt,int tile,int face,ITkrGeometrySvc *tkrGeoSvc,const projections *prj,
-					  int tower,int view,double tiledim_x, double tiledim_y, double tiledim_z,
-					  HepPoint3D acdCenter);
-
-   ///Returns a 3D coordinate of the position of the hit within the tower.
-   HepPoint3D findStripPosition(ITkrGeometrySvc *tkrGeoSvc,int tower, int layer, int view, double stripId);
-
-   ///Converts the projection to a vector
-   ///Returns that vector
-   HepVector3D convertPrj(ITkrGeometrySvc *tkrGeoSvc, const projections *prj, int prjit,
-	                      int tower, int view, HepPoint3D &prjStart);
-
-   ///Returns a point that contains the coordinate of where the projection intersects
-   HepPoint3D getAcdCoord(HepVector3D newPrj,HepPoint3D prjStart, HepPoint3D acdCenter,
-						  double &theta, int view,int face,
-						  double tiledim_x, double tiledim_y, double tiledim_z,
-						  HepPoint3D &boundCoord1, HepPoint3D &boundCoord2,
-						  HepPoint3D &checkPoint1, HepPoint3D &checkPoint2,
-						  HepPoint3D &checkPoint3, HepPoint3D &checkPoint4);
-   void getTileBoundaries(int tile, int face, int view,
-						  float &lesserBoundary, float &greaterBoundary);
-
-
-   ///Determines if the first tile hit is from the top or a side row
-   ///Returns an id that tells where it was hit.
-   int evaluateTiles(int tile);
-
    //! gets the tower ID and mask, then calls the functions
    //! that do the checking
    bool compare(int &count);
@@ -207,6 +187,22 @@ private:
    ///to understand format.
    void reorderLayers(int& layers);
 
+
+int trigger7of8Form (unsigned int x,
+                                 unsigned int y, 
+                                 unsigned int xy012,
+                                 unsigned int xy013,
+                                 unsigned int xy023,
+                                 unsigned int xy123);
+
+int triggerForm (unsigned int x, unsigned int y);
+
+ int triggerRemap (int trigger);
+
+static const TFC_geometry *locateGeo (int            id, 
+                                      int      printIt);
+
+
    /// access to the Glast Detector Service to read in geometry constants from XML files
    IGlastDetSvc *m_glastDetSvc;
 
@@ -216,7 +212,7 @@ private:
 
    int m_CAL_LO;
    int m_CAL_HI;
-   const static int m_THROTTLE_SET = 1;
+   static const int m_THROTTLE_SET = 1;
 
    int m_veto, m_tmsk;
    int m_acd_X, m_acd_Y, m_acd_Front;
@@ -269,6 +265,26 @@ private:
    int m_useFilterProjecting;
    int m_useGleamTileGeometry;
    int m_PrjColMatch;
+
+
+  int num_NOCALLO_FILTER_TILE_VETO;
+  int num_SPLASH_0_VETO           ;
+  int num_E0_TILE_VETO            ;
+  int num_E350_FILTER_TILE_VETO  ;
+  int num_SPLASH_1_VETO           ;
+  int num_TOP_VETO                ;
+  int num_SIDE_VETO               ;
+  int num_EL0_ETOT_01_VETO        ;
+  int num_EL0_ETOT_90_VETO        ;
+  int num_ZBOTTOM_VETO            ;
+  int num_TKR_TOP_VETO            ;
+  int num_TKR_ROW01_VETO         ;
+  int num_TKR_ROW23_VETO          ;
+  int num_TKR_EQ_0_VETO           ;
+  int num_TKR_SKIRT_VETO          ;
+  int num_TKR_LT_2_ELO_VETO        ;
+   int num_ANY_VETO;
+
 };
 
 #endif

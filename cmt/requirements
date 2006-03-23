@@ -1,9 +1,9 @@
 package OnboardFilter
 
-version v1r1p8
-# $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/cmt/requirements,v 1.41 2005/05/27 23:05:19 burnett Exp $
+version v2r0p4
+# $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/cmt/requirements,v 1.51 2006/02/05 20:23:46 burnett Exp $
 
-author Navid Golpayegani <golpa@milkyway.gsfc.nasa.gov>
+author Richard Hughes <HUGHES@mps.ohio-state.edu>
 
 use EbfWriter           *
 use TkrUtil             *
@@ -16,18 +16,54 @@ apply_pattern package_header
 private
 
 macro OnboardFilter_cppflags "" \
-   Linux "-DGLEAM -D__i386"\
-   WIN32 "/D GLEAM /D__i386"
+   Linux "-DGLEAM -D__i386 -DEFC_FILTER  -D__unix__"\
+   WIN32 "/D GLEAM /D__i386 /DEFC_FILTER  /D_WIN32"
 
 macro OnboardFilter_cflags $(OnboardFilter_cppflags)
 
-macro headers "" WIN32 "*.h"#the following prepend for local includes
-macro_prepend includes "-I ../src -I ../DFC  " WIN32 " /I ..\src  /I ..\DFC "
+#the following prepend for local includes
+macro_prepend includes "-I ../src -I ../flight/EFC -I ../flight/EDS -I ../flight/EDS/src -I ../flight/EFC/src " \
+     WIN32 " /I ..\src  /I ..\flight\EFC /I ..\flight\EDS /I ..\flight\EDS\src /I ..\flight\EFC\src "
 
 
-macro_prepend includes "-I ../src " WIN32 " /I ..\src  "
+macro headers "" WIN32 "*.h"
 
-library OnboardFilter -s=../src $(headers) *.cxx  *.c -s=Dll *.cxx
-apply_pattern package_Cshlibflags
+library OnboardFilter \
+ -s=../OnboardFilter $(headers)\
+ -s=../src $(headers) *.cxx \
+ -s=../src/Dll *.cxx \
+ -s=../flight/EFC/src $(headers) A*.c E*.c T*.c \
+ -s=../flight/EDS/EDS/io $(headers) \ 
+ -s=../flight/EDS/EDS/impl $(headers) \ 
+ -s=../flight/EDS/src $(headers) E*.c T*.c \
+ -s=../flight/EDS/src/io $(headers) E*.c L*.c 
+
 # use this only for the test. TODO: make it cleaner
-# no unit test for now --THB
+apply_pattern package_Cshlibflags
+
+private
+use TkrRecon       * -no_auto_imports
+use FluxSvc        * -no_auto_imports
+use flux   
+use TkrDigi        * -no_auto_imports
+use AcdDigi        * -no_auto_imports
+use CalDigi        * -no_auto_imports
+use Trigger        * -no_auto_imports
+use CalUtil        * -no_auto_imports
+use CalRecon       * -no_auto_imports
+use AcdRecon       * -no_auto_imports
+use RootIo         * -no_auto_imports
+use AnalysisNtuple * -no_auto_imports
+use ntupleWriterSvc * -no_auto_imports
+use merit          * -no_auto_imports
+use CRflux         * -no_auto_imports
+
+public
+
+
+
+apply_pattern package_test
+set TESTJOBOPTIONS ${ONBOARDFILTERROOT}/src/test/jobOptions.txt
+
+include_dirs "$(ONBOARDFILTERROOT)/flight/EFC" $(ONBOARDFILTERROOT)/flight/EDS"
+

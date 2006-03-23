@@ -1,4 +1,5 @@
 #include "OnboardFilter/FilterTracks.h"
+#include "EFC/TFC_projectionDef.h"
 
 static const AlgFactory<FilterTracks>  Factory;
 const IAlgFactory& FilterTracksFactory = Factory;
@@ -6,6 +7,7 @@ const IAlgFactory& FilterTracksFactory = Factory;
 FilterTracks::FilterTracks(const std::string& name, ISvcLocator* pSvcLocator)
 :Algorithm(name, pSvcLocator){
 
+    declareProperty("Run",     m_run = 0);
     declareProperty("UseNumHits",     m_usenumhits = 0);
 	declareProperty("WriteHits",      m_writehits = 0);
 	declareProperty("Scattering",     m_scattering = 0);
@@ -47,6 +49,7 @@ StatusCode FilterTracks::finalize(){
 }
 
 StatusCode FilterTracks::execute(){
+  if (m_run == 0) return StatusCode::SUCCESS;
   MsgStream log(msgSvc(),name());
   log<<MSG::DEBUG<<"execute()"<<endreq;
   ITkrGeometrySvc *tkrGeoSvc=NULL;
@@ -62,13 +65,14 @@ StatusCode FilterTracks::execute(){
   }
   //Loop over the towers
 
-  const OnboardFilterTds::projections *prjs=status->getProjection();
+  TFC_projections *prjs = status->getProjections();
   int startPrj=0;
   for(int tower=0;tower<16;tower++){
     HepPoint3D point;
-    if(prjs->xy[tower][0]>0 && prjs->xy[tower][1]>0){
+    const TFC_projectionDir *dir = prjs->dir + tower;
+    if(dir->xCnt>0 && dir->yCnt>0){
       //Loop over the x projections
-      for(int xprj=startPrj;xprj<startPrj+prjs->xy[tower][0];xprj++){
+      for(int xprj=startPrj;xprj<startPrj+dir->xCnt;xprj++){
 
         log<<MSG::DEBUG<<"Obtaining X and XZ for hits 0 and 1"<<endreq;
         point=findStripPosition(tkrGeoSvc,tower,prjs->prjs[xprj].max,0,
@@ -80,7 +84,7 @@ StatusCode FilterTracks::execute(){
         m_x[1]=point.x();
         m_xz[1]=point.z();
         //Loop over the y projections
-        for(int yprj=startPrj+prjs->xy[tower][0];yprj<startPrj+prjs->xy[tower][1]+prjs->xy[tower][0];yprj++){
+        for(int yprj=startPrj+prjs->dir->xCnt;yprj<startPrj+prjs->dir->yCnt+prjs->dir->xCnt;yprj++){
 
           if(prjs->prjs[xprj].max==prjs->prjs[yprj].max){//if they start in the same layer
             log<<MSG::DEBUG<<"Obtaining Y and YZ for hits 0 and 1"
@@ -130,7 +134,8 @@ StatusCode FilterTracks::execute(){
         }
       }
     }
-    startPrj+=prjs->curCnt[tower];//I moved this 06/14/04 - DW
+//    startPrj+=(int)prjs->curCnt[tower];//I moved this 06/14/04 - DW
+    startPrj+=prjs->dir->yCnt+prjs->dir->xCnt;
   }
   std::vector<OnboardFilterTds::track> tracks=status->getTracks();
   double maxLength=0;
@@ -294,7 +299,7 @@ double FilterTracks::GetMCAngles(double track_theta_rad, double track_phi_rad,
     SmartDataPtr<Event::McParticleCol> pMcParticle(eventSvc(),EventModel::MC::McParticleCol);
     if(pMcParticle){
       Event::McParticleCol::const_iterator pMCTrack1 = pMcParticle->begin();
-      CLHEP::HepLorentzVector Mc_p0 = (*pMCTrack1)->initialFourMomentum();
+      HepLorentzVector Mc_p0 = (*pMCTrack1)->initialFourMomentum();
       Vector Mc_t0 = Vector(Mc_p0.x(),Mc_p0.y(), Mc_p0.z()).unit();
       double MC_xdir,MC_ydir,MC_zdir;
       MC_xdir   = Mc_t0.x();
@@ -429,12 +434,14 @@ StatusCode FilterTracks::MultipleScattering(){
 
 //Loop over the towers
 
-      const OnboardFilterTds::projections *prjs=status->getProjection();
+//      const OnboardFilterTds::projections *prjs=status->getProjection();
+  TFC_projections *prjs = status->getProjections();
       double startPrj=0;
 
       double old_longest_x = 0;
 	  double old_longest_y = 0;
-	  double disp_one_t, disp_one_b, disp_two_t, disp_two_b, proj_two_b, proj_two_t,
+//	  double proj_two_b;
+	  double disp_one_t, disp_one_b, disp_two_t, disp_two_b, proj_two_t,
 		  bottomhit, tophit, xcompare, xsum_comparison, longest_xcompare, long_firstanglex,
 		  ycompare, ysum_comparison, longest_ycompare, xmax, xmin, long_firstangley,
 		  ymax, ymin, xcompareBottom, ycompareBottom, longest_xcompareBottom, longest_ycompareBottom;
@@ -491,11 +498,12 @@ StatusCode FilterTracks::MultipleScattering(){
           //loop over projections regardless of whether there are both x and y
           int xhits=0;
 		  int yhits=0;
+       const TFC_projectionDir *dir = prjs->dir + tower;
 
 		  //if there are any x projections
-		  if(prjs->xy[tower][0]>0){
+		  if(prjs->dir->xCnt>0){
              //loop over the x projections
-			  for(int xprj=startPrj;xprj<prjs->xy[tower][0];xprj++){
+			  for(int xprj=startPrj;xprj<prjs->dir->xCnt;xprj++){
 
 				  xhits=prjs->prjs[xprj].nhits;
 				    //find the longest x projection
@@ -638,9 +646,9 @@ StatusCode FilterTracks::MultipleScattering(){
               //xavg_compare = (float)xsum_comparison/(float)xcount;
           }
 
-		  if(prjs->xy[tower][1]>0){//if there are any y projections
+		  if(prjs->dir->yCnt>0){//if there are any y projections
 		      //loop over the y projections
-			  for(int yprj=startPrj+prjs->xy[tower][0];yprj<startPrj+prjs->xy[tower][1]+prjs->xy[tower][0];yprj++){
+			  for(int yprj=startPrj+prjs->dir->xCnt;yprj<startPrj+prjs->dir->yCnt+prjs->dir->xCnt;yprj++){
 			      ymax=prjs->prjs[yprj].max;
 				  ymin=prjs->prjs[yprj].min;
 
@@ -972,7 +980,7 @@ StatusCode FilterTracks::TrackSelect(){
     }
 
     //Loop over the towers
-    const OnboardFilterTds::projections *prjs=status->getProjection();
+   TFC_projections *prjs = status->getProjections();
     double startPrj=0;
     int tower;
 	int xhighlayer[16];
@@ -1006,21 +1014,22 @@ StatusCode FilterTracks::TrackSelect(){
 		//FIRST: find the highest common layer of the x and y projections
 		//if there are any x projections
 		int tempxhigh=0;
-		if(prjs->xy[tower][0]>0){
+      const TFC_projectionDir *dir = prjs->dir + tower;
+		if(prjs->dir->xCnt>0){
             //loop over the x projections
-			for(int xprj=startPrj;xprj<startPrj+prjs->xy[tower][0];xprj++){
-                xnumprjs[tower] = prjs->xy[tower][0];
+			for(int xprj=startPrj;xprj<startPrj+prjs->dir->xCnt;xprj++){
+                xnumprjs[tower] = prjs->dir->xCnt;
 				xcount++;
 				//if there are any y projections
-		        if (prjs->xy[tower][1]>0){
+		        if (prjs->dir->yCnt>0){
 		            //loop over the y projections
-			        for (int yprj=startPrj+prjs->xy[tower][0];
-				        yprj<startPrj+prjs->xy[tower][1]+prjs->xy[tower][0];yprj++){
+			        for (int yprj=startPrj+prjs->dir->xCnt;
+				        yprj<startPrj+prjs->dir->yCnt+prjs->dir->xCnt;yprj++){
 			            //find the layer of the highest prj in each tower
 				        sethighok=0;
 						if (prjs->prjs[yprj].max == prjs->prjs[xprj].max){
                            sethighok = 1;
-			               ynumprjs[tower]   = prjs->xy[tower][1];
+			               ynumprjs[tower]   = prjs->dir->yCnt;
                         }
 						if (prjs->prjs[xprj].max >= tempxhigh){
 							if (sethighok == 1){
@@ -1035,7 +1044,7 @@ StatusCode FilterTracks::TrackSelect(){
 		        }
 			}
 		}
-		startPrj+=prjs->curCnt[tower];
+      startPrj+=prjs->dir->yCnt+prjs->dir->xCnt;
       }
 
       //-------------------------------------------------------------
@@ -1110,7 +1119,7 @@ StatusCode FilterTracks::TrackSelect(){
 			tempxmaxhits = 0; tempymaxhits = 0;
 			if (towers_to_check[tower] == 1){
 				//loop over the x projections
-		        for(int xprj=(int)startPrj;xprj<startPrj+prjs->xy[tower][0];xprj++){
+		        for(int xprj=(int)startPrj;xprj<startPrj+prjs->dir->xCnt;xprj++){
 				    if (prjs->prjs[xprj].max == highestlayer){
 					    //find the greatest number of hits in
 						//one of these projections
@@ -1127,8 +1136,8 @@ StatusCode FilterTracks::TrackSelect(){
 				if (tempxmaxprj > xmaxprj) { xmaxprj = tempxmaxprj; }
 
                 //loop over the y projections
-				for (int yprj=startPrj+prjs->xy[tower][0];
-				    yprj<startPrj+prjs->xy[tower][1]+prjs->xy[tower][0];yprj++){
+				for (int yprj=startPrj+prjs->dir->xCnt;
+				    yprj<startPrj+prjs->dir->yCnt+prjs->dir->xCnt;yprj++){
 			        if (prjs->prjs[yprj].max == highestlayer){
 			            //find the greatest number of hits
 				        if (prjs->prjs[yprj].nhits > ymaxhits){
@@ -1144,7 +1153,8 @@ StatusCode FilterTracks::TrackSelect(){
 				if (tempymaxprj > ymaxprj) { ymaxprj = tempymaxprj; }
 
 			}//if towers to check = 1
-			startPrj+=prjs->curCnt[tower];
+         startPrj+=prjs->dir->yCnt+prjs->dir->xCnt;
+//			startPrj+=prjs->curCnt[tower];
 			sum_maxhits[tower] = tempxmaxhits+tempymaxhits;
 			sum_maxprjs[tower] = tempxmaxprj+tempymaxprj;
 			sum_product[tower] = sum_maxhits[tower]*sum_maxprjs[tower];
@@ -1220,10 +1230,12 @@ StatusCode FilterTracks::TrackSelect(){
 		int yprjcount=0;
 		startPrj=0;
 		for (int i=0;i<tower;i++){
-			startPrj+=prjs->curCnt[i];
+         const TFC_projectionDir *dir = prjs->dir + tower;
+         startPrj+=prjs->dir->yCnt+prjs->dir->xCnt;
+//			startPrj+=prjs->curCnt[i];
 		}
 		//loop over the x projections in the highest common layer, and get an average slope
-        for(int xprj=startPrj;xprj<startPrj+prjs->xy[tower][0];xprj++){
+        for(int xprj=startPrj;xprj<startPrj+prjs->dir->xCnt;xprj++){
 			//make sure it starts in the highest common layer
 			if (prjs->prjs[xprj].max == highestlayer){
 		        //calculate its slope
@@ -1244,8 +1256,8 @@ StatusCode FilterTracks::TrackSelect(){
 		    }
 	    }
 		//loop over the y projections in the highest common layer, and get an average slope
-		for(int yprj=startPrj+prjs->xy[tower][0];
-				yprj<startPrj+prjs->xy[tower][1]+prjs->xy[tower][0];yprj++){
+		for(int yprj=startPrj+prjs->dir->xCnt;
+				yprj<startPrj+prjs->dir->yCnt+prjs->dir->xCnt;yprj++){
 			if (prjs->prjs[yprj].max == highestlayer){
 		        //calculate its slope
                 point=findStripPosition(tkrGeoSvc,tower,prjs->prjs[yprj].max,

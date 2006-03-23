@@ -10,7 +10,7 @@
 
 \verbatim
 
-    CVS $Id: TFC_skirt.h,v 1.1.1.1 2005/05/10 14:44:25 russell Exp $
+    CVS $Id: FilterAlg_skirt.h,v 1.1 2005/09/02 19:09:40 hughes Exp $
 \endverbatim
                                                                          */
 /* --------------------------------------------------------------------- */
