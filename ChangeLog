@@ -1,4 +1,41 @@
 ------------------------------------------------------------
+User: usher  Thu Mar 23 10:51:41 PST 2006
+OnboardFilter/src
+
+Removed Files:
+      Tag: GR-v7r3p20-newext
+	ABD.c ABE.c AFC_latRecordPrint.c AFC_latUnpack.c 
+	AFC_remapDef.h AFC_splash.c AFC_splash.h AFC_splashMap.h 
+	AFC_splashMap1x1.c AFC_splashMapBld.h ATF_filter.h 
+	ATF_shadowedTowers.h ATF_shadowedTowers2x2.c 
+	ATF_shadowedTowersCtl.h AWD.c AWE.c BTD.c BTE.c BTE_display.c 
+	BTREE.c CFC_constants.c CFC_constantsPrint.c 
+	CFC_latEnergySum.c CFC_latRawRecordPrint.c CFC_latRawUnpack.c 
+	CFC_latRecordPrint.c CFC_latThreshold.c CFC_latUnpack.c 
+	CFC_ratioCheck.h CFC_towerPrint.c CFC_towerRawRecordPrint.c 
+	CFC_towerRawUnpack.c CFC_towerRecordPrint.c CFC_towerSum.c 
+	CFC_towerUnpack.c CFC_xtalRatioCheck.h DFC_ctl.c DFC_ctlAfc.c 
+	DFC_ctlAfcDef.h DFC_ctlAtf.c DFC_ctlAtfDef.h DFC_ctlCfc.c 
+	DFC_ctlCfcDef.h DFC_ctlDef.h DFC_ctlTfc.c DFC_ctlTfcDef.h 
+	DFC_display.c DFC_evt.c DFC_filter.c DFC_latUnpack.c 
+	DFC_resultsDef.h DFC_rto.c DFC_rto.h DFC_statistics.c 
+	EBF_directory.c EBF_directoryPrint.c EBF_fileIn-Gleam.c 
+	EBF_fileOut.c EBF_gemPrint.c EBF_swap.c EBF_swap.h EDM.c 
+	HEAP.c HUFF.c TFC_acd.c TFC_acd.h TFC_geo_v1r13p0.c 
+	TFC_geometryDef.h TFC_geometryPrint.c TFC_geometryStd.c 
+	TFC_geometryStd.h TFC_geos.c TFC_latRecordPrint.c 
+	TFC_latUnpack.c TFC_projectionDef.h TFC_projectionPrint.c 
+	TFC_projectionTowerFind.c TFC_skirt.c TFC_skirt.h 
+	TFC_stripToLen.h TFC_towerGeometryDef.h TFC_trigger.h 
+	TFC_triggerFill.c TFC_triggerForm.h TFC_triggerSortedForm.h 
+	ffs.h tmr.c tmr.c.sx-xxx-xxx tmr.c.ux-xxx-xxx tmr.c.vx-ppc-gcc 
+	tmr.c.wx-xxx-xxx tmr.c.xx-x86-gcc tmr.c.xx-xxx-xxx tmr.h 
+	tmr.h.sx-xxx-xxx tmr.h.ux-xxx-xxx tmr.h.wx-xxx-xxx 
+	tmr.h.xx-ppc-gcc tmr.h.xx-x86-gcc tmr.h.xx-xxx-xxx 
+Log Message:
+Updating the branch to v2r0p4 version of OBF
+    *
+------------------------------------------------------------
 User: usher  Thu Mar 23 10:49:12 PST 2006
 OnboardFilter/DFC
 
