@@ -1,4 +1,18 @@
 ------------------------------------------------------------
+User: usher  Thu Mar 23 11:00:37 PST 2006
+OnboardFilter/OnboardFilter
+
+Modified Files:
+      Tag: GR-v7r3p20-newext
+	FilterAlg.h FilterAlgTds.h FilterDisplay.h FilterStatus.h 
+	FilterTracks.h 
+Added Files:
+      Tag: GR-v7r3p20-newext
+	OnboardFilterTDS.h filter_rto.h 
+Log Message:
+Trying to bring the branched OBF into line with v2r0p4 for new GR
+    *
+------------------------------------------------------------
 User: usher  Thu Mar 23 10:51:41 PST 2006
 OnboardFilter/src
 
