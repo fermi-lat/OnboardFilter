@@ -3,7 +3,7 @@
 * @brief This is needed for forcing the linker to load all components
 * of the library.
 *
-*  $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/Dll/OnboardFilter_load.cxx,v 1.4 2004/07/12 17:37:47 golpa Exp $
+*  $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/Dll/OnboardFilter_load.cxx,v 1.7 2005/09/06 16:42:29 burnett Exp $
 */
 
 #include "GaudiKernel/DeclareFactoryEntries.h"

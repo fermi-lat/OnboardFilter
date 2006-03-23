@@ -1,9 +1,192 @@
-#include "OnboardFilter/FilterAlg.h"
-#include "CLHEP/Geometry/Transform3D.h"
+
+
+#define EFC_DFILTER
+
+#include <stdlib.h>
+#include <stdio.h>
+#include <errno.h>
+
+#include "EFC/EDM.h"
+//#include "EFC_ss.h"
+#include "filter_rto.h"
+//#include "filter_rto.h"
+#include "EFC/EFC_edsFw.h"
+
+#include "EFC/EFC_gammaResultsPrint.h"
+#include "EFC/EFC_gammaStatsPrint.h"
+#include "EFC/EFC_gammaCfgPrint.h"
+#include "EFC/EFC_gammaCfg.h"
+#include "EFC/EFC_gamma.h"
+
+
+
+#include "EFC/EFC_gammaStatus.h"
+#include "EFC/EFC_gammaResult.h"
+#include "EFC/EFC_gammaStats.h"
+#include "EFC/TFC_projectionDef.h"
+
+
+#if       defined (EFC_DFILTER)
+#include "EFC/EFC_display.h"
+#include "EFC/TFC_geometryPrint.h"
+#include "EFC/TFC_projectionPrint.h"
+#endif
+
+#include "EFC/TFC_geos.h"
+#include "EFC/TFC_geoIds.h"
+#include "EFC_gammaResultDef.h"
+
+
+#include "EDS/LCBV.h"
+#include "EDS/EBF_dir.h"
+#include "EDS/EBF_evt.h"
+#include "EDS/EBF_pkt.h"
+#include "EDS/EBF_mc.h"
+#include "EDS/TMR.h"
+#include "EDS/io/LCBP.h"
+#include "EDS/io/EBF_stream.h"
+#include "EDS/io/EBF_evts.h"
+#include "EDS/EDS_fw.h"
+#include "EDS/ECR_cal.h"
+#include "EDS/EDR_cal.h"
+#include "EDS/EDR_tkr.h"
+
+
+#include "EDS/FFS.h"
+#include "EDS/EBF_cid.h"
+#include "EDS/EBF_ctb.h"
+#include "EDS/EBF_gem.h"
+#include "EDS/EBF_tkr.h"
+#include "EDS/EBF_dir.h"
+#include "EDS/EBF_evt.h"
+#include "EDS/EDR_calUnpack.h"
+#include "EDS/EDR_tkrUnpack.h"
+#include "EDS/EDR_gemPrint.h"
+#include "EDS/EDR_calPrint.h"
+#include "EDS/EDR_tkrPrint.h"
+
+ 
+#include "GaudiKernel/Algorithm.h"
+
+#include "GaudiKernel/MsgStream.h"
+#include "GaudiKernel/AlgFactory.h"
+#include "GaudiKernel/IDataProviderSvc.h"
+#include "GaudiKernel/SmartDataPtr.h"
+#include "GaudiKernel/Property.h"
+#include "GlastSvc/GlastDetSvc/IGlastDetSvc.h"
+
+#include "Event/TopLevel/EventModel.h"
+#include "Event/MonteCarlo/McParticle.h"
+#include "EbfWriter/Ebf.h"
+#include "FilterAlg_skirt.h"
+#include "TFC_acd.h"
+#include "EDS/EDR_tkr.h"
+#include "TFC_geometryDef.h"
+#include "EFC/TFC_projectionDef.h"
+#include "FilterAlg_projectionFind.h"
+
+#include "OnboardFilter/FilterStatus.h"
+#include "OnboardFilter/FilterAlg.h" 
+
+
+/* ---------------------------------------------------------------------- *//*!
+
+  \def    OFFSET_EVEN
+  \brief  An additional offset (from the right) in a 32-bit word from
+          where the set of even layers normally begin.
+
+          In order to properly form the coincidences, a buffer area
+          between the bits representing the even and odd layers must
+          be maintained. This defines the beginning of the set of bits
+          representing the even layers. There is also an offset defined
+          for the set of bits representing the odd bits. Only one of
+          these is non-zero, but the code is written in such a way that
+          the non-zero one can be either.
+                                                                          *//*!
+  \def    OFFSET_ODD
+  \brief  An additional offset (from the right) in a 32-bit word from
+          where the set of odd layers begin.
+
+          In order to properly form the coincidences, a buffer area
+          between the bits representing the even and odd layers must
+          be maintained. This defines the beginning of the set of bits
+          representing the idd layers. There is also an offset defined
+          for the set of bits representing the even bits. Only one of
+          these is non-zero, but the code is written in such a way that
+          the non-zero one can be either.
+                                                                          */
+/* ---------------------------------------------------------------------- */
+#define OFFSET_EVEN 0
+#define OFFSET_ODD  7    
+        
+#define TFC_TRG_REMAP_INIT(_trigger, _even, _odd, _e, _o)                  \
+_even  =  ((((_trigger)>>(EBF_TKR_RIGHT_BIT_K_L ## _e + OFFSET_EVEN)) & 1) \
+      << (EBF_TKR_K_L ## _e));                                             \
+_odd   =  ((((_trigger)>>(EBF_TKR_RIGHT_BIT_K_L ## _o + OFFSET_ODD )) & 1) \
+      << (EBF_TKR_K_L ## _o))
+
+    
+#define TFC_TRG_REMAP(_trigger, _even, _odd, _e, _o)                       \
+_even |=  ((((_trigger)>>(EBF_TKR_RIGHT_BIT_K_L ## _e + OFFSET_EVEN)) & 1) \
+      << (EBF_TKR_K_L ## _e));                                             \
+_odd  |=  ((((_trigger)>>(EBF_TKR_RIGHT_BIT_K_L ## _o + OFFSET_ODD )) & 1) \
+      << (EBF_TKR_K_L ## _o))
+    
+
+
+/* ---------------------------------------------------------------------- *//*!
+
+  \enum   _ACD_SIDE_TILES_M
+  \brief   Enumerates the bit masks used to extract the struck tiles in
+           various rows for both the + and - ACD side tile planes
+									  *//*!
+  \typedef ACD_SIDE_TILES_M
+  \brief   Typedef for enum _ACD_SIDE_TILES_M
+									  */
+/* ---------------------------------------------------------------------- */
+typedef enum _ACD_SIDE_TILES_M
+{
+  ACD_SIDE_TILES_M_ROW  = (0x1f << 16) | (0x1f), 
+  /*!< Primitive bit mask for 1 5 tile row of ACD side tiles              */
+
+  ACD_SIDE_TILES_M_ROW0 = ACD_SIDE_TILES_M_ROW<<(0*5),
+  /*!< Row 0 ACD side tiles, bit mask                                     */ 
+
+  ACD_SIDE_TILES_M_ROW1 = ACD_SIDE_TILES_M_ROW<<(1*5),
+  /*!< Row 1 ACD side tiles, bit mask                                     */ 
+
+  ACD_SIDE_TILES_M_ROW2 = ACD_SIDE_TILES_M_ROW<<(2*5),
+  /*!< Row 2 ACD side tiles, bit mask                                     */ 
+
+  ACD_SIDE_TILES_M_ROW01 = ACD_SIDE_TILES_M_ROW0 | ACD_SIDE_TILES_M_ROW1,
+  /*!< Rows 0 and 1 ACD side tiles, bit mask                              */ 
+
+  ACD_SIDE_TILES_M_ROW3  = 0x80008000,
+  /*!< Row  3 ACD side tiles, bit mask                                    */
+}
+ACD_SIDE_TILES_M; 
+/* ---------------------------------------------------------------------- */
+
+
+
+/* --------------------------------------------------------------------- *//*!
+
+  \var   const TFC_geometry *TFC_Geos[]
+  \brief A list of the available geometries.
+
+   This is used as a cheap database of the known geometries.
+                                                                         */
+/* --------------------------------------------------------------------- */
+extern const TFC_geometry *TFC_Geos[];
+/* --------------------------------------------------------------------- */
+
+
+
 
 static const AlgFactory<FilterAlg> Factory;
-const IAlgFactory& FilterAlgFactory = Factory;
-
+const IAlgFactory& FilterAlgFactory = Factory;  
+GammaCfgTkr          cfg;
+  
 FilterAlg::FilterAlg(const std::string& name, ISvcLocator* pSvcLocator):Algorithm(name, pSvcLocator){
   
   declareProperty("UseGleamAcdVetoes",     m_usegleamacdvetoes     = 0);//Set to 1 to use Gleam veto lists.
@@ -31,6 +214,18 @@ StatusCode FilterAlg::initialize(){
   
   StatusCode sc = StatusCode::SUCCESS;
   
+  
+
+
+
+
+    /* Find the specified geometry */
+   TFC_geoId      geo_id;
+    const TFC_geometry     *geo;
+    int geoPrint = 0;
+   geo_id   = TFC_K_GEO_ID_DEFAULT;
+    geo = locateGeo (geo_id, geoPrint);
+  
   m_glastDetSvc = 0;
   sc = service("GlastDetSvc", m_glastDetSvc, true);
   if (sc.isSuccess() ) {
@@ -47,8 +242,10 @@ StatusCode FilterAlg::initialize(){
   m_throttle = false;
   initMasks(m_MaskFront,m_MaskY,m_MaskX);
   
-  m_CAL_LO = 0x400;
-  m_CAL_HI = 0x800;
+//  m_CAL_LO = 0x400;
+//  m_CAL_HI = 0x800;
+  m_CAL_LO = 1 << EFC_GAMMA_STATUS_V_GEM_CALLO;
+  m_CAL_HI = 1 << EFC_GAMMA_STATUS_V_GEM_CALHI;
   
   m_NOCALLO_FILTER_TILE_VETO = 30;
   m_SPLASH_0_VETO            = 29;
@@ -68,18 +265,64 @@ StatusCode FilterAlg::initialize(){
   m_TKR_LT_2_ELO_VETO        = 15;
   
   m_count = 0;//for debug purposes
+  num_NOCALLO_FILTER_TILE_VETO= 0;
+  num_SPLASH_0_VETO= 0           ;
+  num_E0_TILE_VETO= 0            ;
+  num_E350_FILTER_TILE_VETO= 0  ;
+  num_SPLASH_1_VETO= 0           ;
+  num_TOP_VETO= 0                ;
+  num_SIDE_VETO= 0               ;
+  num_EL0_ETOT_01_VETO= 0        ;
+  num_EL0_ETOT_90_VETO= 0        ;
+  num_ZBOTTOM_VETO= 0            ;
+  num_TKR_TOP_VETO= 0            ;
+  num_TKR_ROW01_VETO= 0         ;
+  num_TKR_ROW23_VETO= 0          ;
+  num_TKR_EQ_0_VETO= 0           ;
+  num_TKR_SKIRT_VETO= 0          ;
+  num_TKR_LT_2_ELO_VETO = 0       ;
+  num_ANY_VETO = 0;
+
+
+    cfg.row2Emax           = ECR_CAL_MEV_TO_LEU (30000);
+    cfg.row01Emax          = ECR_CAL_MEV_TO_LEU (10000);
+    cfg.topEmax            = ECR_CAL_MEV_TO_LEU (30000);
+    cfg.zeroTkrEmin        = ECR_CAL_MEV_TO_LEU (250);
+    cfg.twoTkrEmax         = ECR_CAL_MEV_TO_LEU ( 5);
+    cfg.skirtEmax          = ECR_CAL_MEV_TO_LEU (20);
+    cfg.geometry           = geo;
+
   return StatusCode::SUCCESS;
 }
 
 StatusCode FilterAlg::finalize(){
   MsgStream log(msgSvc(),name());
   log<<MSG::DEBUG<<"Finalizing"<<endreq;
+  printf("NOCALLO_FILTER_TILE_VETO: %d\n",num_NOCALLO_FILTER_TILE_VETO);
+  printf("SPLASH_0_VETO: %d\n",num_SPLASH_0_VETO);
+  printf("E0_TILE_VETO: %d\n",num_E0_TILE_VETO);
+  printf("E350_FILTER_TILE_VETO: %d\n",num_E350_FILTER_TILE_VETO);
+  printf("SPLASH_1_VETO: %d\n",num_SPLASH_1_VETO);
+  printf("TOP_VETO: %d\n",num_TOP_VETO);
+  printf("SIDE_VETO: %d\n",num_SIDE_VETO);
+  printf("EL0_ETOT_01_VETO: %d\n",num_EL0_ETOT_01_VETO);
+  printf("EL0_ETOT_90_VETO: %d\n",num_EL0_ETOT_90_VETO);
+  printf("ZBOTTOM_VETO: %d\n",num_ZBOTTOM_VETO);
+  printf("TKR_TOP_VETO: %d\n",num_TKR_TOP_VETO);
+  printf("TKR_ROW01_VETO: %d\n",num_TKR_ROW01_VETO);
+  printf("TKR_ROW23_VETO: %d\n",num_TKR_ROW23_VETO);
+  printf("TKR_EQ_0_VETO: %d\n",num_TKR_EQ_0_VETO);
+  printf("TKR_SKIRT_VETO: %d\n",num_TKR_SKIRT_VETO);
+  printf("TKR_LT_2_ELO_VETO: %d\n",num_TKR_LT_2_ELO_VETO);
+  printf("ANY_VETO: %d\n",num_ANY_VETO);
   return StatusCode::SUCCESS;
 }
 
 StatusCode FilterAlg::execute(){
+//  printf("\n\n\n******************************Calling FilterAlg\n");
+//  if (m_count < 1) return StatusCode::SUCCESS;
   MsgStream log(msgSvc(),name());
-  log<<MSG::DEBUG<<"execute()"<<endreq;
+ // log<<MSG::DEBUG<<"execute()"<<endreq;
   ITkrGeometrySvc *tkrGeoSvc=NULL;
   if(service("TkrGeometrySvc",tkrGeoSvc,true).isFailure()){
     log<<MSG::ERROR<<"Couldn't set up TkrGeometrySvc!"<<endreq;
@@ -94,8 +337,8 @@ StatusCode FilterAlg::execute(){
   SmartDataPtr<OnboardFilterTds::FilterStatus> filter(eventSvc(),
                                                       "/Event/Filter/FilterStatus");
   if(!filter){
-    log<<MSG::ERROR<<"Unable to retrieve FilterStatus from TDS"<<endreq;
-    return StatusCode::FAILURE;
+//    log<<MSG::ERROR<<"Unable to retrieve FilterStatus from TDS"<<endreq;
+    return StatusCode::SUCCESS;
   }
   
   //fill in the variables we need
@@ -114,6 +357,17 @@ StatusCode FilterAlg::execute(){
   m_xcapture = filter->getXcapture();
   m_ycapture = filter->getYcapture();
   
+  
+
+  unsigned int tmsk = createTowerMask(m_tcids);
+  do{
+      
+      int tower;
+      tower = FFS (tmsk) - 16;
+      tmsk &= ~(0x80000000 >> (tower+16));
+  }
+  while (tmsk);
+
   //reset veto word
   m_vetoword = 0;
   
@@ -140,12 +394,108 @@ StatusCode FilterAlg::execute(){
   evaluateAtf();
   evaluateZbottom();
   if (m_evaluateCal1) evaluateCal1();
-  tkrFilter(tkrGeoSvc);
+  TFC_projections *m_prjs = filter->getProjections();
+  EDR_tkr *m_tkr = filter->getTkr();
+  unsigned int vetoes = 0;
+  unsigned int status = tkrFilter(&cfg, 4.0*m_energy, m_acd_X, m_acd_Y, m_acd_Front, 
+      vetoes, m_tkr, m_prjs);
+
+//  if ((m_tcids == 0 )&&(4.0*m_energy > 250)) setVeto(m_TKR_EQ_0_VETO);
+  if ((m_tcids == 0 )) setVeto(m_TKR_EQ_0_VETO);
+
+
+//
+// Check the status bits
+   if (isVetoed(status,EFC_GAMMA_STATUS_M_TKR_LT_2_ELO)) setVeto(m_TKR_LT_2_ELO_VETO);
+   if (isVetoed(status,EFC_GAMMA_STATUS_M_TKR_SKIRT)) setVeto(m_TKR_SKIRT_VETO);
+   if (isVetoed(status,EFC_GAMMA_STATUS_M_TKR_EQ_0)) setVeto(m_TKR_EQ_0_VETO);
+   if (isVetoed(status,EFC_GAMMA_STATUS_M_TKR_ROW2)) setVeto(m_TKR_ROW23_VETO);
+   if (isVetoed(status,EFC_GAMMA_STATUS_M_TKR_ROW01)) setVeto(m_TKR_ROW01_VETO);
+   if (isVetoed(status,EFC_GAMMA_STATUS_M_TKR_TOP)) setVeto(m_TKR_TOP_VETO);
+
+  m_TKR_TOP_VETO             = 20;
+  m_TKR_ROW01_VETO           = 19;
+  m_TKR_ROW23_VETO           = 18;
+  m_TKR_EQ_0_VETO            = 17;
+  m_TKR_SKIRT_VETO           = 16;
+  m_TKR_LT_2_ELO_VETO        = 15;
+
   
   //All Vetoes have been filled in.
   m_count++;//for debugging purposes
   //put the vetoword in the tds
   newFilterAlgData->setVetoWord(m_vetoword);
+
+  if ((m_vetoword >> (m_NOCALLO_FILTER_TILE_VETO-15)) & 1) {
+   num_NOCALLO_FILTER_TILE_VETO++;
+   //printf("AlgFilterV30: NOCALLO_FILTER_TILE_VETO\n");
+  }  
+  if ((m_vetoword >> (m_SPLASH_0_VETO-15)) & 1)            {
+   num_SPLASH_0_VETO++           ;
+   //printf("AlgFilterV29: SPLASH_0_VETO\n");
+  }  
+  if ((m_vetoword >> (m_E0_TILE_VETO-15)) & 1)             {
+   num_E0_TILE_VETO++            ;
+   //printf("AlgFilterV28: E0_TILE_VETO\n");
+  }  
+  if ((m_vetoword >> (m_E350_FILTER_TILE_VETO-15)) & 1)    {
+   num_E350_FILTER_TILE_VETO++  ;
+   //printf("AlgFilterV27: E350_FILTER_TILE_VETO\n");
+  }  
+  if ((m_vetoword >> (m_SPLASH_1_VETO-15)) & 1)            {
+   num_SPLASH_1_VETO++           ;
+   //printf("AlgFilterV26: SPLASH_1_VETO\n");
+  }  
+  if ((m_vetoword >> (m_TOP_VETO-15)) & 1)                 {
+   num_TOP_VETO++                ;
+   //printf("AlgFilterV25: TOP_VETO\n");
+  }  
+  if ((m_vetoword >> (m_SIDE_VETO-15)) & 1)                {
+   num_SIDE_VETO++               ;
+   //printf("AlgFilterV24: SIDE_VETO\n");
+  }  
+  if ((m_vetoword >> (m_EL0_ETOT_01_VETO-15)) & 1)         {
+   num_EL0_ETOT_01_VETO++        ;
+   //printf("AlgFilterV23: EL0_ETOT_01_VETO\n");
+  }  
+  if ((m_vetoword >> (m_EL0_ETOT_90_VETO-15)) & 1)         {
+   num_EL0_ETOT_90_VETO++        ;
+   //printf("AlgFilterV22: EL0_ETOT_90_VETO\n");
+  }  
+  if ((m_vetoword >> (m_ZBOTTOM_VETO-15)) & 1)             {
+   num_ZBOTTOM_VETO++            ;
+   //printf("AlgFilterV21: ZBOTTOM_VETO\n");
+  }  
+  if ((m_vetoword >> (m_TKR_TOP_VETO-15)) & 1)             {
+   num_TKR_TOP_VETO++            ;
+   //printf("AlgFilterV20: TKR_TOP_VETO\n");
+  }  
+  if ((m_vetoword >> (m_TKR_ROW01_VETO-15)) & 1)           {
+   num_TKR_ROW01_VETO++         ;
+   //printf("AlgFilterV19: TKR_ROW01_VETO\n");
+  }  
+  if ((m_vetoword >> (m_TKR_ROW23_VETO-15)) & 1)           {
+   num_TKR_ROW23_VETO++          ;
+   //printf("AlgFilterV18: TKR_ROW23_VETO\n");
+  }  
+  if ((m_vetoword >> (m_TKR_EQ_0_VETO-15)) & 1)            {
+   num_TKR_EQ_0_VETO++           ;
+   //printf("AlgFilterV17: TKR_EQ_0_VETO\n");
+  }  
+  if ((m_vetoword >> (m_TKR_SKIRT_VETO-15)) & 1)           {
+   num_TKR_SKIRT_VETO++          ;
+   //printf("AlgFilterV16: TKR_SKIRT_VETO\n");
+  }  
+  if ((m_vetoword >> (m_TKR_LT_2_ELO_VETO-15)) & 1)        {
+   num_TKR_LT_2_ELO_VETO++       ;
+   //printf("AlgFilterV15: TKR_LT_2_ELO_VETO\n");
+  }  
+  if (m_vetoword > 0) {
+   num_ANY_VETO++;
+   //printf("AlgFilterV: ANY_VETO\n");
+  } else {
+   //printf("AlgFilterV: NOT vetoed!\n");
+  }
   
   return StatusCode::SUCCESS;
   
@@ -364,7 +714,8 @@ void FilterAlg::CheckCal(){
     if ( numbits >= 4){
       setVeto(m_SPLASH_0_VETO);
     }
-    else if (numbits == 3){
+//    else if (numbits == 3){
+    else {
       if ( AFC_splash() ){
         setVeto(m_SPLASH_0_VETO);
       }
@@ -608,18 +959,24 @@ void FilterAlg::evaluateCal1(){
   if (m_energy > 0){
     if (m_energy < 300 ){
       float e_ratio = m_layerEnergy[0]/m_energy;
-      if ( (e_ratio > 0.01) && (e_ratio < 0.90))
-        return;
-      else if (e_ratio <= 0.01){
-        setVeto(m_EL0_ETOT_01_VETO);
-        return;
-      }
-      else if (e_ratio >= 0.90){
-        setVeto(m_EL0_ETOT_90_VETO);
-        return;
-      }
+//      if (e_ratio <= 0.01){
+//        setVeto(m_EL0_ETOT_01_VETO);
+//      }
+//      else if (e_ratio >= 0.90){
+//        setVeto(m_EL0_ETOT_90_VETO);
+//      }
+       int status = CFC__ratioLayerCheck 
+                (4*m_layerEnergy[0], 4*m_energy,
+		 10,    m_EL0_ETOT_01_VETO,
+		 900,    m_EL0_ETOT_90_VETO);
+       setVeto(status);
+
+      
     }
   }
+  
+  
+  
   return;
   
   //And there was another section that checked whether 20% of the
@@ -627,1025 +984,289 @@ void FilterAlg::evaluateCal1(){
   //implemnted since the filter has been in Gleam.  It is not coded here.
 }
 
-
-
-void FilterAlg::tkrFilter(ITkrGeometrySvc *tkrGeoSvc){
-  
-  const int TOPFACE = 0;
-  const int ROW01 = 1;
-  const int ROW23 = 2;
-  int numProjections = 0;
-  int totalnumProjections = 0;
-  int firstmatch, tilematch, dispatch, acd_firstmatch;
-  int prjcnt, view, prjstart, counter;
-  
-  const int id = 0;
-  const struct _TFC_geometry *geo;
-  geo = TFC_geosLocate (TFC_Geos, -1, id);
-  
-  //Get filter info from TDS
-  SmartDataPtr<OnboardFilterTds::FilterStatus> filter(eventSvc(),
-                                                      "/Event/Filter/FilterStatus");
-  
-  //if there is NO possibility of a TKR trigger,
-  //and the energy is less than 250 MeV
-  if ( m_tcids == 0 ){
-    if (m_energy > 250) setVeto(m_TKR_EQ_0_VETO);
-  }
-  else{
-    unsigned int tmsk = createTowerMask(m_tcids);
-    dispatch = FilterAlg_acdProjectTemplate (m_acd_X, m_acd_Y, m_acd_Front);
-    do{
-      
-      int tower;
-      tower = FFS (tmsk) - 16;
-      tmsk &= ~(0x80000000 >> (tower+16));
-      
-      /*for each tower that has a 2 or 3IAR, find projections using
-        whatever method the user chooses.  If the user wants to use the
-        method that the filter uses, the user can just take the output
-        of the filter and is mostly done.
-        
-        Once the projections for this tower are found, see if they match
-        with any ACD tiles that are hit.  Info about this is in the
-        TDS, so no work is necessary.
-      */
-      
-      //findProjections(tower, projections);// **USER CAN WRITE THIS**
-      //For now, rather than find all the projections, just read them
-      //in from the TDS.
-      
-      //look for a match between the tower
-      const projections *prj = filter->getProjection();
-      
-      firstmatch = ACDProject(tkrGeoSvc,tower, prj);
-      //determine whether the first tile match is from TOP or a ROW
-      tilematch = evaluateTiles(firstmatch);
-      
-      int xcnt = prj->xy[tower][0];
-      int ycnt = prj->xy[tower][1];
-      numProjections = xcnt+ycnt;
-      totalnumProjections += numProjections;
-      
-      //if (m_energy < 5000){
-      
-      //Here, use FilterAlg_acd.c.  Have to determine where the x
-      //projection starts for this tower.
-      //Loop over the projections in this view
-      //get count of projections in this view
-      view = 0;
-      prjcnt = prj->xy[tower][view]+prj->xy[tower][view+1];
-      
-      if (m_useFilterProjecting){
-        //count all the projections in towers before this one
-        prjstart = 0;
-        for (counter = 0; counter < tower; counter++){
-          prjstart += prj->xy[counter][0] + prj->xy[counter][1];
-        }
-        
-        acd_firstmatch = 0xffffffff;
-        if (prjcnt > 0){
-          acd_firstmatch = FilterAlg_acdProject (prj,prjstart,
-                                                 xcnt,ycnt,geo,tower,
-                                                 dispatch,
-                                                 m_acd_X,m_acd_Y,m_acd_Front);
-          //if it returns zero (which means no coincidences), set it to the
-          //default value again
-          if (acd_firstmatch == 0x0) acd_firstmatch = 0xffffffff;
-        }
-        else acd_firstmatch = 0xffffffff;
-        
-        if ((unsigned int)acd_firstmatch != 0xffffffff){
-          if (( (acd_firstmatch & 0xf0000000) >> 28) == 4){
-            tilematch = TOPFACE;
-            firstmatch = 88;
-          }
-          else if (acd_firstmatch & 0x3ff){
-            tilematch = ROW01;
-            firstmatch = 88;
-          }
-          else {
-            tilematch = ROW23;
-            firstmatch = 88;
-          }
-        }
-        else {firstmatch = 89; tilematch = 3;}
-      }
-      if (numProjections == 0) tilematch = 3;//so it doesn't trip ROW23
-      
-      if ( firstmatch < 89 ){//values 0-88 mean there was a tile match
-        if ( tilematch == TOPFACE){
-          if (m_energy < 30000) setVeto(m_TKR_TOP_VETO);
-        }
-        else{
-          if ( tilematch == ROW01 ){
-            if (m_energy < 10000) setVeto(m_TKR_ROW01_VETO);
-          }
-          else if ( tilematch == ROW23 ){
-            if (m_energy < 30000) setVeto(m_TKR_ROW23_VETO);
-          }
-        }
-        return; //exit the routine
-      }
-      //}// if energy
-      
-      if (m_energy == 0){
-        //Project to the skirt region.  The filter does this, so one can
-        //just trust the filter output.  Or if the user wants to do it
-        //themselves, they can do that.
-        
-        //if ( SkirtProject() ) setVeto(m_TKR_SKIRT_VETO);
-        
-        //Until SkirtProject() is coded, copy from OnboardFilter:
-        if (m_FilterStatus_HI & 0x2) setVeto(m_TKR_SKIRT_VETO);
-      }
-      
-    }
-    while (tmsk);
-    
-    //If the filter makes it to this point (no veto), then it does this:
-    if ( totalnumProjections < 3 ){
-      if (totalnumProjections < 2){
-        if (m_energy > 250) return setVeto(m_TKR_EQ_0_VETO);
-      }
-      //veto commented out: if (m_energy < 350) setVeto(m_TKR_LT_2_ELO_VETO);
-    }
-    
-    return; //we are completely done filtering
-    
-  }//else
-  return;
-}//latFilter
-
-int FilterAlg::ACDProject(ITkrGeometrySvc *tkrGeoSvc,int tower, const OnboardFilterTds::projections *prj){
-  
-  //loop over all the tiles, extending the projections back
-  //to the tiles to see if they were hit.
-  //Order: top, x-, x+, y-, y+
-  double tiledim_x, tiledim_y, tiledim_z;
-  int face, row, col; //, r_row, r_col, c_row, c_col;
-  unsigned int acdX_minus = m_acd_X & 0x0000ffff;
-  unsigned int acdX_plus  = m_acd_X & 0xffff0000;
-  unsigned int acdY_minus = m_acd_Y & 0x0000ffff;
-  unsigned int acdY_plus  = m_acd_Y & 0xffff0000;
-  unsigned int acdFront = m_acd_Front;
-  int bitnum, tile, prjcnt,view;
-  int numtiles = cntBits(m_acd_X) + cntBits(m_acd_Y) + cntBits(m_acd_Front);
-  int firstmatch = 0;
-  HepVector3D newPrj;
-  HepPoint3D acdCoord,prjStart,prjStop;
-  
-  StatusCode sc = StatusCode::SUCCESS;
-  MsgStream log(msgSvc(),name());
-  
-  //Loop over all the tiles that are hit
-  for (int it=0;it<numtiles;it++){
-    //Get the tile and face to look at
-    if (acdFront){
-      bitnum = 31 - FFS(acdFront);     //gets first tile
-      tile = bitnum;                   //set the tile number
-      acdFront ^= (int)pow(2.0,bitnum);  //remove the tile from acdFront
-      face = 0;
-    }
-    else if (acdX_minus){
-      bitnum = 31 - FFS(acdX_minus);   //gets first tile
-      tile = bitnum;              //set the tile number
-      acdX_minus ^= (int)pow(2.0,bitnum);//remove the tile from acdX_minus
-      face = 0x1;
-    }
-    else if (acdX_plus){
-      bitnum = 31 - FFS(acdX_plus);    //get the first tile
-      tile = bitnum - 16;                   //set the tile number
-      acdX_plus ^= (int)pow(2.0,bitnum); //remove the tile from acdX_plus
-      face = 0x3;
-    }
-    else if (acdY_minus){
-      bitnum = 31 - FFS(acdY_minus);   //get the first tile
-      tile = bitnum;              //set the tile number
-      acdY_minus ^= (int)pow(2.0,bitnum);//remove the tile from acdY_minus
-      face = 0x2;
-    }
-    else if (acdY_plus){
-      bitnum = 31 - FFS(acdY_plus);    //get the first tile
-      tile = bitnum - 16;                   //set the tile number
-      acdY_plus ^= (int)pow(2.0,bitnum); //remove the tile from acdY_plus
-      face = 0x4;
-    }
-    
-    //generate a row and column number from the tile and face
-    convertId(tile, face, row, col);
-    
-    //create an acdId object for the tile
-    idents::AcdId acdId(0, face, row, col);
-    
-    //get the volume id and transform for the tile
-    idents::VolumeIdentifier volId = acdId.volId();
-    std::string str;
-    std::vector<double> dim;
-    sc = m_glastDetSvc->getShapeByID(volId, &str, &dim);
-    if ( sc.isFailure() ) {
-      //log << MSG::WARNING << "Failed to retrieve Shape by Id - probably invalid volId" << endreq;
-      return 89;
-    }
-    HepGeom::Transform3D transform;
-    sc = m_glastDetSvc->getTransform3DByID(volId, &transform);
-    if (sc.isFailure() ) {
-      log << MSG::WARNING << "Failed to get transformation" << endreq;
-      return 89;
-    }
-    HepPoint3D center(0., 0., 0.);
-    HepPoint3D acdCenter = transform * center;
-    
-    //get the tile dimensions
-    if ((face==0x0)||(face==0x2)||(face==0x4)){
-      tiledim_x = dim[0];
-      tiledim_y = dim[1];
-      tiledim_z = dim[2];
-    }
-    else if ((face==0x1)||(face==0x3)){
-      tiledim_x = dim[1];//try reversing them
-      tiledim_y = dim[0];
-      tiledim_z = dim[2];
-    }
-    
-    //determine which view to look at when looking at the row coord
-    if (face == 0) //use the y coordinates
-      view = 1;
-    else if ((face == 0x1) || (face == 0x3))//use the x coordinates (x view)
-      view = 0;
-    else if ((face == 0x2) || (face == 0x4))//use the y coordinates (y view)
-      view = 1;
-    
-    //Loop over the projections in this view
-    //get count of projections in this view
-    prjcnt = prj->xy[tower][view];
-    
-    firstmatch = projectionLoop(prjcnt,tile,face,tkrGeoSvc,prj,tower,view,
-                                tiledim_x, tiledim_y, tiledim_z, acdCenter);
-    if ((firstmatch != 0) && (firstmatch != 89)) return firstmatch;
-  }
-  
-  if ((firstmatch != 89)&&(numtiles>0)) return firstmatch;
-  else return 89;//means a tile is not hit
-}
-
-int FilterAlg::projectionLoop(int prjcnt,int tile,int face,ITkrGeometrySvc *tkrGeoSvc,const projections *prj,
-                              int tower,int view, double tiledim_x, double tiledim_y, double tiledim_z
-                              ,HepPoint3D acdCenter)
+int FilterAlg::CFC__ratioLayerCheck (int num,      int den,
+                                 int lo_limit, int lo_status,
+                                 int hi_limit, int hi_status)
 {
-  
-  double xdist, ydist, zdist, theta, deltaX, deltaY, slope, topHit, midHit,
-    check;
-  float lesserBoundary, greaterBoundary;
-  bool rowhit = false;
-  bool colhit = false;
-  int prjit, prjstart;
-  HepVector3D newPrj;
-  HepPoint3D prjStart,acdCoord,prjStop,boundCoord1,boundCoord2,
-    checkPoint1,checkPoint2,checkPoint3,checkPoint4;
-  
-  //count all the projections in towers before this one
-  int counter;
-  prjstart = 0;
-  for (counter = 0; counter < tower; counter++){
-    prjstart += prj->xy[counter][0] + prj->xy[counter][1];
-  }
-  if (view == 1){
-    prjstart += prj->xy[tower][0];
-  }
-  
-  //now loop over the projections in this view
-  for (prjit = prjstart; prjit < (prjcnt + prjstart); prjit++){
-    
-    //only consider projections that start in layer 8 or higher!
-    if ((prj->prjs[prjit].max >= 8) && (face == 0)){
-      //convert the projection into a vector
-      newPrj = convertPrj(tkrGeoSvc,prj,prjit,tower,view,prjStart);
-      
-      //see where the vector intersects the acd
-      acdCoord = getAcdCoord(newPrj,prjStart, acdCenter, theta, view,face,
-                             tiledim_x, tiledim_y, tiledim_z, boundCoord1, boundCoord2,
-                             checkPoint1, checkPoint2, checkPoint3, checkPoint4);
-      
-      //see how far it is from the edge of the acd
-      xdist = fabs(acdCenter.x() - acdCoord.x());
-      ydist = fabs(acdCenter.y() - acdCoord.y());
-      zdist = fabs(acdCenter.z() - acdCoord.z());
-      
-      getTileBoundaries(tile, face, view, lesserBoundary, greaterBoundary);
-      
-      //see if the row was hit by this projection
-      rowhit = false;
-      
-      if (m_useGleamTileGeometry){
-        if (ydist <= (tiledim_y/2)) rowhit = true;
-      }
-      else if (!m_useGleamTileGeometry){
-        if ((acdCoord.y() >= (lesserBoundary))&&(acdCoord.y() <= (greaterBoundary)))
-          rowhit = true;
-      }
-      
-      if (rowhit) prjit = (prjcnt+prjstart);
-    }
-    else if (face != 0){
-      //convert the projection into a vector
-      newPrj = convertPrj(tkrGeoSvc,prj,prjit,tower,view,prjStart);
-      
-      //see where the vector intersects the acd
-      acdCoord = getAcdCoord(newPrj,prjStart, acdCenter, theta, view,face,
-                             tiledim_x, tiledim_y, tiledim_z, boundCoord1, boundCoord2,
-                             checkPoint1, checkPoint2, checkPoint3, checkPoint4);
-      
-      //see how far it is from the edge of the acd
-      xdist = fabs(acdCenter.x() - acdCoord.x());
-      ydist = fabs(acdCenter.y() - acdCoord.y());
-      zdist = fabs(acdCenter.z() - acdCoord.z());
-      
-      //see if the row was hit by this projection
-      getTileBoundaries(tile, face, view, lesserBoundary, greaterBoundary);
-      rowhit = false;
-      if (m_useGleamTileGeometry){
-        if ((face == 0x1) || (face == 0x3)){
-          if (zdist <= (tiledim_z/2)) rowhit = true;
-        }
-      }
-      else if (!m_useGleamTileGeometry){
-        if ((acdCoord.z() >= lesserBoundary)&&(acdCoord.z() <= greaterBoundary))
-          rowhit = true;
-      }
-      
-      //have to do some additional checking to satisfy some conditions that
-      //JJ wrote into the Filter code.  See TFC_acd.c.
-      if (face == 0x1){//we are using view 0 (x) here
-        if ((tower != 0) && (tower != 4) && (tower != 8) && (tower != 12)){
-          deltaX = (prj->prjs[prjit].hits[0] - prj->prjs[prjit].hits[2]);
-          if (deltaX <= 2*1536/3) rowhit = false;
-        }
-        else{
-          //does the slope make sense?
-          topHit = prj->prjs[prjit].hits[0];
-          midHit = prj->prjs[prjit].hits[1];
-          slope = topHit - midHit;
-          if (slope >= 0) rowhit = false;//slope must be negative
-          //does it exit the tower quickly?
-          deltaX = topHit - prj->prjs[prjit].hits[2];
-          check = topHit + deltaX;
-          if (check >= 0) rowhit = false;//check must be less than zero
-        }
-      }
-      else if (face == 0x2){//using view 1 (y)
-        if ((tower != 0) && (tower != 1) && (tower != 2) && (tower != 3)){
-          deltaY = (prj->prjs[prjit].hits[0] - prj->prjs[prjit].hits[2]);
-          if (deltaY <= 2*1536/3) rowhit = false;
-        }
-        else{
-          //does the slope make sense?
-          topHit = prj->prjs[prjit].hits[0];
-          midHit = prj->prjs[prjit].hits[1];
-          slope = topHit - midHit;
-          if (slope >= 0) rowhit = false;//slope must be negative
-          //does it exit the tower quickly?
-          deltaY = topHit - prj->prjs[prjit].hits[2];
-          check = topHit + deltaY;
-          if (check >= 0) rowhit = false;//check must be less than zero
-        }
-      }
-      else if (face == 0x3){//using view 0 (x)
-        if ((tower != 3) && (tower != 7) && (tower != 11) && (tower != 15)){
-          deltaX = (prj->prjs[prjit].hits[0] - prj->prjs[prjit].hits[2]);
-          if (deltaX <= 2*1536/3) rowhit = false;
-        }
-        else{
-          //does the slope make sense?
-          topHit = prj->prjs[prjit].hits[0];
-          midHit = prj->prjs[prjit].hits[1];
-          slope = topHit - midHit;
-          if (slope <= 0) rowhit = false;//slope must be positive
-          //does it exit the tower quickly?
-          deltaX = topHit - prj->prjs[prjit].hits[2];
-          check = topHit + deltaX;
-          if (check <= 1582) rowhit = false;//check must be greater than 1582
-        }
-      }
-      else if (face == 0x4){//using view 1 (y)
-        if ((tower != 12) && (tower != 13) && (tower != 14) && (tower != 15)){
-          deltaY = (prj->prjs[prjit].hits[0] - prj->prjs[prjit].hits[2]);
-          if (deltaY <= 2*1536/3) rowhit = false;
-        }
-        else{
-          //does the slope make sense?
-          topHit = prj->prjs[prjit].hits[0];
-          midHit = prj->prjs[prjit].hits[1];
-          slope = topHit - midHit;
-          if (slope <= 0) rowhit = false;//slope must be positive
-          //does it exit the tower quickly?
-          deltaY = topHit - prj->prjs[prjit].hits[2];
-          check = topHit + deltaY;
-          if (check <= 1582) rowhit = false;//check must be greater than 1582
-        }
-      }
-      
-      if (rowhit) prjit = (prjcnt+prjstart);
-      
-    }//else if (face != 0)
-    
-  }//prj loop for view = 1
-  
-  //*************************************************************/
-  
-  //determine which view to look at when looking at the col coord
-  if (face == 0) //use the x coordinates
-    view = 0;
-  else if ((face == 0x1) || (face == 0x3))//use the y coordinates (y view)
-    view = 1;
-  else if ((face == 0x2) || (face == 0x4))//use the x coordinates (x view)
-    view = 0;
-  
-  //Loop over the projections in this view
-  //get count of projections in this view
-  prjcnt = prj->xy[tower][view];
-  
-  //count all the projections in towers before this one
-  prjstart = 0;
-  for (counter = 0; counter < tower; counter++){
-    prjstart += prj->xy[counter][0] + prj->xy[counter][1];
-  }
-  if (view == 1){
-    prjstart += prj->xy[tower][0];
-  }
-  
-  for (prjit = prjstart; prjit < (prjcnt+prjstart); prjit++){//prj loop for view = 0
-    
-    //only consider projections that start in layer 8 or higher!
-    if ((prj->prjs[prjit].max >= 8) && (face == 0)){
-      
-      //convert the projection into a vector and see where it intersects the acd
-      newPrj = convertPrj(tkrGeoSvc,prj,prjit,tower,view,prjStart);
-      
-      //see where the vector intersects the acd
-      acdCoord = getAcdCoord(newPrj,prjStart, acdCenter, theta, view,face,
-                             tiledim_x, tiledim_y, tiledim_z, boundCoord1, boundCoord2,
-                             checkPoint1, checkPoint2, checkPoint3, checkPoint4);
-      
-      //see how far it is from the edge of the acd
-      xdist = fabs(acdCenter.x() - acdCoord.x());
-      ydist = fabs(acdCenter.y() - acdCoord.y());
-      zdist = fabs(acdCenter.z() - acdCoord.z());
-      
-      getTileBoundaries(tile, face, view, lesserBoundary, greaterBoundary);
-      
-      //see if the tile was hit by this projection
-      colhit = false;
-      if (face == 0){ //use the y coordinates
-        if (m_useGleamTileGeometry){
-          //if (xdist <= (tiledim_x/2 + 5)) colhit = true;
-          if (xdist <= (tiledim_x/2)) colhit = true;
-        }
-        else if (!m_useGleamTileGeometry){
-          if ((acdCoord.x() >= (lesserBoundary-1))&&(acdCoord.x() <= (greaterBoundary+1)))
-            colhit = true;
-        }
-      }
-      else if ((face == 0x1) || (face == 0x3)){//use the y coordinates (y view)
-        if (m_useGleamTileGeometry){
-          if (ydist <= (tiledim_y/2)) colhit = true;
-        }
-        else if (!m_useGleamTileGeometry){
-          if ((acdCoord.y() >= lesserBoundary)&&(acdCoord.y() <= greaterBoundary))
-            colhit = true;
-        }
-      }
-      else if ((face == 0x2) || (face == 0x4)){//use the x coordinates (x view)
-        if (m_useGleamTileGeometry){
-          if (xdist <= (tiledim_x/2)) colhit = true;
-        }
-        else if (!m_useGleamTileGeometry){
-          if ((acdCoord.x() >= lesserBoundary)&&(acdCoord.x() <= greaterBoundary))
-            colhit = true;
-        }
-      }
-      
-      if (colhit) prjit = (prjcnt+prjstart);//make the loop end
-      
-    }
-    else if (face != 0){
-      
-      
-      //convert the projection into a vector and see where it intersects the acd
-      newPrj = convertPrj(tkrGeoSvc,prj,prjit,tower,view,prjStart);
-      
-      //see where the vector intersects the acd
-      acdCoord = getAcdCoord(newPrj,prjStart, acdCenter, theta, view,face,
-                             tiledim_x, tiledim_y, tiledim_z, boundCoord1, boundCoord2,
-                             checkPoint1, checkPoint2, checkPoint3, checkPoint4);
-      
-      //see if the tile was hit by this projection
-      colhit = false;
-      /*
-        bool X1_Within_Boundaries = ((boundCoord1.x() <= checkPoint1.x() )
-        &&  (checkPoint1.x() <= boundCoord2.x() ) );
-        bool X2_Within_Boundaries = ((boundCoord1.x() <= checkPoint2.x() )
-        &&  (checkPoint2.x() <= boundCoord2.x() ) );
-        bool X3_Within_Boundaries = ((boundCoord1.x() <= checkPoint3.x() )
-        &&  (checkPoint3.x() <= boundCoord2.x() ) );
-        bool X4_Within_Boundaries = ((boundCoord1.x() <= checkPoint4.x() )
-        &&  (checkPoint4.x() <= boundCoord2.x() ) );
-        bool Y1_Within_Boundaries = ((boundCoord1.y() <= checkPoint1.y() )
-        &&  (checkPoint1.y() <= boundCoord2.y() ) );
-        bool Y2_Within_Boundaries = ((boundCoord1.y() <= checkPoint2.y() )
-        &&  (checkPoint2.y() <= boundCoord2.y() ) );
-        bool Y3_Within_Boundaries = ((boundCoord1.y() <= checkPoint3.y() )
-        &&  (checkPoint3.y() <= boundCoord2.y() ) );
-        bool Y4_Within_Boundaries = ((boundCoord1.y() <= checkPoint4.y() )
-        &&  (checkPoint4.y() <= boundCoord2.y() ) );
-        bool Z1_Within_Boundaries = ((boundCoord1.z() <= checkPoint1.z() )
-        &&  (checkPoint1.z() <= boundCoord2.z() ) );
-        bool Z2_Within_Boundaries = ((boundCoord1.z() <= checkPoint2.z() )
-        &&  (checkPoint2.z() <= boundCoord2.z() ) );
-        bool Z3_Within_Boundaries = ((boundCoord1.z() <= checkPoint3.z() )
-        &&  (checkPoint3.z() <= boundCoord2.z() ) );
-        bool Z4_Within_Boundaries = ((boundCoord1.z() <= checkPoint4.z() )
-        &&  (checkPoint4.z() <= boundCoord2.z() ) );
-      */
-      int X1_Within_Bound=0; if ((boundCoord1.x() <= checkPoint1.x() )
-                                 &&  (checkPoint1.x() <= boundCoord2.x() ) )
-        X1_Within_Bound = 1;
-      int X2_Within_Bound=0; if ((boundCoord1.x() <= checkPoint2.x() )
-                                 &&  (checkPoint2.x() <= boundCoord2.x() ) )
-        X2_Within_Bound = 1;
-      int X3_Within_Bound=0; if ((boundCoord1.x() <= checkPoint3.x() )
-                                     &&  (checkPoint3.x() <= boundCoord2.x() ) )
-        X3_Within_Bound = 1;
-      int X4_Within_Bound=0; if ((boundCoord1.x() <= checkPoint4.x() )
-                                 &&  (checkPoint4.x() <= boundCoord2.x() ) )
-        X4_Within_Bound = 1;
-      int Y1_Within_Bound=0; if ((boundCoord1.y() <= checkPoint1.y() )
-                                 &&  (checkPoint1.y() <= boundCoord2.y() ) )
-        Y1_Within_Bound = 1;
-      int Y2_Within_Bound=0; if ((boundCoord1.y() <= checkPoint2.y() )
-                                 &&  (checkPoint2.y() <= boundCoord2.y() ) )
-        Y2_Within_Bound = 1;
-      int Y3_Within_Bound=0; if ((boundCoord1.y() <= checkPoint3.y() )
-                                 &&  (checkPoint3.y() <= boundCoord2.y() ) )
-        Y3_Within_Bound = 1;
-      int Y4_Within_Bound=0; if ((boundCoord1.y() <= checkPoint4.y() )
-                                 &&  (checkPoint4.y() <= boundCoord2.y() ) )
-        Y4_Within_Bound = 1;
-      int Z1_Within_Bound=0; if ((boundCoord1.z() <= checkPoint1.z() )
-                                 &&  (checkPoint1.z() <= boundCoord2.z() ) )
-        Z1_Within_Bound = 1;
-      int Z2_Within_Bound=0; if ((boundCoord1.z() <= checkPoint2.z() )
-                                 &&  (checkPoint2.z() <= boundCoord2.z() ) )
-        Z2_Within_Bound = 1;
-      int Z3_Within_Bound=0; if ((boundCoord1.z() <= checkPoint3.z() )
-                                 &&  (checkPoint3.z() <= boundCoord2.z() ) )
-        Z3_Within_Bound = 1;
-      int Z4_Within_Bound=0; if ((boundCoord1.z() <= checkPoint4.z() )
-                                 &&  (checkPoint4.z() <= boundCoord2.z() ) )
-        Z4_Within_Bound = 1;
-      
-      int total_within = 0;
-      if ((face == 0x1) || (face == 0x3)){//use the y coordinates (y view)
-        total_within = Y3_Within_Bound + Y4_Within_Bound
-          + Z1_Within_Bound + Z2_Within_Bound;
-        if (total_within >= 2) colhit = true;
-      }
-      else if ((face == 0x2) || (face == 0x4)){//use the x coordinates (x view)
-        total_within = X3_Within_Bound + X4_Within_Bound
-          + Z1_Within_Bound + Z2_Within_Bound;
-        if (total_within >= 2) colhit = true;
-      }
-      /*
-        if (m_PrjColMatch)
-        {
-        //NOTE:  JJ does not do this part in his code.  He only checks to see if
-        //it falls within a row, not a column.
-        //Actually, this part may not make any sense at all.  I'll leave it in
-        //the code commented out.
-        
-        if (face == 0x1){//we are using view 1 (y) here
-        if ((tower != 0) && (tower != 4) && (tower != 8) && (tower != 12)){
-        deltaY = fabs(prj->prjs[prjit].hits[2] - prj->prjs[prjit].hits[0]);
-        if (deltaY <= 2*1536/3) colhit = false;
-        }
-        }
-        else if (face == 0x2){//using view 0 (x)
-        if ((tower != 0) && (tower != 1) && (tower != 2) && (tower != 3)){
-        deltaX = fabs(prj->prjs[prjit].hits[2] - prj->prjs[prjit].hits[0]);
-        if (deltaX <= 2*1536/3) colhit = false;
-        }
-        }
-        else if (face == 0x3){//using view 1 (y)
-        if ((tower != 3) && (tower != 7) && (tower != 11) && (tower != 15)){
-        deltaY = fabs(prj->prjs[prjit].hits[2] - prj->prjs[prjit].hits[0]);
-        if (deltaY <= 2*1536/3) colhit = false;
-        }
-        }
-        else if (face == 0x4){//using view 0 (x)
-        if ((tower != 12) && (tower != 13) && (tower != 14) && (tower != 15)){
-        deltaX = fabs(prj->prjs[prjit].hits[2] - prj->prjs[prjit].hits[0]);
-        if (deltaX <= 2*1536/3) colhit = false;
-        }
-        }
-        }
-      */
-      if (colhit) prjit = (prjcnt+prjstart);//make the loop end
-    }
-    
-  }//prj loop
-  
-  //if a tile is hit, return the tile.
-  if (!m_PrjColMatch){//no added functionality (checking the columns for a projection match)
-    
-    if ((face==0)&&(rowhit && colhit))
-      return reconstructTileNumber(tile, face);
-    else if ((face != 0) && (rowhit))
-      return reconstructTileNumber(tile, face);
-    
-  }
-  else if (m_PrjColMatch){
-    
-    if (rowhit && colhit) return reconstructTileNumber(tile,face);
-    
-  }
-  
-  return 89;//if no matches are found, returns this value, which means...no matches!
-  
+   int  shf;
+
+   shf = FFS (den) - 0xb;
+   
+   /*
+    | Check to see if have a small enough number to scale by 10 bits.
+    | This means at least 11 bits free at the top to stay out of the
+    | sign bit. 
+   */
+   if (shf < 0)
+   {
+       /* Scale so that there is no overflow */
+       num >>= shf;
+       den >>= shf;
+   }
+       
+
+   /* Scale by 10 bits, this gives 1/1024 accuracy */
+   num <<= 10;
+
+   if      (num <= lo_limit * den) return lo_status;
+   else if (num >= hi_limit * den) return hi_status;
+
+
+   return 0;
 }
 
-HepVector3D FilterAlg::convertPrj(ITkrGeometrySvc *tkrGeoSvc, const projections *prj,
-                                  int prjit, int tower,int view, HepPoint3D &prjStart){
-  HepPoint3D prjStop;
-  HepVector3D newPrj;
-  
-  //get the location of the first hit down from the top
-  prjStart = findStripPosition(tkrGeoSvc,tower,prj->prjs[prjit].max,
-                               view,prj->prjs[prjit].hits[0]);
-  //get the location of the top hit
-  prjStop = findStripPosition(tkrGeoSvc,tower,prj->prjs[prjit].max-1,
-                              view,prj->prjs[prjit].hits[1]);
-  
-  //this creates the vector centered in the middle of the tower
-  newPrj = prjStart-prjStop;//have the vector pointing up
-  newPrj = newPrj/newPrj.mag();//normalize it to a unit vector
-  
-  return newPrj;
-}
+/* ---------------------------------------------------------------------- *//*!
 
-HepPoint3D FilterAlg::getAcdCoord(HepVector3D newPrj,HepPoint3D prjStart, HepPoint3D acdCenter,
-                                  double &theta, int view,int face,
-                                  double tiledim_x, double tiledim_y, double tiledim_z,
-                                  HepPoint3D &boundCoord1, HepPoint3D &boundCoord2,
-                                  HepPoint3D &checkPoint1, HepPoint3D &checkPoint2,
-                                  HepPoint3D &checkPoint3, HepPoint3D &checkPoint4){
-  
-  HepPoint3D acdCoord;
-  double dZ, dX, dY, l, l1, l2, l3, l4, lprime,
-    x, y, z, x1, x2, x3, x4, y1, y2, y3, y4, z1, z2, z3, z4,
-    bX1, bX2, bY1, bY2, bZ1, bZ2;
-  
-  x = newPrj.x();
-  y = newPrj.y();
-  z = newPrj.z();
-  theta = asin(z);
-  if (face == 0){//we're looking at the top here
-    dZ = acdCenter.z() - prjStart.z();//?subtract acdZ/2 to account for the thickness of the tile?
-    l = fabs(dZ)/sin(theta);
-    lprime = l*cos(theta);
-    if (view == 1){
-      dY = lprime;
-      dX = 0;
-      if ((y<0)&&(dY>0)) dY *= -1;//make sure dY is negative if it should be!
-      if ((y>0)&&(dY<0)) dY *= -1;//make sure dY is positive if it should be!
-    }
-    else if (view == 0){
-      dY = 0;
-      dX = lprime;
-      if ((x<0)&&(dX>0)) dX *= -1;//make sure dX is negative if it should be!
-      if ((x>0)&&(dX<0)) dX *= -1;//make sure dX is positive if it should be!
-    }
-    
-  }
-  else if ((face==1) || (face==3)){
-    if (view == 1){//face = 1 or 3
-      
-      bX1 = acdCenter.x() - tiledim_x/2;
-      bX2 = acdCenter.x() + tiledim_x/2;
-      bY1 = acdCenter.y() - tiledim_y/2;
-      bY2 = acdCenter.y() + tiledim_y/2;
-      bZ1 = acdCenter.z() - tiledim_z/2;
-      bZ2 = acdCenter.z() + tiledim_z/2;
-      
-      boundCoord1 = HepPoint3D(bX1, bY1, bZ1);
-      boundCoord2 = HepPoint3D(bX2, bY2, bZ2);
-      
-      //calculate the intersection points!
-      y1 = prjStart.y() - bY1;
-      l1 = y1/cos(theta);
-      z1 = l1*sin(theta);// + prjStart.z();
-      if ((y<0)&&(y1<0)) z1 = -1*fabs(z1);
-      if ((y<0)&&(y1>0)) z1 = fabs(z1);
-      if ((y>0)&&(y1<0)) z1 = fabs(z1);
-      if ((y>0)&&(y1>0)) z1 = -1*fabs(z1);
-      
-      y2 = prjStart.y() - bY2;
-      l2 = y2/cos(theta);
-      z2 = l2*sin(theta);// + prjStart.z();
-      if ((y<0)&&(y2<0)) z2 = -1*fabs(z2);
-      if ((y<0)&&(y2>0)) z2 = fabs(z2);
-      if ((y>0)&&(y2<0)) z2 = fabs(z2);
-      if ((y>0)&&(y2>0)) z2 = -1*fabs(z2);
-      
-      z3 = bZ1 - prjStart.z();//check this!  what if it starts above bZ1?
-      l3 = z3/sin(theta);//no fabs(z3) because we want to let l3 be negative
-      y3 = l3*cos(theta);
-      if ((y<0)&&(z3<0)) y3 = -1*fabs(y3);
-      if ((y<0)&&(z3>0)) y3 = fabs(y3);
-      if ((y>0)&&(z3>0)) y3 = -1*fabs(y3);
-      if ((y>0)&&(z3<0)) y3 = fabs(y3);
-      
-      z4 = bZ2 - prjStart.z();
-      l4 = z4/sin(theta);
-      y4 = l4*cos(theta);
-      if ((y<0)&&(z4<0)) y4 = -1*fabs(y4);
-      if ((y<0)&&(z4>0)) y4 = fabs(y4);
-      if ((y>0)&&(z4>0)) y4 = -1*fabs(y4);
-      if ((y>0)&&(z4<0)) y4 = fabs(y4);
-      
-      checkPoint1 = HepPoint3D(0, bY1, z1+prjStart.z());
-      checkPoint2 = HepPoint3D(0, bY2, z2+prjStart.z());
-      checkPoint3 = HepPoint3D(0, y3+prjStart.y(), bZ1);
-      checkPoint4 = HepPoint3D(0, y4+prjStart.y(), bZ2);
-    }
-    else if (view == 0){
-      dX = acdCenter.x() - prjStart.x();
-      l=fabs(dX)/cos(theta);
-      dZ = l*sin(theta);
-      dY = 0;
-      if((z<0)&&(dZ>0)) dZ *= -1;
-      if((z>0)&&(dZ<0)) dZ *= -1;
-    }
-  }
-  else if ((face==2) || (face==4)){
-    if (view==0){
-      //get the tile boundaries
-      bX1 = acdCenter.x() - tiledim_x/2;
-      bX2 = acdCenter.x() + tiledim_x/2;
-      bY1 = acdCenter.y() - tiledim_y/2;
-      bY2 = acdCenter.y() + tiledim_y/2;
-      bZ1 = acdCenter.z() - tiledim_z/2;
-      bZ2 = acdCenter.z() + tiledim_z/2;
-      
-      boundCoord1 = HepPoint3D(bX1, bY1, bZ1);
-      boundCoord2 = HepPoint3D(bX2, bY2, bZ2);
-      
-      //get the intersection points
-      x1 = prjStart.x()-bX1;
-      l1=x1/cos(theta);
-      z1 = l1*sin(theta); //allow z1 to be negative if it wants to be
-      if ((x<0)&&(x1<0)) z1 = -1*fabs(z1);
-      if ((x<0)&&(x1>0)) z1 = fabs(z1);
-      if ((x>0)&&(x1<0)) z1 = fabs(z1);
-      if ((x>0)&&(x1>0)) z1 = -1*fabs(z1);
-      
-      x2 = prjStart.x() - bX2;
-      l2=x2/cos(theta);
-      z2 = l2*sin(theta); //allow z2 to be negative if it wants to be
-      if ((x<0)&&(x2<0)) z2 = -1*fabs(z2);
-      if ((x<0)&&(x2>0)) z2 = fabs(z2);
-      if ((x>0)&&(x2<0)) z2 = fabs(z2);
-      if ((x>0)&&(x2>0)) z2 = -1*fabs(z2);
-      
-      z3 = bZ1 - prjStart.z();//check this!  what if it starts above bZ1?
-      l3 = z3/sin(theta);//not fabs(z3), because we want to let l3 be negative
-      x3 = l3*cos(theta);
-      
-      z4 = bZ2 - prjStart.z();
-      l4 = z4/sin(theta);
-      x4 = l4*cos(theta);
-      
-      checkPoint1 = HepPoint3D(bX1, 0, z1+prjStart.z());
-      checkPoint2 = HepPoint3D(bX2, 0, z2+prjStart.z());
-      checkPoint3 = HepPoint3D(x3+prjStart.x(), 0, bZ1);
-      checkPoint4 = HepPoint3D(x4+prjStart.x(), 0, bZ2);
-    }
-    else if (view==1){
-      dX = acdCenter.x() - prjStart.x();
-      l=fabs(dX)/cos(theta);
-      dZ = l*sin(theta);
-      dY = 0;
-      if((z<0)&&(dZ>0)) dZ *= -1;
-      if((z>0)&&(dZ<0)) dZ *= -1;
-    }
-  }
-  
-  acdCoord = HepPoint3D(dX,dY,dZ) + prjStart;
-  
-  return acdCoord;
-}
+  \fn unsigned int tkrFilter  (const GammaCfgTkr       *cfgTkr,
+                               unsigned int             energy,
+                               unsigned int              acd_x,
+                               unsigned int              acd_y,
+                               unsigned int              acd_z,
+			       unsigned int             vetoes,
+                               EDR_tkr                    *tlr,
+			       TFC_projections           *prjs)
 
-void FilterAlg::getTileBoundaries(int tile, int face, int view,
-                                  float &lesserBoundary, float &greaterBoundary){
-  
-  int row, col;
-  const int id = 0;//the default id, which currently picks out the latest geometry
-  const double StripConversion = 0.228;
-  
-  const struct _TFC_geometry *geo;
-  geo = TFC_geosLocate (TFC_Geos, -1, id);
-  
-  convertId(tile, face, row, col);
-  
-  if ( face == 0){
-    if ( view == 0 ){
-      if    (col == 0){ lesserBoundary  = geo->acd.xTopEdges[0]*StripConversion;
-      greaterBoundary = geo->acd.xTopEdges[1]*StripConversion;}
-      else if (col==1){ lesserBoundary  = geo->acd.xTopEdges[1]*StripConversion;
-      greaterBoundary = geo->acd.xTopEdges[2]*StripConversion;}
-      else if (col==2){ lesserBoundary  = geo->acd.xTopEdges[2]*StripConversion;
-      greaterBoundary = geo->acd.xTopEdges[3]*StripConversion;}
-      else if (col==3){ lesserBoundary  = geo->acd.xTopEdges[3]*StripConversion;
-      greaterBoundary = geo->acd.xTopEdges[4]*StripConversion;}
-      else if (col==4){ lesserBoundary  = geo->acd.xTopEdges[4]*StripConversion;
-      greaterBoundary = geo->acd.xTopEdges[5]*StripConversion;}
-    }
-    else if (view == 1){
-      if    (row == 0){ lesserBoundary  = geo->acd.yTopEdges[0]*StripConversion;
-      greaterBoundary = geo->acd.yTopEdges[1]*StripConversion;}
-      else if (row==1){ lesserBoundary  = geo->acd.yTopEdges[1]*StripConversion;
-      greaterBoundary = geo->acd.yTopEdges[2]*StripConversion;}
-      else if (row==2){ lesserBoundary  = geo->acd.yTopEdges[2]*StripConversion;
-      greaterBoundary = geo->acd.yTopEdges[3]*StripConversion;}
-      else if (row==3){ lesserBoundary  = geo->acd.yTopEdges[3]*StripConversion;
-      greaterBoundary = geo->acd.yTopEdges[4]*StripConversion;}
-      else if (row==4){ lesserBoundary  = geo->acd.yTopEdges[4]*StripConversion;
-      greaterBoundary = geo->acd.yTopEdges[5]*StripConversion;}
-    }
-  }
-  else if (face != 0){
-    if      (row==0){ lesserBoundary  = geo->acd.zSides[1]/10.;
-    greaterBoundary = geo->acd.zSides[0]/10.;}
-    else if (row==1){ lesserBoundary  = geo->acd.zSides[2]/10.;
-    greaterBoundary = geo->acd.zSides[1]/10.;}
-    else if (row==2){ lesserBoundary  = geo->acd.zSides[3]/10.;
-    greaterBoundary = geo->acd.zSides[2]/10.;}
-    else if (row==3){ lesserBoundary  = geo->acd.zSides[4]/10.;
-    greaterBoundary = geo->acd.zSides[3]/10.;}
-    else if (row==4){ lesserBoundary  = geo->acd.zSides[5]/10.;
-    greaterBoundary = geo->acd.zSides[4]/10.;}
-  }
-  //NOTE: In order to use JJ's tile geometry with my track projection methods, one would
-  //      have to add boundaries for the columns in addition to the rows.
-  //      These would replace boundCoord1, boundCoord2, boundCoord3, and boundCoord4.
-  
-  return;
-}
+  \brief  Performs the most computationally intensive portions of the
+          filtering. This involves TKR pattern recognition and matching
+          to the ACD, skirt region and CAL
+  \return A summary status bit mask
 
-HepPoint3D FilterAlg::findStripPosition(ITkrGeometrySvc *tkrGeoSvc,int tower,
-                                        int layer, int view, double stripId){
-  //stripId is in first ladder
-  if(stripId<384)
-    return tkrGeoSvc->getStripPosition(tower,layer,view,stripId);
-  
-  //stripId is in second ladder
-  if(stripId>392 && stripId<777)
-    return tkrGeoSvc->getStripPosition(tower,layer,view,stripId-9);
-  
-  //stripId is in third ladder
-  if(stripId>786 && stripId<1171)
-    return tkrGeoSvc->getStripPosition(tower,layer,view,stripId-9-10);
-  
-  //stripId is in fourth ladder
-  if(stripId>1179)
-    return tkrGeoSvc->getStripPosition(tower,layer,view,stripId-9-10-9);
-  
-  //stripId is in a gap. We need to compute the position manually
-  int below;
-  int numstrips;
-  //stripId is in first gap
-  if(stripId>383 && stripId<393){
-    below=383;
-    numstrips=10;
-  }
-  //stripId is in second gap
-  if(stripId>776 && stripId<787){
-    below=776;
-    numstrips=11;
-  }
-  //stripId is in third gap
-  if(stripId>1170 && stripId<1180){
-    below=1170;
-    numstrips=10;
-  }
-  HepPoint3D pointBelow=tkrGeoSvc->getStripPosition(tower,layer,view,below);
-  HepPoint3D pointAbove=tkrGeoSvc->getStripPosition(tower,layer,view,below+1);
-  HepPoint3D incPoint=pointAbove-pointBelow;
-  incPoint/=numstrips;
-  for(int counter=below;counter<stripId;counter++)
-    pointBelow+=incPoint;
-  return pointBelow;
-}
+  \param cfg    The tracker configuration and cut criteria
+  \param energy The total energy in the CAL
+  \param acd_x  The bit pattern of struck tiles in the side X+/X- planes
+  \param acd_y  The bit pattern of struck tiles in the side Y+/Y- planes  
+  \param acd_z  The bit pattern of struck tiles in the top  Z     plane
+  \param vetoes The bit mask of vetoes. If, at any time in this routine
+                a veto bit is added that matches in this word, the
+                routine is aborted.
+  \param tlr    The unpacked tracker data for the entire LAT
+  \param prjs   Filled in with the projections for this event
 
-void FilterAlg::convertId(int tile, int face, int &row, int &col){
+                                                                          */
+/* ---------------------------------------------------------------------- */
+unsigned int FilterAlg::tkrFilter  (const GammaCfgTkr          *cfg,
+                                unsigned int             energy,
+                                unsigned int              acd_x,
+                                unsigned int              acd_y,
+                                unsigned int              acd_z,
+				unsigned int             vetoes,
+				EDR_tkr                    *tlr,
+				TFC_projections           *prjs)
+{
+   EDR_tkrTower          *ttrs;
+   TFC_projection         *prj;
+   int                    tmsk;
+   int                  status;
+   int                  curCnt;
+   int                dispatch;
+   unsigned short int   twrMsk;
+   unsigned int        doSkirt;
+   const TFC_geometry     *geo;
+ 
+   unsigned int tw   = -1;
+   
+//   TFC_projectionsPrint(prjs,tw);
+    /* If all requested, limit to those that actually have info */
+
+/*    printf("TFC_projectionsPrint input: twrMsk=%x\n",twrMsk);
+    if (twrMsk == -1) twrMsk  = prjs->twrMsk << 16;
+    else              twrMsk &= 0xffff0000;
+    printf("TFC_projectionsPrint: twrMsk=%x\n",twrMsk);
+    while (twrMsk)
+    {
+       int towerId = FFS (twrMsk);
+       const TFC_projectionDir *dir = prjs->dir + towerId;
+       twrMsk = FFS_eliminate (twrMsk, towerId);
+       printProjections (prjs->prjs + dir->idx, dir->xCnt, dir->yCnt, towerId);
+    }
+    printf("TFC_projectionsPrint: done\n");
+*/
+   /* 
+    | !!! IMPROVEMENT !!! 
+    | -------------------
+    | Need a better method for selecting only the towers that have their
+    | strips unpacked. Don't want the TOT stuff.
+    |
+    | There is no check for tmsk == 0. This is a precondition of this
+    | routine being called, i.e. it's already been done. 
+   */
+   tmsk   = tlr->twrMap & 0xffff0000;
+   curCnt = 0;
+   twrMsk = 0;
+   tmsk  = prjs->twrMsk << 16;
+
+   /*
+    |  !!! KLUDGE !!!
+    |  --------------
+    |  This is too sloppy, need better way to initialize and keep the
+    |  maximum number of projections under control
+   */
+   
+   if (energy > cfg->topEmax) 
+   {   
+       acd_z = 0;
+   }
+   
+   if (energy > cfg->row01Emax)
+   {
+       acd_x &= ~ACD_SIDE_TILES_M_ROW01;
+       acd_y &= ~ACD_SIDE_TILES_M_ROW01;
+   }
+     
+   if (energy > cfg->row2Emax) 
+   {
+       acd_x &= ~ACD_SIDE_TILES_M_ROW2;
+       acd_y &= ~ACD_SIDE_TILES_M_ROW2;
+   }
+
+
+   /*
+    | TFC_acdrojectTemplate produces a bit mask of which ACD planes a
+    | candidate track will be projected to. Only planes that have any
+    | chance are included.
+   */
+   dispatch = TFC_acdProjectTemplate ((int)acd_x, (int)acd_y, (int)acd_z);
+   doSkirt  = energy < cfg->skirtEmax;
+   
+   prj    = prjs->prjs;   
+   ttrs   = tlr->twrs;
+   geo    = cfg->geometry;
+   const TFC_geometryTkr    tkrgeo = geo->tkr;
+   status = 0;
+   while (tmsk)
+   {
+       int                  tower;
+       EDR_tkrTower          *ttr;
+//       int     tkrStatus;
+       TFC_projectionDir     *dir;
+       
+       tower = FFS (tmsk);
+       ttr   = ttrs + tower;
+       tmsk  = FFS_eliminate (tmsk, tower);
+
+	   dir       = prjs->dir + tower;
+       prj = prjs->prjs + dir->idx;
+       /* Find the projections */
+           int   acdStatus;
+           int skirtStatus;
+           int        xCnt;
+           int        yCnt;
+           int        tCnt;
+
+
+           /* Form the projection directory for this tower */
+           xCnt = dir->xCnt;
+           yCnt = dir->yCnt;
+
+           /* Keep track of which towers have projections and total count */
+	   twrMsk   |= (0x8000 >> tower);
+	   tCnt      = xCnt + yCnt;
+           curCnt   += tCnt;
+
+	   /* 
+            | Don't do the TKR/ACD matching if the energy is high to
+            | make backsplash a concern.
+	   */
+	   if (dispatch)
+	   {
+              /* Project the candidate projections to the ACD planes */
+	      acdStatus = TFC_acdProject (prj,
+					  xCnt,
+					  yCnt,
+					  geo,
+					  tower,
+					  dispatch,
+					  acd_x,
+					  acd_y,
+					  acd_z);
+	      
+	      /* Check if have any matches */
+	      if (acdStatus)
+              {
+                 /* Have a match, classify the match type */
+                 int which;
+
+		 /* Check whether have TOP or SIDE face match */
+		 which = (acdStatus & 0xf0000000) >> 28;
+		 if (which == 4) status |= EFC_GAMMA_STATUS_M_TKR_TOP;
+		 else
+		 {
+		     /* Side face match, check if have ROW01 or ROW23 match */
+		     status |= (acdStatus & 0x3ff) 
+		             ? EFC_GAMMA_STATUS_M_TKR_ROW01
+		             : EFC_GAMMA_STATUS_M_TKR_ROW2;
+		 }
+
+		 if (isVetoed (status, vetoes)) goto EXIT;
+	      }
+           }
+
+           
+	   /* No ACD match, try projecting to the skirt */
+           if (doSkirt)
+           {
+                 
+               skirtStatus = FilterAlg_skirtProject (prj,
+                                               xCnt,
+                                               yCnt,
+                                               geo,
+                                               tower);
+
+               /*
+                | !!! KLUDGE !!!
+                | --------------
+                | Need a decision on this cut. Does one need to cancel
+                | this cut if have 2 or more tracks in the event. Currently
+                | it is not cancelled, so the logic says, as soon as
+                | one finds any track in the skirt region, that's it.
+               */
+               if (skirtStatus)  
+	       {
+		 status |= EFC_GAMMA_STATUS_M_TKR_SKIRT;
+		 if (isVetoed (status, vetoes)) goto EXIT;
+	       }
+           }
+
+   }
+
+
+   /* If there is evidence for less than 2 complete tracks... */
+   if (curCnt < 3)
+   {
+       if (curCnt < 2)  
+       { 
+	   if (energy >= cfg->zeroTkrEmin)
+	   {
+               status |= EFC_GAMMA_STATUS_M_TKR_EQ_0;
+	   }
+	   goto EXIT;
+       }
+
+
+       /* Number of projections == 2, so call it one full track */
+       status |= EFC_GAMMA_STATUS_M_TKR_EQ_1;
+
+       /* If energy low enough, must have some evidence of two tracks */
+       if (energy < cfg->twoTkrEmax) 
+       {
+           status |= EFC_GAMMA_STATUS_M_TKR_LT_2_ELO;
+       }
+   }
+   else
+   {
+       /* Note that have ge 2 tracks */
+       status |= EFC_GAMMA_STATUS_M_TKR_GE_2;
+   }
+
+   
+ EXIT:
+   EDM_INFOPRINTF ((EFC_Filter_edm, 
+		    "LAT FILTER STATUS = %8.8x (xyCnt = %d)\n",
+		    status, 
+		    curCnt));
   
-  if (face == 0){//front
-    if      (tile < 5)  row = 0;
-    else if (tile < 10) row = 1;
-    else if (tile < 15) row = 2;
-    else if (tile < 20) row = 3;
-    else if (tile < 25) row = 4;
-    col = tile - (5*row);
-    return;
-  }
-  else if ((face == 0x1) || (face == 0x4)){//x minus, y plus
-    if      (tile < 5)  row = 0;
-    else if (tile < 10) row = 1;
-    else if (tile < 15) row = 2;
-    else if (tile < 16) row = 3;
-    col = tile - (5*row);
-    if (row == 4) col = 0;
-    return;
-  }
-  else if ((face == 0x2) || (face == 0x3)){//y minus, x plus
-    if      (tile < 5)  row = 0;
-    else if (tile < 10) row = 1;
-    else if (tile < 15) row = 2;
-    else if (tile < 16) row = 3;
-    col = tile - (5*row);
-    if (row == 4) col = 0;
-    return;
-  }
-  return;
-}
 
-void FilterAlg::createTileList(int face, int row, int col, int rowlist[], int collist[]){
-  int rowit, colit;
-  if (face == 0){
-    for (rowit=0;rowit<5;rowit++){//set row list
-      rowlist[rowit] = 5*row + rowit;
-    }
-    for (colit=0;colit<5;colit++){//set column list
-      collist[colit] = col + 5*colit;
-    }
-    return;
-  }
-  else if ( (face == 0x1) || (face == 0x4) ){//x minus and y plus faces
-    if (row < 3){//set row list
-      for (rowit=0;rowit<5;rowit++){
-        rowlist[rowit] = rowit + 5*row;
-      }
-    }
-    else{
-      for (rowit=0;rowit<5;rowit++){
-        rowlist[rowit] = 15;
-      }
-    }
-    for (colit=0;colit<3;colit++){//set column list
-      collist[colit] = (4 - col) + 5*colit;
-    }
-    collist[3] = 15;
-    return;
-  }
-  else if ( (face == 0x2) || (face == 0x3) ){//y minus and x plus faces
-    if (row < 3){//set row list
-      for (rowit=0;rowit<5;rowit++){
-        rowlist[rowit] = rowit + 5*row;
-      }
-    }
-    else{
-      for (rowit=0;rowit<5;rowit++){
-        rowlist[rowit] = 15;
-      }
-    }
-    for (colit=0;colit<3;colit++){//set column list
-      collist[colit] = col + 5*colit;
-    }
-    collist[3] = 15;
-    return;
-  }
-  return;
-}
-
-int FilterAlg::reconstructTileNumber(int tile, short face){
-  if      (face == 0)   return tile;       //top face
-  else if (face == 0x4) return (tile + 25);//y plus face
-  else if (face == 0x2) return (tile + 41);//y minus face (25+16)
-  else if (face == 0x3) return (tile + 57);//x plus face (25+16+16)
-  else if (face == 0x1) return (tile + 73);//x minus face (25+16+16+16)
-  return 89;
-}
-
-int FilterAlg::evaluateTiles(int tile){
-  const int TOPFACE = 0;
-  const int ROW01 = 1;
-  const int ROW23 = 2;
-  if (tile < 25) return TOPFACE;
-  if ( ((tile>=25)&&(tile<=34)) ||
-       ((tile>=41)&&(tile<=50)) ||
-       ((tile>=57)&&(tile<=66)) ||
-       ((tile>=73)&&(tile<=82))   )
-    return ROW01;
-  else return ROW23;
+   return status;
 }
 
 
@@ -1824,10 +1445,12 @@ bool FilterAlg::compare(int &count)
       if (start_layer_2 > start_layer_3) start_layer = start_layer_2;
       else start_layer = start_layer_3;
       
+      int newstart = triggerForm(m_xcapture[tower],m_ycapture[tower]);
       if (valid_tower >=0) start_layer = valid_tower;
       
       if (valid_tower>=0){
-        if ((m_acd_Front & m_maskTop) && (start_layer > 14)){
+//        if ((m_acd_Front & m_maskTop) && (start_layer > 14)){
+        if ((m_acd_Front & m_maskTop) && (newstart <= 2)){
           setVeto(m_TOP_VETO);
                    return done;
         }
@@ -1846,6 +1469,262 @@ bool FilterAlg::compare(int &count)
     }
   if (possible_towers==0) return done;
   return notdone;
+}
+
+int FilterAlg::triggerForm (unsigned int x, unsigned int y)
+{
+   unsigned int      xt;
+   unsigned int      yt;
+   unsigned int    xy00;
+   unsigned int    xy11;
+   unsigned int    xy22;
+   unsigned int    xy01;
+   unsigned int    xy02;
+   unsigned int    xy12;
+   unsigned int    xy13;
+   unsigned int    xy23;
+   unsigned int   xy012;
+   unsigned int   xy013;
+   unsigned int   xy023;
+   unsigned int   xy123;
+   unsigned int trigger;
+   int            start;
+   int           length;
+   
+   start = 31;
+  /*
+            876543210fedcba9876543210
+       x =         13579bdfh02468aceg
+       y =         13579bdfh02468aceg
+       
+      xt   = (x & 0x1ff) | ((x & (0x1ff << 9) << 7));
+      yt   = (y & 0x1ff) | ((y & (0x1ff << 9) << 7));      
+      
+      xt  = 13579bdfh.......02468aceg
+      xt  = 13579bdfh.......02468aceg
+
+
+      xy00 = xt & yt;
+      xy11 = (xy00 << 16) | (xy00 >> 17)
+      xy22 = (xy00 >> 1)
+      xy33 =  xy11 >> 1)
+
+                fedcba9876543210fedcba9876543210 
+      xy01 = xy(       13579bdfh       02468aceg)    xy00
+           & xy(       02468aceg       _13579bdf)    xy11
+           = xy00 &  xy11;
+
+      xy02 = xy(       13579bdfh       02468aceg)    xy00
+           = xy(       _13579bdfh      _02468ace)    xy22
+           = xy00 & xy22;
+
+      xy12 = xy(       02468aceg       _13579bdf)    xy11
+           = xy(       _13579bdfh      _02468ace)    xy22
+           =  xy11 & xy22;
+             
+      xy13 = xy(       02468aceg       _13579bdf)    xy11
+           & xy(       _02468aceg       _13579bd)    xy33
+           = xy11 & (xy11 >> 1);
+
+      xy23 = xy(       _13579bdfh      _02468ace)    xy22
+           & xy(       _02468aceg       _13579bd)    xy33
+           = xy01 >> 1;
+   */
+
+   
+   /*
+    | To get a 7/8 or 6/6, must have at least a 4/4 somewhere. This is
+    | a quick check to eliminate towers with no possibility of a trigger.
+    | Initialize the return value to be the 2/2 coincidence.
+   */
+   xt   =  (x & 0x1ff) | ((x & (0x1ff << 9)) << 7);
+   yt   =  (y & 0x1ff) | ((y & (0x1ff << 9)) << 7);
+   xy00 = (xt & yt);
+   xy11 = (xy00 << 16) | (xy00 >> 17);
+   xy01 =  xy00 & xy11;
+//   printf ("X   : %8.8x\n"
+//                        "Y   : %8.8x\n"
+//                        "XT  : %8.8x\n"
+//                        "YT  : %8.8x\n"
+//                        "XY00: %8.8x\n"
+//                        "XY11: %8.8x\n"
+//                        "XY01: %8.8x\n",
+//                        x, y, xt, yt, xy00, xy11, xy01);
+   
+   if (xy01 == 0)
+   {
+       /*
+        | No need to fill in remaining trigger fields, they are defaulted.
+        | In this case and in this case only, the layer bits are still in
+        | the accept order. For the most part no one ever looks at the
+        | layer map when there is less than a 4/4 coincidence. Basically,
+        | doing the remapping isn't worth the time. (Remember, this case
+        | is the most common fate, so saving time here is worth this
+        | complication.)
+       */
+       return start;
+   }
+   
+   
+   /*
+    | Try going for 7/8 layer coincidence. In order to get the length
+    | the coincidence (ie the number of struck planes) correct, the
+    | length is initialized at 1. That is because the minimum coincidence
+    | length for 7/8 is 4 planes and the minimum coincidence length for
+    | 3/3 is 3 planes. Arbitrarily, the length of coincidence is baselined
+    | at 3 planes.
+   */
+   xy22      = xy00 >> 1;
+   xy02      = xy00 & xy22;
+   xy12      = xy11 & xy22;
+   xy13      = xy11 & (xy11 >> 1);
+   xy23      = xy01 >> 1;
+   xy012     = xy01 & xy22;
+   xy013     = xy01 & xy13;
+   xy023     = xy02 & xy23;
+   xy123     = xy12 & xy23;
+   trigger   = trigger7of8Form (xt, yt, xy012, xy013, xy023, xy123);
+   
+   
+   length    = 3;
+//   t.si      = 0;
+//   t.bf.type = TFC_K_TRIGGER_TYPE_7_OF_8;
+
+   
+   /*
+    | If no 7/8, try 6/6 coincidence. In order to get the length of
+    | the coincidence (ie the number of struck planes) correct, the
+    | length is initialized at 0.
+   */
+   if (trigger == 0)
+   {
+       /*
+                       fedcba9876543210fedcba9876543210
+            xy012 = xy(       13579bdfh       02468aceg)    xy00
+                  & xy(       02468aceg       _13579bdf)    xy11
+                  & xy(       _13579bdfh      _02468ace)    xy22
+       */
+      trigger = xy01 & xy02;
+      
+
+      /* No 6/6 of coincidence */  
+      if (trigger == 0)
+      {
+          /* Only made it to 4/4 */
+//          t.si        = 0;
+//          t.bf.type   = TFC_K_TRIGGER_TYPE_4_OF_4;
+//          t.bf.layers = ((xy01 >> OFFSET_ODD) & (0x1ff << 9)) | (xy01 & 0x1ff);
+          return start;
+      }
+
+      /* No 7/8, but did have a 6/6 */
+//      t.bf.type = TFC_K_TRIGGER_TYPE_6_OF_6;
+//      length    = 2;
+   }
+   else
+   {
+   }
+   
+
+   trigger = triggerRemap (trigger);
+   
+   /*
+    | Must have a trigger now. Find the starting layer number and the
+    | length of the coincidence. Note that the layer closest to the ACD
+    | top plane is labelled as 0. 
+   */
+   trigger   <<= 32 - 18;        
+   start       = FFS (trigger);   
+   return start;
+}
+
+int FilterAlg::trigger7of8Form (unsigned int x,
+                                 unsigned int y, 
+                                 unsigned int xy012,
+                                 unsigned int xy013,
+                                 unsigned int xy023,
+                                 unsigned int xy123)
+{
+   unsigned int      xy;
+   unsigned int x_or_y0;
+   unsigned int x_or_y1;
+
+   /*
+
+    x_or_y0 =   (       13579bdfh       02468aceg)
+    x_or_y1 =   (       02468aceg       _13579bdf)
+
+                 fedcba9876543210fedcba9876543210    
+      xy012 = xy(       13579bdfh       02468aceg)    xy00
+            & xy(       02468aceg       _13579bdf)    xy11
+            & xy(       _13579bdfh      _02468ace)    xy22
+            &   (       _02468aceg      __13579bd)    x_or_y1 >> 1
+
+      xy013 = xy(       13579bdfh       02468aceg)    xy00
+            & xy(       02468aceg       _13579bdf)    xy11
+            &   (       _13579bdfh      _02468ace)    x_or_y0 >> 1            
+            & xy(       _02468aceg      __13579bdf)   xy33
+
+
+      xy023 = xy(       13579bdfh       02468aceg)    xy00
+            &   (       02468aceg       _13579bdfh)   x_or_y1      
+            & xy(       _13579bdfh      _02468ace)    xy22
+            & xy(       _02468aceg      __13579bdf)   xy33
+
+
+      xy123 =   (       13579bdfh       02468aceg)    x_or_y0
+            & xy(       02468aceg       _13579bdf)    xy11
+            & xy(       _13579bdfh      _02468ace)    xy22
+            & xy(       _02468aceg      __13579bdf)   xy33
+            
+   */
+   x_or_y0 = (x | y);
+   x_or_y1 = (x_or_y0 << 16) | (x_or_y0 >> 17);
+
+
+
+   /* Now form all the triple coincidence AND'd with the missing X or Y   */
+   xy   = ((xy012 & ((x_or_y1)>>1)) |          /* (xy321 & x|y(0)) */
+           (xy013 & ((x_or_y0)>>1)) |          /* (xy320 & x|y(1)) */
+           (xy023 & ((x_or_y1)>>0)) |          /* (xy310 & x|y(2)) */
+           (xy123 & ((x_or_y0)>>0)));          /* (xy210 & x|y(3)) */
+
+   
+   return (int) xy;
+}
+
+ int FilterAlg::triggerRemap (int trigger)
+{
+   /*
+    | Two variables, 'even' and 'odd' are used during the remapping
+    | even though, strictly speaking, only one is needed. Using two
+    | variables allows both integer units on those processors that
+    | have it to be used. Using an extra variable costs one additional
+    | OR instruction, but allows 18 other instructions to be executed
+    | in pairs.
+    |
+    | This routine should take on the order of 10 clock cycles, or
+    | for 133 MHz RAD750, about 75nsecs.
+   */
+   unsigned int even;
+   unsigned int  odd;
+
+   /*
+    | Note that layers 0 and 1 are not remapped. They can never begin
+    | a coincidence, hence no need to remap them.
+   */
+   TFC_TRG_REMAP_INIT (trigger, even, odd, 2, 3);   
+   TFC_TRG_REMAP      (trigger, even, odd, 4, 5);
+   TFC_TRG_REMAP      (trigger, even, odd, 6, 7);
+   TFC_TRG_REMAP      (trigger, even, odd, 8, 9);
+   TFC_TRG_REMAP      (trigger, even, odd, A, B);
+   TFC_TRG_REMAP      (trigger, even, odd, C, D);
+   TFC_TRG_REMAP      (trigger, even, odd, E, F);
+   TFC_TRG_REMAP      (trigger, even, odd, G, H);
+
+   
+
+   return even | odd;
 }
 
 void FilterAlg::getRowMask(int tower, int row){
@@ -2061,6 +1940,93 @@ void FilterAlg::setVeto(int veto){
   m_vetoword |= (int)pow(2.0,(veto-15));
   return;
 }
+
+
+/* ---------------------------------------------------------------------- *//*!
+
+  \fn            int isVetoed (unsigned int status, unsigned int vetoes)
+  \brief         Checks whether any of the veto bits are up
+  \return        Non-zero if the \a status bits contain any of the 
+                 veto bits.
+
+  \param  status The current set of status bits
+  \param  vetoes The set of veto bits
+
+                                                                          */
+/* ---------------------------------------------------------------------- */
+int FilterAlg::isVetoed (unsigned int status, unsigned int vetoes)
+{
+  return status & vetoes;
+}
+/* ---------------------------------------------------------------------- */
+
+
+
+/* ---------------------------------------------------------------------- *//*!
+
+  \fn     const TFC_geometry *locateGeo (int id, int printIt)
+  \brief  Locates the specified geometry within the list of available
+          geometries.
+  \return A pointer to the specified geometry.
+
+  \param      id  The id of the specified geometry.
+  \param printIt  If non-zero, prints the geometry.
+
+   If the specified geometry is not located, a list of the available 
+   geometries is printed and the program exits
+									  */
+/* ---------------------------------------------------------------------- */
+const TFC_geometry *FilterAlg::locateGeo (int id, int printIt)
+{
+
+    const TFC_geometry *geo;
+
+    /* Lookup the specified geometry */
+    geo = TFC_geosLocate (TFC_Geos, -1, id);
+
+    /* If can't find the specified geometry, report error and quit */
+    if (!geo) 
+    {
+       printf ("ERROR: Unable to locate the specified geometry, id = %d\n"
+	       "       The available choices are\n\n");
+
+       EDM_CODE 
+       (
+          {
+            int  idx;
+
+	    /* Print just a header line */
+	    puts ("");
+	    TFC_geometryPrint (NULL, TFC_M_GEO_OPTS_TAG_HDR);
+
+	    /* Print the tag for each */
+	    idx = 0;
+	    while ((geo = TFC_Geos[idx++])) 
+	    {
+	     TFC_geometryPrint (geo, TFC_M_GEO_OPTS_TAG);
+	    }
+         }
+      )
+
+       exit (-1);
+    }
+
+   
+    /* Print the detector geometry if desired */
+    EDM_CODE
+    (
+     puts ("");
+     TFC_geometryPrint (geo, 
+                        printIt ? TFC_M_GEO_OPTS_ALL 
+                                : TFC_M_GEO_OPTS_TAG_HDR | TFC_M_GEO_OPTS_TAG);
+    )
+ 
+    return geo;
+}
+/* ---------------------------------------------------------------------- */
+
+
+
 
 /*
   Into TDS: xy00, xy11, xy22, xy33 from line 814 and following

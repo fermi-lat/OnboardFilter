@@ -19,7 +19,7 @@
  * The data is stored as one continuos string of bytes
  * No attempt is made to verify that the data stored is correctly
  * formated ebf.
- * $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/OnboardFilter/FilterAlgTds.h,v 1.2 2004/07/12 19:47:16 golpa Exp $
+ * $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/OnboardFilter/FilterAlgTds.h,v 1.5 2005/09/02 19:08:11 hughes Exp $
  */
 
 //extern const CLID& CLID_FilterAlgTds;

@@ -13,6 +13,9 @@
 #include "Event/TopLevel/EventModel.h"
 
 #include "TkrUtil/ITkrGeometrySvc.h"
+#include "EFC/TFC_projectionDef.h"
+#include "EDS/EDR_tkr.h"
+#include "EFC/EFC_gammaStatus.h"
 
 /**
  * @class FilterStatus
@@ -105,19 +108,6 @@ namespace OnboardFilterTds{
     double length;
   };
 
-  struct projection{
-    unsigned char       min; /*!< Beginning layer number of the projection */
-    unsigned char       max; /*!< Ending    layer number of the projection */
-    unsigned         layers; /*!< Bit mask representing the struck layers  */
-    unsigned char     nhits; /*!< Number of hits assigned                  */
-    short int      hits[18]; /*!< Hits assigned to proj                    */
-  };
-
-  struct projections{
-    unsigned short int curCnt[16]; /*!< Current number of projections in use   */
-    unsigned short int  xy[16][2]; /*!< Count of X/Y projections               */
-    projection prjs[1000];     /*!< List of projections                    */
-  };
 
   class FilterStatus : public DataObject{
   public:
@@ -132,6 +122,7 @@ namespace OnboardFilterTds{
     unsigned int getLow() const;
     ///Returns the value stored in CalEnergy
     float getCalEnergy() const;
+    int getStageEnergy() const;
     ///Return the Code specifying the towers with triggers or possible triggers
     int getTcids() const;
     ///Return the ACD hit map results
@@ -142,7 +133,8 @@ namespace OnboardFilterTds{
     const int *getLayers()const ;
     ///Return the projections for a specific tower
     //const projections *getProjection(int tower)const ;
-    const projections *getProjection() const;
+    TFC_projections *getProjections() ;
+    EDR_tkr *getTkr() ;
     ///Return all available tracks
     std::vector<track> getTracks()const;
     ///Return angular separation between best track and incomming particle
@@ -173,7 +165,7 @@ namespace OnboardFilterTds{
     ///Set the statuscode of the filter
     void set(const unsigned int code);
     ///Set the Energy in CAL
-    void setCalEnergy(const int energy);
+    void setStageEnergy(const int energy);
     ///Set the Code specifying the towers with triggers or possible triggers
     void setTcids(const int ids);
     ///Set the ACD hit map results
@@ -184,7 +176,8 @@ namespace OnboardFilterTds{
     void setLayers(const int *layerCode);
     ///Set the projection of a specific tower
     //void setProjection(const int tower,const projections &projections);
-    void setProjection(const projections &projections);
+    void setProjections(const TFC_projections &projections);
+    void setTkr(const EDR_tkr &tkr);
     ///Add a new track to the list of tracks
     void setTrack(const track &newTrack);
     void setSeparation(const double sep);
@@ -234,15 +227,64 @@ namespace OnboardFilterTds{
     double getYangleL() const;
     double getXlongestB() const;
     double getYlongestB() const;
+
+   int getGemThrTkr()const;
+   
+    int getGemCalHiLo() const;
+    int getGemCondsumCno() const;
+    int getGemAcd_vetoes_XZ() const;
+    int getGemAcd_vetoes_YZ() const;
+    int getGemAcd_vetoes_XY() const;
+    int getGemAcd_vetoes_RU() const;
+    int getGemLivetime() const;
+    int getGemTrgtime() const;
+    int getGemPpstime() const;
+    int getGemDiscarded() const;
+    int getGemPrescaled() const;
+    int getGemSent()const;
+
+    
+   void setGemThrTkr(const int val);
+   void setGemCalHiLo(const int val);
+   void setGemCondsumCno(const int val);
+   void setGemAcd_vetoes_XZ(const int val);
+   void setGemAcd_vetoes_YZ(const int val);
+   void setGemAcd_vetoes_XY(const int val);
+   void setGemAcd_vetoes_RU(const int val);
+   void setGemLivetime(const int val);
+   void setGemTrgtime(const int val);
+   void setGemPpstime(const int val);
+   void setGemDiscarded(const int val);
+   void setGemPrescaled(const int val);
+   void setGemSent(const int val);
+
+
     //****TEMP
 
   private:
     ///Filter status code
     unsigned int m_status;
     ///Energy in CAL
-    float m_calEnergy;
+    int m_stageEnergy;
     ///Towers with triggers
     int m_tcids;
+
+    ///Gem info
+   int m_gem_thrTkr;  
+   int m_gem_calHiLo;  
+   int m_gem_condsumCno;
+   int m_gem_acd_vetoes_XZ;
+   int m_gem_acd_vetoes_YZ;
+   int m_gem_acd_vetoes_XY;
+   int m_gem_acd_vetoes_RU;
+   int m_gem_livetime;
+   int m_gem_trgtime;   
+   int m_gem_ppstime;
+   int m_gem_discarded; 
+   int m_gem_prescaled; 
+   int m_gem_sent;
+
+
     ///ACD hit map
     int m_acd_xz;
     int m_acd_yz;
@@ -254,7 +296,8 @@ namespace OnboardFilterTds{
     int m_layers[16];
     ///Projections for the towers
     //projections m_prjs[16];
-    projections m_prjs;
+    TFC_projections m_prjs;
+    EDR_tkr         m_tkr;
     ///Tracks found for this event
     std::vector<track> m_tracks;
     ///Angular separation between best track and incomming particle
@@ -295,6 +338,49 @@ namespace OnboardFilterTds{
   inline unsigned int FilterStatus::getLow() const{
     return m_status & 0x7FFF;
   }
+
+   inline int FilterStatus::getGemThrTkr()const{
+    return m_gem_thrTkr;
+  }
+   
+   inline int FilterStatus::getGemCalHiLo()const{
+    return m_gem_calHiLo;
+  } 
+   inline int FilterStatus::getGemCondsumCno()const{
+    return m_gem_condsumCno;
+  }
+   inline int FilterStatus::getGemAcd_vetoes_XZ()const{
+    return m_gem_acd_vetoes_XZ;
+  }
+   inline int FilterStatus::getGemAcd_vetoes_YZ()const{
+    return m_gem_acd_vetoes_YZ;
+  }
+   inline int FilterStatus::getGemAcd_vetoes_XY()const{
+    return m_gem_acd_vetoes_XY;
+  }
+   inline int FilterStatus::getGemAcd_vetoes_RU()const{
+    return m_gem_acd_vetoes_RU;
+  }
+   inline int FilterStatus::getGemLivetime()const{
+    return m_gem_livetime;
+  }
+   inline int FilterStatus::getGemTrgtime()const{
+    return m_gem_trgtime;
+  }  
+   inline int FilterStatus::getGemPpstime()const{
+    return m_gem_ppstime;
+  }
+   inline int FilterStatus::getGemDiscarded()const{
+    return m_gem_discarded;
+  } 
+   inline int FilterStatus::getGemPrescaled()const{
+    return m_gem_prescaled;
+  } 
+   inline int FilterStatus::getGemSent()const{
+    return m_gem_sent;
+  }
+
+
   inline void FilterStatus::getAcdMap(int &xz, int &yz, int &xy) const {
     xz=m_acd_xz;
     yz=m_acd_yz;
@@ -304,11 +390,17 @@ namespace OnboardFilterTds{
     memcpy(copy,m_acdStatus,sizeof(m_acdStatus)*16);
   }
 
-  inline const projections * FilterStatus::getProjection()const{
+  inline TFC_projections * FilterStatus::getProjections(){
     return &m_prjs;
   }
+  inline EDR_tkr * FilterStatus::getTkr(){
+    return &m_tkr;
+  }
   inline float FilterStatus::getCalEnergy() const{
-    return m_calEnergy;
+    return (float)((m_stageEnergy & EFC_GAMMA_STAGE_M_ENERGY)/4.0);
+  }
+  inline int FilterStatus::getStageEnergy() const{
+    return m_stageEnergy;
   }
   inline int FilterStatus::getTcids()const{
     return m_tcids;
@@ -373,7 +465,7 @@ namespace OnboardFilterTds{
 
   inline FilterStatus::FilterStatus(){
     m_status=0;
-    m_calEnergy=0;
+    m_stageEnergy=0;
     m_tcids=0;
     m_acd_xy=0;
     m_acd_xz=0;
@@ -381,9 +473,8 @@ namespace OnboardFilterTds{
     for(int counter=0;counter<16;counter++){
       m_acdStatus[counter]=0;
       m_layers[counter]=0;
-      m_prjs.xy[counter][0]=0;
-      m_prjs.xy[counter][1]=0;
-      m_prjs.curCnt[counter]=0;
+      m_prjs.curCnt=0;
+      m_prjs.twrMsk=0;
     }
     m_separation=-1;
     m_tracks.clear();
@@ -396,13 +487,56 @@ namespace OnboardFilterTds{
     m_status=code;
   }
 
-  inline void FilterStatus::setCalEnergy(const int energy){
-    m_calEnergy=(float)energy/4.;//must divide by 4 to get MeV units
+  inline void FilterStatus::setStageEnergy(const int stageEnergy){
+    m_stageEnergy=stageEnergy;//must divide by 4 to get MeV units
   }
 
   inline void FilterStatus::setTcids(const int ids){
     m_tcids=ids;
   }
+
+
+  inline void FilterStatus::setGemThrTkr(const int val){
+    m_gem_thrTkr = val;
+  }
+   
+   inline void FilterStatus::setGemCalHiLo(const int val){
+    m_gem_calHiLo = val;
+  } 
+   inline void FilterStatus::setGemCondsumCno(const int val){
+    m_gem_condsumCno = val;
+  }
+   inline void FilterStatus::setGemAcd_vetoes_XZ(const int val){
+    m_gem_acd_vetoes_XZ = val;
+  }
+   inline void FilterStatus::setGemAcd_vetoes_YZ(const int val){
+    m_gem_acd_vetoes_YZ = val;
+  }
+   inline void FilterStatus::setGemAcd_vetoes_XY(const int val){
+    m_gem_acd_vetoes_XY = val;
+  }
+   inline void FilterStatus::setGemAcd_vetoes_RU(const int val){
+    m_gem_acd_vetoes_RU = val;
+  }
+   inline void FilterStatus::setGemLivetime(const int val){
+    m_gem_livetime = val;
+  }
+   inline void FilterStatus::setGemTrgtime(const int val){
+    m_gem_trgtime = val;
+  }  
+   inline void FilterStatus::setGemPpstime(const int val){
+    m_gem_ppstime = val;
+  }
+   inline void FilterStatus::setGemDiscarded(const int val){
+    m_gem_discarded = val;
+  } 
+   inline void FilterStatus::setGemPrescaled(const int val){
+    m_gem_prescaled = val;
+  } 
+   inline void FilterStatus::setGemSent(const int val){
+    m_gem_sent = val;
+  }
+
 
   inline void FilterStatus::setAcdMap(const int xz, const int yz, const int xy){
     m_acd_xz=xz;
@@ -420,8 +554,12 @@ namespace OnboardFilterTds{
       m_layers[counter]=layerCode[counter];
   }
 
-  inline void FilterStatus::setProjection(const projections &prjs){
+  inline void FilterStatus::setProjections(const TFC_projections &prjs){
     memcpy(&m_prjs, &prjs,sizeof(prjs));
+  }
+
+  inline void FilterStatus::setTkr(const EDR_tkr &tkr){
+    memcpy(&m_tkr, &tkr,sizeof(tkr));
   }
 
   inline void FilterStatus::setSeparation(const double sep){
@@ -581,7 +719,7 @@ namespace OnboardFilterTds{
 
   inline std::ostream& FilterStatus::fillStream(std::ostream &s) const{
     s<<"Filter Return Code: "<<m_status<<std::endl;
-    s<<"Filter code for Energy in CAL: "<<m_calEnergy<<std::endl;
+    s<<"Filter code for StageEnergy in CAL: "<<m_stageEnergy<<std::endl;
     return s;
   }
 
