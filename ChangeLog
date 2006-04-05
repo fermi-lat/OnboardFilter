@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: hughes  Wed Apr  5 02:28:59 PDT 2006
+OnboardFilter/cmt
+
+Modified Files:
+	requirements 
+Log Message:
+fix requirements file for gmake/Fred builds
+    *
+------------------------------------------------------------
 User: usher  Thu Mar 23 11:00:41 PST 2006
 OnboardFilter/src/test
 
