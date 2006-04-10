@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: hughes  Mon Apr 10 07:37:09 PDT 2006
+OnboardFilter/doc
+
+Modified Files:
+	release.notes 
+Log Message:
+tag for divide by zero, pointer init
+    *
+------------------------------------------------------------
 User: hughes  Wed Apr  5 02:28:59 PDT 2006
 OnboardFilter/cmt
 
