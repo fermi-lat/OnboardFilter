@@ -1,4 +1,16 @@
 ------------------------------------------------------------
+User: mcenery  Wed May  3 13:19:53 PDT 2006
+OnboardFilter/src
+
+Modified Files:
+	OnboardFilter.cxx 
+Log Message:
+Updating default location to pick up shared libraries to accomodate
+the lib directory.
+
+
+    *
+------------------------------------------------------------
 User: mcenery  Wed May  3 10:26:44 PDT 2006
 OnboardFilter/src
 
