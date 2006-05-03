@@ -1,4 +1,15 @@
 ------------------------------------------------------------
+User: mcenery  Wed May  3 10:26:44 PDT 2006
+OnboardFilter/src
+
+Modified Files:
+	OnboardFilter.cxx 
+Log Message:
+Add code to expand environment variables when specifying path to the 
+shared libraries.
+
+    *
+------------------------------------------------------------
 TAG
 Tag name: v2r0p5, operation: add
 Package: OnboardFilter
