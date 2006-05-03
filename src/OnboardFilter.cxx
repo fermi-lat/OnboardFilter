@@ -6,7 +6,7 @@
 
 \verbatim
 
-  CVS $Id: filter.c,v 1.3 2005/10/17 19:56:26 russell Exp $
+  CVS $Id: OnboardFilter.cxx,v 1.48 2006/03/14 03:12:52 hughes Exp $
 \endverbatim
 
                                                                           */
@@ -134,6 +134,8 @@
 #include "EbfWriter/Ebf.h"
 #include "OnboardFilter/FilterStatus.h"
 #include "OnboardFilter/OnboardFilterTDS.h"
+
+#include "facilities/Util.h" // for expandEnvVar
 
 //#include "CDM_prvdefs.h"
 
@@ -514,6 +516,9 @@ StatusCode OnboardFilter::initialize()
 //   loadLib ("$(ONBOARDFILTER)/$(BINDIR)/libOnboardFilter.so",1,0);
 //   loadLib ("libcal_db_gains.so",1,0);
 //   loadLib ("libcal_db_pedestals.so",1,0);
+   facilities::Util::expandEnvVar(&m_FileName_Filter);
+   facilities::Util::expandEnvVar(&m_FileName_Pedestals);
+   facilities::Util::expandEnvVar(&m_FileName_Gains);
    loadLib (m_FileName_Filter.c_str(),1,0);
    loadLib (m_FileName_Pedestals.c_str(),1,0);
    loadLib (m_FileName_Gains.c_str(),1,0);
