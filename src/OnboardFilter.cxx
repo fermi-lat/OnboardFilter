@@ -6,7 +6,7 @@
 
 \verbatim
 
-  CVS $Id: OnboardFilter.cxx,v 1.48 2006/03/14 03:12:52 hughes Exp $
+  CVS $Id: OnboardFilter.cxx,v 1.49 2006/05/03 17:26:44 mcenery Exp $
 \endverbatim
 
                                                                           */
@@ -400,9 +400,9 @@ const IAlgFactory& OnboardFilterFactory = Factory;
 FilterInfo OnboardFilter::myFilterInfo;
 
 OnboardFilter::OnboardFilter(const std::string& name, ISvcLocator *pSvcLocator):Algorithm(name,pSvcLocator),m_rejected(0){
-  declareProperty("FileNameFilter"  ,m_FileName_Filter="$(ONBOARDFILTERROOT)/$(BINDIR)/libOnboardFilter.so");
-  declareProperty("FileNamePeds"  ,m_FileName_Pedestals="$(ONBOARDFILTERROOT)/$(BINDIR)/libcal_db_pedestals.so");
-  declareProperty("FileNameGains"  ,m_FileName_Gains="$(ONBOARDFILTERROOT)/$(BINDIR)/libcal_db_gains.so");
+  declareProperty("FileNameFilter"  ,m_FileName_Filter="$(ONBOARDFILTERROOT)/../../lib/libOnboardFilter.so");
+  declareProperty("FileNamePeds"  ,m_FileName_Pedestals="$(ONBOARDFILTERROOT)/../../lib/libcal_db_pedestals.so");
+  declareProperty("FileNameGains"  ,m_FileName_Gains="$(ONBOARDFILTERROOT)/../../lib/libcal_db_gains.so");
   declareProperty("mask",m_mask=0);
   declareProperty("PassThrough",m_passThrough=1);
 //  GemInfo myGemInfo = GemInfo();
