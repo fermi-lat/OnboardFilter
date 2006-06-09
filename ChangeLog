@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: usher  Fri Jun  9 13:49:10 PDT 2006
+OnboardFilter/flight/MDB/src
+
+Removed Files:
+	MDB_database.c MDB_database.ph mdb.cidc 
+Log Message:
+Removing flight software from this package (it is moving to an external library, or set of libraries)
+    *
+------------------------------------------------------------
 User: usher  Fri Jun  9 13:49:09 PDT 2006
 OnboardFilter/flight/MDB/sdf
 
