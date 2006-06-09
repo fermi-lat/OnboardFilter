@@ -6,7 +6,7 @@
 
 \verbatim
 
-  CVS $Id: OnboardFilter.cxx,v 1.49 2006/05/03 17:26:44 mcenery Exp $
+  CVS $Id: OnboardFilter.cxx,v 1.48 2006/03/14 03:12:52 hughes Exp $
 \endverbatim
 
                                                                           */
@@ -40,7 +40,7 @@
 #include <stdio.h>
 #include <errno.h>
 
-#include "filter_rto.h"
+#include "src/filter_rto.h"
 
 #include "EFC_DB/EFC_DB_schema.h"
 #include "GFC_DB/GFC_DB_schema.h"
@@ -48,17 +48,17 @@
 #include "RFC_DB/RFC_DB_schema.h"
 #include "RFC_DB/RFC_DB_instance.h"
 
-#include "EFC/EDM.h"
+//#include "EFC/EDM.h"
 #include "EFC/EFC.h"
 #include "EFC/EFC_edsFw.h"
-#include "EFC/GFC_resultsPrint.h"
-#include "EFC/RFC_resultsPrint.h"
-#include "EFC/EFC_display.h"
+//#include "EFC/GFC_resultsPrint.h"
+//#include "EFC/RFC_resultsPrint.h"
+//#include "EFC/EFC_display.h"
 
-#include "EDS_fwPvt.h"
-#include "EDS/EDS_fw.h"
-#include "EDS/TMR.h"
-#include "EDS/LCBV.h"
+//#include "../flight/EDS/src/EDS_fwPvt.h"
+//#include "EDS/EDS_fw.h"
+//#include "EDS/TMR.h"
+//#include "EDS/LCBV.h"
 #include "EDS/io/LCBP.h"
 #include "EDS/io/EBF_stream.h"
 #include "EDS/io/EBF_evts.h"
@@ -78,27 +78,27 @@
 
 #include "EFC/GFC.h"
 #include "EFC/GFC_resultsPrint.h"
-#include "EFC/GFC_statsPrint.h"
-#include "EFC/GFC_cfgPrint.h"
-#include "EFC/GFC_status.h"
-#include "EFC/GFC_stats.h"
+//#include "EFC/GFC_statsPrint.h"
+//#include "EFC/GFC_cfgPrint.h"
+//#include "EFC/GFC_status.h"
+//#include "EFC/GFC_stats.h"
 
-#include "GFC_def.h"
-#include "GFC_resultDef.h"
+//#include "../flight/EFC/src/GFC_def.h"
+//#include "../flight/EFC/src/GFC_resultDef.h"
 
 #include "EFC/RFC.h"
 #include "EFC/RFC_resultsPrint.h"
-#include "EFC/RFC_statsPrint.h"
-#include "EFC/RFC_cfgPrint.h"
-#include "EFC/RFC_status.h"
-#include "EFC/RFC_stats.h"
+//#include "EFC/RFC_statsPrint.h"
+//#include "EFC/RFC_cfgPrint.h"
+//#include "EFC/RFC_status.h"
+//#include "EFC/RFC_stats.h"
 
-#include "RFC_def.h"
-#include "RFC_resultDef.h"
+//#include "../flight/EFC/src/RFC_def.h"
+#include "../flight/EFC/src/RFC_resultDef.h"
 
-#include "EDS/EBF_evt.h"
-#include "EDS/EBF_pkt.h"
-#include "EDS/EBF_mc.h"
+//#include "EDS/EBF_evt.h"
+//#include "EDS/EBF_pkt.h"
+//#include "EDS/EBF_mc.h"
 #include "EDS/EBF_dir.h"
 #include "EDS/ECR_cal.h"
 #include "EDS/EBF_cid.h"
@@ -134,8 +134,7 @@
 #include "EbfWriter/Ebf.h"
 #include "OnboardFilter/FilterStatus.h"
 #include "OnboardFilter/OnboardFilterTDS.h"
-
-#include "facilities/Util.h" // for expandEnvVar
+#include "facilities/Util.h"
 
 //#include "CDM_prvdefs.h"
 
@@ -289,71 +288,69 @@ public:
 };
 
 
-class OnboardFilter:public Algorithm{
-
+class OnboardFilter:public Algorithm
+{
 public:
-  OnboardFilter(const std::string& name, ISvcLocator *pSvcLocator);
-  StatusCode initialize();
-  StatusCode execute();
-  StatusCode finalize();
+    OnboardFilter(const std::string& name, ISvcLocator *pSvcLocator);
+    StatusCode initialize();
+    StatusCode execute();
+    StatusCode finalize();
 
-  int eventCount;
-  int eventProcessed;
-  int eventBad; 
+    int eventCount;
+    int eventProcessed;
+    int eventBad; 
   
+    /* ====================================================================== */
+    /*  Internal functions                                                    */
+    /* ---------------------------------------------------------------------- */
 
-/* ====================================================================== */
-/*  Internal functions                                                    */
-/* ---------------------------------------------------------------------- */
+    #ifdef EDM_USE
+    static void   setMessageLevels (MessageObjLevels                 lvl);
+    EDM_level Filter_edm = EDM_K_FATAL;
+    #endif
 
+    static void printEnergy (int energy);
 
-#ifdef EDM_USE
-static void   setMessageLevels (MessageObjLevels                 lvl);
-EDM_level Filter_edm = EDM_K_FATAL;
-#endif
+    static void *allocate (int                     nbytes,
+                           const char               *name);
 
-static void printEnergy (int energy);
+    static void  free_em  (void                      *ptr);
 
+    //static int   createOutput      (OutputHandler           *output,
+    //                                const char                *name);
+    //static __inline int getMCsequence  (const EBF_evt *evt);
+    int rtoFill (FilterRto *rto);
+    static int loadLib (const char *library_name, int verbose, int libs);
 
-static void *allocate           (int                     nbytes,
-                                 const char               *name);
+    static void extractFilterInfo (Stream *stream, EDS_fwIxb *ixb);
+    static int myOutputFlush (Stream *stream, int reason);
+    static int passThrough (void        *unused,
+                            unsigned int nbytes,
+                            EBF_pkt        *pkt,
+                            EBF_siv         siv,
+                            EDS_fwIxb       ixb);
 
-static void  free_em            (void                      *ptr);
+    int getMCsequence (const EBF_evt *evt);
+    void storeHits(OnboardFilterTds::TowerHits *hits);
 
-//static int   createOutput      (OutputHandler           *output,
-//                                const char                *name);
-//static __inline int getMCsequence  (const EBF_evt *evt);
-int rtoFill (FilterRto *rto);
-static int loadLib (const char *library_name, int verbose, int libs);
+    /* ====================================================================== */
 
-static void extractFilterInfo (Stream *stream, EDS_fwIxb *ixb);
-static int myOutputFlush (Stream *stream, int reason);
-static int passThrough (void        *unused,
-                        unsigned int nbytes,
-                        EBF_pkt        *pkt,
-                        EBF_siv         siv,
-                        EDS_fwIxb       ixb);
+    /* ====================================================================== */
 
-int getMCsequence (const EBF_evt *evt);
-  void storeHits(OnboardFilterTds::TowerHits *hits);
-
-/* ====================================================================== */
-
-
-
-/* ====================================================================== */
-
-static FilterInfo myFilterInfo;
-  int m_mask;  //mask for setting filter to reject
-  int m_rejected;
-  int m_passThrough;
+    static FilterInfo myFilterInfo;
+    int m_mask;  //mask for setting filter to reject
+    int m_rejected;
+    int m_passThrough;
+    // Path to shareables
+    std::string m_FileNamePath;
     // File name for peds/gains
     std::string m_FileName_Filter;
     std::string m_FileName_Pedestals;
     std::string m_FileName_Gains;
-  int m_vetoBits[17];      //array to count # of times each veto bit was set
-  int m_statusBits[15];      //array to count # of times each veto bit was set
-  FilterRto m_rto;
+
+    int m_vetoBits[17];      //array to count # of times each veto bit was set
+    int m_statusBits[15];      //array to count # of times each veto bit was set
+    FilterRto m_rto;
     EDS_fw                   *edsFw;
     LCBP                        lcb;
 
@@ -363,34 +360,28 @@ static FilterInfo myFilterInfo;
     const EDS_DB_HandlerConstructServices *services;
     FilterCtx                   ctx;
 
-
     EFC                        *efcRFC;
     const EFC_DB_Schema     *schemaRFC;
     EDS_DB_handlerServicesGet                   getRFC;
     const EDS_DB_HandlerConstructServices *servicesRFC;
     FilterCtx                   ctxRFC;
 
+    /* ====================================================================== */
+    /* Configurations                                                         */
+    /* ---------------------------------------------------------------------- *//*!
 
+    \var    EFC_definition Gfc_Definitions
+    \brief  The defining parameters for this filter
 
-/* ====================================================================== */
-/* Configurations                                                         */
-/* ---------------------------------------------------------------------- *//*!
-
-   \var    EFC_definition Gfc_Definitions
-   \brief  The defining parameters for this filter
-
-   \par
+    \par
     There are two sets of definitions, one for doing the reporting using
     the normal energies, the other for doing the reporting using the
     MC energies
                                                                           */
-/* ---------------------------------------------------------------------- */
-//static const  EFC_definition Gfc_Definitions[2];
-/* ---------------------------------------------------------------------- */
-static   EFC_definition Gfc_Definitions[2];
-
-
-
+    /* ---------------------------------------------------------------------- */
+    //static const  EFC_definition Gfc_Definitions[2];
+    /* ---------------------------------------------------------------------- */
+    static   EFC_definition Gfc_Definitions[2];
 };
 
 
@@ -400,9 +391,12 @@ const IAlgFactory& OnboardFilterFactory = Factory;
 FilterInfo OnboardFilter::myFilterInfo;
 
 OnboardFilter::OnboardFilter(const std::string& name, ISvcLocator *pSvcLocator):Algorithm(name,pSvcLocator),m_rejected(0){
-  declareProperty("FileNameFilter"  ,m_FileName_Filter="$(ONBOARDFILTERROOT)/../../lib/libOnboardFilter.so");
-  declareProperty("FileNamePeds"  ,m_FileName_Pedestals="$(ONBOARDFILTERROOT)/../../lib/libcal_db_pedestals.so");
-  declareProperty("FileNameGains"  ,m_FileName_Gains="$(ONBOARDFILTERROOT)/../../lib/libcal_db_gains.so");
+  declareProperty("FileNameFilter"  ,m_FileName_Filter="$(ONBOARDFILTERROOT)/$(BINDIR)/libOnboardFilter.so");
+//  declareProperty("FileNamePeds"  ,m_FileName_Pedestals="$(ONBOARDFILTERROOT)/$(BINDIR)/libcal_db_pedestals.so");
+//  declareProperty("FileNameGains"  ,m_FileName_Gains="$(ONBOARDFILTERROOT)/$(BINDIR)/libcal_db_gains.so");
+  declareProperty("FileNamePath",  m_FileNamePath="$(FLIGHTCODELIBS)");
+  declareProperty("FileNamePeds",  m_FileName_Pedestals="cal_db_pedestals");
+  declareProperty("FileNameGains", m_FileName_Gains="cal_db_gains");
   declareProperty("mask",m_mask=0);
   declareProperty("PassThrough",m_passThrough=1);
 //  GemInfo myGemInfo = GemInfo();
@@ -501,27 +495,64 @@ int OnboardFilter::loadLib (const char *library_name, int verbose, int libs)
 
 StatusCode OnboardFilter::initialize()
 {
-   Stream ostreams[2];
-   eventCount = 0;
-   eventProcessed = 0;
-   eventBad = 0;
+    Stream ostreams[2];
+    eventCount = 0;
+    eventProcessed = 0;
+    eventBad = 0;
 //   MsgStream log(msgSvc(),name());
-   setProperties();
-   printf("Initializing Filter Settings\n");
-   int      status; 
-   status = rtoFill (&m_rto); 
+    setProperties();
+    printf("Initializing Filter Settings\n");
+    int      status; 
+    status = rtoFill (&m_rto); 
 
-   /* Initialize the time base */
-   TMR_initialize  ();
+    /* Initialize the time base */
+    TMR_initialize  ();
 //   loadLib ("$(ONBOARDFILTER)/$(BINDIR)/libOnboardFilter.so",1,0);
 //   loadLib ("libcal_db_gains.so",1,0);
 //   loadLib ("libcal_db_pedestals.so",1,0);
-   facilities::Util::expandEnvVar(&m_FileName_Filter);
-   facilities::Util::expandEnvVar(&m_FileName_Pedestals);
-   facilities::Util::expandEnvVar(&m_FileName_Gains);
-   loadLib (m_FileName_Filter.c_str(),1,0);
-   loadLib (m_FileName_Pedestals.c_str(),1,0);
-   loadLib (m_FileName_Gains.c_str(),1,0);
+////   loadLib (m_FileName_Filter.c_str(),1,0);
+    int ret = facilities::Util::expandEnvVar(&m_FileNamePath);
+
+#ifdef WIN32
+    std::string fType = ".dll";
+    std::string delim = "/";
+#else
+    std::string fType = ".so";
+    std::string delim = "/lib";
+#endif
+
+    std::string calPedFile = m_FileNamePath + delim + m_FileName_Pedestals + fType;
+    loadLib (calPedFile.c_str(),1,0);
+    
+    std::string calGainFile = m_FileNamePath + delim + m_FileName_Gains + fType;
+    loadLib (calGainFile.c_str(),1,0);
+    
+    std::string gfc_db_File = m_FileNamePath + delim +  "gfc_db_master" + fType;
+    loadLib (gfc_db_File.c_str(),1,0);
+    
+    gfc_db_File = m_FileNamePath + delim + "gfc_db_default" + fType;
+    loadLib (gfc_db_File.c_str(),1,0);
+    
+    gfc_db_File = m_FileNamePath + delim + "gfc_db_normal" + fType;
+    loadLib (gfc_db_File.c_str(),1,0);
+
+    std::string rfc_db_File = m_FileNamePath + delim + "rfc_db_master" + fType;
+    loadLib (rfc_db_File.c_str(),1,0);
+
+    rfc_db_File = m_FileNamePath + delim + "rfc_db_default" + fType;
+    loadLib (rfc_db_File.c_str(),1,0);
+
+    rfc_db_File = m_FileNamePath + delim + "rfc_db_normal" + fType;
+    loadLib (rfc_db_File.c_str(),1,0);
+
+    std::string eds_db_File = m_FileNamePath + delim + "eds_db" + fType;
+    loadLib (eds_db_File.c_str(),1,0);
+
+    std::string geo_db_File = m_FileNamePath + delim + "geo_db" + fType;
+    loadLib (geo_db_File.c_str(),1,0);
+
+    std::string ggf_db_File = m_FileNamePath + delim + "ggf_db" + fType;
+    loadLib (ggf_db_File.c_str(),1,0);
 
    /* Print information about the runtime options */
 //   filter_rtoPrint (&m_rto);
@@ -1151,7 +1182,7 @@ void  OnboardFilter::extractFilterInfo(Stream *ostream, EDS_fwIxb *ixb)
    int                           cid;
    int                         tids;
    int                         tcids;
-   int              status;
+//   int                        status;
    EDR_tkr                   *tkr;
    EDR_tkrTower          *ttrs;
    const EDR_calTower   *ctr;
@@ -1501,10 +1532,18 @@ void OnboardFilter::printEnergy (int energy)
 }
 /* --------------------------------------------------------------------- */
 
-StatusCode OnboardFilter::finalize(){
-	using namespace std;
-    printf("OnboardFilter::finalize: events total %d; processed %d; bad %d\n",
-         eventCount,eventProcessed,eventBad);
+StatusCode OnboardFilter::finalize()
+{
+//    using namespace std;
+   
+    MsgStream log(msgSvc(),name());
+//    printf("OnboardFilter::finalize: events total %d; processed %d; bad %d\n",
+//         eventCount,eventProcessed,eventBad);
+    log << MSG::INFO << "OnboardFilter::finalize: events total " << eventCount <<
+           "; processed " << eventCount << "; bad " << eventBad << endreq;
+    log << MSG::INFO << "Rejected " << m_rejected << " triggers using mask " << m_mask  << endreq;
+    log << MSG::INFO;
+
 
     /* No EFC_deconstruct to call */
 
@@ -1520,7 +1559,7 @@ StatusCode OnboardFilter::finalize(){
 //   free_em ((void *)fw);
 
 //    if(log.isActive()){
-
+/*
       printf("Status Bit                         Value\n");
       printf("EFC_GAMMA_STATUS_M_ACD             %d\n",m_statusBits[0]);       
       printf("EFC_GAMMA_STATUS_M_DIR             %d\n",m_statusBits[1]);       
@@ -1557,7 +1596,45 @@ StatusCode OnboardFilter::finalize(){
       printf("EFC_GAMMA_STATUS_M_SPLASH_0            %d\n",m_vetoBits[14]);
       printf("EFC_GAMMA_STATUS_M_NOCALLO_FILTER_TILE %d\n",m_vetoBits[15]);
       printf("EFC_GAMMA_STATUS_M_VETOED              %d\n",m_vetoBits[16]);
+*/
+      log << MSG::INFO << "Status Bit                         Value" << endreq;
+      log << MSG::INFO << "EFC_GAMMA_STATUS_M_ACD             " << m_statusBits[0] << endreq;       
+      log << MSG::INFO << "EFC_GAMMA_STATUS_M_DIR             " << m_statusBits[1] << endreq;       
+      log << MSG::INFO << "EFC_GAMMA_STATUS_M_ATF             " << m_statusBits[2] << endreq;      
+      log << MSG::INFO << "EFC_GAMMA_STATUS_M_CAL1            " << m_statusBits[3] << endreq;
+      log << MSG::INFO << "EFC_GAMMA_STATUS_M_TKR             " << m_statusBits[4] << endreq;
+      log << MSG::INFO << "EFC_GAMMA_STATUS_M_ACD_TOP         " << m_statusBits[5] << endreq;
+      log << MSG::INFO << "EFC_GAMMA_STATUS_M_ACD_SIDE        " << m_statusBits[6] << endreq;
+      log << MSG::INFO << "EFC_GAMMA_STATUS_M_ACD_SIDE_FILTER " << m_statusBits[7] << endreq;
+      log << MSG::INFO << "EFC_GAMMA_STATUS_M_TKR_POSSIBLE    " << m_statusBits[8] << endreq;
+      log << MSG::INFO << "EFC_GAMMA_STATUS_M_TKR_TRIGGER     " << m_statusBits[9] << endreq;
+      log << MSG::INFO << "EFC_GAMMA_STATUS_M_CAL_LO          " << m_statusBits[10] << endreq;
+      log << MSG::INFO << "EFC_GAMMA_STATUS_M_CAL_HI          " << m_statusBits[11] << endreq;
+      log << MSG::INFO << "EFC_GAMMA_STATUS_M_TKR_EQ_1        " << m_statusBits[12] << endreq;
+      log << MSG::INFO << "EFC_GAMMA_STATUS_M_TKR_GE_2        " << m_statusBits[13] << endreq;
+      log << MSG::INFO << "EFC_GAMMA_STATUS_M_TKR_THROTTLE    " << m_statusBits[14] << endreq;
+    
+      log << MSG::INFO << "Veto Bit Summary" << endreq;
+      log << MSG::INFO << "Trigger Name                           Count\n" << endreq;
+      log << MSG::INFO << "EFC_GAMMA_STATUS_M_TKR_LT_2_ELO        " << m_vetoBits[0] << endreq;
+      log << MSG::INFO << "EFC_GAMMA_STATUS_M_TKR_SKIRT           " << m_vetoBits[1] << endreq;
+      log << MSG::INFO << "EFC_GAMMA_STATUS_M_TKR_EQ_0            " << m_vetoBits[2] << endreq;
+      log << MSG::INFO << "EFC_GAMMA_STATUS_M_TKR_ROW2            " << m_vetoBits[3] << endreq;
+      log << MSG::INFO << "EFC_GAMMA_STATUS_M_TKR_ROW01           " << m_vetoBits[4] << endreq;
+      log << MSG::INFO << "EFC_GAMMA_STATUS_M_TKR_TOP             " << m_vetoBits[5] << endreq;
+      log << MSG::INFO << "EFC_GAMMA_STATUS_M_ZBOTTOM             " << m_vetoBits[6] << endreq;
+      log << MSG::INFO << "EFC_GAMMA_STATUS_M_EL0_ETOT_90         " << m_vetoBits[7] << endreq;
+      log << MSG::INFO << "EFC_GAMMA_STATUS_M_EL0_ETOT_01         " << m_vetoBits[8] << endreq;
+      log << MSG::INFO << "EFC_GAMMA_STATUS_M_SIDE                " << m_vetoBits[9] << endreq;
+      log << MSG::INFO << "EFC_GAMMA_STATUS_M_TOP                 " << m_vetoBits[10] << endreq;
+      log << MSG::INFO << "EFC_GAMMA_STATUS_M_SPLASH_1            " << m_vetoBits[11] << endreq;
+      log << MSG::INFO << "EFC_GAMMA_STATUS_M_E350_FILTER_TILE    " << m_vetoBits[12] << endreq;
+      log << MSG::INFO << "EFC_GAMMA_STATUS_M_E0_TILE             " << m_vetoBits[13] << endreq;
+      log << MSG::INFO << "EFC_GAMMA_STATUS_M_SPLASH_0            " << m_vetoBits[14] << endreq;
+      log << MSG::INFO << "EFC_GAMMA_STATUS_M_NOCALLO_FILTER_TILE " << m_vetoBits[15] << endreq;
+      log << MSG::INFO << "EFC_GAMMA_STATUS_M_VETOED              " << m_vetoBits[16] << endreq;
 //    }
-  return StatusCode::SUCCESS;
+      
+    return StatusCode::SUCCESS;
 }
 
