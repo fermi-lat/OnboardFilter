@@ -2,6 +2,27 @@
 TAG
 Tag name: v3r0p2, operation: add
 Package: OnboardFilter
+User: mcenery  Fri Jun  9 12:39:59 2006
+Files:
+  OnboardFilter/src/FilterStatus.cxx  1.14
+  OnboardFilter/src/FilterTracks.cxx  1.23
+  OnboardFilter/src/FilterDisplay.cxx  1.7
+  OnboardFilter/src/FilterAlg.cxx  1.8
+  OnboardFilter/src/FilterAlg_projectionFind.h  1.1
+  OnboardFilter/src/.cvsignore  1.1
+  OnboardFilter/src/FilterAlgTds.cxx  1.5
+  OnboardFilter/src/FilterAlg_acd.h  1.4
+  OnboardFilter/src/FilterAlg_skirt.h  1.1
+  OnboardFilter/src/OnboardFilter.cxx  1.50
+  OnboardFilter/src/Dll/OnboardFilter_dll.cxx  1.5
+  OnboardFilter/src/Dll/OnboardFilter_load.cxx  1.7
+  OnboardFilter/src/test/jobOptions.txt  1.11
+
+    *
+------------------------------------------------------------
+TAG
+Tag name: v3r0p2, operation: add
+Package: OnboardFilter
 User: mcenery  Fri Jun  9 12:39:40 2006
 Files:
   OnboardFilter/.cvsignore  1.2
