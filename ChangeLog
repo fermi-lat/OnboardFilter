@@ -1,4 +1,20 @@
 ------------------------------------------------------------
+User: usher  Fri Jun  9 13:48:25 PDT 2006
+OnboardFilter/flight/CAL_DB/src
+
+Removed Files:
+	.__afsF208 .cvsignore cal_db_common_create.c 
+	cal_db_common_create.h cal_db_gains_create.c 
+	cal_db_gains_create.cidc cal_db_pedestals_create.c 
+	cal_db_pedestals_create.cidc cal_import.h cal_import_full.h 
+	cal_import_gains.h cal_import_gains_full.h 
+	cal_import_gains_idealized.h cal_import_idealized.h 
+	cal_import_pedestals.h cal_import_pedestals_full.h 
+	cal_import_pedestals_idealized.h 
+Log Message:
+Removing flight software from this package (it is moving to an external library, or set of libraries)
+    *
+------------------------------------------------------------
 User: usher  Fri Jun  9 13:48:24 PDT 2006
 OnboardFilter/flight/CAL_DB/sdf
 
