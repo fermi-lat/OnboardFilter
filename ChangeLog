@@ -1,5 +1,20 @@
 ------------------------------------------------------------
 User: usher  Fri Jun  9 13:48:53 PDT 2006
+OnboardFilter/flight/EFC/EFC
+
+Removed Files:
+	EDM.h EFC.h EFC_display.h EFC_edsFw.h EFC_fate.h 
+	EFC_samplerPrint.h GFC.h GFC_cfg.h GFC_cfgPrint.h 
+	GFC_cfgPrmsV0.h GFC_resultsPrint.h GFC_stats.h 
+	GFC_statsPrint.h GFC_status.h RFC.h RFC_cfg.h RFC_cfgPrint.h 
+	RFC_cfgPrmsV0.h RFC_resultsPrint.h RFC_stats.h 
+	RFC_statsPrint.h RFC_status.h TFC_projectionDef.h 
+	TFC_projectionPrint.h cp.csh 
+Log Message:
+Removing flight software from this package (it is moving to an external library, or set of libraries)
+    *
+------------------------------------------------------------
+User: usher  Fri Jun  9 13:48:53 PDT 2006
 OnboardFilter/flight/EFC
 
 Removed Files:
