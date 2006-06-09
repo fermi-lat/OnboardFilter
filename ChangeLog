@@ -1,5 +1,14 @@
 ------------------------------------------------------------
 User: usher  Fri Jun  9 13:49:47 PDT 2006
+OnboardFilter/flight/RFC_DB/RFC_DB
+
+Removed Files:
+	RFC_DB_instance.h RFC_DB_schema.h 
+Log Message:
+Removing flight software from this package (it is moving to an external library, or set of libraries)
+    *
+------------------------------------------------------------
+User: usher  Fri Jun  9 13:49:47 PDT 2006
 OnboardFilter/flight/RFC_DB
 
 Removed Files:
