@@ -1,4 +1,19 @@
 ------------------------------------------------------------
+User: usher  Fri Jun  9 13:49:06 PDT 2006
+OnboardFilter/flight/GFC_DB/src
+
+Removed Files:
+	.cvsignore GFC_DB_default.c GFC_DB_default.h GFC_DB_default.ph 
+	GFC_DB_macros.h GFC_DB_master.c GFC_DB_master.h 
+	GFC_DB_master.h.gch GFC_DB_master.ph GFC_DB_normal.c 
+	GFC_DB_normal.h GFC_DB_normal.ph gfc_db_default.cab.c 
+	gfc_db_default.cab.ph gfc_db_default.cidc gfc_db_master.cab.c 
+	gfc_db_master.cab.ph gfc_db_master.cidc gfc_db_normal.cab.c 
+	gfc_db_normal.cab.ph gfc_db_normal.cidc 
+Log Message:
+Removing flight software from this package (it is moving to an external library, or set of libraries)
+    *
+------------------------------------------------------------
 User: usher  Fri Jun  9 13:49:05 PDT 2006
 OnboardFilter/flight/GFC_DB/sdf
 
