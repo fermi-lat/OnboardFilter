@@ -1,4 +1,14 @@
 ------------------------------------------------------------
+User: usher  Fri Jun  9 13:49:01 PDT 2006
+OnboardFilter/flight/EMP/ptd
+
+Removed Files:
+	aem2.txt ebf_data.c ld_test_asc.vw test_ahc.c test_ahc.cidc 
+	test_asc.c test_asc.cidc test_exp.c test_exp.cidc 
+Log Message:
+Removing flight software from this package (it is moving to an external library, or set of libraries)
+    *
+------------------------------------------------------------
 User: usher  Fri Jun  9 13:49:00 PDT 2006
 OnboardFilter/flight/EMP/cmt
 
