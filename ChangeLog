@@ -1,5 +1,14 @@
 ------------------------------------------------------------
 User: usher  Fri Jun  9 13:48:25 PDT 2006
+OnboardFilter/flight/CDM/CDM
+
+Removed Files:
+	CDM_msgs.h CDM_pubdefs.h 
+Log Message:
+Removing flight software from this package (it is moving to an external library, or set of libraries)
+    *
+------------------------------------------------------------
+User: usher  Fri Jun  9 13:48:25 PDT 2006
 OnboardFilter/flight/CAL_DB/src
 
 Removed Files:
