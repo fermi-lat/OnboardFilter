@@ -1,4 +1,16 @@
 ------------------------------------------------------------
+User: usher  Fri Jun  9 13:48:33 PDT 2006
+OnboardFilter/flight/CMX/fragments
+
+Removed Files:
+	bes_header bsp bsp_header bsp_trailer cat cat_header 
+	cat_trailer cdm cdm_header cdm_trailer exe exe_header 
+	exe_trailer msg msg_header msg_trailer shr shr_header 
+	shr_trailer usr usr_header usr_trailer 
+Log Message:
+Removing flight software from this package (it is moving to an external library, or set of libraries)
+    *
+------------------------------------------------------------
 User: usher  Fri Jun  9 13:48:32 PDT 2006
 OnboardFilter/flight/CMX/doc
 
