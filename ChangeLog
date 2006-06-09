@@ -1,4 +1,24 @@
 ------------------------------------------------------------
+User: usher  Fri Jun  9 13:48:34 PDT 2006
+OnboardFilter/flight/CMX/ptd
+
+Removed Files:
+	cmx_gnu_ld_parse.cygwin-0.0.ref 
+	cmx_gnu_ld_parse.cygwin-0.0.txt 
+	cmx_gnu_ld_parse.linux-gcc-0.0.ref 
+	cmx_gnu_ld_parse.linux-gcc-0.0.txt 
+	cmx_gnu_ld_parse.linux-gcc-1.0.ref 
+	cmx_gnu_ld_parse.linux-gcc-1.0.txt 
+	cmx_gnu_ld_parse.mv2304-0.0.ref 
+	cmx_gnu_ld_parse.mv2304-0.0.txt cmx_gnu_ld_parse.pl 
+	cmx_gnu_ld_parse.readme cmx_gnu_ld_parse.unknown.0.ref 
+	cmx_gnu_ld_parse.unknown.0.txt cmx_gnu_ld_parse.unknown.1.ref 
+	cmx_gnu_ld_parse.unknown.1.txt cmx_gnu_ld_regress.pl 
+	cmx_gnu_ld_regress.txt 
+Log Message:
+Removing flight software from this package (it is moving to an external library, or set of libraries)
+    *
+------------------------------------------------------------
 User: usher  Fri Jun  9 13:48:33 PDT 2006
 OnboardFilter/flight/CMX/fragments
 
