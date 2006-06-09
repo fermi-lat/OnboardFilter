@@ -1,5 +1,16 @@
 ------------------------------------------------------------
 User: usher  Fri Jun  9 13:49:19 PDT 2006
+OnboardFilter/flight/PBI/PBI/impl
+
+Removed Files:
+	ASM.h.xx-ppc-gcc Alias.h.cx-xxx-gcc Alias.h.sx-xxx-gcc 
+	Alias.h.xx-xxx-gcc Alias.h.xx-xxx-scc Inline.h.xx-xxx-gcc 
+	Inline.h.xx-xxx-scc Unions_big.h Unions_little.h 
+Log Message:
+Removing flight software from this package (it is moving to an external library, or set of libraries)
+    *
+------------------------------------------------------------
+User: usher  Fri Jun  9 13:49:19 PDT 2006
 OnboardFilter/flight/PBI/PBI
 
 Removed Files:
