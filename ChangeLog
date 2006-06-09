@@ -1,4 +1,14 @@
 ------------------------------------------------------------
+User: usher  Fri Jun  9 13:49:08 PDT 2006
+OnboardFilter/flight/GGF_DB/src
+
+Removed Files:
+	.cvsignore GEO_DB_data.c GEO_DB_data.h GEO_DB_data.h.gch 
+	GEO_DB_data.ph geo_db_data.cidc 
+Log Message:
+Removing flight software from this package (it is moving to an external library, or set of libraries)
+    *
+------------------------------------------------------------
 User: usher  Fri Jun  9 13:49:07 PDT 2006
 OnboardFilter/flight/GGF_DB/sdf
 
