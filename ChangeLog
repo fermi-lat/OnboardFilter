@@ -1,4 +1,14 @@
 ------------------------------------------------------------
+User: usher  Fri Jun  9 13:48:47 PDT 2006
+OnboardFilter/flight/EDS/ptd/scripts
+
+Removed Files:
+	ld-ebf_print.vx ld-ebf_sivtest.vx ld-ebf_unpacktest.vx 
+	ld-ffstest.vx ld-tmrtest.vx mc.cshrc 
+Log Message:
+Removing flight software from this package (it is moving to an external library, or set of libraries)
+    *
+------------------------------------------------------------
 User: usher  Fri Jun  9 13:48:46 PDT 2006
 OnboardFilter/flight/EDS/ptd
 
