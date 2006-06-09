@@ -6,7 +6,7 @@
 
 \verbatim
 
-  CVS $Id: OnboardFilter.cxx,v 1.48 2006/03/14 03:12:52 hughes Exp $
+  CVS $Id: OnboardFilter.cxx,v 1.51 2006/06/09 20:55:11 usher Exp $
 \endverbatim
 
                                                                           */
@@ -94,7 +94,7 @@
 //#include "EFC/RFC_stats.h"
 
 //#include "../flight/EFC/src/RFC_def.h"
-#include "../flight/EFC/src/RFC_resultDef.h"
+#include "EFC/src/RFC_resultDef.h"
 
 //#include "EDS/EBF_evt.h"
 //#include "EDS/EBF_pkt.h"
