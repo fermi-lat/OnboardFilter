@@ -1,4 +1,20 @@
 ------------------------------------------------------------
+User: usher  Fri Jun  9 13:49:27 PDT 2006
+OnboardFilter/flight/PBS/ptd
+
+Removed Files:
+	test_bswp.c test_bswp.cidc test_clear.c test_clear.cidc 
+	test_crash.c test_crash.cidc test_divdi3.c test_divdi3.cidc 
+	test_ffs.c test_ffs.cidc test_fork.c test_fork.cidc test_fpa.c 
+	test_fpa.cidc test_gettimeofday.c test_gettimeofday.cidc 
+	test_lsu.c test_lsu.cidc test_mba.c test_mba.cidc 
+	test_parity.c test_parity.cidc test_pbsinit.c 
+	test_pbsinit.cidc test_ques.c test_ques.cidc test_raven.c 
+	test_raven.cidc 
+Log Message:
+Removing flight software from this package (it is moving to an external library, or set of libraries)
+    *
+------------------------------------------------------------
 User: usher  Fri Jun  9 13:49:26 PDT 2006
 OnboardFilter/flight/PBS/ptd/LTX
 
