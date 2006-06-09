@@ -1,5 +1,16 @@
 ------------------------------------------------------------
 User: usher  Fri Jun  9 13:48:40 PDT 2006
+OnboardFilter/flight/CPU_DB/src
+
+Removed Files:
+	.cvsignore CPU_DB_epu.h CPU_DB_sc.h CPU_DB_schema.h 
+	CPU_DB_server.c CPU_DB_server.ph CPU_DB_siu.h 
+	cpu_db_server.cidc cpu_epu.cidc cpu_sc.cidc cpu_siu.cidc 
+Log Message:
+Removing flight software from this package (it is moving to an external library, or set of libraries)
+    *
+------------------------------------------------------------
+User: usher  Fri Jun  9 13:48:40 PDT 2006
 OnboardFilter/flight/CPU_DB/sdf
 
 Removed Files:
