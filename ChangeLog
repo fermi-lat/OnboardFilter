@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: usher  Fri Jun  9 13:48:54 PDT 2006
+OnboardFilter/flight/EFC/cmt
+
+Removed Files:
+	.cvsignore Makefile requirements 
+Log Message:
+Removing flight software from this package (it is moving to an external library, or set of libraries)
+    *
+------------------------------------------------------------
 User: usher  Fri Jun  9 13:48:53 PDT 2006
 OnboardFilter/flight/EFC/EFC
 
