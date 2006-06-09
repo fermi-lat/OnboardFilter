@@ -1,4 +1,16 @@
 ------------------------------------------------------------
+User: usher  Fri Jun  9 13:49:20 PDT 2006
+OnboardFilter/flight/PBI/ptd
+
+Removed Files:
+	doc_gather.c doc_gather.cidc test_alias.c test_alias.cidc 
+	test_attribute.c test_attribute.cidc test_endianness.c 
+	test_endianness.cidc test_ofs.c test_ofs.cidc test_unions.c 
+	test_unions.cidc 
+Log Message:
+Removing flight software from this package (it is moving to an external library, or set of libraries)
+    *
+------------------------------------------------------------
 User: usher  Fri Jun  9 13:49:19 PDT 2006
 OnboardFilter/flight/PBI/cmt
 
