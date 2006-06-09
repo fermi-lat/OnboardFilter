@@ -1,5 +1,15 @@
 ------------------------------------------------------------
 User: usher  Fri Jun  9 13:48:58 PDT 2006
+OnboardFilter/flight/EFC_DB/EFC_DB
+
+Removed Files:
+	EFC_DB_mode.h EFC_DB_sampler.h EFC_DB_schema.h 
+	EFC_DB_schemas.h 
+Log Message:
+Removing flight software from this package (it is moving to an external library, or set of libraries)
+    *
+------------------------------------------------------------
+User: usher  Fri Jun  9 13:48:58 PDT 2006
 OnboardFilter/flight/EFC_DB
 
 Removed Files:
