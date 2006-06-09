@@ -1,5 +1,14 @@
 ------------------------------------------------------------
 User: usher  Fri Jun  9 13:49:09 PDT 2006
+OnboardFilter/flight/MDB/sdf
+
+Removed Files:
+	MDB.log 
+Log Message:
+Removing flight software from this package (it is moving to an external library, or set of libraries)
+    *
+------------------------------------------------------------
+User: usher  Fri Jun  9 13:49:09 PDT 2006
 OnboardFilter/flight/MDB/cmt
 
 Removed Files:
