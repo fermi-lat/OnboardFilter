@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: usher  Fri Jun  9 13:49:48 PDT 2006
+OnboardFilter/flight/RFC_DB/cmt
+
+Removed Files:
+	.cvsignore Makefile requirements 
+Log Message:
+Removing flight software from this package (it is moving to an external library, or set of libraries)
+    *
+------------------------------------------------------------
 User: usher  Fri Jun  9 13:49:47 PDT 2006
 OnboardFilter/flight/RFC_DB/RFC_DB
 
