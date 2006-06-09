@@ -1,4 +1,16 @@
 ------------------------------------------------------------
+User: usher  Fri Jun  9 13:49:41 PDT 2006
+OnboardFilter/flight/PBS/sdf
+
+Removed Files:
+	Crash.txt LLI.txt MEM.txt PBS.log PBS_2_0.txt PBS_2_10.txt 
+	PBS_2_2.txt PBS_2_3.txt PBS_2_4.txt PBS_2_5.txt PBS_2_6.txt 
+	PBS_2_7.txt PBS_2_8.txt PBS_2_9.txt Performance.txt RW.txt 
+	TASK.txt TAU.txt TBD.txt TIME.txt 
+Log Message:
+Removing flight software from this package (it is moving to an external library, or set of libraries)
+    *
+------------------------------------------------------------
 User: usher  Fri Jun  9 13:49:40 PDT 2006
 OnboardFilter/flight/PBS/ptd
 
