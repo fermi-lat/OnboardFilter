@@ -1,5 +1,14 @@
 ------------------------------------------------------------
 User: usher  Fri Jun  9 13:48:27 PDT 2006
+OnboardFilter/flight/CGB_DB
+
+Removed Files:
+	CAL_DB_pedestals.h ChangeLog 
+Log Message:
+Removing flight software from this package (it is moving to an external library, or set of libraries)
+    *
+------------------------------------------------------------
+User: usher  Fri Jun  9 13:48:27 PDT 2006
 OnboardFilter/flight/CDM/src
 
 Removed Files:
