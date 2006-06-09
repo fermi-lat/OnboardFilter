@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: usher  Fri Jun  9 13:49:12 PDT 2006
+OnboardFilter/flight/MSG
+
+Removed Files:
+	ChangeLog 
+Log Message:
+Removing flight software from this package (it is moving to an external library, or set of libraries)
+    *
+------------------------------------------------------------
 User: usher  Fri Jun  9 13:49:11 PDT 2006
 OnboardFilter/flight/MPP_DB/src
 
