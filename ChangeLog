@@ -1,4 +1,24 @@
 ------------------------------------------------------------
+User: usher  Fri Jun  9 13:49:16 PDT 2006
+OnboardFilter/flight/MSG/src
+
+Removed Files:
+	M2S_msgs.c M2S_msgs.h M2S_msgs.msg M2S_msgs.ph MSG_configure.c 
+	MSG_configure.ph MSG_control.c MSG_control.ph MSG_cpu.c 
+	MSG_cpu.c.ux-xxx-xxx MSG_cpu.c.vx-xxx-xxx MSG_cpu.ph 
+	MSG_createFacility.c MSG_createFacility.ph MSG_health.h 
+	MSG_m2sdefs.h MSG_msgs.c MSG_msgs.msg MSG_msgs.ph MSG_output.c 
+	MSG_output.ph MSG_packet.ih MSG_printAttach.c 
+	MSG_printAttach.ph MSG_printProc.c MSG_printProc.ph 
+	MSG_prvdefs.h MSG_prvdefs_mt.h MSG_prvdefs_st.h MSG_readMsg.c 
+	MSG_readMsg.ph MSG_report.c MSG_report.ph MSG_report_mt.c.keep 
+	MSG_report_mt.ph MSG_report_st.c MSG_report_st.ph msg.cidh 
+	msg2src.c msg2src.cidc msg2src.dox msg_mt.cidc msg_print.cidc 
+	msg_st.cidc msg_test.cidh 
+Log Message:
+Removing flight software from this package (it is moving to an external library, or set of libraries)
+    *
+------------------------------------------------------------
 User: usher  Fri Jun  9 13:49:15 PDT 2006
 OnboardFilter/flight/MSG/sdf
 
