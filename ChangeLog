@@ -1,5 +1,14 @@
 ------------------------------------------------------------
 User: usher  Fri Jun  9 13:48:52 PDT 2006
+OnboardFilter/flight/EDS_DB/src
+
+Removed Files:
+	EDS_DB_doc.c EDS_DB_doc.ph eds_db_doc.cidc 
+Log Message:
+Removing flight software from this package (it is moving to an external library, or set of libraries)
+    *
+------------------------------------------------------------
+User: usher  Fri Jun  9 13:48:52 PDT 2006
 OnboardFilter/flight/EDS_DB/sdf
 
 Removed Files:
