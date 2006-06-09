@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: usher  Fri Jun  9 13:49:17 PDT 2006
+OnboardFilter/flight/MSG_DB
+
+Removed Files:
+	ChangeLog 
+Log Message:
+Removing flight software from this package (it is moving to an external library, or set of libraries)
+    *
+------------------------------------------------------------
 User: usher  Fri Jun  9 13:49:16 PDT 2006
 OnboardFilter/flight/MSG/src
 
