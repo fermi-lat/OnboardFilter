@@ -1,5 +1,14 @@
 ------------------------------------------------------------
 User: usher  Fri Jun  9 13:49:02 PDT 2006
+OnboardFilter/flight/GEO_DB/GEO_DB
+
+Removed Files:
+	GEO_DB_macros.h GEO_DB_print.h GEO_DB_schema.h TFC_geometry.h 
+Log Message:
+Removing flight software from this package (it is moving to an external library, or set of libraries)
+    *
+------------------------------------------------------------
+User: usher  Fri Jun  9 13:49:02 PDT 2006
 OnboardFilter/flight/GEO_DB
 
 Removed Files:
