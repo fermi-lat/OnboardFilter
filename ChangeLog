@@ -1,4 +1,27 @@
 ------------------------------------------------------------
+User: usher  Fri Jun  9 13:48:58 PDT 2006
+OnboardFilter/flight/EFC/src
+
+Removed Files:
+	AFC_splash.c AFC_splash.h AFC_splashMap1x1.c 
+	AFC_splashMapBld.h AFC_splashMapDef.h ATF_filter.h 
+	ATF_shadowedTowers.h ATF_shadowedTowers2x2.c 
+	ATF_shadowedTowersDef.h CFC_ratio.h EDM.c EFC.c EFC_display.c 
+	EFC_edsFw.c EFC_samplerDef.h EFC_samplerPrint.c GFC.c 
+	GFC_cfgPrint.c GFC_dbConfigure.c GFC_def.h GFC_resultDef.h 
+	GFC_resultsPrint.c GFC_stats.c GFC_statsDef.h GFC_statsPrint.c 
+	OFC.c.new RFC.c RFC.c.keep RFC_cfgPrint.c RFC_dbConfigure.c 
+	RFC_def.h RFC_resultDef.h RFC_resultsPrint.c RFC_stats.c 
+	RFC_stats.ph RFC_statsDef.h RFC_statsPrint.c TFC_acd.c 
+	TFC_acd.h TFC_projectionFind.c TFC_projectionFind.h 
+	TFC_projectionPrint.c TFC_skirt.c TFC_skirt.h TFC_trigger.h 
+	TFC_triggerFill.c TFC_triggerFill.h TFC_triggerForm.h 
+	TFC_triggerSortedForm.h defc.cidc efc.cab.c efc.cidc efcd.cidc 
+	efcprint.cidc filter_rto.c filter_rto.h iefc.cidc 
+Log Message:
+Removing flight software from this package (it is moving to an external library, or set of libraries)
+    *
+------------------------------------------------------------
 User: usher  Fri Jun  9 13:48:55 PDT 2006
 OnboardFilter/flight/EFC/sdf
 
