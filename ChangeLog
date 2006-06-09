@@ -1,4 +1,24 @@
 ------------------------------------------------------------
+User: usher  Fri Jun  9 13:49:24 PDT 2006
+OnboardFilter/flight/PBS/PBS
+
+Removed Files:
+	BSWP.h BSWP.ih BSWP_boot.h BSWP_boot.ih BUG.h CACHE.h FFS.ih 
+	FORK.h FPA.h INT.ih L.h L.ih LI.h LI.ih LI_comdefs.h 
+	LI_protos.h LI_pubdefs.h LI_type.h LSU.h L_comdefs.h 
+	L_protos.h L_pubdefs.h MBA.h MTX.h MTX.ih PARITY.h PARITY.ih 
+	PBS.h PL.h PL.ih PL_comdefs.h PL_protos.h PL_pubdefs.h 
+	PL_type.h PTS.h PTS.ih PTS_comdefs.h Q.h Q.ih QI.h QI.ih 
+	QI_comdefs.h QI_protos.h QI_pubdefs.h QI_type.h Q_comdefs.h 
+	Q_protos.h Q_pubdefs.h REG.h RNG.h RW.h RW.ih RWF.h 
+	RW_comdefs.h RW_protos.h RW_pubdefs.h RW_type.h SEM.h SEM.ih 
+	SPIN.h SPIN.ih SPIN_time.h TASK.h TASK.ih TAU.h TAU.ih TBD.h 
+	TBD.ih TMR.h TOC.h TOC.ih TOC_comdefs.h TOV.h TSS.h WCT.h 
+	WUT.h WUT_cb.h WUT_tmr.h 
+Log Message:
+Removing flight software from this package (it is moving to an external library, or set of libraries)
+    *
+------------------------------------------------------------
 User: usher  Fri Jun  9 13:49:21 PDT 2006
 OnboardFilter/flight/PBS
 
