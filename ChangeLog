@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: usher  Fri Jun  9 13:49:15 PDT 2006
+OnboardFilter/flight/MSG/sdf
+
+Removed Files:
+	MSG.log MSG.release_notes MSG.todo 
+Log Message:
+Removing flight software from this package (it is moving to an external library, or set of libraries)
+    *
+------------------------------------------------------------
 User: usher  Fri Jun  9 13:49:14 PDT 2006
 OnboardFilter/flight/MSG/ptd
 
