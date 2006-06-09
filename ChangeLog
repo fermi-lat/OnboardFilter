@@ -1,5 +1,16 @@
 ------------------------------------------------------------
 User: usher  Fri Jun  9 13:48:44 PDT 2006
+OnboardFilter/flight/EDS/EDS/impl
+
+Removed Files:
+	FFS.xx-ppc-gcc.h FFS.xx-x86-gcc.h FFS.xx-xxx-xxx.h 
+	TMR.sx-xxx-xxx.h TMR.ux-xxx-xxx.h TMR.wx-xxx-xxx.h 
+	TMR.xx-ppc-gcc.h TMR.xx-x86-gcc.h TMR.xx-xxx-xxx.h 
+Log Message:
+Removing flight software from this package (it is moving to an external library, or set of libraries)
+    *
+------------------------------------------------------------
+User: usher  Fri Jun  9 13:48:44 PDT 2006
 OnboardFilter/flight/EDS/EDS
 
 Removed Files:
