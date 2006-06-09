@@ -1,4 +1,22 @@
 ------------------------------------------------------------
+User: usher  Fri Jun  9 13:49:44 PDT 2006
+OnboardFilter/flight/PBS/src
+
+Removed Files:
+	BSWP.c BSWP.ph BSWP_boot.c BSWP_boot.ph BUG.c BUG.ph CACHE.c 
+	CACHE.ph FORK.c FORK.ph FPA.c FPA.ph L.c L.ph LI.c LI.ph LSU.c 
+	LSU.ph LSU_pvt.ih MBA.c MBA.ph MTX.c MTX.ph PARITY.c PARITY.ph 
+	PBS.c PBS.ph PL.c PL.ph PTS.c PTS.ph Q.c Q.ph QI.c QI.ph RNG.c 
+	RNG.ph RW.c RW.ph RWF.c RWF.ph RW_tmr.h RW_tmr.ih SEM.c SEM.ph 
+	SPIN.c SPIN.ph TASK.c TASK.ph TASK_pvtdefs.h TAU.c TAU.ph 
+	TBD.c TBD.ph TBD_pvtdefs.h TMR.c TOC.c TOC.ph TOV.c TOV.ph 
+	TSS.c TSS.ph WCT.c WCT.ph WCT_pvtdefs.h WCT_pvtdefs.ih WUT.c 
+	WUT.ph WUT_debug.c WUT_debug.c.keep WUT_debug.ph divdi3.c 
+	divdi3.ph longlong.h pbs.cidc pbs_boot.cidc 
+Log Message:
+Removing flight software from this package (it is moving to an external library, or set of libraries)
+    *
+------------------------------------------------------------
 User: usher  Fri Jun  9 13:49:41 PDT 2006
 OnboardFilter/flight/PBS/sdf
 
