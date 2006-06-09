@@ -1,4 +1,14 @@
 ------------------------------------------------------------
+User: usher  Fri Jun  9 13:48:45 PDT 2006
+OnboardFilter/flight/EDS/EDS/io
+
+Removed Files:
+	EBF_evt.ih EBF_evts.h EBF_pkt.ih EBF_pkts.h EBF_stream.h 
+	EBF_swap.h LCBP.h 
+Log Message:
+Removing flight software from this package (it is moving to an external library, or set of libraries)
+    *
+------------------------------------------------------------
 User: usher  Fri Jun  9 13:48:44 PDT 2006
 OnboardFilter/flight/EDS/EDS/impl
 
