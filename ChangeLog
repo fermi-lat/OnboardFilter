@@ -1,4 +1,16 @@
 ------------------------------------------------------------
+User: usher  Fri Jun  9 13:49:04 PDT 2006
+OnboardFilter/flight/GEO_DB/src
+
+Removed Files:
+	GEO_DB_print.c GEO_DB_print.ph geo_db_data.cab.c 
+	geo_db_data.cab.ph geo_db_data.cidc geo_db_print.cab.c 
+	geo_db_print.cab.ph geo_db_print.cidc geoprint.c.keep 
+	geoprint.cidc geoprint.ph geoprintx.cidc 
+Log Message:
+Removing flight software from this package (it is moving to an external library, or set of libraries)
+    *
+------------------------------------------------------------
 User: usher  Fri Jun  9 13:49:03 PDT 2006
 OnboardFilter/flight/GEO_DB/sdf
 
