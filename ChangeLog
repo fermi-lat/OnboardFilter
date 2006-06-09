@@ -1,4 +1,14 @@
 ------------------------------------------------------------
+User: usher  Fri Jun  9 13:48:29 PDT 2006
+OnboardFilter/flight/CMX/CMX
+
+Removed Files:
+	CMX_asBuiltPub.h CMX_asBuiltSpy.h CMX_interface_pub.h 
+	CMX_lookupPub.h CMX_lookupSpy.h 
+Log Message:
+Removing flight software from this package (it is moving to an external library, or set of libraries)
+    *
+------------------------------------------------------------
 User: usher  Fri Jun  9 13:48:28 PDT 2006
 OnboardFilter/flight/CGB_DB/src
 
