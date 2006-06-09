@@ -1,5 +1,14 @@
 ------------------------------------------------------------
 User: usher  Fri Jun  9 13:49:08 PDT 2006
+OnboardFilter/flight/MDB
+
+Removed Files:
+	ChangeLog 
+Log Message:
+Removing flight software from this package (it is moving to an external library, or set of libraries)
+    *
+------------------------------------------------------------
+User: usher  Fri Jun  9 13:49:08 PDT 2006
 OnboardFilter/flight/GGF_DB/src
 
 Removed Files:
