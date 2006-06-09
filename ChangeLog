@@ -1,4 +1,14 @@
 ------------------------------------------------------------
+User: usher  Fri Jun  9 13:48:22 PDT 2006
+OnboardFilter/flight/CAL_DB/CAL_DB
+
+Removed Files:
+	CAL_DB_schema.h CAL_DB_schema_gains.h 
+	CAL_DB_schema_pedestals.h CAL_DB_subsystems.h 
+Log Message:
+Removing flight software from this package (it is moving to an external library, or set of libraries)
+    *
+------------------------------------------------------------
 TAG
 Tag name: v3r0p2, operation: add
 Package: OnboardFilter
