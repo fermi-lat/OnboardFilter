@@ -1,4 +1,23 @@
 ------------------------------------------------------------
+User: usher  Fri Jun  9 13:48:35 PDT 2006
+OnboardFilter/flight/CMX/src
+
+Removed Files:
+	CMX_asBuilt.c CMX_asBuilt.ph CMX_asBuiltPrv.h CMX_asBuiltSpy.c 
+	CMX_asBuiltSpy.ph CMX_interfaceCollate.c 
+	CMX_interfaceCollate.ph CMX_interfaceCompare.c 
+	CMX_interfaceCompare.ph CMX_interfaceFind.c 
+	CMX_interfaceFind.ph CMX_interfaceRead.c CMX_interfaceRead.ph 
+	CMX_interfaceRecurse.c CMX_interfaceRecurse.ph 
+	CMX_interfaceShow.c CMX_interfaceShow.ph CMX_interface_prv.h 
+	CMX_lookup.c CMX_lookup.ph CMX_lookupPrv.h CMX_lookupSpy.c 
+	CMX_lookupSpy.ph cid.c cid.cidc cid.h.dox cmx.make 
+	cmx_asBuilt.cidc cmx_asBuiltSpy.cidc cmx_count.c 
+	cmx_count.cidc cmx_count.h.dox cmx_interface.cidc 
+Log Message:
+Removing flight software from this package (it is moving to an external library, or set of libraries)
+    *
+------------------------------------------------------------
 User: usher  Fri Jun  9 13:48:34 PDT 2006
 OnboardFilter/flight/CMX/sdf
 
