@@ -1,5 +1,14 @@
 ------------------------------------------------------------
 User: usher  Fri Jun  9 13:49:26 PDT 2006
+OnboardFilter/flight/PBS/ptd/LTX
+
+Removed Files:
+	test_pbs.ux.py test_pbs.ux.xml test_pbs.vx.py test_pbs.vx.xml 
+Log Message:
+Removing flight software from this package (it is moving to an external library, or set of libraries)
+    *
+------------------------------------------------------------
+User: usher  Fri Jun  9 13:49:26 PDT 2006
 OnboardFilter/flight/PBS/cmt
 
 Removed Files:
