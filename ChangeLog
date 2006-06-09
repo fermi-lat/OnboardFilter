@@ -1,4 +1,23 @@
 ------------------------------------------------------------
+User: usher  Fri Jun  9 13:48:31 PDT 2006
+OnboardFilter/flight/CMX/cmt
+
+Removed Files:
+	.cvsignore Doxyfake.c Doxyfile.template 
+	Doxyfile.template.1.3.3 Doxyfile.template.1.4.4 
+	Doxyhead.html.template Doxymain.template 
+	Doxymiss.html.template Doxytail.html.template INSTALL_CMT 
+	INSTALL_CMX LAT-FSW-logo.gif Makefile cmx_command.help 
+	cmx_command.pl cmx_common.pl cmx_compiler.pl cmx_cvsignore.pl 
+	cmx_doxygen.pl cmx_execute.csh cmx_execute.sh 
+	cmx_execute_cyg.csh cmx_execute_cyg.sh cmx_instance.pl 
+	cmx_link.pl cmx_msgcheck.pl cmx_msgcode cmx_nop.pl 
+	cmx_populate.pl cmx_rebuild.pl cmx_release 
+	cmx_release.sh.template cmx_reverse.pl requirements 
+Log Message:
+Removing flight software from this package (it is moving to an external library, or set of libraries)
+    *
+------------------------------------------------------------
 User: usher  Fri Jun  9 13:48:29 PDT 2006
 OnboardFilter/flight/CMX
 
