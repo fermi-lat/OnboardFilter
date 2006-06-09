@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: usher  Fri Jun  9 13:48:40 PDT 2006
+OnboardFilter/flight/CPU_DB/sdf
+
+Removed Files:
+	CPU_DB.log 
+Log Message:
+Removing flight software from this package (it is moving to an external library, or set of libraries)
+    *
+------------------------------------------------------------
 User: usher  Fri Jun  9 13:48:39 PDT 2006
 OnboardFilter/flight/CPU_DB/cmt
 
