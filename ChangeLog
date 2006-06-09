@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: usher  Fri Jun  9 13:49:26 PDT 2006
+OnboardFilter/flight/PBS/cmt
+
+Removed Files:
+	.cvsignore Makefile loc.csh loc.sh requirements 
+Log Message:
+Removing flight software from this package (it is moving to an external library, or set of libraries)
+    *
+------------------------------------------------------------
 User: usher  Fri Jun  9 13:49:25 PDT 2006
 OnboardFilter/flight/PBS/PBS/impl
 
