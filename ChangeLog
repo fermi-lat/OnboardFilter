@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: usher  Fri Jun  9 13:55:10 PDT 2006
+OnboardFilter/cmt
+
+Modified Files:
+	requirements 
+Log Message:
+Modifications to access flight software as external libraries, both windows and linux
+    *
+------------------------------------------------------------
 User: usher  Fri Jun  9 13:49:49 PDT 2006
 OnboardFilter/flight/RFC_DB/src
 
