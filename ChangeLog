@@ -1,4 +1,29 @@
 ------------------------------------------------------------
+User: usher  Fri Jun  9 13:48:50 PDT 2006
+OnboardFilter/flight/EDS/src
+
+Removed Files:
+	EBF_calEnergy.c EBF_calEnergy.ph EBF_dir.c EBF_dir.ph 
+	EBF_dirPrint.c EBF_dirPrint.ph EBF_match.c EBF_match.ph 
+	EBF_matchPvt.h EBF_siv.c EBF_siv.ph EBF_tkr.c EBF_tkr.ph 
+	ECR_cal.c ECR_cal.c.bck ECR_cal.ph ECR_calPrint.c 
+	ECR_calPrint.ph EDR_acdPrint.c EDR_acdPrint.ph EDR_acdRemap.h 
+	EDR_acdUnpack.c EDR_acdUnpack.ph EDR_calPrint.c 
+	EDR_calPrint.c.bck EDR_calPrint.ph EDR_calUnpack.c 
+	EDR_calUnpack.c.bck EDR_calUnpack.ph EDR_gemPrint.c 
+	EDR_gemPrint.ph EDR_mcPrint.c EDR_mcPrint.ph EDR_tkrPrint.c 
+	EDR_tkrPrint.ph EDR_tkrUnpack.c EDR_tkrUnpack.ph EDSD_print.c 
+	EDSD_print.ph EDSD_siv.c EDSD_siv.ph EDSD_sizes.c 
+	EDSD_sizes.ph EDSD_tkr.c EDSD_tkr.ph EDSD_unpack.c 
+	EDSD_unpack.ph EDS_fw.c EDS_fw.c.bck EDS_fw.ph EDS_fwPvt.h 
+	EDS_fwPvt.h.bck TMR.c TMR.ph calcal ebf2c.c ebf2c.cidc 
+	ebf2c.ph ebf_acvt.c ebf_acvt.cidc ebf_acvt.ph ebf_print.c 
+	ebf_print.cidc ebf_print.ph ebf_sizes.c ebf_sizes.cidc 
+	ebf_sizes.ph eds.cidc edsd.cidc edspbs.cidc edsprint.cidc 
+Log Message:
+Removing flight software from this package (it is moving to an external library, or set of libraries)
+    *
+------------------------------------------------------------
 User: usher  Fri Jun  9 13:48:47 PDT 2006
 OnboardFilter/flight/EDS/sdf
 
