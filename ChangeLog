@@ -1,5 +1,14 @@
 ------------------------------------------------------------
 User: usher  Fri Jun  9 13:49:21 PDT 2006
+OnboardFilter/flight/PBS
+
+Removed Files:
+	ChangeLog 
+Log Message:
+Removing flight software from this package (it is moving to an external library, or set of libraries)
+    *
+------------------------------------------------------------
+User: usher  Fri Jun  9 13:49:21 PDT 2006
 OnboardFilter/flight/PBI/src
 
 Removed Files:
