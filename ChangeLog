@@ -1,4 +1,19 @@
 ------------------------------------------------------------
+User: usher  Fri Jun  9 13:49:14 PDT 2006
+OnboardFilter/flight/MSG/ptd
+
+Removed Files:
+	MSG_test.c MSG_testBuffer.c MSG_testFormat.c MSG_testNoTask.c 
+	MSG_testOptions.c MSG_testShotgun.c MSG_testState.c 
+	MSG_testThread.c MSG_testUtility.c MSG_tstdefs.h MTS_msgs.c 
+	MTS_msgs.h MTS_msgs.msg test_msg_mt.cidc test_msg_mt.dox 
+	test_msg_mt.dox.ux-xxx-xxx test_msg_mt.dox.vx-xxx-xxx 
+	test_msg_mt.sx test_msg_mt.vx test_msg_st.cidc 
+	test_msg_st.dox.ux-xxx-xxx 
+Log Message:
+Removing flight software from this package (it is moving to an external library, or set of libraries)
+    *
+------------------------------------------------------------
 User: usher  Fri Jun  9 13:49:13 PDT 2006
 OnboardFilter/flight/MSG/ptd/LTX
 
