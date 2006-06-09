@@ -1,4 +1,16 @@
 ------------------------------------------------------------
+User: usher  Fri Jun  9 13:48:37 PDT 2006
+OnboardFilter/flight/CPG_DB/src
+
+Removed Files:
+	.cvsignore CAL_DB_gains.h CAL_DB_gains.h.recent 
+	CAL_DB_gains.ph CAL_DB_gains_flight.c cal_db_create.c 
+	cal_db_gains.cidc cal_db_gains_create.cidc cal_gains.h 
+	copy.csh 
+Log Message:
+Removing flight software from this package (it is moving to an external library, or set of libraries)
+    *
+------------------------------------------------------------
 User: usher  Fri Jun  9 13:48:36 PDT 2006
 OnboardFilter/flight/CPG_DB/sdf
 
