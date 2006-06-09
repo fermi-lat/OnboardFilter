@@ -1,4 +1,22 @@
 ------------------------------------------------------------
+User: usher  Fri Jun  9 13:48:44 PDT 2006
+OnboardFilter/flight/EDS/EDS
+
+Removed Files:
+	EBF_acd.h EBF_cal.h EBF_calEnergy.h EBF_cid.h EBF_ctb.h 
+	EBF_dir.h EBF_dirPrint.h EBF_ebw.h EBF_edw.h EBF_esw.h 
+	EBF_evt.h EBF_gem.h EBF_gemLocate.h EBF_match.h EBF_mc.h 
+	EBF_pkt.h EBF_siv.h EBF_tem.h EBF_tkr.h ECR_cal.h 
+	ECR_calPrint.h EDA_acd.h EDA_cal.h EDA_tkr.h EDR_acd.h 
+	EDR_acdPrint.h EDR_acdUnpack.h EDR_cal.h EDR_calPrint.h 
+	EDR_calUnpack.h EDR_gemPrint.h EDR_mcPrint.h EDR_tkr.h 
+	EDR_tkrPrint.h EDR_tkrUnpack.h EDSD_print.h EDSD_siv.h 
+	EDSD_sizes.h EDSD_tkr.h EDSD_unpack.h EDS_endianness.h 
+	EDS_fw.h EDS_fwServices.h EDS_tag.h FFS.h LCBV.h TMR.h 
+Log Message:
+Removing flight software from this package (it is moving to an external library, or set of libraries)
+    *
+------------------------------------------------------------
 User: usher  Fri Jun  9 13:48:42 PDT 2006
 OnboardFilter/flight/EDS
 
