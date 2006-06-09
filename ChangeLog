@@ -1,4 +1,18 @@
 ------------------------------------------------------------
+User: usher  Fri Jun  9 13:49:49 PDT 2006
+OnboardFilter/flight/RFC_DB/src
+
+Removed Files:
+	.cvsignore RFC_DB_default.c RFC_DB_default.h RFC_DB_default.ph 
+	RFC_DB_macros.h RFC_DB_master.c RFC_DB_master.h 
+	RFC_DB_master.ph RFC_DB_normal.c RFC_DB_normal.h 
+	RFC_DB_normal.ph ren.csh rfc_db_default.cab.c 
+	rfc_db_default.cab.ph rfc_db_master.cab.c rfc_db_master.cab.ph 
+	rfc_db_normal.cab.c rfc_db_normal.cab.ph 
+Log Message:
+Removing flight software from this package (it is moving to an external library, or set of libraries)
+    *
+------------------------------------------------------------
 User: usher  Fri Jun  9 13:49:48 PDT 2006
 OnboardFilter/flight/RFC_DB/sdf
 
