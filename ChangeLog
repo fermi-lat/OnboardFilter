@@ -1,4 +1,16 @@
 ------------------------------------------------------------
+User: usher  Fri Jun  9 13:49:40 PDT 2006
+OnboardFilter/flight/PBS/ptd
+
+Removed Files:
+	test_rng.c test_rng.cidc test_spin.c test_spin.cidc 
+	test_task.c test_task.cidc test_tmr.c test_tmr.cidc test_tov.c 
+	test_tov.cidc test_wct.c test_wct.cidc test_wut.c 
+	test_wut.cidc 
+Log Message:
+Removing flight software from this package (it is moving to an external library, or set of libraries)
+    *
+------------------------------------------------------------
 User: usher  Fri Jun  9 13:49:27 PDT 2006
 OnboardFilter/flight/PBS/ptd
 
