@@ -1,5 +1,16 @@
 ------------------------------------------------------------
 User: usher  Fri Jun  9 13:48:28 PDT 2006
+OnboardFilter/flight/CGB_DB/src
+
+Removed Files:
+	.cvsignore CAL_DB_gains.c CAL_DB_gains.h CAL_DB_gains.ph 
+	CAL_DB_pedestals.c CAL_DB_pedestals.h CAL_DB_pedestals.ph 
+	cal_db_create.c cal_gains.h cal_pedestals.h 
+Log Message:
+Removing flight software from this package (it is moving to an external library, or set of libraries)
+    *
+------------------------------------------------------------
+User: usher  Fri Jun  9 13:48:28 PDT 2006
 OnboardFilter/flight/CGB_DB/sdf
 
 Removed Files:
