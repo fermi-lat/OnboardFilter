@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: usher  Fri Jun  9 13:48:42 PDT 2006
+OnboardFilter/flight/EDST/src
+
+Removed Files:
+	EDST_compareList.c EDST_errBuff.c ebf_diff.c ebf_diff.cidc 
+Log Message:
+Removing flight software from this package (it is moving to an external library, or set of libraries)
+    *
+------------------------------------------------------------
 User: usher  Fri Jun  9 13:48:41 PDT 2006
 OnboardFilter/flight/EDST/sdf
 
