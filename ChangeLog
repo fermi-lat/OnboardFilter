@@ -1,4 +1,30 @@
 ------------------------------------------------------------
+User: usher  Fri Jun  9 13:49:25 PDT 2006
+OnboardFilter/flight/PBS/PBS/impl
+
+Removed Files:
+	BSWP.ih.big_endian BSWP.ih.little_endian BSWP.ih.xx-ppc-gcc 
+	BSWP.ih.xx-x86-gcc BSWP.ih.xx-xxx-xxx CACHE.h.xx-ppc-xxx 
+	CACHE.h.xx-xxx-xxx FFS.ih.xx-ppc-gcc FFS.ih.xx-x86-gcc 
+	FFS.ih.xx-xxx-xxx INT.ih.vx-xxx-xxx INT.ih.xx-xxx-xxx 
+	MBA.h.vx-xxx-xxx MBA.h.xx-xxx-xxx MTX.h.px-xxx-xxx 
+	MTX.h.vx-xxx-xxx MTX.ih.px-xxx-xxx MTX.ih.vx-xxx-xxx 
+	PBS.h.px-xxx-xxx PBS.h.vx-xxx-xxx PTS.h.sx-xxx-xxx 
+	PTS.h.xx-ppc-gcc PTS.h.xx-x86-gcc PTS.h.xx-xxx-xxx 
+	REG.h.xx-ppc-gcc REG.h.xx-xxx-xxx RW.ih.px-xxx-xxx 
+	RW.ih.vx-xxx-xxx RW_pubdefs.h.px-xxx-xxx 
+	RW_pubdefs.h.vx-xxx-xxx SEM.h.px-xxx-xxx SEM.h.vx-xxx-xxx 
+	SEM.ih.px-xxx-xxx SEM.ih.vx-xxx-xxx SPIN.ih.lx-xxx-xxx 
+	SPIN.ih.sx-xxx-scc SPIN.ih.xx-ppc-gcc SPIN_time.h.lx-xxx-xxx 
+	SPIN_time.h.sx-xxx-scc SPIN_time.h.xx-ppc-gcc 
+	TASK.h.px-xxx-xxx TASK.h.vx-xxx-xxx TASK.ih.px-xxx-xxx 
+	TASK.ih.vx-xxx-xxx TAU.h.vx-ppc750-xxx TAU.h.xx-xxx-xxx 
+	TAU.ih.xx-ppc750-gcc TAU.ih.xx-xxx-xxx TBD.ih.px-xxx-xxx 
+	TBD.ih.vx-xxx-xxx TOV.h.px-xxx-xxx TOV.h.vx-xxx-xxx 
+Log Message:
+Removing flight software from this package (it is moving to an external library, or set of libraries)
+    *
+------------------------------------------------------------
 User: usher  Fri Jun  9 13:49:24 PDT 2006
 OnboardFilter/flight/PBS/PBS
 
