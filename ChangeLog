@@ -1,5 +1,14 @@
 ------------------------------------------------------------
 User: usher  Fri Jun  9 13:48:28 PDT 2006
+OnboardFilter/flight/CGB_DB/sdf
+
+Removed Files:
+	CGB.log CGB_DB.release_notes 
+Log Message:
+Removing flight software from this package (it is moving to an external library, or set of libraries)
+    *
+------------------------------------------------------------
+User: usher  Fri Jun  9 13:48:28 PDT 2006
 OnboardFilter/flight/CGB_DB/cmt
 
 Removed Files:
