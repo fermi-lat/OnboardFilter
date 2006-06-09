@@ -1,4 +1,28 @@
 ------------------------------------------------------------
+User: usher  Fri Jun  9 13:49:45 PDT 2006
+OnboardFilter/flight/PBS/src/impl
+
+Removed Files:
+	MBA.c.vx-ppc-gcc MBA.c.xx-xxx-xxx MTX.c.vx-ppc-gcc 
+	MTX.c.xx-xxx-xxx PARITY.c.xx-ppc-gcc PARITY.c.xx-xxx-xxx 
+	PBS.c.vx-ppc-gcc PBS.c.xx-xxx-xxx PTS.c.lx-xxx-xxx 
+	PTS.c.sx-xxx-xxx PTS.c.vx-ppc-gcc RW.c.px-xxx-xxx 
+	RW.c.vx-xxx-xxx RW_tmr.c.px-xxx-xxx RW_tmr.c.vx-xxx-xxx 
+	RW_tmr.h.px-xxx-xxx RW_tmr.h.vx-xxx-xxx RW_tmr.ih.px-xxx-xxx 
+	RW_tmr.ih.vx-xxx-xxx SEM.c.vx-ppc-gcc SEM.c.xx-xxx-xxx 
+	TASK.c.px-xxx-xxx TASK.c.vx-xxx-xxx TASK_pvtdefs.h.px-xxx-xxx 
+	TASK_pvtdefs.h.vx-xxx-xxx TAU.c.vx-ppc750-gcc TAU.c.xx-xxx-xxx 
+	TBD.c.px-xxx-xxx TBD.c.vx-xxx-xxx TBD_pvtdefs.h.px-xxx-xxx 
+	TBD_pvtdefs.h.vx-xxx-xxx TOV.c.px-xxx-xxx TOV.c.vx-xxx-xxx 
+	TOV_pvtdefs.h.px-xxx-xxx WCT.c.ux-xxx-xxx WCT.c.vx-xxx-xxx 
+	WCT_pvtdefs.h.ux-xxx-xxx WCT_pvtdefs.h.vx-xxx-xxx 
+	WCT_pvtdefs.ih.ux-xxx-xxx WCT_pvtdefs.ih.vx-xxx-xxx 
+	WUT.c.px-xxx-xxx WUT.c.vx-ppc-gcc WUT_debug.c.px-xxx-xxx 
+	WUT_debug.c.vx-xxx-xxx 
+Log Message:
+Removing flight software from this package (it is moving to an external library, or set of libraries)
+    *
+------------------------------------------------------------
 User: usher  Fri Jun  9 13:49:44 PDT 2006
 OnboardFilter/flight/PBS/src
 
