@@ -1,5 +1,16 @@
 ------------------------------------------------------------
 User: usher  Fri Jun  9 13:48:54 PDT 2006
+OnboardFilter/flight/EFC/ptd
+
+Removed Files:
+	displaytest.c displaytest.cidc edmtest.c edmtest.cidc 
+	ld-filter.vx splashtest.c splashtest.cidc tkrremaptest.c 
+	tkrremaptest.cidc tkrtrgformtest.c tkrtrgformtest.cidc 
+Log Message:
+Removing flight software from this package (it is moving to an external library, or set of libraries)
+    *
+------------------------------------------------------------
+User: usher  Fri Jun  9 13:48:54 PDT 2006
 OnboardFilter/flight/EFC/cmt
 
 Removed Files:
