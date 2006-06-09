@@ -1,5 +1,16 @@
 ------------------------------------------------------------
 User: usher  Fri Jun  9 13:49:13 PDT 2006
+OnboardFilter/flight/MSG/ptd/LTX
+
+Removed Files:
+	test_msg_mt.ux.py test_msg_mt.ux.xml test_msg_mt.vx.py 
+	test_msg_mt.vx.slac test_msg_mt.vx.xml test_msg_st.ux.py 
+	test_msg_st.ux.xml 
+Log Message:
+Removing flight software from this package (it is moving to an external library, or set of libraries)
+    *
+------------------------------------------------------------
+User: usher  Fri Jun  9 13:49:13 PDT 2006
 OnboardFilter/flight/MSG/doc
 
 Removed Files:
