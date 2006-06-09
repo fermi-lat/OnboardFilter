@@ -1,4 +1,15 @@
 ------------------------------------------------------------
+User: usher  Fri Jun  9 13:48:27 PDT 2006
+OnboardFilter/flight/CDM/src
+
+Removed Files:
+	CDM_manager.c CDM_manager.ph CDM_manager.phsav CDM_msgs.c 
+	CDM_msgs.msg CDM_msgs.ph CDM_prvdefs.h CDM_utility.c 
+	CDM_utility.ph cdm.cidc 
+Log Message:
+Removing flight software from this package (it is moving to an external library, or set of libraries)
+    *
+------------------------------------------------------------
 User: usher  Fri Jun  9 13:48:26 PDT 2006
 OnboardFilter/flight/CDM/sdf
 
