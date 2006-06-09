@@ -1,5 +1,17 @@
 ------------------------------------------------------------
 User: usher  Fri Jun  9 13:48:46 PDT 2006
+OnboardFilter/flight/EDS/ptd
+
+Removed Files:
+	ebf_sivtest.c ebf_sivtest.cidc ebf_tkrtest.c ebf_tkrtest.cidc 
+	ebf_unpacktest.c ebf_unpacktest.cidc ecr_caltest.cidc 
+	eds_posttest.c eds_posttest.cidc ffstest.c ffstest.cidc 
+	tmrtest.c tmrtest.cidc 
+Log Message:
+Removing flight software from this package (it is moving to an external library, or set of libraries)
+    *
+------------------------------------------------------------
+User: usher  Fri Jun  9 13:48:46 PDT 2006
 OnboardFilter/flight/EDS/doc
 
 Removed Files:
