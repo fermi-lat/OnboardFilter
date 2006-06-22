@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: burnett  Thu Jun 22 15:08:07 PDT 2006
+OnboardFilter/cmt
+
+Modified Files:
+	requirements 
+Log Message:
+fix to build and start test program
+    *
+------------------------------------------------------------
 TAG
 Tag name: v3r1p0, operation: add
 Package: OnboardFilter
