@@ -3,7 +3,7 @@
 * @brief This is needed for forcing the linker to load all components
 * of the library.
 *
-*  $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/Dll/OnboardFilter_load.cxx,v 1.5 2004/07/12 19:47:27 golpa Exp $
+*  $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/Dll/OnboardFilter_load.cxx,v 1.7 2005/09/06 16:42:29 burnett Exp $
 */
 
 #include "GaudiKernel/DeclareFactoryEntries.h"
@@ -14,5 +14,6 @@ DECLARE_FACTORY_ENTRIES(OnboardFilter) {
     DECLARE_ALGORITHM(OnboardFilter);
     DECLARE_ALGORITHM(FilterTracks);
 	DECLARE_ALGORITHM(FilterAlg);
+    DECLARE_ALGORITHM(FilterAlgTuple);
     DECLARE_TOOL(FilterDisplay);
 } 
