@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: burnett  Fri Jun 23 08:44:59 PDT 2006
+OnboardFilter/src/Dll
+
+Modified Files:
+	OnboardFilter_load.cxx 
+Log Message:
+forgot to set the algorithm :-(
+    *
+------------------------------------------------------------
 User: burnett  Fri Jun 23 08:44:58 PDT 2006
 OnboardFilter/cmt
 
