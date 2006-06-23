@@ -1,4 +1,41 @@
 ------------------------------------------------------------
+TAG
+Tag name: v4r0p1, operation: add
+Package: OnboardFilter
+User: burnett  Fri Jun 23 08:45:33 2006
+Files:
+  OnboardFilter/.cvsignore  1.2
+  OnboardFilter/ChangeLog  1.644
+  OnboardFilter/OnboardFilter/FilterAlg.h  1.5
+  OnboardFilter/OnboardFilter/FilterTracks.h  1.11
+  OnboardFilter/OnboardFilter/filter_rto.h  1.1
+  OnboardFilter/OnboardFilter/OnboardFilterTDS.h  1.2
+  OnboardFilter/OnboardFilter/FilterStatus.h  1.31
+  OnboardFilter/OnboardFilter/FilterAlgTds.h  1.5
+  OnboardFilter/OnboardFilter/FilterDisplay.h  1.5
+  OnboardFilter/OnboardFilter/LogInfoDef.h  1.1
+  OnboardFilter/cmt/.cvsignore  1.2
+  OnboardFilter/cmt/requirements  1.63
+  OnboardFilter/cmt/Makefile  1.4
+  OnboardFilter/doc/release.notes  1.45
+  OnboardFilter/doc/OnboardFilter.jpg  1.2
+  OnboardFilter/src/FilterStatus.cxx  1.14
+  OnboardFilter/src/FilterTracks.cxx  1.23
+  OnboardFilter/src/FilterDisplay.cxx  1.7
+  OnboardFilter/src/FilterAlg.cxx  1.8
+  OnboardFilter/src/FilterAlg_projectionFind.h  1.1
+  OnboardFilter/src/.cvsignore  1.1
+  OnboardFilter/src/FilterAlgTds.cxx  1.5
+  OnboardFilter/src/FilterAlgTuple.cxx  1.1
+  OnboardFilter/src/FilterAlg_acd.h  1.4
+  OnboardFilter/src/FilterAlg_skirt.h  1.1
+  OnboardFilter/src/OnboardFilter.cxx  1.53
+  OnboardFilter/src/Dll/OnboardFilter_dll.cxx  1.5
+  OnboardFilter/src/Dll/OnboardFilter_load.cxx  1.8
+  OnboardFilter/src/test/jobOptions.txt  1.11
+
+    *
+------------------------------------------------------------
 User: burnett  Fri Jun 23 08:44:59 PDT 2006
 OnboardFilter/src/Dll
 
