@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: burnett  Fri Jun 23 08:44:58 PDT 2006
+OnboardFilter/cmt
+
+Modified Files:
+	requirements 
+Log Message:
+forgot to set the algorithm :-(
+    *
+------------------------------------------------------------
 TAG
 Tag name: v4r0, operation: add
 Package: OnboardFilter
