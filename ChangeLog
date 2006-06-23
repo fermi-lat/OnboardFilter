@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: burnett  Fri Jun 23 08:24:50 PDT 2006
+OnboardFilter/doc
+
+Modified Files:
+	release.notes 
+Log Message:
+tagging after move of tuple code, fix of IExternal interface package
+    *
+------------------------------------------------------------
 User: burnett  Fri Jun 23 08:24:49 PDT 2006
 OnboardFilter/cmt
 
