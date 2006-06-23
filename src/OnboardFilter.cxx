@@ -6,7 +6,7 @@
 
 \verbatim
 
-  CVS $Id: OnboardFilter.cxx,v 1.51 2006/06/09 20:55:11 usher Exp $
+  CVS $Id: OnboardFilter.cxx,v 1.52 2006/06/09 21:18:30 usher Exp $
 \endverbatim
 
                                                                           */
@@ -39,9 +39,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <errno.h>
-
 #include "src/filter_rto.h"
-
 #include "EFC_DB/EFC_DB_schema.h"
 #include "GFC_DB/GFC_DB_schema.h"
 #include "GFC_DB/GFC_DB_instance.h"
