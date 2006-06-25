@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: burnett  Sun Jun 25 11:53:20 PDT 2006
+OnboardFilter/cmt
+
+Modified Files:
+	requirements 
+Log Message:
+clean up code a little, replace printf statements; ready to tag.
+    *
+------------------------------------------------------------
 TAG
 Tag name: v4r0p1, operation: add
 Package: OnboardFilter
