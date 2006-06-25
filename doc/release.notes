@@ -2,7 +2,8 @@
  * @file release.notes
  * @brief Package OnboardFilter
  * @verbatim
- * v4r0   06-jun-2006  THB : Move tuple-generating code from meritAlg to new alg (FilterAlgTuple) here
+ * v4r0p2 25-jun-2006  THB : replace printf debug statements
+ * v4r0   23-jun-2006  THB : Move tuple-generating code from meritAlg to new alg (FilterAlgTuple) here
  * v3r1p0 Solstice'06   TU : First version with flight external libraries
  * v3r0p1 10-apr-2006  REH : divide by zero fix, pointer init in EBF_dir
  * v3r0   15-mar-2006  REH : major upgrade, using shared libraries for configuration

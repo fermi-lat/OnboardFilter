@@ -1,12 +1,12 @@
 /* ---------------------------------------------------------------------- *//*!
 
-   \file  filter.c
-   \brief Driver program to test filtering code
+   \file  OnboardFilter.cxx
+   \brief  run filter
    \author JJRussell - russell@slac.stanford.edu
 
 \verbatim
 
-  CVS $Id: OnboardFilter.cxx,v 1.52 2006/06/09 21:18:30 usher Exp $
+  CVS $Id: OnboardFilter.cxx,v 1.53 2006/06/23 15:20:58 burnett Exp $
 \endverbatim
 
                                                                           */
@@ -39,24 +39,15 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <errno.h>
-#include "src/filter_rto.h"
+#include "src/filter_rto.h"  // where is this? 
 #include "EFC_DB/EFC_DB_schema.h"
 #include "GFC_DB/GFC_DB_schema.h"
 #include "GFC_DB/GFC_DB_instance.h"
 #include "RFC_DB/RFC_DB_schema.h"
 #include "RFC_DB/RFC_DB_instance.h"
 
-//#include "EFC/EDM.h"
 #include "EFC/EFC.h"
 #include "EFC/EFC_edsFw.h"
-//#include "EFC/GFC_resultsPrint.h"
-//#include "EFC/RFC_resultsPrint.h"
-//#include "EFC/EFC_display.h"
-
-//#include "../flight/EDS/src/EDS_fwPvt.h"
-//#include "EDS/EDS_fw.h"
-//#include "EDS/TMR.h"
-//#include "EDS/LCBV.h"
 #include "EDS/io/LCBP.h"
 #include "EDS/io/EBF_stream.h"
 #include "EDS/io/EBF_evts.h"
@@ -76,27 +67,9 @@
 
 #include "EFC/GFC.h"
 #include "EFC/GFC_resultsPrint.h"
-//#include "EFC/GFC_statsPrint.h"
-//#include "EFC/GFC_cfgPrint.h"
-//#include "EFC/GFC_status.h"
-//#include "EFC/GFC_stats.h"
-
-//#include "../flight/EFC/src/GFC_def.h"
-//#include "../flight/EFC/src/GFC_resultDef.h"
-
 #include "EFC/RFC.h"
 #include "EFC/RFC_resultsPrint.h"
-//#include "EFC/RFC_statsPrint.h"
-//#include "EFC/RFC_cfgPrint.h"
-//#include "EFC/RFC_status.h"
-//#include "EFC/RFC_stats.h"
-
-//#include "../flight/EFC/src/RFC_def.h"
 #include "EFC/src/RFC_resultDef.h"
-
-//#include "EDS/EBF_evt.h"
-//#include "EDS/EBF_pkt.h"
-//#include "EDS/EBF_mc.h"
 #include "EDS/EBF_dir.h"
 #include "EDS/ECR_cal.h"
 #include "EDS/EBF_cid.h"
@@ -134,7 +107,6 @@
 #include "OnboardFilter/OnboardFilterTDS.h"
 #include "facilities/Util.h"
 
-//#include "CDM_prvdefs.h"
 
 
 /* ====================================================================== */
@@ -493,13 +465,20 @@ int OnboardFilter::loadLib (const char *library_name, int verbose, int libs)
 
 StatusCode OnboardFilter::initialize()
 {
+
+    MsgStream log(msgSvc(), name());
+   
     Stream ostreams[2];
     eventCount = 0;
     eventProcessed = 0;
     eventBad = 0;
 //   MsgStream log(msgSvc(),name());
     setProperties();
+#if 0
     printf("Initializing Filter Settings\n");
+#else
+    log << MSG::INFO << "Initializing Filter Settings" << endreq;
+#endif
     int      status; 
     status = rtoFill (&m_rto); 
 
@@ -519,38 +498,39 @@ StatusCode OnboardFilter::initialize()
     std::string delim = "/lib";
 #endif
 
+    int verbose(0); // wired in??
     std::string calPedFile = m_FileNamePath + delim + m_FileName_Pedestals + fType;
-    loadLib (calPedFile.c_str(),1,0);
+    loadLib (calPedFile.c_str(),verbose,0);
     
     std::string calGainFile = m_FileNamePath + delim + m_FileName_Gains + fType;
-    loadLib (calGainFile.c_str(),1,0);
+    loadLib (calGainFile.c_str(),verbose,0);
     
     std::string gfc_db_File = m_FileNamePath + delim +  "gfc_db_master" + fType;
-    loadLib (gfc_db_File.c_str(),1,0);
+    loadLib (gfc_db_File.c_str(),verbose,0);
     
     gfc_db_File = m_FileNamePath + delim + "gfc_db_default" + fType;
-    loadLib (gfc_db_File.c_str(),1,0);
+    loadLib (gfc_db_File.c_str(),verbose,0);
     
     gfc_db_File = m_FileNamePath + delim + "gfc_db_normal" + fType;
-    loadLib (gfc_db_File.c_str(),1,0);
+    loadLib (gfc_db_File.c_str(),verbose,0);
 
     std::string rfc_db_File = m_FileNamePath + delim + "rfc_db_master" + fType;
-    loadLib (rfc_db_File.c_str(),1,0);
+    loadLib (rfc_db_File.c_str(),verbose,0);
 
     rfc_db_File = m_FileNamePath + delim + "rfc_db_default" + fType;
-    loadLib (rfc_db_File.c_str(),1,0);
+    loadLib (rfc_db_File.c_str(),verbose,0);
 
     rfc_db_File = m_FileNamePath + delim + "rfc_db_normal" + fType;
-    loadLib (rfc_db_File.c_str(),1,0);
+    loadLib (rfc_db_File.c_str(),verbose,0);
 
     std::string eds_db_File = m_FileNamePath + delim + "eds_db" + fType;
-    loadLib (eds_db_File.c_str(),1,0);
+    loadLib (eds_db_File.c_str(),verbose,0);
 
     std::string geo_db_File = m_FileNamePath + delim + "geo_db" + fType;
-    loadLib (geo_db_File.c_str(),1,0);
+    loadLib (geo_db_File.c_str(),verbose,0);
 
     std::string ggf_db_File = m_FileNamePath + delim + "ggf_db" + fType;
-    loadLib (ggf_db_File.c_str(),1,0);
+    loadLib (ggf_db_File.c_str(),verbose,0);
 
    /* Print information about the runtime options */
 //   filter_rtoPrint (&m_rto);
@@ -618,7 +598,11 @@ StatusCode OnboardFilter::initialize()
    /* Find the filter and get it ready for action */
    schema       = EFC_lookup (GFC_DB_SCHEMA, GFC_DB_INSTANCE_K_MASTER);
    const char               *fnd = schema->eds.get;
+#if 0
    printf("fnd %s\n",fnd);
+#else
+   log << MSG::DEBUG << "fnd " << fnd << endreq;
+#endif
    get          = (const EDS_DB_HandlerConstructServices*(*)(void*)) CMX_lookupSymbol(fnd);
    services     = (EDS_DB_HandlerConstructServices *)get (0);
    efc          = (EFC *)allocate (services->sizeOf (schema, &ctx), "Efc");
@@ -631,7 +615,11 @@ StatusCode OnboardFilter::initialize()
    /* Find the filter and get it ready for action */
    schemaRFC       = EFC_lookup (RFC_DB_SCHEMA, RFC_DB_INSTANCE_K_MASTER);
    const char               *fndRFC = schemaRFC->eds.get;
+#if 0
    printf("fndRFC %s\n",fndRFC);
+#else
+   log << MSG::DEBUG << "fndRFC "<< fndRFC << endreq;
+#endif
    getRFC          = (const EDS_DB_HandlerConstructServices*(*)(void*)) CMX_lookupSymbol(fndRFC);
    servicesRFC     = (EDS_DB_HandlerConstructServices *)getRFC (0);
    efcRFC          = (EFC *)allocate (servicesRFC->sizeOf (schemaRFC, &ctxRFC), "Efc_rfc");
@@ -810,6 +798,9 @@ int OnboardFilter::myOutputFlush (Stream *stream, int reason)
 StatusCode OnboardFilter::execute()
 //int doFilter (const EFC_rto *rto)
 {
+
+    MsgStream log(msgSvc(), name());
+
     unsigned int             status;
     EBF_stream                 *ebf;
     EBF_evts                   evts;
@@ -855,7 +846,11 @@ StatusCode OnboardFilter::execute()
 // Check for ebf on tds
     SmartDataPtr<EbfWriterTds::Ebf> ebfData(eventSvc(),"/Event/Filter/Ebf");
     if(!ebfData){
+#if 0
       printf(" status %x energy %d passed? %d  ! noebf\n",0,0,0);
+#else
+        log << MSG::DEBUG << "Status, energy, passed? "<<endreq;
+#endif
 //      printf("   no ebf on tds, returning\n");
       return StatusCode::SUCCESS;
     }
@@ -864,13 +859,22 @@ StatusCode OnboardFilter::execute()
     unsigned int length;
     char *data=ebfData->get(length);
     if(length==0){
+#if 0
       printf("Event has no EBF data. Ignoring\n");
+#else
+        log << MSG::WARNING << "Event has no EBF data. Ignoring" << endreq;
+#endif
       return StatusCode::SUCCESS;
     }
 
     ebf = EBF_streamOpen(EBF_STREAM_TYPE_K_DATA,data,length);
     if (ebf == NULL){
+#if 0
       printf("Unable to pass ebf data to the ebf reader\n");
+#else
+        log << MSG::WARNING << "Unable to pass ebf data to the ebf reader" << endreq;
+
+#endif
       return StatusCode::SUCCESS;
     }
 
@@ -885,8 +889,12 @@ StatusCode OnboardFilter::execute()
     if (ievts != 1) 
     {
         eventBad++;
+#if 0
         printf("OnboardFilter::execute; eventBad %d count %d\n",
             eventBad,eventCount);
+#else
+        log << MSG::WARNING << "eventbad " << eventBad << " count " << eventCount<< endreq;
+#endif
     }
     eventProcessed++;
  
