@@ -1,5 +1,14 @@
 ------------------------------------------------------------
 User: burnett  Sun Jun 25 11:53:21 PDT 2006
+OnboardFilter/src
+
+Modified Files:
+	OnboardFilter.cxx 
+Log Message:
+clean up code a little, replace printf statements; ready to tag.
+    *
+------------------------------------------------------------
+User: burnett  Sun Jun 25 11:53:21 PDT 2006
 OnboardFilter/doc
 
 Modified Files:
