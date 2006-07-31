@@ -213,7 +213,14 @@ namespace OnboardFilterTds{
     void setYangleL(const double yangleL);
     void setXlongestB(const double xlongestB);
     void setYlongestB(const double ylongestB);
+    void setBestTrack(int xHits,int yHits,
+                              double slopeXZ,double slopeYZ,
+                              double intXZ,double intYZ);
 
+    void getBestTrack(int &xHits,int &yHits,
+                              double &slopeXZ,double &slopeYZ,
+                              double &intXZ,double &intYZ);
+ 
     double getHoughSep() const;
     double getHighLayer() const;
 
@@ -293,6 +300,14 @@ namespace OnboardFilterTds{
    int m_gem_sent;
     LogInfo m_logData[16*8*12];    // 16 towers * 8 layers * 12 logs
 
+//
+// BestTRack info
+    int m_xHits;
+    int m_yHits;
+    double m_slopeXZ;
+    double m_slopeYZ;
+    double m_intXZ;
+    double m_intYZ;
 
    int m_numLogsHit;
     ///ACD hit map
@@ -508,6 +523,31 @@ namespace OnboardFilterTds{
   inline void FilterStatus::set(const unsigned int code){
     m_status=code;
   }
+
+  inline void FilterStatus::setBestTrack(
+                              int xHits,int yHits,
+                              double slopeXZ,double slopeYZ,
+                              double intXZ,double intYZ){
+    m_xHits    = xHits;
+    m_yHits    = yHits;
+    m_slopeXZ  = slopeXZ;
+    m_slopeYZ  = slopeYZ;
+    m_intXZ    = intXZ;
+    m_intYZ    = intYZ;
+  }
+
+  inline void FilterStatus::getBestTrack(
+                              int &xHits,int &yHits,
+                              double &slopeXZ,double &slopeYZ,
+                              double &intXZ,double &intYZ){
+    xHits    = m_xHits;
+    yHits    = m_yHits;
+    slopeXZ  = m_slopeXZ;
+    slopeYZ  = m_slopeYZ;
+    intXZ    = m_intXZ;
+    intYZ    = m_intYZ;
+  }
+
 
   inline void FilterStatus::setStageEnergy(const int stageEnergy){
     m_stageEnergy=stageEnergy;//must divide by 4 to get MeV units
