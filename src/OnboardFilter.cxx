@@ -6,7 +6,7 @@
 
 \verbatim
 
-  CVS $Id: OnboardFilter.cxx,v 1.53 2006/06/23 15:20:58 burnett Exp $
+  CVS $Id: OnboardFilter.cxx,v 1.54 2006/06/25 18:53:21 burnett Exp $
 \endverbatim
 
                                                                           */
@@ -55,7 +55,6 @@
 
 #include "CDM/CDM_pubdefs.h"
 #include "CMX/CMX_lookupPub.h"
- 
 
 
 /* ---------------------------------------------------------------------- *\
@@ -80,6 +79,7 @@
 #include "EDS/EDR_tkrUnpack.h"
 #include "EDS/EDR_calUnpack.h"
 #include "EDS/EDR_calPrint.h"
+#include "EFC/TFC_projectionPrint.h"
 
 #if       defined (EFC_DFILTER)
 #include "EFC/EFC_display.h"
@@ -105,6 +105,7 @@
 #include "EbfWriter/Ebf.h"
 #include "OnboardFilter/FilterStatus.h"
 #include "OnboardFilter/OnboardFilterTDS.h"
+#include "OnboardFilter/trackProj.hh" 
 #include "facilities/Util.h"
 
 
@@ -236,7 +237,6 @@ typedef struct _FilterCtx
 FilterCtx;
 /* ====================================================================== */
 
-
 class FilterInfo
 {
 public:
@@ -265,7 +265,8 @@ public:
     StatusCode initialize();
     StatusCode execute();
     StatusCode finalize();
-
+    trackProj *myTrackProj;
+ 
     int eventCount;
     int eventProcessed;
     int eventBad; 
@@ -352,6 +353,9 @@ public:
     //static const  EFC_definition Gfc_Definitions[2];
     /* ---------------------------------------------------------------------- */
     static   EFC_definition Gfc_Definitions[2];
+    
+
+    
 };
 
 
@@ -467,7 +471,7 @@ StatusCode OnboardFilter::initialize()
 {
 
     MsgStream log(msgSvc(), name());
-   
+    myTrackProj = new trackProj();
     Stream ostreams[2];
     eventCount = 0;
     eventProcessed = 0;
@@ -1040,10 +1044,32 @@ StatusCode OnboardFilter::execute()
     newStatus->setTkr(TDS_variables.tkr);
     newStatus->setLayers(TDS_layers);
     newStatus->setTmsk(TDS_variables.tmsk);
+    printf("newStatus set; tmsk %x\n",TDS_variables.tmsk);
     newStatus->setLogData(TDS_variables.numLogsHit,TDS_variables.logData);
     
     storeHits(hits);
 
+
+// bestracking
+//
+// Find the best track 
+    int flag = 1;  // 0=choose longest tst hits morack; 1=choose track with
+    int xHits = 0;
+    int yHits = 0;
+    double slopeXZ = 0.0;
+    double slopeYZ = 0.0;
+    double intXZ = 0.0;
+    double intYZ = 0.0;
+    if (TDS_variables.tcids > 0) 
+      myTrackProj->execute(flag,newStatus->getProjections(),
+         xHits,yHits,slopeXZ,slopeYZ,
+         intXZ,intYZ);
+//    printf("looking for besttrack xh %d yh %d xz %f yz %f\n",
+//      xHits,yHits,
+//      slopeXZ,slopeYZ);
+//   ~bestTrack;
+    newStatus->setBestTrack(xHits,yHits,slopeXZ,slopeYZ,
+      intXZ,intYZ);
 
     if(m_mask!=0 && (m_mask & (TDS_variables.status >> 15)) !=0){
       this->setFilterPassed(false);
@@ -1312,8 +1338,9 @@ void  OnboardFilter::extractFilterInfo(Stream *ostream, EDS_fwIxb *ixb)
    prjs = (const TFC_projections *)ixb->blk.ptrs[EFC_EDS_FW_OBJ_K_PRJS];
    if (twrMsk == -1) twrMsk  = prjs->twrMsk << 16;
    else              twrMsk &= 0xffff0000;
+//   printf("extractFilterInfo: twrMsk from prjs %x\n",twrMsk);
    TDS_variables.tmsk= twrMsk;
-
+//   TFC_projectionsPrint(prjs,twrMsk);
    while (twrMsk)
    {
       int towerId = FFS (twrMsk);
