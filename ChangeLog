@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: hughes  Mon Jul 31 07:58:12 PDT 2006
+OnboardFilter/src
+
+Added Files:
+	trackProj.cxx 
+Log Message:
+new file for bestTrack calculation
+    *
+------------------------------------------------------------
 TAG
 Tag name: v4r0p2, operation: add
 Package: OnboardFilter
