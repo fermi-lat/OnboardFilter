@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: hughes  Mon Jul 31 09:41:48 PDT 2006
+OnboardFilter/OnboardFilter
+
+Modified Files:
+	FilterStatus.h 
+Log Message:
+modifications for bestTrack calculation
+    *
+------------------------------------------------------------
 User: hughes  Mon Jul 31 07:58:34 PDT 2006
 OnboardFilter/src
 
