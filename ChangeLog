@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: hughes  Mon Jul 31 07:58:34 PDT 2006
+OnboardFilter/src
+
+Modified Files:
+	OnboardFilter.cxx 
+Log Message:
+modifications for bestTrack calculation
+    *
+------------------------------------------------------------
 User: hughes  Mon Jul 31 07:58:22 PDT 2006
 OnboardFilter/OnboardFilter
 
