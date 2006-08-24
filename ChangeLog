@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: heather  Thu Aug 24 15:13:57 PDT 2006
+OnboardFilter/cmt
+
+Modified Files:
+	requirements 
+Log Message:
+remove TDS classes and move to OnboardFilterTds
+    *
+------------------------------------------------------------
 User: heather  Thu Aug 24 15:13:56 PDT 2006
 OnboardFilter/OnboardFilter
 
