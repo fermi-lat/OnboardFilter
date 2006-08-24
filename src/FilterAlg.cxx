@@ -23,7 +23,7 @@
 #include "Event/MonteCarlo/McParticle.h"
 #include "EbfWriter/Ebf.h"
 
-#include "OnboardFilter/FilterStatus.h"
+#include "OnboardFilterTds/FilterStatus.h"
 #include "OnboardFilter/FilterAlg.h" 
 
 

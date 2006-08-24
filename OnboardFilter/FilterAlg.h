@@ -25,8 +25,8 @@
 
 #include <string>
 
-#include "OnboardFilter/FilterStatus.h"
-#include "OnboardFilter/FilterAlgTds.h"
+#include "OnboardFilterTds/FilterStatus.h"
+#include "OnboardFilterTds/FilterAlgTds.h"
 
 //#include "FilterAlg_acd.h"
 

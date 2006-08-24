@@ -3,13 +3,13 @@
  * @brief Algorithm to compute tracks from the Filter's projections
  * @author Navid Golpayeagani - golpa@milkyway.gsfc.nasa.gov
  * @author David Wren - dnwren@milkyway.gsfc.nasa.gov
- * $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/OnboardFilter/FilterTracks.h,v 1.10 2005/09/02 19:08:29 hughes Exp $
+ * $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/OnboardFilter/FilterTracks.h,v 1.11 2005/09/22 15:38:53 hughes Exp $
  */
 
 #ifndef _FILTER_TRACKS_H_
 #define _FILTER_TRACKS_H_
 
-#include "OnboardFilter/FilterStatus.h"
+#include "OnboardFilterTds/FilterStatus.h"
 
 #include "GaudiKernel/Algorithm.h"
 #include "GaudiKernel/MsgStream.h"
@@ -18,6 +18,8 @@
 #include "GaudiKernel/SmartDataPtr.h"
 #include "GaudiKernel/Property.h"
 #include "GlastSvc/GlastDetSvc/IGlastDetSvc.h"
+
+#include "TkrUtil/ITkrGeometrySvc.h"
 
 #include "Event/TopLevel/EventModel.h"
 #include "Event/MonteCarlo/McParticle.h"

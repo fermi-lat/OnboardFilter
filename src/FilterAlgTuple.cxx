@@ -2,7 +2,7 @@
 /** @file FilterAlgTuple.cxx
 @brief Declaration and implementation of FilterAlgTuple
 
-$Header:$
+$Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/FilterAlgTuple.cxx,v 1.1 2006/06/23 15:21:42 burnett Exp $
 
 */
 #include "ntupleWriterSvc/INTupleWriterSvc.h"
@@ -13,8 +13,8 @@ $Header:$
 #include "GaudiKernel/AlgFactory.h"
 #include "GaudiKernel/SmartDataPtr.h"
 
-#include "OnboardFilter/FilterStatus.h"
-#include "OnboardFilter/FilterAlgTds.h"
+#include "OnboardFilterTds/FilterStatus.h"
+#include "OnboardFilterTds/FilterAlgTds.h"
 
 #include <string>
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
