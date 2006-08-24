@@ -6,7 +6,7 @@
 
 \verbatim
 
-  CVS $Id: OnboardFilter.cxx,v 1.54 2006/06/25 18:53:21 burnett Exp $
+  CVS $Id: OnboardFilter.cxx,v 1.55 2006/07/31 14:58:34 hughes Exp $
 \endverbatim
 
                                                                           */
@@ -93,6 +93,7 @@
 
  
 #include "GaudiKernel/Algorithm.h"
+#include "GaudiKernel/MsgStream.h"
 
 #include "GaudiKernel/AlgFactory.h"
 #include "GaudiKernel/IDataProviderSvc.h"
@@ -103,7 +104,7 @@
 #include "Event/TopLevel/EventModel.h"
 #include "Event/MonteCarlo/McParticle.h"
 #include "EbfWriter/Ebf.h"
-#include "OnboardFilter/FilterStatus.h"
+#include "OnboardFilterTds/FilterStatus.h"
 #include "OnboardFilter/OnboardFilterTDS.h"
 #include "OnboardFilter/trackProj.hh" 
 #include "facilities/Util.h"

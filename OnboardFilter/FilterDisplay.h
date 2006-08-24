@@ -3,7 +3,7 @@
 /**
  * @file DetectorDisplay.h
  * @brief Classes to display computed tracks in the Gui
- * $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/OnboardFilter/FilterDisplay.h,v 1.3 2004/07/12 19:47:16 golpa Exp $
+ * $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/OnboardFilter/FilterDisplay.h,v 1.5 2005/09/02 19:08:18 hughes Exp $
  */
 
 #include "GaudiKernel/MsgStream.h"
@@ -27,7 +27,7 @@ public:
     StatusCode initialize(gui::GuiMgr *);
 };
 
-#include "OnboardFilter/FilterStatus.h"
+#include "OnboardFilterTds/FilterStatus.h"
 #include "gui/DisplayRep.h"
 #include "GaudiKernel/IDataProviderSvc.h"
 #include "GaudiKernel/SmartDataPtr.h"
@@ -41,7 +41,7 @@ class FilterTrackDisplay : public gui::DisplayRep{
   IDataProviderSvc *dps;
 };
 
-#include "OnboardFilter/FilterStatus.h"
+#include "OnboardFilterTds/FilterStatus.h"
 #include "gui/DisplayRep.h"
 #include "GaudiKernel/IDataProviderSvc.h"
 #include "GaudiKernel/SmartDataPtr.h"
