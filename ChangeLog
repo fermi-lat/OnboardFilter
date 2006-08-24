@@ -1,4 +1,16 @@
 ------------------------------------------------------------
+User: heather  Thu Aug 24 15:13:56 PDT 2006
+OnboardFilter/OnboardFilter
+
+Modified Files:
+	FilterAlg.h FilterDisplay.h FilterTracks.h OnboardFilterTDS.h 
+Removed Files:
+      Tag: v4r0p2
+	FilterAlgTds.h FilterStatus.h LogInfoDef.h 
+Log Message:
+remove TDS classes and move to OnboardFilterTds
+    *
+------------------------------------------------------------
 User: hughes  Mon Jul 31 09:41:48 PDT 2006
 OnboardFilter/OnboardFilter
 
