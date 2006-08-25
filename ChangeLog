@@ -2,6 +2,16 @@
 TAG
 Tag name: v4r0p2, operation: add
 Package: OnboardFilter
+User: heather  Fri Aug 25 11:38:44 2006
+Files:
+  OnboardFilter/src/FilterStatus.cxx  1.14
+  OnboardFilter/src/FilterAlgTds.cxx  1.5
+
+    *
+------------------------------------------------------------
+TAG
+Tag name: v4r0p2, operation: add
+Package: OnboardFilter
 User: heather  Fri Aug 25 11:36:38 2006
 Files:
   OnboardFilter/OnboardFilter/FilterAlgTds.h  1.5
