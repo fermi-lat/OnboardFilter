@@ -1,5 +1,14 @@
 ------------------------------------------------------------
 User: heather  Fri Aug 25 11:42:35 PDT 2006
+OnboardFilter/src
+
+Removed Files:
+	FilterAlgTds.cxx FilterStatus.cxx 
+Log Message:
+really remove the TDS classes from the HEAD
+    *
+------------------------------------------------------------
+User: heather  Fri Aug 25 11:42:35 PDT 2006
 OnboardFilter/doc
 
 Modified Files:
