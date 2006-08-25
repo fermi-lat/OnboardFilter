@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: heather  Fri Aug 25 11:42:34 PDT 2006
+OnboardFilter/OnboardFilter
+
+Removed Files:
+	FilterAlgTds.h FilterStatus.h LogInfoDef.h 
+Log Message:
+really remove the TDS classes from the HEAD
+    *
+------------------------------------------------------------
 TAG
 Tag name: v4r0p2, operation: add
 Package: OnboardFilter
