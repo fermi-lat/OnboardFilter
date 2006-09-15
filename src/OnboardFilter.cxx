@@ -6,7 +6,7 @@
 
 \verbatim
 
-  CVS $Id: OnboardFilter.cxx,v 1.55 2006/07/31 14:58:34 hughes Exp $
+  CVS $Id: OnboardFilter.cxx,v 1.56 2006/08/24 22:13:57 heather Exp $
 \endverbatim
 
                                                                           */
@@ -1045,7 +1045,7 @@ StatusCode OnboardFilter::execute()
     newStatus->setTkr(TDS_variables.tkr);
     newStatus->setLayers(TDS_layers);
     newStatus->setTmsk(TDS_variables.tmsk);
-    printf("newStatus set; tmsk %x\n",TDS_variables.tmsk);
+    //printf("newStatus set; tmsk %x\n",TDS_variables.tmsk);
     newStatus->setLogData(TDS_variables.numLogsHit,TDS_variables.logData);
     
     storeHits(hits);
