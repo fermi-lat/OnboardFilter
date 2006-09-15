@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: heather  Fri Sep 15 16:32:59 PDT 2006
+OnboardFilter/src
+
+Modified Files:
+	OnboardFilter.cxx 
+Log Message:
+comment out printf statement
+    *
+------------------------------------------------------------
 TAG
 Tag name: v4r1p1, operation: add
 Package: OnboardFilter
