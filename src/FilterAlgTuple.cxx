@@ -2,7 +2,7 @@
 /** @file FilterAlgTuple.cxx
 @brief Declaration and implementation of FilterAlgTuple
 
-$Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/FilterAlgTuple.cxx,v 1.2 2006/08/24 22:13:57 heather Exp $
+$Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/FilterAlgTuple.cxx,v 1.3 2006/11/22 15:53:32 mcenery Exp $
 
 */
 #include "ntupleWriterSvc/INTupleWriterSvc.h"
@@ -127,6 +127,16 @@ StatusCode FilterAlgTuple::initialize() {
   <td>D<td>    bits 15-31 of the filter status word (17 bits) 
   <tr><td>  FilterStatus_LO
   <td>D<td>    bits  0-14 of the filter status word (15 bits)
+  <tr><td>  FilterXhits
+  <td>D<td>    number of hits on best track XZ slope
+  <tr><td>  FilterYhits
+  <td>D<td>    number of hits on best track YZ slope
+  <tr><td>  FilterXZslope
+  <td>D<td>    XZ slope
+  <tr><td>  FilterYZslope
+  <td>D<td>    YZ slope
+  <tr><td>  FilterEnergy
+  <td>D<td>    Energy as determined by onboard alg
   <tr><td>  FilterAngSep   
   <td>D<td>    Filter status separation
 </table> 
