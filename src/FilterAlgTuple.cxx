@@ -2,7 +2,7 @@
 /** @file FilterAlgTuple.cxx
 @brief Declaration and implementation of FilterAlgTuple
 
-$Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/FilterAlgTuple.cxx,v 1.1 2006/06/23 15:21:42 burnett Exp $
+$Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/FilterAlgTuple.cxx,v 1.2 2006/08/24 22:13:57 heather Exp $
 
 */
 #include "ntupleWriterSvc/INTupleWriterSvc.h"
@@ -38,7 +38,11 @@ private:
     INTupleWriterSvc* m_rootTupleSvc;;
     double m_statusHi, m_statusLo,m_separation;
     double m_filterAlgStatus;
- 
+    double m_filtxdir,m_filtydir ,m_filtzdir;
+    float m_energy;
+    double m_slopeYZ,m_slopeXZ;
+    int m_xHits, m_yHits;
+
     int m_warnNoFilterStatus;   // count WARNINGs: no FilterStatus found
  
 };
@@ -133,6 +137,14 @@ StatusCode FilterAlgTuple::initialize() {
     m_rootTupleSvc->addItem(m_eventTreeName, "FilterStatus_LO",  &m_statusLo );
     m_rootTupleSvc->addItem(m_eventTreeName, "FilterAlgStatus",  &m_filterAlgStatus );
     m_rootTupleSvc->addItem(m_eventTreeName, "FilterAngSep",     &m_separation );
+    m_rootTupleSvc->addItem(m_eventTreeName, "FilterEnergy",     &m_energy );
+    m_rootTupleSvc->addItem(m_eventTreeName, "FilterXhits",     &m_xHits );
+    m_rootTupleSvc->addItem(m_eventTreeName, "FilterYhits",     &m_yHits );
+    m_rootTupleSvc->addItem(m_eventTreeName, "FilterSlopeYZ",     &m_slopeYZ );
+        m_rootTupleSvc->addItem(m_eventTreeName, "FilterSlopeXZ",     &m_slopeXZ );
+    m_rootTupleSvc->addItem(m_eventTreeName, "FilterXDir",     &m_filtxdir );
+    m_rootTupleSvc->addItem(m_eventTreeName, "FilterYDir",     &m_filtydir );
+    m_rootTupleSvc->addItem(m_eventTreeName, "FilterZDir",     &m_filtzdir );
 
     return sc;
 }
@@ -148,6 +160,28 @@ StatusCode FilterAlgTuple::execute() {
         m_statusHi=filterStatus->getHigh();
         m_statusLo=filterStatus->getLow();
         m_separation=filterStatus->getSeparation();
+	m_energy=filterStatus->getCalEnergy();
+	m_xHits = 0;
+	m_yHits = 0;
+        m_filtxdir=m_filtydir=m_filtzdir=0;
+	double slopeXZ = 0.0;
+	double slopeYZ = 0.0;
+	double intXZ = 0.0;
+	double intYZ = 0.0;
+	filterStatus->getBestTrack(m_xHits,m_yHits,slopeXZ,slopeYZ,intXZ,intYZ);
+	if(m_xHits>0&&m_yHits>0){
+	  float alpha = atan2(slopeYZ,slopeXZ);
+	  if(alpha < 0) {
+	    alpha = alpha+2.0*3.1415;
+	  }
+	  float m_slope = sqrt(pow(slopeXZ,2) + pow(slopeYZ,2));
+	  float beta = atan(m_slope);
+	  m_filtxdir = cos(alpha)*sin(beta);
+	  m_filtydir = sin(alpha)*sin(beta);
+	  m_filtzdir = cos(beta);
+	}
+	m_slopeYZ=slopeYZ;
+	m_slopeXZ=slopeXZ;
     }else {
         m_statusHi = m_statusLo = 0;
 
