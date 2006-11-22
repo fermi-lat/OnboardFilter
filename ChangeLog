@@ -1,4 +1,14 @@
 ------------------------------------------------------------
+User: mcenery  Wed Nov 22 07:53:32 PST 2006
+OnboardFilter/src
+
+Modified Files:
+	FilterAlgTuple.cxx 
+Log Message:
+Adding filter energy and best onboard track information to merit
+
+    *
+------------------------------------------------------------
 TAG
 Tag name: v4r1p2, operation: add
 Package: OnboardFilter
