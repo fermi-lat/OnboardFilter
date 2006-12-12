@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: usher  Tue Dec 12 14:19:03 PST 2006
+OnboardFilter/cmt
+
+Modified Files:
+	requirements 
+Log Message:
+Restructuring of OnboardFilter to accomodate latest FSW (as of 11/1/2006) and allow ability to include more than one filter running at any given time. Currently set up to handle 3 filters: Gamma, CNO and Mip, but hopefully handles in place to include more.
+    *
+------------------------------------------------------------
 User: mcenery  Wed Nov 22 07:57:16 PST 2006
 OnboardFilter/src
 
