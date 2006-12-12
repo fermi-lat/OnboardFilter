@@ -2,7 +2,7 @@
 /** @file FilterAlgTuple.cxx
 @brief Declaration and implementation of FilterAlgTuple
 
-$Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/FilterAlgTuple.cxx,v 1.3 2006/11/22 15:53:32 mcenery Exp $
+$Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/FilterAlgTuple.cxx,v 1.4 2006/11/22 15:57:16 mcenery Exp $
 
 */
 #include "ntupleWriterSvc/INTupleWriterSvc.h"
@@ -14,9 +14,11 @@ $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/FilterAlgTuple.cxx,v 1.3
 #include "GaudiKernel/SmartDataPtr.h"
 
 #include "OnboardFilterTds/FilterStatus.h"
+#include "OnboardFilterTds/ObfFilterStatus.h"
 #include "OnboardFilterTds/FilterAlgTds.h"
 
 #include <string>
+#include <cmath>
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 /** @class FilterAlgTuple
 @brief generate tuple stuff for the Onboard Filter
@@ -42,6 +44,13 @@ private:
     float m_energy;
     double m_slopeYZ,m_slopeXZ;
     int m_xHits, m_yHits;
+
+    int m_gamStatusHi;
+    int m_gamStatusLo;
+    int m_cnoStatusHi;
+    int m_cnoStatusLo;
+    int m_mipStatusHi;
+    int m_mipStatusLo;
 
     int m_warnNoFilterStatus;   // count WARNINGs: no FilterStatus found
  
@@ -143,18 +152,25 @@ StatusCode FilterAlgTuple::initialize() {
 
 */
 
-    m_rootTupleSvc->addItem(m_eventTreeName, "FilterStatus_HI",  &m_statusHi);
-    m_rootTupleSvc->addItem(m_eventTreeName, "FilterStatus_LO",  &m_statusLo );
-    m_rootTupleSvc->addItem(m_eventTreeName, "FilterAlgStatus",  &m_filterAlgStatus );
-    m_rootTupleSvc->addItem(m_eventTreeName, "FilterAngSep",     &m_separation );
-    m_rootTupleSvc->addItem(m_eventTreeName, "FilterEnergy",     &m_energy );
+    m_rootTupleSvc->addItem(m_eventTreeName, "FilterStatus_HI", &m_statusHi);
+    m_rootTupleSvc->addItem(m_eventTreeName, "FilterStatus_LO", &m_statusLo );
+    m_rootTupleSvc->addItem(m_eventTreeName, "FilterAlgStatus", &m_filterAlgStatus );
+    m_rootTupleSvc->addItem(m_eventTreeName, "FilterAngSep",    &m_separation );
+    m_rootTupleSvc->addItem(m_eventTreeName, "FilterEnergy",    &m_energy );
     m_rootTupleSvc->addItem(m_eventTreeName, "FilterXhits",     &m_xHits );
     m_rootTupleSvc->addItem(m_eventTreeName, "FilterYhits",     &m_yHits );
-    m_rootTupleSvc->addItem(m_eventTreeName, "FilterSlopeYZ",     &m_slopeYZ );
-        m_rootTupleSvc->addItem(m_eventTreeName, "FilterSlopeXZ",     &m_slopeXZ );
-    m_rootTupleSvc->addItem(m_eventTreeName, "FilterXDir",     &m_filtxdir );
-    m_rootTupleSvc->addItem(m_eventTreeName, "FilterYDir",     &m_filtydir );
-    m_rootTupleSvc->addItem(m_eventTreeName, "FilterZDir",     &m_filtzdir );
+    m_rootTupleSvc->addItem(m_eventTreeName, "FilterSlopeYZ",   &m_slopeYZ );
+    m_rootTupleSvc->addItem(m_eventTreeName, "FilterSlopeXZ",   &m_slopeXZ );
+    m_rootTupleSvc->addItem(m_eventTreeName, "FilterXDir",      &m_filtxdir );
+    m_rootTupleSvc->addItem(m_eventTreeName, "FilterYDir",      &m_filtydir );
+    m_rootTupleSvc->addItem(m_eventTreeName, "FilterZDir",      &m_filtzdir );
+
+    m_rootTupleSvc->addItem(m_eventTreeName, "ObfGamStatusHi",  &m_gamStatusHi);
+    m_rootTupleSvc->addItem(m_eventTreeName, "ObfGamStatusLo",  &m_gamStatusLo);
+    m_rootTupleSvc->addItem(m_eventTreeName, "ObfCnoStatusHi",  &m_cnoStatusHi);
+    m_rootTupleSvc->addItem(m_eventTreeName, "ObfCnoStatusLo",  &m_cnoStatusLo);
+    m_rootTupleSvc->addItem(m_eventTreeName, "ObfMipStatusHi",  &m_mipStatusHi);
+    m_rootTupleSvc->addItem(m_eventTreeName, "ObfMipStatusLo",  &m_mipStatusLo);
 
     return sc;
 }
@@ -165,6 +181,7 @@ StatusCode FilterAlgTuple::execute() {
     StatusCode  sc = StatusCode::SUCCESS;
     MsgStream log(msgSvc(), name());
 
+    // Old school output
     SmartDataPtr<OnboardFilterTds::FilterStatus> filterStatus(eventSvc(), "/Event/Filter/FilterStatus");
     if( filterStatus ){
         m_statusHi=filterStatus->getHigh();
@@ -180,7 +197,7 @@ StatusCode FilterAlgTuple::execute() {
 	double intYZ = 0.0;
 	filterStatus->getBestTrack(m_xHits,m_yHits,slopeXZ,slopeYZ,intXZ,intYZ);
 	if(m_xHits>0&&m_yHits>0){
-	  float alpha = atan2(slopeYZ,slopeXZ);
+        float alpha = atan2(slopeYZ,slopeXZ);
 	  if(alpha < 0) {
 	    alpha = alpha+2.0*3.1415;
 	  }
@@ -203,10 +220,40 @@ StatusCode FilterAlgTuple::execute() {
             log  << endreq;
         }
     }
+
+    // Beyond old school
     SmartDataPtr<FilterAlgTds::FilterAlgData> filterAlgStatus(eventSvc(),"/Event/Filter/FilterAlgData");
     if(filterAlgStatus){
         m_filterAlgStatus=(double)filterAlgStatus->getVetoWord();
     }
+
+    // ultra modern method
+    SmartDataPtr<OnboardFilterTds::ObfFilterStatus> obfStatus(eventSvc(), "/Event/Filter/ObfFilterStatus");
+
+    if (obfStatus)
+    {
+        // Pointer to our retrieved objects
+        const OnboardFilterTds::IObfStatus* obfResult = 0;
+
+        // Start with Gamma Filter
+        obfResult = obfStatus->getFilterStatus(OnboardFilterTds::ObfFilterStatus::GammaFilter);
+
+        m_gamStatusHi = obfResult ? obfResult->getStatusHi() : -1;
+        m_gamStatusLo = obfResult ? obfResult->getStatusLo() : -1;
+
+        // Start with CNO Filter
+        obfResult = obfStatus->getFilterStatus(OnboardFilterTds::ObfFilterStatus::CNOFilter);
+
+        m_cnoStatusHi = obfResult ? obfResult->getStatusHi() : -1;
+        m_cnoStatusLo = obfResult ? obfResult->getStatusLo() : -1;
+
+        // Start with Gamma Filter
+        obfResult = obfStatus->getFilterStatus(OnboardFilterTds::ObfFilterStatus::MipFilter);
+
+        m_mipStatusHi = obfResult ? obfResult->getStatusHi() : -1;
+        m_mipStatusLo = obfResult ? obfResult->getStatusLo() : -1;
+    }
+
     return sc;
 }
 //------------------------------------------------------------------------------
