@@ -1,4 +1,20 @@
 ------------------------------------------------------------
+User: usher  Tue Dec 12 14:19:04 PST 2006
+OnboardFilter/src
+
+Modified Files:
+	FilterAlg.cxx FilterAlgTuple.cxx FilterDisplay.cxx 
+	FilterTracks.cxx OnboardFilter.cxx trackProj.cxx 
+Added Files:
+	CNOFilterOutput.cxx CNOFilterOutput.h CalFilterOutput.cxx 
+	CalFilterOutput.h GammaFilterOutput.cxx GammaFilterOutput.h 
+	GemFilterOutput.cxx GemFilterOutput.h MipFilterOutput.cxx 
+	MipFilterOutput.h ObfInterface.cxx ObfInterface.h OutputRtn.h 
+	TkrFilterOutput.cxx TkrFilterOutput.h trackProj.h 
+Log Message:
+Restructuring of OnboardFilter to accomodate latest FSW (as of 11/1/2006) and allow ability to include more than one filter running at any given time. Currently set up to handle 3 filters: Gamma, CNO and Mip, but hopefully handles in place to include more.
+    *
+------------------------------------------------------------
 User: usher  Tue Dec 12 14:19:03 PST 2006
 OnboardFilter/doc
 
