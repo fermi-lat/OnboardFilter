@@ -7,12 +7,12 @@
 #include <exception>
 //#include <_exception>
 //#include "/usr/products/Glast/GLAST_EXT/rh9_gcc32/ROOT/v4.02.00/root/cint/include/_exception.h"
-#include "OnboardFilter/trackProj.hh"
+#include "trackProj.h"
 #include "EDS/FFS.h"
 
 //____________________________________________________________________________
 
-void trackProj::execute(int flag, TFC_projections          *prjs,
+void trackProj::execute(int flag, const TFC_projections *prjs,
          int &xHits, int &yHits,
          double &slopeXZ, double &slopeYZ,
          double &intXZ, double &intYZ){
@@ -25,17 +25,17 @@ void trackProj::execute(int flag, TFC_projections          *prjs,
    intXZ = 0.0;
    intYZ = 0.0;
 
-   TFC_projection         *prj;
+   const TFC_projection *prj;
 
-   prj    = prjs->prjs;   
+   prj = prjs->prjs;   
    int tmsk = prjs->twrMsk << 16;
    int maxCnt = prjs->maxCnt;
    int curCnt = prjs->curCnt;
 //   printf("Projections: tower mask %x maxCnt %d curCnt %d\n",tmsk,maxCnt,curCnt);
    int xy = 1;
    while (tmsk) {
-      int                  tower;
-      TFC_projectionDir     *dir;
+      int                      tower;
+      const TFC_projectionDir *dir;
 
       tower = FFS (tmsk);     // get first bit set, this is the tower number
       tmsk  = FFS_eliminate (tmsk, tower);  // eliminate bit corresponding to tower
@@ -66,8 +66,8 @@ void trackProj::execute(int flag, TFC_projections          *prjs,
 //      const TFC_projectionDir *dir = prjs->dir + tower;
    tmsk = prjs->twrMsk << 16;
    while (tmsk) {
-      int                  tower;
-      TFC_projectionDir     *dir;
+      int                      tower;
+      const TFC_projectionDir *dir;
       HepPoint3D point;
       tower = FFS (tmsk);     // get first bit set, this is the tower number
       tmsk  = FFS_eliminate (tmsk, tower);  // eliminate bit corresponding to tower
@@ -76,7 +76,6 @@ void trackProj::execute(int flag, TFC_projections          *prjs,
       prj = prjs->prjs + dir->idx;
       int        xCnt;
       int        yCnt;
-      int        tCnt;
 
 
       /* Form the projection directory for this tower */

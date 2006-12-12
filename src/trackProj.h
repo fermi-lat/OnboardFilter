@@ -20,7 +20,7 @@ class trackProj {
 public:
    trackProj() {loadGeometry();}
    ~trackProj() {}
-   void execute(int flag, TFC_projections          *prjs,
+   void execute(int flag, const TFC_projections *prjs,
          int &xHits, int &yHits,
          double &xzSlope, double &yzSlope,
          double &xzInt, double &yzInt);
