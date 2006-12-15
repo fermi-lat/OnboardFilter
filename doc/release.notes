@@ -2,6 +2,7 @@
  * @file release.notes
  * @brief Package OnboardFilter
  * @verbatim
+ * v4r2p0 15-Dec-2006  TU  : Major refactoring, update to gsw v1r0 of fsw code (multi filters)
  * v4r1p2 15-sep-2006  HMK : Comment out printf statement in OnboardFilter.cxx
  * v4r1p1 25-aug-2006  HMK : Really remove the TDS classes
  * v4r1   24-aug-2006  HMK : Use OnboardFilterTds to store TDS classes
