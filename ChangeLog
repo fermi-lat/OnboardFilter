@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: usher  Fri Dec 15 15:37:23 PST 2006
+OnboardFilter/src
+
+Modified Files:
+	FilterAlgTuple.cxx 
+Log Message:
+Consensus for 1 long word output per filter
+    *
+------------------------------------------------------------
 User: usher  Tue Dec 12 14:19:04 PST 2006
 OnboardFilter/OnboardFilter
 
