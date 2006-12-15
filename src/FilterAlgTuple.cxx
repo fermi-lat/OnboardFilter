@@ -2,7 +2,7 @@
 /** @file FilterAlgTuple.cxx
 @brief Declaration and implementation of FilterAlgTuple
 
-$Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/FilterAlgTuple.cxx,v 1.4 2006/11/22 15:57:16 mcenery Exp $
+$Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/FilterAlgTuple.cxx,v 1.5 2006/12/12 22:19:04 usher Exp $
 
 */
 #include "ntupleWriterSvc/INTupleWriterSvc.h"
@@ -45,12 +45,9 @@ private:
     double m_slopeYZ,m_slopeXZ;
     int m_xHits, m_yHits;
 
-    int m_gamStatusHi;
-    int m_gamStatusLo;
-    int m_cnoStatusHi;
-    int m_cnoStatusLo;
-    int m_mipStatusHi;
-    int m_mipStatusLo;
+    int m_gamStatus;
+    int m_cnoStatus;
+    int m_mipStatus;
 
     int m_warnNoFilterStatus;   // count WARNINGs: no FilterStatus found
  
@@ -165,12 +162,9 @@ StatusCode FilterAlgTuple::initialize() {
     m_rootTupleSvc->addItem(m_eventTreeName, "FilterYDir",      &m_filtydir );
     m_rootTupleSvc->addItem(m_eventTreeName, "FilterZDir",      &m_filtzdir );
 
-    m_rootTupleSvc->addItem(m_eventTreeName, "ObfGamStatusHi",  &m_gamStatusHi);
-    m_rootTupleSvc->addItem(m_eventTreeName, "ObfGamStatusLo",  &m_gamStatusLo);
-    m_rootTupleSvc->addItem(m_eventTreeName, "ObfCnoStatusHi",  &m_cnoStatusHi);
-    m_rootTupleSvc->addItem(m_eventTreeName, "ObfCnoStatusLo",  &m_cnoStatusLo);
-    m_rootTupleSvc->addItem(m_eventTreeName, "ObfMipStatusHi",  &m_mipStatusHi);
-    m_rootTupleSvc->addItem(m_eventTreeName, "ObfMipStatusLo",  &m_mipStatusLo);
+    m_rootTupleSvc->addItem(m_eventTreeName, "ObfGamStatus",    &m_gamStatus);
+    m_rootTupleSvc->addItem(m_eventTreeName, "ObfCnoStatus",    &m_cnoStatus);
+    m_rootTupleSvc->addItem(m_eventTreeName, "ObfMipStatus",    &m_mipStatus);
 
     return sc;
 }
@@ -236,22 +230,16 @@ StatusCode FilterAlgTuple::execute() {
         const OnboardFilterTds::IObfStatus* obfResult = 0;
 
         // Start with Gamma Filter
-        obfResult = obfStatus->getFilterStatus(OnboardFilterTds::ObfFilterStatus::GammaFilter);
-
-        m_gamStatusHi = obfResult ? obfResult->getStatusHi() : -1;
-        m_gamStatusLo = obfResult ? obfResult->getStatusLo() : -1;
+        obfResult   = obfStatus->getFilterStatus(OnboardFilterTds::ObfFilterStatus::GammaFilter);
+        m_gamStatus = obfResult ? obfResult->getStatus32() : -1;
 
         // Start with CNO Filter
-        obfResult = obfStatus->getFilterStatus(OnboardFilterTds::ObfFilterStatus::CNOFilter);
-
-        m_cnoStatusHi = obfResult ? obfResult->getStatusHi() : -1;
-        m_cnoStatusLo = obfResult ? obfResult->getStatusLo() : -1;
+        obfResult   = obfStatus->getFilterStatus(OnboardFilterTds::ObfFilterStatus::CNOFilter);
+        m_cnoStatus = obfResult ? obfResult->getStatus32() : -1;
 
         // Start with Gamma Filter
-        obfResult = obfStatus->getFilterStatus(OnboardFilterTds::ObfFilterStatus::MipFilter);
-
-        m_mipStatusHi = obfResult ? obfResult->getStatusHi() : -1;
-        m_mipStatusLo = obfResult ? obfResult->getStatusLo() : -1;
+        obfResult   = obfStatus->getFilterStatus(OnboardFilterTds::ObfFilterStatus::MipFilter);
+        m_mipStatus = obfResult ? obfResult->getStatus32() : -1;
     }
 
     return sc;
