@@ -8,7 +8,7 @@
 *
 * @authors T. Usher
 *
-* $Header: /nfs/slac/g/glast/ground/cvs/TkrRecon/src/PatRec/VectorLinks/VecPoint.h,v 0.1 2006/03/21 01:12:37 usher Exp $
+* $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/ObfInterface.h,v 1.1 2006/12/12 22:19:04 usher Exp $
 */
 
 #ifndef __ObfInterface_H
@@ -50,7 +50,7 @@ public:
 
     ///@name access methods
     /// Set up a filter specified by its name
-    int  setupFilter(const std::string& filterName, int priority, void* prm);
+    int  setupFilter(const std::string& filterName, int priority, bool clearVetoBits);
 
     /// Set up the specific passthrough filter
     bool setupPassThrough(void* prm);
