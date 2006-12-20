@@ -42,6 +42,28 @@ static int          myOutputFlush (void *unused, int reason);
 static int          passThrough (void *unused, unsigned int nbytes, EBF_pkt *pkt, EBF_siv siv, EDS_fwIxb ixb);
 
 /* ---------------------------------------------------------------------- */
+// Local struct definition for veto mask (must be better way...)
+typedef struct _EFC_samplerPrescaler
+{
+  unsigned int countdown;   /*!< Current countdown value                  */
+  unsigned int   refresh;   /*!< Refresh value                            */
+} EFC_samplerPrescaler;
+
+typedef struct _EFC_samplerVetoes
+{
+  unsigned int      def;   /*!< Default veto mask                         */
+  unsigned int   active;   /*!< Active (this event) veto mask             */
+} EFC_samplerVetoes;
+
+typedef struct _EFC_sampler
+{
+   EFC_samplerVetoes vetoes; /*!< The default and active veto mask        */
+   unsigned int     enables; /*!< The mask of enabled samplers            */
+   EFC_samplerPrescaler
+             prescalers[32]; /*!< The prescales for each veto condition   */
+} EFC_sampler;
+
+/* ---------------------------------------------------------------------- */
 // Local utility class for handling output call back routines at end of event
 class EOVCallBackParams
 {
@@ -131,7 +153,7 @@ ObfInterface::~ObfInterface()
     return;
 }
 
-int ObfInterface::setupFilter(const std::string& filterName, int priority, void* prm)
+int ObfInterface::setupFilter(const std::string& filterName, int priority, bool clearVetoBits)
 {
     int filterId = -100;
 
@@ -179,6 +201,14 @@ int ObfInterface::setupFilter(const std::string& filterName, int priority, void*
 
         /* Register and enable the filter */
         filterId = EDS_fwHandlerServicesRegister (m_edsFw,  priority, gfcService, filter);
+
+        // Modify the veto mask is requested
+        if (clearVetoBits)
+        {
+            EFC_sampler* sampler = (EFC_sampler*)EFC_get(filter, EFC_OBJECT_K_SAMPLER);
+
+            sampler->vetoes.def = 0;
+        }
 
         // Keep track of the pointer for deletion at end of processing
         m_filterVec.push_back(filter);

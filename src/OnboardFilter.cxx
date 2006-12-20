@@ -6,7 +6,7 @@
 
 \verbatim
 
-  CVS $Id: OnboardFilter.cxx,v 1.57 2006/09/15 23:32:58 heather Exp $
+  CVS $Id: OnboardFilter.cxx,v 1.58 2006/12/12 22:19:04 usher Exp $
 \endverbatim
                                                                           */
 /* ---------------------------------------------------------------------- */
@@ -143,7 +143,7 @@ StatusCode OnboardFilter::initialize()
     // Set up the Gamma Filter and associated output
     if (m_gammaFilter)
     {
-        int filterId = m_obfInterface->setupFilter("GammaFilter", priority++, 0);
+        int filterId = m_obfInterface->setupFilter("GammaFilter", priority++, m_passThrough);
 
         if (filterId == -100)
         {
@@ -158,7 +158,7 @@ StatusCode OnboardFilter::initialize()
     // Set up the CNO (Heavy Ion) filter and associated output
     if (m_CNOFilter)
     {
-        int filterId = m_obfInterface->setupFilter("CNOFilter", priority++, 0);
+        int filterId = m_obfInterface->setupFilter("CNOFilter", priority++, false);
 
         if (filterId == -100)
         {
@@ -173,7 +173,7 @@ StatusCode OnboardFilter::initialize()
     // Set up the MIP filter and associated output
     if (m_MIPFilter)
     {
-        int filterId = m_obfInterface->setupFilter("MipFilter", priority++, 0);
+        int filterId = m_obfInterface->setupFilter("MipFilter", priority++, false);
 
         if (filterId == -100)
         {
