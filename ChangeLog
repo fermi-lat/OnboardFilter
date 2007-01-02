@@ -1,4 +1,53 @@
 ------------------------------------------------------------
+TAG
+Tag name: v4r2p1, operation: add
+Package: OnboardFilter
+User: usher  Tue Jan  2 14:40:32 2007
+Files:
+  OnboardFilter/.cvsignore  1.2
+  OnboardFilter/ChangeLog  1.690
+  OnboardFilter/OnboardFilter/FilterAlg.h  1.6
+  OnboardFilter/OnboardFilter/FilterTracks.h  1.12
+  OnboardFilter/OnboardFilter/filter_rto.h  1.1
+  OnboardFilter/OnboardFilter/OnboardFilterTDS.h  1.3
+  OnboardFilter/OnboardFilter/FilterDisplay.h  1.6
+  OnboardFilter/cmt/.cvsignore  1.2
+  OnboardFilter/cmt/requirements  1.69
+  OnboardFilter/cmt/Makefile  1.4
+  OnboardFilter/doc/release.notes  1.50
+  OnboardFilter/doc/OnboardFilter.jpg  1.3
+  OnboardFilter/src/GemFilterOutput.cxx  1.1
+  OnboardFilter/src/CNOFilterOutput.h  1.2
+  OnboardFilter/src/CalFilterOutput.cxx  1.1
+  OnboardFilter/src/FilterAlg.cxx  1.10
+  OnboardFilter/src/CNOFilterOutput.cxx  1.2
+  OnboardFilter/src/ObfInterface.cxx  1.2
+  OnboardFilter/src/FilterAlg_projectionFind.h  1.1
+  OnboardFilter/src/TkrFilterOutput.h  1.1
+  OnboardFilter/src/FilterAlg_skirt.h  1.1
+  OnboardFilter/src/FilterAlgTuple.cxx  1.6
+  OnboardFilter/src/FilterAlg_acd.h  1.4
+  OnboardFilter/src/GemFilterOutput.h  1.1
+  OnboardFilter/src/MipFilterOutput.h  1.2
+  OnboardFilter/src/trackProj.cxx  1.2
+  OnboardFilter/src/TkrFilterOutput.cxx  1.1
+  OnboardFilter/src/ObfInterface.h  1.2
+  OnboardFilter/src/GammaFilterOutput.h  1.2
+  OnboardFilter/src/GammaFilterOutput.cxx  1.2
+  OnboardFilter/src/FilterDisplay.cxx  1.8
+  OnboardFilter/src/FilterTracks.cxx  1.24
+  OnboardFilter/src/CalFilterOutput.h  1.1
+  OnboardFilter/src/OutputRtn.h  1.1
+  OnboardFilter/src/trackProj.h  1.1
+  OnboardFilter/src/.cvsignore  1.1
+  OnboardFilter/src/OnboardFilter.cxx  1.60
+  OnboardFilter/src/MipFilterOutput.cxx  1.2
+  OnboardFilter/src/Dll/OnboardFilter_dll.cxx  1.5
+  OnboardFilter/src/Dll/OnboardFilter_load.cxx  1.8
+  OnboardFilter/src/test/jobOptions.txt  1.11
+
+    *
+------------------------------------------------------------
 User: usher  Tue Jan  2 14:24:57 PST 2007
 OnboardFilter/src
 
