@@ -6,7 +6,7 @@
 
 \verbatim
 
-  CVS $Id: OnboardFilter.cxx,v 1.58 2006/12/12 22:19:04 usher Exp $
+  CVS $Id: OnboardFilter.cxx,v 1.59 2006/12/20 18:59:00 usher Exp $
 \endverbatim
                                                                           */
 /* ---------------------------------------------------------------------- */
@@ -151,7 +151,7 @@ StatusCode OnboardFilter::initialize()
         }
 
         // Set the Gamma Filter output routine
-        OutputRtn* outRtn = new GammaFilterOutput(filterId);
+        OutputRtn* outRtn = new GammaFilterOutput(filterId, m_passThrough);
         m_obfInterface->setEovOutputCallBack(outRtn);
     }
 
@@ -185,7 +185,7 @@ StatusCode OnboardFilter::initialize()
         m_obfInterface->setEovOutputCallBack(outRtn);
     }
 
-    // Set up a passthrough filter if we don't want OBF to reject events
+    // Set up a passthrough filter if we don't want OBF to reject event processing
     if (m_passThrough)
     {
         if (!m_obfInterface->setupPassThrough(0))
@@ -270,6 +270,7 @@ StatusCode OnboardFilter::execute()
         if(m_mask!=0 && (m_mask & (filterStatus >> 15)) !=0)
         {
             this->setFilterPassed(false);
+            m_rejected++;
         }
     }
 
@@ -281,6 +282,10 @@ StatusCode OnboardFilter::execute()
 StatusCode OnboardFilter::finalize()
 {
     m_obfInterface->dumpCounters();
+
+    MsgStream log(msgSvc(), name());
+    log << MSG::INFO << "Rejected " << m_rejected << " triggers using mask: "
+        << std::hex << m_mask << std::dec << endreq;
 
     return StatusCode::SUCCESS;
 }

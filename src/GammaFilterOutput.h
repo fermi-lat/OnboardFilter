@@ -8,7 +8,7 @@
 *
 * @authors T. Usher
 *
-* $Header: /nfs/slac/g/glast/ground/cvs/TkrRecon/src/PatRec/VectorLinks/VecPoint.h,v 0.1 2006/03/21 01:12:37 usher Exp $
+* $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/GammaFilterOutput.h,v 1.1 2006/12/12 22:19:04 usher Exp $
 */
 
 #ifndef __GammaFilterOutput_H
@@ -19,7 +19,7 @@
 class GammaFilterOutput : virtual public OutputRtn
 {
 public:
-    GammaFilterOutput(int offset);
+    GammaFilterOutput(int offset, bool passThrough=false);
     virtual ~GammaFilterOutput() {}
 
     // This defines the method called for end of event processing
@@ -28,10 +28,11 @@ public:
     // This for end of run processing
     void eorProcessing(MsgStream& log);
 private:
-    int m_offset;   // Offset into ixb event desriptor block for this information
+    int  m_offset;         // Offset into ixb event desriptor block for this information
+    bool m_passThrough;    // Pass through mode or not
 
-    int m_vetoBits[17];      //array to count # of times each veto bit was set
-    int m_statusBits[15];    //array to count # of times each veto bit was set
+    int  m_vetoBits[17];   //array to count # of times each veto bit was set
+    int  m_statusBits[15]; //array to count # of times each veto bit was set
 };
 
 #endif // __ObfInterface_H
