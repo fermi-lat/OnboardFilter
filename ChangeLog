@@ -1,4 +1,15 @@
 ------------------------------------------------------------
+User: usher  Tue Jan  2 14:24:57 PST 2007
+OnboardFilter/src
+
+Modified Files:
+	CNOFilterOutput.cxx CNOFilterOutput.h GammaFilterOutput.cxx 
+	GammaFilterOutput.h MipFilterOutput.cxx MipFilterOutput.h 
+	OnboardFilter.cxx 
+Log Message:
+Modifications to 1) clean up end of run output, 2) insure that msb is still set (signifying a vetoed event) when running in "pass through" mode.
+    *
+------------------------------------------------------------
 User: usher  Wed Dec 20 10:59:00 PST 2006
 OnboardFilter/src
 
