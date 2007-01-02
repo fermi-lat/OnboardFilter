@@ -12,7 +12,8 @@
 #include "XFC/XFC/MFC_status.h"
 
 // Constructor
-MipFilterOutput::MipFilterOutput(int offset) : m_offset(offset)
+MipFilterOutput::MipFilterOutput(int offset, bool passThrough) : 
+      m_offset(offset), m_passThrough(passThrough)
 {
     // zero our counters
     memset(m_vetoBits,   0, 17*sizeof(int));
@@ -44,6 +45,13 @@ void MipFilterOutput::eovProcessing(void* callBackParm, EDS_fwIxb* ixb)
     EDS_rsdDsc*   rsdDsc       = ixb->rsd.dscs + m_offset;
     unsigned int* dscPtr       = (unsigned int*)rsdDsc->ptr;
     unsigned int  statusWord   = *dscPtr++;
+
+    // If we are running pass through mode then we need to manually set the veto bit
+    // in the event their was a veto
+    if (m_passThrough)
+    {
+        if (statusWord & MFC_STATUS_M_VETO_DEF) statusWord |= MFC_STATUS_M_VETOED;
+    }
 
     // Create a new MIP Status TDS sub object
     OnboardFilterTds::ObfMipStatus* mipStat = new OnboardFilterTds::ObfMipStatus(statusWord);
@@ -77,27 +85,27 @@ void MipFilterOutput::eovProcessing(void* callBackParm, EDS_fwIxb* ixb)
 void MipFilterOutput::eorProcessing(MsgStream& log)
 {
     // Output the bit frequency table
-    log << MSG::INFO << "-- Mip Filter bit frequency table -- " << endreq;
-    log << MSG::INFO << "Status Bit                         Value" << endreq;
-    log << MSG::INFO << "MFC_STATUS_M_STAGE_GEM             " << m_statusBits[0] << endreq;       
-    log << MSG::INFO << "MFC_STATUS_M_STAGE_ACD             " << m_statusBits[1] << endreq;       
-    log << MSG::INFO << "MFC_STATUS_M_STAGE_DIR             " << m_statusBits[2] << endreq;      
-    log << MSG::INFO << "MFC_STATUS_M_STAGE_CAL             " << m_statusBits[3] << endreq;
-    log << MSG::INFO << "MFC_STATUS_M_STAGE_XCAL            " << m_statusBits[4] << endreq;
-    log << MSG::INFO << "MFC_STATUS_M_MULTI_PKT             " << m_statusBits[5] << endreq;
-    log << MSG::INFO << "MFC_STATUS_M_ERR_CAL               " << m_statusBits[6] << endreq;
-    log << MSG::INFO << "MFC_STATUS_M_ERR_CTB               " << m_statusBits[7] << endreq;
-    log << MSG::INFO << "MFC_STATUS_M_ERR_DIR               " << m_statusBits[8] << endreq;
+    log << MSG::INFO << "-- Mip Filter bit frequency table -- \n"
+        << "    Status Bit                         Value\n"
+        << "    MFC_STATUS_M_STAGE_GEM             " << m_statusBits[0] << "\n"       
+        << "    MFC_STATUS_M_STAGE_ACD             " << m_statusBits[1] << "\n"       
+        << "    MFC_STATUS_M_STAGE_DIR             " << m_statusBits[2] << "\n"      
+        << "    MFC_STATUS_M_STAGE_CAL             " << m_statusBits[3] << "\n"
+        << "    MFC_STATUS_M_STAGE_XCAL            " << m_statusBits[4] << "\n"
+        << "    MFC_STATUS_M_MULTI_PKT             " << m_statusBits[5] << "\n"
+        << "    MFC_STATUS_M_ERR_CAL               " << m_statusBits[6] << "\n"
+        << "    MFC_STATUS_M_ERR_CTB               " << m_statusBits[7] << "\n"
+        << "    MFC_STATUS_M_ERR_DIR               " << m_statusBits[8] << "\n"
     
-    log << MSG::INFO << "Veto Bit Summary" << endreq;
-    log << MSG::INFO << "Trigger Name                           Count\n" << endreq;
-    log << MSG::INFO << "MFC_STATUS_M_NO_TKR_ADJ            " << m_vetoBits[0] << endreq;
-    log << MSG::INFO << "MFC_STATUS_M_LYR_COUNTS            " << m_vetoBits[1] << endreq;
-    log << MSG::INFO << "MFC_STATUS_M_NO_ACD_TKR            " << m_vetoBits[2] << endreq;
-    log << MSG::INFO << "MFC_STATUS_M_GEM_NOTKR             " << m_vetoBits[3] << endreq;
-    log << MSG::INFO << "MFC_STATUS_M_GEM_CNO               " << m_vetoBits[4] << endreq;
-    log << MSG::INFO << "MFC_STATUS_M_VETOED                " << m_vetoBits[16] << endreq;
-    log << MSG::INFO << endreq;
+        << "    Veto Bit Summary" << "\n"
+        << "    Trigger Name                           Count\n" << "\n"
+        << "    MFC_STATUS_M_NO_TKR_ADJ            " << m_vetoBits[0] << "\n"
+        << "    MFC_STATUS_M_LYR_COUNTS            " << m_vetoBits[1] << "\n"
+        << "    MFC_STATUS_M_NO_ACD_TKR            " << m_vetoBits[2] << "\n"
+        << "    MFC_STATUS_M_GEM_NOTKR             " << m_vetoBits[3] << "\n"
+        << "    MFC_STATUS_M_GEM_CNO               " << m_vetoBits[4] << "\n"
+        << "    MFC_STATUS_M_VETOED                " << m_vetoBits[16] << "\n"
+        << endreq;
 
     return;
 }
