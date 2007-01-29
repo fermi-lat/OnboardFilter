@@ -1,4 +1,14 @@
 ------------------------------------------------------------
+User: usher  Mon Jan 29 10:06:34 PST 2007
+OnboardFilter/src
+
+Modified Files:
+	GammaFilterOutput.cxx GammaFilterOutput.h ObfInterface.cxx 
+	ObfInterface.h OnboardFilter.cxx 
+Log Message:
+Modifications to enable operation of obf in the "old" way where the meaning of FilterStatus_HI in the ntuple will be preserved (ie == 0 means event passed the Gamma Filter). This is default operation
+    *
+------------------------------------------------------------
 TAG
 Tag name: v4r2p1, operation: add
 Package: OnboardFilter
