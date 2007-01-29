@@ -131,14 +131,14 @@ ObfInterface::ObfInterface(MsgStream& log, const std::string& filePath, void* ca
 
     // Register the "post" routine to handle end of event processing
     EDS_fwPostRegister   (m_edsFw,
-                          EDS_FW_K_POST_1,
+                          EDS_FW_K_POST_0,
                          (EDS_fwPostStartRtn)NULL,
                          (EDS_fwPostWriteRtn)extractFilterInfo,
                          (EDS_fwPostNotifyRtn)NULL,
                          (EDS_fwPostFlushRtn)myOutputFlush,
                           m_callBack);
 
-    EDS_fwPostChange   (m_edsFw, EDS_FW_M_POST_1,  EDS_FW_M_POST_1  );
+    EDS_fwPostChange   (m_edsFw, EDS_FW_M_POST_0,  EDS_FW_M_POST_0  );
 
     // Clear vector of filter pointers
     m_filterVec.clear();
@@ -153,7 +153,7 @@ ObfInterface::~ObfInterface()
     return;
 }
 
-int ObfInterface::setupFilter(const std::string& filterName, int priority, bool clearVetoBits)
+int ObfInterface::setupFilter(const std::string& filterName, int priority, unsigned vetoMask, bool clearVetoBits)
 {
     int filterId = -100;
 
@@ -202,13 +202,15 @@ int ObfInterface::setupFilter(const std::string& filterName, int priority, bool 
         /* Register and enable the filter */
         filterId = EDS_fwHandlerServicesRegister (m_edsFw,  priority, gfcService, filter);
 
-        // Modify the veto mask is requested
-        if (clearVetoBits)
-        {
+        // Modify the veto mask is requested (this means we are running "pass through" mode)
+//        if (clearVetoBits)
+//        {
             EFC_sampler* sampler = (EFC_sampler*)EFC_get(filter, EFC_OBJECT_K_SAMPLER);
 
-            sampler->vetoes.def = 0;
-        }
+            sampler->vetoes.def = vetoMask;
+
+//            sampler->vetoes.def = 0;
+//        }
 
         // Keep track of the pointer for deletion at end of processing
         m_filterVec.push_back(filter);
@@ -234,12 +236,12 @@ void ObfInterface::setEovOutputCallBack(OutputRtn* outRtn)
 bool ObfInterface::setupPassThrough(void* prm)
 {
     //  Register and enable the "passThrough" handler.  This handler is only
-    //  used to set EDS_FW_FN_M_POST_1, which allows the "post" routine to get filter
+    //  used to set EDS_FW_FN_M_POST_0, which allows the "post" routine to get filter
     //  info from the IXB block
     int id = EDS_fwHandlerRegister (m_edsFw,
              -1,
              EDS_FW_OBJ_M_DIR,
-             EDS_FW_FN_M_DIR | EDS_FW_FN_M_POST_1,
+             EDS_FW_FN_M_DIR | EDS_FW_FN_M_POST_0,
              1000,
              (EDS_fwHandlerProcessRtn    )passThrough,
              (EDS_fwHandlerAssociateRtn  )NULL,
@@ -512,7 +514,7 @@ int passThrough (void        *unused,
                  EBF_siv         siv,
                  EDS_fwIxb       ixb)
 {
-  return EDS_FW_FN_M_NO_MORE | EDS_FW_FN_M_POST_1;
+  return EDS_FW_FN_M_NO_MORE | EDS_FW_FN_M_POST_0;
 }
 
 

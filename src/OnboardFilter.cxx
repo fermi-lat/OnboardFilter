@@ -6,7 +6,7 @@
 
 \verbatim
 
-  CVS $Id: OnboardFilter.cxx,v 1.59 2006/12/20 18:59:00 usher Exp $
+  CVS $Id: OnboardFilter.cxx,v 1.60 2007/01/02 22:24:57 usher Exp $
 \endverbatim
                                                                           */
 /* ---------------------------------------------------------------------- */
@@ -70,7 +70,8 @@ private:
     bool        m_gemFilterInfo;
     bool        m_tkrHitsInfo;
 
-    int         m_mask;  //mask for setting filter to reject
+    int         m_mask;            //mask for setting filter to reject
+    unsigned    m_gamBitsToIgnore; // This sets a mask of gamma filter veto bits to ignore
     int         m_rejected;
 
     // Path to shareables
@@ -95,10 +96,18 @@ const IAlgFactory& OnboardFilterFactory = Factory;
 OnboardFilter::OnboardFilter(const std::string& name, ISvcLocator *pSvcLocator) : Algorithm(name,pSvcLocator), 
           m_rejected(0)
 {
+    // The default gamma veto bit ignore mask
+    unsigned gamBitsToIgnore = GFC_STATUS_M_TKR_LT_2_ELO
+                             | GFC_STATUS_M_EL0_ETOT_90 
+                             | GFC_STATUS_M_EL0_ETOT_01
+                             | GFC_STATUS_M_SPLASH_1;
+
+    // Properties for this algorithm
     declareProperty("FileNamePath",   m_FileNamePath       = "$(FLIGHTCODELIBS)");
     declareProperty("FileNamePeds",   m_FileName_Pedestals = "cal_db_pedestals");
     declareProperty("FileNameGains",  m_FileName_Gains     = "cal_db_gains");
     declareProperty("mask",           m_mask               = 0);
+    declareProperty("GamFilterMask",  m_gamBitsToIgnore    = gamBitsToIgnore);
     declareProperty("PassThrough",    m_passThrough        = true);
     declareProperty("gammaFilter",    m_gammaFilter        = true);
     declareProperty("CNOFilter",      m_CNOFilter          = true);
@@ -143,7 +152,9 @@ StatusCode OnboardFilter::initialize()
     // Set up the Gamma Filter and associated output
     if (m_gammaFilter)
     {
-        int filterId = m_obfInterface->setupFilter("GammaFilter", priority++, m_passThrough);
+        unsigned vetoMask = m_passThrough ? 0 : ~m_gamBitsToIgnore & GFC_STATUS_M_VETOES;
+
+        int filterId = m_obfInterface->setupFilter("GammaFilter", priority++, vetoMask, m_passThrough);
 
         if (filterId == -100)
         {
@@ -151,14 +162,16 @@ StatusCode OnboardFilter::initialize()
         }
 
         // Set the Gamma Filter output routine
-        OutputRtn* outRtn = new GammaFilterOutput(filterId, m_passThrough);
+        OutputRtn* outRtn = new GammaFilterOutput(filterId, m_gamBitsToIgnore, m_passThrough);
         m_obfInterface->setEovOutputCallBack(outRtn);
     }
 
     // Set up the CNO (Heavy Ion) filter and associated output
     if (m_CNOFilter)
     {
-        int filterId = m_obfInterface->setupFilter("CNOFilter", priority++, false);
+        unsigned vetoMask = HFC_STATUS_M_VETO_DEF;
+
+        int filterId = m_obfInterface->setupFilter("CNOFilter", priority++, vetoMask, false);
 
         if (filterId == -100)
         {
@@ -173,7 +186,9 @@ StatusCode OnboardFilter::initialize()
     // Set up the MIP filter and associated output
     if (m_MIPFilter)
     {
-        int filterId = m_obfInterface->setupFilter("MipFilter", priority++, false);
+        unsigned vetoMask = MFC_STATUS_M_VETO_DEF;
+
+        int filterId = m_obfInterface->setupFilter("MipFilter", priority++, vetoMask, false);
 
         if (filterId == -100)
         {
@@ -185,13 +200,11 @@ StatusCode OnboardFilter::initialize()
         m_obfInterface->setEovOutputCallBack(outRtn);
     }
 
-    // Set up a passthrough filter if we don't want OBF to reject event processing
-    if (m_passThrough)
+    // Set up a "passthrough" filter which allows us to always retrieve results from 
+    // the filters after they have run
+    if (!m_obfInterface->setupPassThrough(0))
     {
-        if (!m_obfInterface->setupPassThrough(0))
-        {
-            log << MSG::ERROR << "Failed to initialize pass through Filter" << endreq;
-        }
+        log << MSG::ERROR << "Failed to initialize pass through Filter" << endreq;
     }
 
     // Extra filter output only if filters set up
