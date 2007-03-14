@@ -1,4 +1,14 @@
 ------------------------------------------------------------
+User: lsrea  Wed Mar 14 15:44:59 PDT 2007
+OnboardFilter/src
+
+Modified Files:
+	FilterAlgTuple.cxx 
+Log Message:
+disable code in FilterAlgTuple.cxx, has been moved to AnalysisNtuple
+
+    *
+------------------------------------------------------------
 User: lsrea  Wed Mar 14 15:44:58 PDT 2007
 OnboardFilter/doc
 
