@@ -2,7 +2,7 @@
 /** @file FilterAlgTuple.cxx
 @brief Declaration and implementation of FilterAlgTuple
 
-$Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/FilterAlgTuple.cxx,v 1.5 2006/12/12 22:19:04 usher Exp $
+$Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/FilterAlgTuple.cxx,v 1.6 2006/12/15 23:37:23 usher Exp $
 
 */
 #include "ntupleWriterSvc/INTupleWriterSvc.h"
@@ -23,6 +23,10 @@ $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/FilterAlgTuple.cxx,v 1.5
 /** @class FilterAlgTuple
 @brief generate tuple stuff for the Onboard Filter
 */
+
+namespace{
+    bool disabled = true;
+}
 class FilterAlgTuple : public Algorithm {
 
 public:
@@ -68,8 +72,10 @@ Algorithm(name, pSvcLocator),  m_rootTupleSvc(0)
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 StatusCode FilterAlgTuple::initialize() {
-    StatusCode  sc = StatusCode::SUCCESS;
 
+    StatusCode  sc = StatusCode::SUCCESS;
+    if(disabled) return sc;
+    
     MsgStream log(msgSvc(), name());
 
     // Use the Job options service to get the Algorithm's parameters
@@ -173,6 +179,8 @@ StatusCode FilterAlgTuple::initialize() {
 StatusCode FilterAlgTuple::execute() {
 
     StatusCode  sc = StatusCode::SUCCESS;
+    if(disabled) return sc;
+
     MsgStream log(msgSvc(), name());
 
     // Old school output
@@ -246,6 +254,8 @@ StatusCode FilterAlgTuple::execute() {
 }
 //------------------------------------------------------------------------------
 StatusCode FilterAlgTuple::finalize() {
+
+    if(disabled) return StatusCode::SUCCESS;
 
     MsgStream log(msgSvc(), name());
     log << MSG::INFO ;
