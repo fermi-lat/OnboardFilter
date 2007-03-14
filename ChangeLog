@@ -1,5 +1,15 @@
 ------------------------------------------------------------
 User: lsrea  Wed Mar 14 15:44:58 PDT 2007
+OnboardFilter/doc
+
+Modified Files:
+	release.notes 
+Log Message:
+disable code in FilterAlgTuple.cxx, has been moved to AnalysisNtuple
+
+    *
+------------------------------------------------------------
+User: lsrea  Wed Mar 14 15:44:58 PDT 2007
 OnboardFilter/cmt
 
 Modified Files:
