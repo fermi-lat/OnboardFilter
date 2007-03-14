@@ -1,4 +1,14 @@
 ------------------------------------------------------------
+User: lsrea  Wed Mar 14 15:44:58 PDT 2007
+OnboardFilter/cmt
+
+Modified Files:
+	requirements 
+Log Message:
+disable code in FilterAlgTuple.cxx, has been moved to AnalysisNtuple
+
+    *
+------------------------------------------------------------
 TAG
 Tag name: v4r2p2, operation: add
 Package: OnboardFilter
