@@ -6,7 +6,7 @@
 
 \verbatim
 
-  CVS $Id: OnboardFilter.cxx,v 1.60 2007/01/02 22:24:57 usher Exp $
+  CVS $Id: OnboardFilter.cxx,v 1.61 2007/01/29 18:06:34 usher Exp $
 \endverbatim
                                                                           */
 /* ---------------------------------------------------------------------- */
@@ -257,7 +257,7 @@ StatusCode OnboardFilter::execute()
     SmartDataPtr<EbfWriterTds::Ebf> ebfData(eventSvc(),"/Event/Filter/Ebf");
     if(!ebfData)
     {
-        log << MSG::INFO << "No ebf data found "<<endreq;
+        log << MSG::DEBUG << "No ebf data found "<<endreq;
 
         return StatusCode::SUCCESS;
     }
