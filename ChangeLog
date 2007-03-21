@@ -1,22 +1,4 @@
 ------------------------------------------------------------
-User: usher  Wed Mar 21 09:02:09 PDT 2007
-OnboardFilter/cmt
-
-Modified Files:
-	requirements 
-Log Message:
-Preparing to tag v4r2p4
-    *
-------------------------------------------------------------
-User: usher  Wed Mar 21 09:00:45 PDT 2007
-OnboardFilter/src
-
-Modified Files:
-	OnboardFilter.cxx 
-Log Message:
-make ebf data message DEBUG level instead of INFO
-    *
-------------------------------------------------------------
 TAG
 Tag name: v4r2p3, operation: add
 Package: OnboardFilter
