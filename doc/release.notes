@@ -2,6 +2,7 @@
  * @file release.notes
  * @brief Package OnboardFilter
  * @verbatim
+ * v4r2p4 21-Mar-2007  TU  : Change ebf data message in OnboardFilter to DEBUG level from INFO
  * v4r2p3 14-Mar-2007  LSR : Move tuple stuff to AnalysisNtuple (code is still there, but disabled)
  * v4r2p2 29-Jan-2007  TU  : Mods to mask unwanted veto bits and return FilterStatus_HI to previous modes
  * v4r2p0 15-Dec-2006  TU  : Major refactoring, update to gsw v1r0 of fsw code (multi filters)
