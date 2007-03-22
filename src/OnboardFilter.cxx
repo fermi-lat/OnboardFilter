@@ -6,7 +6,7 @@
 
 \verbatim
 
-  CVS $Id: OnboardFilter.cxx,v 1.61 2007/01/29 18:06:34 usher Exp $
+  CVS $Id: OnboardFilter.cxx,v 1.62 2007/03/21 16:00:45 usher Exp $
 \endverbatim
                                                                           */
 /* ---------------------------------------------------------------------- */
@@ -73,6 +73,7 @@ private:
     int         m_mask;            //mask for setting filter to reject
     unsigned    m_gamBitsToIgnore; // This sets a mask of gamma filter veto bits to ignore
     int         m_rejected;
+    int         m_noEbfData;
 
     // Path to shareables
     std::string m_FileNamePath;
@@ -94,7 +95,7 @@ const IAlgFactory& OnboardFilterFactory = Factory;
 //FilterInfo OnboardFilter::myFilterInfo;
 
 OnboardFilter::OnboardFilter(const std::string& name, ISvcLocator *pSvcLocator) : Algorithm(name,pSvcLocator), 
-          m_rejected(0)
+          m_rejected(0), m_noEbfData(0)
 {
     // The default gamma veto bit ignore mask
     unsigned gamBitsToIgnore = GFC_STATUS_M_TKR_LT_2_ELO
@@ -258,6 +259,10 @@ StatusCode OnboardFilter::execute()
     if(!ebfData)
     {
         log << MSG::DEBUG << "No ebf data found "<<endreq;
+        
+        // If no ebf data then no point continuing on 
+        this->setFilterPassed(false);
+        m_noEbfData++;
 
         return StatusCode::SUCCESS;
     }
@@ -297,6 +302,8 @@ StatusCode OnboardFilter::finalize()
     m_obfInterface->dumpCounters();
 
     MsgStream log(msgSvc(), name());
+    log << MSG::INFO << "Encountered " << m_noEbfData << " events with no ebf data"
+        << endreq;
     log << MSG::INFO << "Rejected " << m_rejected << " triggers using mask: "
         << std::hex << m_mask << std::dec << endreq;
 
