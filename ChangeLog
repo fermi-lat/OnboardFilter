@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: usher  Thu Mar 22 16:16:19 PDT 2007
+OnboardFilter/src
+
+Modified Files:
+	OnboardFilter.cxx 
+Log Message:
+setFilterPassed(false) for events with no ebf data (and keep cuont of them).
+    *
+------------------------------------------------------------
 TAG
 Tag name: v4r2p4, operation: add
 Package: OnboardFilter
