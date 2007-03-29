@@ -1,13 +1,4 @@
 ------------------------------------------------------------
-User: usher  Thu Mar 29 09:05:52 PDT 2007
-OnboardFilter/cmt
-
-Modified Files:
-	requirements 
-Log Message:
-Make failure of no ebf data events optional
-    *
-------------------------------------------------------------
 TAG
 Tag name: v4r2p5, operation: add
 Package: OnboardFilter
