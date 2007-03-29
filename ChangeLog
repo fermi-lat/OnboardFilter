@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: usher  Thu Mar 29 09:05:53 PDT 2007
+OnboardFilter/doc
+
+Modified Files:
+	release.notes 
+Log Message:
+Make failure of no ebf data events optional
+    *
+------------------------------------------------------------
 User: usher  Thu Mar 29 09:05:52 PDT 2007
 OnboardFilter/cmt
 
