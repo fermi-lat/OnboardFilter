@@ -1,5 +1,14 @@
 ------------------------------------------------------------
 User: usher  Thu Mar 29 09:05:53 PDT 2007
+OnboardFilter/src
+
+Modified Files:
+	OnboardFilter.cxx 
+Log Message:
+Make failure of no ebf data events optional
+    *
+------------------------------------------------------------
+User: usher  Thu Mar 29 09:05:53 PDT 2007
 OnboardFilter/doc
 
 Modified Files:
