@@ -6,7 +6,7 @@
 
 \verbatim
 
-  CVS $Id: OnboardFilter.cxx,v 1.63 2007/03/22 23:16:19 usher Exp $
+  CVS $Id: OnboardFilter.cxx,v 1.64 2007/03/29 16:05:53 usher Exp $
 \endverbatim
                                                                           */
 /* ---------------------------------------------------------------------- */
@@ -34,6 +34,7 @@
 #include "GammaFilterOutput.h"
 #include "MipFilterOutput.h"
 #include "CNOFilterOutput.h"
+#include "DFCFilterOutput.h"
 #include "CalFilterOutput.h"
 #include "TkrFilterOutput.h"
 #include "GemFilterOutput.h"
@@ -62,6 +63,7 @@ private:
     bool        m_gammaFilter;
     bool        m_CNOFilter;
     bool        m_MIPFilter;
+    bool        m_DFCFilter;
     bool        m_passThrough;
 
     // Extra output call backs
@@ -114,6 +116,7 @@ OnboardFilter::OnboardFilter(const std::string& name, ISvcLocator *pSvcLocator) 
     declareProperty("gammaFilter",    m_gammaFilter        = true);
     declareProperty("CNOFilter",      m_CNOFilter          = true);
     declareProperty("MIPFilter",      m_MIPFilter          = true);
+    declareProperty("DFCFilter",      m_DFCFilter          = true);
     declareProperty("CalFilterInfo",  m_calFilterInfo      = true);
     declareProperty("TkrFilterInfo",  m_tkrFilterInfo      = true);
     declareProperty("GemFilterInfo",  m_gemFilterInfo      = true);
@@ -200,6 +203,23 @@ StatusCode OnboardFilter::initialize()
 
         // Set the Mip filter output routine
         OutputRtn* outRtn = new MipFilterOutput(filterId);
+        m_obfInterface->setEovOutputCallBack(outRtn);
+    }
+
+    // Set up the CNO (Heavy Ion) filter and associated output
+    if (m_DFCFilter)
+    {
+        unsigned vetoMask = DFC_STATUS_M_VETO_DEF;
+
+        int filterId = m_obfInterface->setupFilter("DFCFilter", priority++, vetoMask, false);
+
+        if (filterId == -100)
+        {
+            log << MSG::ERROR << "Failed to initialize DFC Filter" << endreq;
+        }
+
+        // Set the CNO filter output routine
+        OutputRtn* outRtn = new DFCFilterOutput(filterId);
         m_obfInterface->setEovOutputCallBack(outRtn);
     }
 

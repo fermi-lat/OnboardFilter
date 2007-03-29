@@ -2,7 +2,7 @@
 /** @file FilterAlgTuple.cxx
 @brief Declaration and implementation of FilterAlgTuple
 
-$Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/FilterAlgTuple.cxx,v 1.6 2006/12/15 23:37:23 usher Exp $
+$Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/FilterAlgTuple.cxx,v 1.7 2007/03/14 22:44:59 lsrea Exp $
 
 */
 #include "ntupleWriterSvc/INTupleWriterSvc.h"
@@ -52,6 +52,7 @@ private:
     int m_gamStatus;
     int m_cnoStatus;
     int m_mipStatus;
+    int m_dfcStatus;
 
     int m_warnNoFilterStatus;   // count WARNINGs: no FilterStatus found
  
@@ -171,6 +172,7 @@ StatusCode FilterAlgTuple::initialize() {
     m_rootTupleSvc->addItem(m_eventTreeName, "ObfGamStatus",    &m_gamStatus);
     m_rootTupleSvc->addItem(m_eventTreeName, "ObfCnoStatus",    &m_cnoStatus);
     m_rootTupleSvc->addItem(m_eventTreeName, "ObfMipStatus",    &m_mipStatus);
+    m_rootTupleSvc->addItem(m_eventTreeName, "ObfDfcStatus",    &m_dfcStatus);
 
     return sc;
 }
@@ -241,13 +243,17 @@ StatusCode FilterAlgTuple::execute() {
         obfResult   = obfStatus->getFilterStatus(OnboardFilterTds::ObfFilterStatus::GammaFilter);
         m_gamStatus = obfResult ? obfResult->getStatus32() : -1;
 
-        // Start with CNO Filter
+        // Get the CNO (HFC) Filter
         obfResult   = obfStatus->getFilterStatus(OnboardFilterTds::ObfFilterStatus::CNOFilter);
         m_cnoStatus = obfResult ? obfResult->getStatus32() : -1;
 
-        // Start with Gamma Filter
+        // Get the MIP filter
         obfResult   = obfStatus->getFilterStatus(OnboardFilterTds::ObfFilterStatus::MipFilter);
         m_mipStatus = obfResult ? obfResult->getStatus32() : -1;
+
+        // Get the Diagnostic filter
+        obfResult   = obfStatus->getFilterStatus(OnboardFilterTds::ObfFilterStatus::DFCFilter);
+        m_dfcStatus = obfResult ? obfResult->getStatus32() : -1;
     }
 
     return sc;
