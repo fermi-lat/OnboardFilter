@@ -16,6 +16,8 @@
 #include "XFC_DB/MFC_DB_instance.h"
 #include "XFC_DB/HFC_DB_schema.h"
 #include "XFC_DB/HFC_DB_instance.h"
+#include "XFC_DB/DFC_DB_schema.h"
+#include "XFC_DB/DFC_DB_instance.h"
 
 #include "EFC/EFC.h"
 #include "EFC/EFC_edsFw.h"
@@ -92,26 +94,31 @@ ObfInterface::ObfInterface(MsgStream& log, const std::string& filePath, void* ca
     m_schemaMap["GammaFilter"] = SchemaPair(GFC_DB_SCHEMA, GFC_DB_INSTANCE_K_MASTER);
     m_schemaMap["MipFilter"]   = SchemaPair(MFC_DB_SCHEMA, MFC_DB_INSTANCE_K_MASTER);
     m_schemaMap["CNOFilter"]   = SchemaPair(HFC_DB_SCHEMA, HFC_DB_INSTANCE_K_MASTER);
+    m_schemaMap["DFCFilter"]   = SchemaPair(DFC_DB_SCHEMA, DFC_DB_INSTANCE_K_MASTER);
 
     // Schema id to file names
     m_idToFile.clear();
 
-    m_idToFile[SchemaPair(GFC_DB_SCHEMA,GFC_DB_INSTANCE_K_MASTER)]  = "gfc_db_master";
-    m_idToFile[SchemaPair(GFC_DB_SCHEMA,GFC_DB_INSTANCE_K_NORMAL)]  = "gfc_db_normal";
-    m_idToFile[SchemaPair(GFC_DB_SCHEMA,GFC_DB_INSTANCE_K_DEFAULT)] = "gfc_db_default";
+    m_idToFile[SchemaPair(GFC_DB_SCHEMA,GFC_DB_INSTANCE_K_MASTER)]    = "gfc_db_master";
+    m_idToFile[SchemaPair(GFC_DB_SCHEMA,GFC_DB_INSTANCE_K_NORMAL)]    = "gfc_db_normal";
+    m_idToFile[SchemaPair(GFC_DB_SCHEMA,GFC_DB_INSTANCE_K_DEFAULT)]   = "gfc_db_default";
 
-    m_idToFile[SchemaPair(MFC_DB_SCHEMA,MFC_DB_INSTANCE_K_MASTER)]  = "mfc_db_master";
-    m_idToFile[SchemaPair(MFC_DB_SCHEMA,MFC_DB_INSTANCE_K_NORMAL)]  = "mfc_db_normal";
-    m_idToFile[SchemaPair(MFC_DB_SCHEMA,MFC_DB_INSTANCE_K_DEFAULT)] = "mfc_db_default";
+    m_idToFile[SchemaPair(MFC_DB_SCHEMA,MFC_DB_INSTANCE_K_MASTER)]    = "mfc_db_master";
+    m_idToFile[SchemaPair(MFC_DB_SCHEMA,MFC_DB_INSTANCE_K_NORMAL)]    = "mfc_db_normal";
+    m_idToFile[SchemaPair(MFC_DB_SCHEMA,MFC_DB_INSTANCE_K_DEFAULT)]   = "mfc_db_default";
 
-    m_idToFile[SchemaPair(HFC_DB_SCHEMA,HFC_DB_INSTANCE_K_MASTER)]  = "hfc_db_master";
-    m_idToFile[SchemaPair(HFC_DB_SCHEMA,HFC_DB_INSTANCE_K_NORMAL)]  = "hfc_db_normal";
-    m_idToFile[SchemaPair(HFC_DB_SCHEMA,HFC_DB_INSTANCE_K_DEFAULT)] = "hfc_db_default";
+    m_idToFile[SchemaPair(HFC_DB_SCHEMA,HFC_DB_INSTANCE_K_MASTER)]    = "hfc_db_master";
+    m_idToFile[SchemaPair(HFC_DB_SCHEMA,HFC_DB_INSTANCE_K_NORMAL)]    = "hfc_db_normal";
+    m_idToFile[SchemaPair(HFC_DB_SCHEMA,HFC_DB_INSTANCE_K_DEFAULT)]   = "hfc_db_default";
   
+    m_idToFile[SchemaPair(DFC_DB_SCHEMA,DFC_DB_INSTANCE_K_MASTER)]    = "dfc_db_master";
+    m_idToFile[SchemaPair(DFC_DB_SCHEMA,DFC_DB_INSTANCE_K_PRIMITIVE)] = "dfc_db_primitive";
+
     // EFC library already loaded (we link to it)
     // Load the other filter libraries
     loadLibrary ("hfc", m_verbosity);
     loadLibrary ("mfc", m_verbosity);
+    loadLibrary ("dfc", m_verbosity);
 /*
     // do we need this?
     std::string eds_db_File = m_FileNamePath + delim + "eds_db" + fType;
