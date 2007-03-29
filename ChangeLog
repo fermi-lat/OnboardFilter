@@ -1,4 +1,15 @@
 ------------------------------------------------------------
+User: usher  Thu Mar 29 12:50:46 PDT 2007
+OnboardFilter/src
+
+Modified Files:
+	FilterAlgTuple.cxx ObfInterface.cxx OnboardFilter.cxx 
+Added Files:
+	DFCFilterOutput.cxx DFCFilterOutput.h 
+Log Message:
+Add modifications to allow inclusion of the Diagnostic Filter (DFC) as requested by Eric Grove (and gcr folks)
+    *
+------------------------------------------------------------
 TAG
 Tag name: v4r2p6, operation: add
 Package: OnboardFilter
