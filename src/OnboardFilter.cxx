@@ -6,7 +6,7 @@
 
 \verbatim
 
-  CVS $Id: OnboardFilter.cxx,v 1.62 2007/03/21 16:00:45 usher Exp $
+  CVS $Id: OnboardFilter.cxx,v 1.63 2007/03/22 23:16:19 usher Exp $
 \endverbatim
                                                                           */
 /* ---------------------------------------------------------------------- */
@@ -74,6 +74,7 @@ private:
     unsigned    m_gamBitsToIgnore; // This sets a mask of gamma filter veto bits to ignore
     int         m_rejected;
     int         m_noEbfData;
+    bool        m_failNoEbfData;
 
     // Path to shareables
     std::string m_FileNamePath;
@@ -117,6 +118,7 @@ OnboardFilter::OnboardFilter(const std::string& name, ISvcLocator *pSvcLocator) 
     declareProperty("TkrFilterInfo",  m_tkrFilterInfo      = true);
     declareProperty("GemFilterInfo",  m_gemFilterInfo      = true);
     declareProperty("TkrHitsInfo",    m_tkrHitsInfo        = false);
+    declareProperty("FailNoEbfData",  m_failNoEbfData      = false);
 }
 /* --------------------------------------------------------------------- */
 
@@ -261,7 +263,7 @@ StatusCode OnboardFilter::execute()
         log << MSG::DEBUG << "No ebf data found "<<endreq;
         
         // If no ebf data then no point continuing on 
-        this->setFilterPassed(false);
+        if (m_failNoEbfData) this->setFilterPassed(false);
         m_noEbfData++;
 
         return StatusCode::SUCCESS;
