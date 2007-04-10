@@ -6,7 +6,7 @@
 
 \verbatim
 
-  CVS $Id: OnboardFilter.cxx,v 1.64 2007/03/29 16:05:53 usher Exp $
+  CVS $Id: OnboardFilter.cxx,v 1.65 2007/03/29 19:50:46 usher Exp $
 \endverbatim
                                                                           */
 /* ---------------------------------------------------------------------- */
@@ -89,6 +89,11 @@ private:
 
     // Call back parm for holding pointers to output classes
     FilterTdsPointers* m_tdsPointers;
+
+    // The list of filters to use to reject events
+    //typedef std::list<OnboardFilterTds::IObfStatus::FilterKeys> FilterList;
+    typedef std::vector<unsigned int> FilterList;
+    FilterList  m_filterList;
 };
 
 
@@ -122,6 +127,12 @@ OnboardFilter::OnboardFilter(const std::string& name, ISvcLocator *pSvcLocator) 
     declareProperty("GemFilterInfo",  m_gemFilterInfo      = true);
     declareProperty("TkrHitsInfo",    m_tkrHitsInfo        = false);
     declareProperty("FailNoEbfData",  m_failNoEbfData      = false);
+    declareProperty("FilterList",     m_filterList);
+
+    // Set up the default to filter on Gamma and CNO filters
+    m_filterList.clear();
+    m_filterList.push_back(OnboardFilterTds::ObfFilterStatus::GammaFilter);
+    m_filterList.push_back(OnboardFilterTds::ObfFilterStatus::CNOFilter);
 }
 /* --------------------------------------------------------------------- */
 
@@ -302,12 +313,30 @@ StatusCode OnboardFilter::execute()
         log << MSG::ERROR << "Error in filter processing, fate = " << fate << endreq;
     }
 
-    // This will cause events failing the gamma filter to stop event processing
-    if (m_gammaFilter)
+    // Check to see if we are vetoing events at this stage
+    if (m_mask != 0)
     {
-        unsigned int filterStatus = newStatus->get();
+        unsigned int combStatus = 0xFFFFFFFF;
 
-        if(m_mask!=0 && (m_mask & (filterStatus >> 15)) !=0)
+        // Loop through the list of filters to apply
+        for(FilterList::iterator listItr = m_filterList.begin(); listItr != m_filterList.end(); listItr++)
+        {
+            // Retrieve enum
+            //OnboardFilterTds::ObfFilterStatus::FilterKeys key = *listItr;
+            OnboardFilterTds::ObfFilterStatus::FilterKeys key = (OnboardFilterTds::ObfFilterStatus::FilterKeys)(*listItr);
+
+            // Look up the information for this filter
+            const OnboardFilterTds::IObfStatus* filterStat = obfStatus->getFilterStatus(key);
+
+            // Make sure the filter ran
+            if (!filterStat) continue;
+
+            // And result into previous results
+            combStatus &= filterStat->getStatus32();
+        }
+
+        // High order bit set means we reject events, assume m_mask = -1 does that job
+        if (combStatus & m_mask)
         {
             this->setFilterPassed(false);
             m_rejected++;
