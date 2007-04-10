@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: usher  Tue Apr 10 08:38:48 PDT 2007
+OnboardFilter/src
+
+Added Files:
+	HFCFilterOutput.cxx HFCFilterOutput.h 
+Log Message:
+Rename CNOFilterOutput to HFCFilterOutput to be consistent with real usage of the HFC Filter
+    *
+------------------------------------------------------------
 User: usher  Tue Apr 10 08:37:47 PDT 2007
 OnboardFilter/src
 
