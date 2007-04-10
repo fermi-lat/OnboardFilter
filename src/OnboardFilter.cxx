@@ -6,7 +6,7 @@
 
 \verbatim
 
-  CVS $Id: OnboardFilter.cxx,v 1.65 2007/03/29 19:50:46 usher Exp $
+  CVS $Id: OnboardFilter.cxx,v 1.66 2007/04/10 00:35:25 usher Exp $
 \endverbatim
                                                                           */
 /* ---------------------------------------------------------------------- */
@@ -33,7 +33,7 @@
 #include "ObfInterface.h"
 #include "GammaFilterOutput.h"
 #include "MipFilterOutput.h"
-#include "CNOFilterOutput.h"
+#include "HFCFilterOutput.h"
 #include "DFCFilterOutput.h"
 #include "CalFilterOutput.h"
 #include "TkrFilterOutput.h"
@@ -61,7 +61,7 @@ private:
 
     // Filters to run 
     bool        m_gammaFilter;
-    bool        m_CNOFilter;
+    bool        m_HFCFilter;
     bool        m_MIPFilter;
     bool        m_DFCFilter;
     bool        m_passThrough;
@@ -119,7 +119,7 @@ OnboardFilter::OnboardFilter(const std::string& name, ISvcLocator *pSvcLocator) 
     declareProperty("GamFilterMask",  m_gamBitsToIgnore    = gamBitsToIgnore);
     declareProperty("PassThrough",    m_passThrough        = true);
     declareProperty("gammaFilter",    m_gammaFilter        = true);
-    declareProperty("CNOFilter",      m_CNOFilter          = true);
+    declareProperty("HFCFilter",      m_HFCFilter          = true);
     declareProperty("MIPFilter",      m_MIPFilter          = true);
     declareProperty("DFCFilter",      m_DFCFilter          = true);
     declareProperty("CalFilterInfo",  m_calFilterInfo      = true);
@@ -129,10 +129,10 @@ OnboardFilter::OnboardFilter(const std::string& name, ISvcLocator *pSvcLocator) 
     declareProperty("FailNoEbfData",  m_failNoEbfData      = false);
     declareProperty("FilterList",     m_filterList);
 
-    // Set up the default to filter on Gamma and CNO filters
+    // Set up the default to filter on Gamma and HFC filters
     m_filterList.clear();
     m_filterList.push_back(OnboardFilterTds::ObfFilterStatus::GammaFilter);
-    m_filterList.push_back(OnboardFilterTds::ObfFilterStatus::CNOFilter);
+    m_filterList.push_back(OnboardFilterTds::ObfFilterStatus::HFCFilter);
 }
 /* --------------------------------------------------------------------- */
 
@@ -183,20 +183,20 @@ StatusCode OnboardFilter::initialize()
         m_obfInterface->setEovOutputCallBack(outRtn);
     }
 
-    // Set up the CNO (Heavy Ion) filter and associated output
-    if (m_CNOFilter)
+    // Set up the HFC (Heavy Ion) filter and associated output
+    if (m_HFCFilter)
     {
         unsigned vetoMask = HFC_STATUS_M_VETO_DEF;
 
-        int filterId = m_obfInterface->setupFilter("CNOFilter", priority++, vetoMask, false);
+        int filterId = m_obfInterface->setupFilter("HFCFilter", priority++, vetoMask, false);
 
         if (filterId == -100)
         {
-            log << MSG::ERROR << "Failed to initialize CNO Filter" << endreq;
+            log << MSG::ERROR << "Failed to initialize HFC Filter" << endreq;
         }
 
-        // Set the CNO filter output routine
-        OutputRtn* outRtn = new CNOFilterOutput(filterId);
+        // Set the HFC filter output routine
+        OutputRtn* outRtn = new HFCFilterOutput(filterId);
         m_obfInterface->setEovOutputCallBack(outRtn);
     }
 
@@ -217,7 +217,7 @@ StatusCode OnboardFilter::initialize()
         m_obfInterface->setEovOutputCallBack(outRtn);
     }
 
-    // Set up the CNO (Heavy Ion) filter and associated output
+    // Set up the DFC (Diagnostic) filter and associated output
     if (m_DFCFilter)
     {
         unsigned vetoMask = DFC_STATUS_M_VETO_DEF;
@@ -229,7 +229,7 @@ StatusCode OnboardFilter::initialize()
             log << MSG::ERROR << "Failed to initialize DFC Filter" << endreq;
         }
 
-        // Set the CNO filter output routine
+        // Set the DFC filter output routine
         OutputRtn* outRtn = new DFCFilterOutput(filterId);
         m_obfInterface->setEovOutputCallBack(outRtn);
     }

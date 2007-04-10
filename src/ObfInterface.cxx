@@ -93,7 +93,7 @@ ObfInterface::ObfInterface(MsgStream& log, const std::string& filePath, void* ca
 
     m_schemaMap["GammaFilter"] = SchemaPair(GFC_DB_SCHEMA, GFC_DB_INSTANCE_K_MASTER);
     m_schemaMap["MipFilter"]   = SchemaPair(MFC_DB_SCHEMA, MFC_DB_INSTANCE_K_MASTER);
-    m_schemaMap["CNOFilter"]   = SchemaPair(HFC_DB_SCHEMA, HFC_DB_INSTANCE_K_MASTER);
+    m_schemaMap["HFCFilter"]   = SchemaPair(HFC_DB_SCHEMA, HFC_DB_INSTANCE_K_MASTER);
     m_schemaMap["DFCFilter"]   = SchemaPair(DFC_DB_SCHEMA, DFC_DB_INSTANCE_K_MASTER);
 
     // Schema id to file names
