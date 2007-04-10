@@ -52,11 +52,11 @@ void DFCFilterOutput::eovProcessing(void* callBackParm, EDS_fwIxb* ixb)
         if (statusWord & DFC_STATUS_M_VETO_DEF) statusWord |= DFC_STATUS_M_VETOED;
     }
 
-    // Create a new Gamma Status TDS sub object
-    OnboardFilterTds::ObfDFCStatus* cnoStat = new OnboardFilterTds::ObfDFCStatus(statusWord);
+    // Create a new DFC Status TDS sub object
+    OnboardFilterTds::ObfDFCStatus* dfcStat = new OnboardFilterTds::ObfDFCStatus(statusWord);
 
     // Add it to the TDS object
-    obfFilterStatus->addFilterStatus(OnboardFilterTds::ObfFilterStatus::DFCFilter, cnoStat);
+    obfFilterStatus->addFilterStatus(OnboardFilterTds::ObfFilterStatus::DFCFilter, dfcStat);
 
     // Increment counters accordingly
     if((statusWord & DFC_STATUS_M_STAGE_GEM) != 0)      m_statusBits[0]++;
@@ -72,7 +72,7 @@ void DFCFilterOutput::eovProcessing(void* callBackParm, EDS_fwIxb* ixb)
 void DFCFilterOutput::eorProcessing(MsgStream& log)
 {
     // Output the bit frequency table
-    log << MSG::INFO << "-- CNO Filter bit frequency table -- \n" 
+    log << MSG::INFO << "-- DFC Filter bit frequency table -- \n" 
         << "    Status Bit                         Value\n"
         << "    DFC_STATUS_M_STAGE_GEM             " << m_statusBits[0] << "\n"       
     

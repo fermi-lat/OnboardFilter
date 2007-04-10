@@ -2,7 +2,7 @@
 /** @file FilterAlgTuple.cxx
 @brief Declaration and implementation of FilterAlgTuple
 
-$Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/FilterAlgTuple.cxx,v 1.7 2007/03/14 22:44:59 lsrea Exp $
+$Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/FilterAlgTuple.cxx,v 1.8 2007/03/29 19:50:46 usher Exp $
 
 */
 #include "ntupleWriterSvc/INTupleWriterSvc.h"
@@ -244,7 +244,7 @@ StatusCode FilterAlgTuple::execute() {
         m_gamStatus = obfResult ? obfResult->getStatus32() : -1;
 
         // Get the CNO (HFC) Filter
-        obfResult   = obfStatus->getFilterStatus(OnboardFilterTds::ObfFilterStatus::CNOFilter);
+        obfResult   = obfStatus->getFilterStatus(OnboardFilterTds::ObfFilterStatus::HFCFilter);
         m_cnoStatus = obfResult ? obfResult->getStatus32() : -1;
 
         // Get the MIP filter
