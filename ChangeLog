@@ -1,4 +1,16 @@
 ------------------------------------------------------------
+User: usher  Tue Apr 10 08:37:47 PDT 2007
+OnboardFilter/src
+
+Modified Files:
+	DFCFilterOutput.cxx FilterAlgTuple.cxx ObfInterface.cxx 
+	OnboardFilter.cxx 
+Removed Files:
+	CNOFilterOutput.cxx CNOFilterOutput.h 
+Log Message:
+Remane all occurances of "CNO" to "HFC" to be consistent with real name and usage of the HFC filter
+    *
+------------------------------------------------------------
 User: usher  Mon Apr  9 17:54:30 PDT 2007
 OnboardFilter/doc
 
