@@ -8,7 +8,7 @@
 *
 * @authors T. Usher
 *
-* $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/DFCFilterOutput.h,v 1.2 2007/01/02 22:24:57 usher Exp $
+* $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/DFCFilterOutput.h,v 1.1 2007/03/29 19:50:46 usher Exp $
 */
 
 #ifndef __DFCFilterOutput_H
@@ -33,8 +33,8 @@ private:
     int m_offset;         // Offset into ixb event desriptor block for this information
     bool m_passThrough;   // Running filter in pass through mode
 
-    int m_vetoBits[16];   //array to count # of times each veto bit was set
-    int m_statusBits[16]; //array to count # of times each veto bit was set
+    int m_vetoBits[17];   //array to count # of times each veto bit was set
+    int m_statusBits[15]; //array to count # of times each veto bit was set
 };
 
 #endif // __ObfInterface_H

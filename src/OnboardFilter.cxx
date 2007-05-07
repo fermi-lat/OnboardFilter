@@ -6,7 +6,7 @@
 
 \verbatim
 
-  CVS $Id: OnboardFilter.cxx,v 1.66 2007/04/10 00:35:25 usher Exp $
+  CVS $Id: OnboardFilter.cxx,v 1.67 2007/04/10 15:37:47 usher Exp $
 \endverbatim
                                                                           */
 /* ---------------------------------------------------------------------- */
@@ -73,6 +73,7 @@ private:
     bool        m_tkrHitsInfo;
 
     int         m_mask;            //mask for setting filter to reject
+    bool        m_rejectEvents;    // Enables rejection of events from list of active filters
     unsigned    m_gamBitsToIgnore; // This sets a mask of gamma filter veto bits to ignore
     int         m_rejected;
     int         m_noEbfData;
@@ -115,7 +116,8 @@ OnboardFilter::OnboardFilter(const std::string& name, ISvcLocator *pSvcLocator) 
     declareProperty("FileNamePath",   m_FileNamePath       = "$(FLIGHTCODELIBS)");
     declareProperty("FileNamePeds",   m_FileName_Pedestals = "cal_db_pedestals");
     declareProperty("FileNameGains",  m_FileName_Gains     = "cal_db_gains");
-    declareProperty("mask",           m_mask               = 0);
+    declareProperty("mask",           m_mask               = 0);      // Switching to using m_rejectEvents! TU 5/7/2007
+    declareProperty("RejectEvents",   m_rejectEvents       = false);
     declareProperty("GamFilterMask",  m_gamBitsToIgnore    = gamBitsToIgnore);
     declareProperty("PassThrough",    m_passThrough        = true);
     declareProperty("gammaFilter",    m_gammaFilter        = true);
@@ -270,6 +272,15 @@ StatusCode OnboardFilter::initialize()
     {
         log << MSG::WARNING << "No filters have been requested! " << endreq;
     }
+
+    // Check that the mask was set?
+    if (m_mask)
+    {
+        log << "Found mask set to " << std::hex << m_mask << "!!" << endreq;
+        log << "mask is no longer used, setting RejectEvents flag to true" << endreq;
+
+        m_rejectEvents = true;
+    }
   
     return StatusCode::SUCCESS;
 }
@@ -314,7 +325,7 @@ StatusCode OnboardFilter::execute()
     }
 
     // Check to see if we are vetoing events at this stage
-    if (m_mask != 0)
+    if (m_rejectEvents)
     {
         unsigned int combStatus = 0xFFFFFFFF;
 
@@ -332,11 +343,11 @@ StatusCode OnboardFilter::execute()
             if (!filterStat) continue;
 
             // And result into previous results
-            combStatus &= filterStat->getStatus32();
+            combStatus &= filterStat->getStatus32() & 0x80000000;
         }
 
-        // High order bit set means we reject events, assume m_mask = -1 does that job
-        if (combStatus & m_mask)
+        // High order bit set means we reject events, at this point combStatus would be non-zero
+        if (combStatus)
         {
             this->setFilterPassed(false);
             m_rejected++;
@@ -355,8 +366,8 @@ StatusCode OnboardFilter::finalize()
     MsgStream log(msgSvc(), name());
     log << MSG::INFO << "Encountered " << m_noEbfData << " events with no ebf data"
         << endreq;
-    log << MSG::INFO << "Rejected " << m_rejected << " triggers using mask: "
-        << std::hex << m_mask << std::dec << endreq;
+    if (m_rejectEvents) log << MSG::INFO << "Rejected " << m_rejected << endreq;
+//        << " triggers using mask: " << std::hex << m_mask << std::dec << endreq;
 
     return StatusCode::SUCCESS;
 }
