@@ -1,31 +1,4 @@
 ------------------------------------------------------------
-User: usher  Mon May  7 12:58:19 PDT 2007
-OnboardFilter/doc
-
-Modified Files:
-	release.notes 
-Log Message:
-Preparing to tag v4r3p1
-    *
-------------------------------------------------------------
-User: usher  Mon May  7 12:58:19 PDT 2007
-OnboardFilter/cmt
-
-Modified Files:
-	requirements 
-Log Message:
-Preparing to tag v4r3p1
-    *
-------------------------------------------------------------
-User: usher  Mon May  7 12:56:22 PDT 2007
-OnboardFilter/src
-
-Modified Files:
-	DFCFilterOutput.h OnboardFilter.cxx 
-Log Message:
-Fix problem with multiple filter event rejection by moving to a new JO parameter (a boolean, RejectEvents). Also fix the output of the DFC filter.
-    *
-------------------------------------------------------------
 TAG
 Tag name: v4r3, operation: add
 Package: OnboardFilter
