@@ -6,7 +6,7 @@
 
 \verbatim
 
-  CVS $Id: OnboardFilter.cxx,v 1.67 2007/04/10 15:37:47 usher Exp $
+  CVS $Id: OnboardFilter.cxx,v 1.68 2007/05/07 19:56:22 usher Exp $
 \endverbatim
                                                                           */
 /* ---------------------------------------------------------------------- */
@@ -276,7 +276,7 @@ StatusCode OnboardFilter::initialize()
     // Check that the mask was set?
     if (m_mask)
     {
-        log << "Found mask set to " << std::hex << m_mask << "!!" << endreq;
+        log << "Found mask set to " << std::hex << m_mask << std::dec << "!!" << endreq;
         log << "mask is no longer used, setting RejectEvents flag to true" << endreq;
 
         m_rejectEvents = true;
