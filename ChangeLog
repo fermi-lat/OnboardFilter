@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: usher  Mon May  7 20:07:44 PDT 2007
+OnboardFilter/src
+
+Modified Files:
+	OnboardFilter.cxx 
+Log Message:
+fix output formatting problem
+    *
+------------------------------------------------------------
 TAG
 Tag name: v4r3p1, operation: add
 Package: OnboardFilter
