@@ -15,8 +15,8 @@ DFCFilterOutput::DFCFilterOutput(int offset, bool passThrough) :
        m_offset(offset), m_passThrough(passThrough)
 {
     // zero our counters
-    memset(m_vetoBits,   0, 16*sizeof(int));
-    memset(m_statusBits, 0, 16*sizeof(int));
+    memset(m_vetoBits,   0, 17*sizeof(int));
+    memset(m_statusBits, 0, 15*sizeof(int));
 
     return;
 }
