@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: usher  Thu May 10 10:51:52 PDT 2007
+OnboardFilter/src
+
+Modified Files:
+	DFCFilterOutput.cxx 
+Log Message:
+oops! Fix memory scribbling at initialization causing bizarre crashes...
+    *
+------------------------------------------------------------
 TAG
 Tag name: v4r3p2, operation: add
 Package: OnboardFilter
