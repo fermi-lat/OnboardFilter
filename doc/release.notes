@@ -2,6 +2,7 @@
  * @file release.notes
  * @brief Package OnboardFilter
  * @verbatim
+ * v4r3p3 10-May-2007  TU  : Fix bug in DFC which inadvertently scribbled on memory
  * v4r3p2  7-May-2007  TU  : Fix output formatting error
  * v4r3p1  7-May-2007  TU  : Fix multiple filter event rejection and DFC filter output
  * v4r3   10-Apr-2007  TU  : Consistent change from "CNO" to "HFC" throughout
