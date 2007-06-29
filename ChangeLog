@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: heather  Thu Jun 28 19:56:14 PDT 2007
+OnboardFilter/cmt
+
+Modified Files:
+	requirements 
+Log Message:
+fix sillly potential leak if someone dumbly (aka me) runs OBF without EBF
+    *
+------------------------------------------------------------
 TAG
 Tag name: v4r3p3, operation: add
 Package: OnboardFilter
