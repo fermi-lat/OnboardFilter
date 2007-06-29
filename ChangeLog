@@ -1,5 +1,14 @@
 ------------------------------------------------------------
 User: heather  Thu Jun 28 19:56:14 PDT 2007
+OnboardFilter/src
+
+Modified Files:
+	OnboardFilter.cxx 
+Log Message:
+fix sillly potential leak if someone dumbly (aka me) runs OBF without EBF
+    *
+------------------------------------------------------------
+User: heather  Thu Jun 28 19:56:14 PDT 2007
 OnboardFilter/doc
 
 Modified Files:
