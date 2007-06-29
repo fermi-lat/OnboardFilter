@@ -6,7 +6,7 @@
 
 \verbatim
 
-  CVS $Id: OnboardFilter.cxx,v 1.68 2007/05/07 19:56:22 usher Exp $
+  CVS $Id: OnboardFilter.cxx,v 1.69 2007/05/08 03:07:44 usher Exp $
 \endverbatim
                                                                           */
 /* ---------------------------------------------------------------------- */
@@ -289,15 +289,6 @@ StatusCode OnboardFilter::execute()
 {
     MsgStream log(msgSvc(), name());
     
-    //  Make the tds objects
-    OnboardFilterTds::TowerHits *hits = new OnboardFilterTds::TowerHits;
-    eventSvc()->registerObject("/Event/Filter/TowerHits",hits);
-    OnboardFilterTds::FilterStatus *newStatus=new OnboardFilterTds::FilterStatus;
-    eventSvc()->registerObject("/Event/Filter/FilterStatus",newStatus);
-
-    OnboardFilterTds::ObfFilterStatus *obfStatus=new OnboardFilterTds::ObfFilterStatus;
-    eventSvc()->registerObject("/Event/Filter/ObfFilterStatus",obfStatus);
-
     // Check for ebf on tds
     SmartDataPtr<EbfWriterTds::Ebf> ebfData(eventSvc(),"/Event/Filter/Ebf");
     if(!ebfData)
@@ -310,6 +301,16 @@ StatusCode OnboardFilter::execute()
 
         return StatusCode::SUCCESS;
     }
+
+    //  Make the tds objects
+    OnboardFilterTds::TowerHits *hits = new OnboardFilterTds::TowerHits;
+    eventSvc()->registerObject("/Event/Filter/TowerHits",hits);
+    OnboardFilterTds::FilterStatus *newStatus=new OnboardFilterTds::FilterStatus;
+    eventSvc()->registerObject("/Event/Filter/FilterStatus",newStatus);
+
+    OnboardFilterTds::ObfFilterStatus *obfStatus=new OnboardFilterTds::ObfFilterStatus;
+    eventSvc()->registerObject("/Event/Filter/ObfFilterStatus",obfStatus);
+
 
     // Store pointers in the call back object
     m_tdsPointers->m_filterStatus    = newStatus;
