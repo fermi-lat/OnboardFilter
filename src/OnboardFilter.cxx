@@ -6,7 +6,7 @@
 
 \verbatim
 
-  CVS $Id: OnboardFilter.cxx,v 1.69 2007/05/08 03:07:44 usher Exp $
+  CVS $Id: OnboardFilter.cxx,v 1.70 2007/06/29 02:56:14 heather Exp $
 \endverbatim
                                                                           */
 /* ---------------------------------------------------------------------- */
@@ -108,8 +108,8 @@ OnboardFilter::OnboardFilter(const std::string& name, ISvcLocator *pSvcLocator) 
 {
     // The default gamma veto bit ignore mask
     unsigned gamBitsToIgnore = GFC_STATUS_M_TKR_LT_2_ELO
-                             | GFC_STATUS_M_EL0_ETOT_90 
-                             | GFC_STATUS_M_EL0_ETOT_01
+                             | GFC_STATUS_M_EL0_ETOT_HI 
+                             | GFC_STATUS_M_EL0_ETOT_LO
                              | GFC_STATUS_M_SPLASH_1;
 
     // Properties for this algorithm

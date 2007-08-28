@@ -105,13 +105,16 @@ ObfInterface::ObfInterface(MsgStream& log, const std::string& filePath, void* ca
 
     m_idToFile[SchemaPair(MFC_DB_SCHEMA,MFC_DB_INSTANCE_K_MASTER)]    = "mfc_db_master";
     m_idToFile[SchemaPair(MFC_DB_SCHEMA,MFC_DB_INSTANCE_K_NORMAL)]    = "mfc_db_normal";
-    m_idToFile[SchemaPair(MFC_DB_SCHEMA,MFC_DB_INSTANCE_K_DEFAULT)]   = "mfc_db_default";
+//    m_idToFile[SchemaPair(MFC_DB_SCHEMA,MFC_DB_INSTANCE_K_DEFAULT)]   = "mfc_db_default";
 
     m_idToFile[SchemaPair(HFC_DB_SCHEMA,HFC_DB_INSTANCE_K_MASTER)]    = "hfc_db_master";
     m_idToFile[SchemaPair(HFC_DB_SCHEMA,HFC_DB_INSTANCE_K_NORMAL)]    = "hfc_db_normal";
     m_idToFile[SchemaPair(HFC_DB_SCHEMA,HFC_DB_INSTANCE_K_DEFAULT)]   = "hfc_db_default";
   
     m_idToFile[SchemaPair(DFC_DB_SCHEMA,DFC_DB_INSTANCE_K_MASTER)]    = "dfc_db_master";
+    m_idToFile[SchemaPair(DFC_DB_SCHEMA,DFC_DB_INSTANCE_K_GEM)]       = "dfc_db_gem";
+    m_idToFile[SchemaPair(DFC_DB_SCHEMA,DFC_DB_INSTANCE_K_TKR)]       = "dfc_db_tkr";
+    m_idToFile[SchemaPair(DFC_DB_SCHEMA,DFC_DB_INSTANCE_K_GROUND_HI)] = "dfc_db_ground_hi";
     m_idToFile[SchemaPair(DFC_DB_SCHEMA,DFC_DB_INSTANCE_K_PRIMITIVE)] = "dfc_db_primitive";
 
     // EFC library already loaded (we link to it)
@@ -435,6 +438,7 @@ void ObfInterface::setMessageLevels (MessageObjLevels lvl)
 
   return;
 }
+
 /* ---------------------------------------------------------------------- */
 #endif
 
@@ -449,7 +453,7 @@ void ObfInterface::dumpCounters()
 //    m_log << MSG::INFO << "Rejected " << m_rejected << " triggers using mask " << m_mask  << endreq;
     m_log << MSG::INFO;
 
-    /* No EFC_deconstruct to call */
+    // No EFC_deconstruct to call 
     free(m_edsFw);
 
     for(std::vector<EFC*>::iterator filterIter = m_filterVec.begin(); filterIter != m_filterVec.end(); filterIter++)
@@ -467,6 +471,7 @@ void ObfInterface::dumpCounters()
 
     return;
 }
+
 
 void extractFilterInfo (EOVCallBackParams* callBack, EDS_fwIxb *ixb)
 {
@@ -496,6 +501,7 @@ unsigned int dummyFreeRtn (void* prm, EBF_pkt *from, EBF_pkt *to)
 {
   return 0;
 }
+
 /* --------------------------------------------------------------------- */
 
 
@@ -523,7 +529,6 @@ int passThrough (void        *unused,
 {
   return EDS_FW_FN_M_NO_MORE | EDS_FW_FN_M_POST_0;
 }
-
 
 
 /* ---------------------------------------------------------------------- *//*!
