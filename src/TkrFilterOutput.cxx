@@ -89,7 +89,7 @@ void TkrFilterOutput::extractFilterTkrInfo(OnboardFilterTds::FilterStatus* filte
         unsigned int         twrMsk       = 0xffffffff;
 
         //  Get the projections 
-        const TFC_projections *prjs = (const TFC_projections *)ixb->blk.ptrs[EFC_EDS_FW_OBJ_K_PRJS];
+        const TFC_prjs *prjs = (const TFC_prjs *)ixb->blk.ptrs[EFC_EDS_FW_OBJ_K_TFC_PRJS];
     
         if (twrMsk == -1) twrMsk  = prjs->twrMsk << 16;
         else              twrMsk &= 0xffff0000;
@@ -105,7 +105,7 @@ void TkrFilterOutput::extractFilterTkrInfo(OnboardFilterTds::FilterStatus* filte
         while (twrMsk)
         {
             int towerId = FFS (twrMsk);
-            const TFC_projectionDir *dir = prjs->dir + towerId;
+            const TFC_prjDir *dir = prjs->dir + towerId;
 
             xCnt[towerId]=dir->xCnt;
             yCnt[towerId]=dir->yCnt;
@@ -118,7 +118,7 @@ void TkrFilterOutput::extractFilterTkrInfo(OnboardFilterTds::FilterStatus* filte
         //   printf("twrMsk %x ebftwrmsk %x \n",twrMsk,EBF_DIR_TEMS_TKR (dir->redux.ctids));
         filterStatus->setTmsk(EBF_DIR_TEMS_TKR (dir->redux.ctids));
 
-        const TFC_projections& prjsRef = *prjs;
+        const TFC_prjs& prjsRef = *prjs;
         filterStatus->setProjections(prjsRef);
 
         int xy00Array[16];
@@ -238,7 +238,7 @@ void TkrFilterOutput::extractBestTrackInfo(OnboardFilterTds::FilterStatus* filte
     double intYZ   = 0.0;
 
     // Get the projections 
-    const TFC_projections *prjs = (const TFC_projections *)ixb->blk.ptrs[EFC_EDS_FW_OBJ_K_PRJS];
+    const TFC_prjs *prjs = (const TFC_prjs *)ixb->blk.ptrs[EFC_EDS_FW_OBJ_K_TFC_PRJS];
 
     // use the trackProj class to do the real work here... but only if data...
     if (filterStatus->getTcids() > 0) 
@@ -277,11 +277,11 @@ void TkrFilterOutput::extractTkrTwrHitInfo(OnboardFilterTds::TowerHits* towerHit
         {
             towerHits->m_hits[towerId].cnt[layers] = ttr->layers[layers].cnt;
             towerHits->m_hits[towerId].beg[layers] = 
-                   (TFC_strip*)malloc(towerHits->m_hits[towerId].cnt[layers]*sizeof(TFC_strip));
+                   (TFC_hit*)malloc(towerHits->m_hits[towerId].cnt[layers]*sizeof(TFC_hit));
             
             memcpy(towerHits->m_hits[towerId].beg[layers],
                    ttr->layers[layers].beg,
-                   towerHits->m_hits[towerId].cnt[layers]*sizeof(TFC_strip));
+                   towerHits->m_hits[towerId].cnt[layers]*sizeof(TFC_hit));
         }
 
         twrMsk = FFS_eliminate (twrMsk, towerId);

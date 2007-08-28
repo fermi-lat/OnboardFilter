@@ -12,7 +12,7 @@
 
 //____________________________________________________________________________
 
-void trackProj::execute(int flag, const TFC_projections *prjs,
+void trackProj::execute(int flag, const TFC_prjs *prjs,
          int &xHits, int &yHits,
          double &slopeXZ, double &slopeYZ,
          double &intXZ, double &intYZ){
@@ -25,7 +25,7 @@ void trackProj::execute(int flag, const TFC_projections *prjs,
    intXZ = 0.0;
    intYZ = 0.0;
 
-   const TFC_projection *prj;
+   const TFC_prj *prj;
 
    prj = prjs->prjs;   
    int tmsk = prjs->twrMsk << 16;
@@ -35,7 +35,7 @@ void trackProj::execute(int flag, const TFC_projections *prjs,
    int xy = 1;
    while (tmsk) {
       int                      tower;
-      const TFC_projectionDir *dir;
+      const TFC_prjDir *dir;
 
       tower = FFS (tmsk);     // get first bit set, this is the tower number
       tmsk  = FFS_eliminate (tmsk, tower);  // eliminate bit corresponding to tower
@@ -67,7 +67,7 @@ void trackProj::execute(int flag, const TFC_projections *prjs,
    tmsk = prjs->twrMsk << 16;
    while (tmsk) {
       int                      tower;
-      const TFC_projectionDir *dir;
+      const TFC_prjDir *dir;
       HepPoint3D point;
       tower = FFS (tmsk);     // get first bit set, this is the tower number
       tmsk  = FFS_eliminate (tmsk, tower);  // eliminate bit corresponding to tower
@@ -87,11 +87,11 @@ void trackProj::execute(int flag, const TFC_projections *prjs,
          for(int xprj=startPrj;xprj<startPrj+dir->xCnt;xprj++){
 
             point=findStripPosition(tower,prjs->prjs[xprj].max,0,
-            prjs->prjs[xprj].hits[prjs->prjs[xprj].max]);
+            prjs->prjs[xprj].hits[prjs->prjs[xprj].max].strip);
             m_x[0]=point.x();
             m_xz[0]=point.z();
             point=findStripPosition(tower,prjs->prjs[xprj].max-1,0,
-            prjs->prjs[xprj].hits[prjs->prjs[xprj].max-1]);
+            prjs->prjs[xprj].hits[prjs->prjs[xprj].max-1].strip);
             m_x[1]=point.x();
             m_xz[1]=point.z();
 //            printf("   xproj start layer %d hits %d\n",prjs->prjs[xprj].max,prjs->prjs[xprj].nhits);
@@ -102,14 +102,14 @@ void trackProj::execute(int flag, const TFC_projections *prjs,
                 if(prjs->prjs[xprj].max==prjs->prjs[yprj].max){//if they start in the same layer
                  
                   point=findStripPosition(tower,prjs->prjs[yprj].max,
-                  1,prjs->prjs[yprj].hits[prjs->prjs[yprj].max]);
+                  1,prjs->prjs[yprj].hits[prjs->prjs[yprj].max].strip);
                   m_y[0]=point.y();
                   m_yz[0]=point.z();
                   //printf("  findStripPosition tower %d max %d hits %d m_y[0] %f\n",
                   //                     tower,prjs->prjs[yprj].max,
                   //                      prjs->prjs[yprj].hits[0],m_y[0]);
                   point=findStripPosition(tower,prjs->prjs[yprj].max-1,
-                  1,prjs->prjs[yprj].hits[prjs->prjs[yprj].max-1]);
+                  1,prjs->prjs[yprj].hits[prjs->prjs[yprj].max-1].strip);
                   m_y[1]=point.y();
                   m_yz[1]=point.z();
                   //printf("  findStripPosition tower %d max %d hits %d m_y[1] %f\n",
@@ -122,11 +122,11 @@ void trackProj::execute(int flag, const TFC_projections *prjs,
                      maxhits=prjs->prjs[yprj].nhits;
                   }
                   point=findStripPosition(tower,prjs->prjs[xprj].max-(maxhits-1),
-                  0,prjs->prjs[xprj].hits[prjs->prjs[xprj].max-(maxhits-1)]);
+                  0,prjs->prjs[xprj].hits[prjs->prjs[xprj].max-(maxhits-1)].strip);
                   m_x[2]=point.x();
                   m_xz[2]=point.z();
                   point=findStripPosition(tower,prjs->prjs[yprj].max-(maxhits-1),
-                  1,prjs->prjs[yprj].hits[prjs->prjs[yprj].max-(maxhits-1)]);
+                  1,prjs->prjs[yprj].hits[prjs->prjs[yprj].max-(maxhits-1)].strip);
                   m_y[2]=point.y();
                   m_yz[2]=point.z();
                   for(int counter=0;counter<3;counter++) {

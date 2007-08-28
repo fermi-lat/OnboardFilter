@@ -1,6 +1,6 @@
  #ifndef TRACKPROJ
 #define TRACKPROJ
-#include "EFC/TFC_projectionDef.h"
+#include "EFC/TFC_prjDef.h"
 //#include "OnboardFilter/TFC_geometry_v1r13p0.c"
 //#include "GGF_DB/GEO_DB_data.h"
 
@@ -20,7 +20,7 @@ class trackProj {
 public:
    trackProj() {loadGeometry();}
    ~trackProj() {}
-   void execute(int flag, const TFC_projections *prjs,
+   void execute(int flag, const TFC_prjs *prjs,
          int &xHits, int &yHits,
          double &xzSlope, double &yzSlope,
          double &xzInt, double &yzInt);
