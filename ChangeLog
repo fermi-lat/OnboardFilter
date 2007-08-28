@@ -1,4 +1,15 @@
 ------------------------------------------------------------
+User: usher  Tue Aug 28 16:37:14 PDT 2007
+OnboardFilter/src
+
+Modified Files:
+	FilterTracks.cxx GammaFilterOutput.cxx ObfInterface.cxx 
+	OnboardFilter.cxx TkrFilterOutput.cxx trackProj.cxx 
+	trackProj.h 
+Log Message:
+Modifications necessary to update to the version of the OnboardFilter associatied with Flight Software B1-0-1
+    *
+------------------------------------------------------------
 TAG
 Tag name: v4r3p4, operation: add
 Package: OnboardFilter
