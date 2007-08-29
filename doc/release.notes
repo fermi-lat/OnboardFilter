@@ -2,6 +2,7 @@
  * @file release.notes
  * @brief Package OnboardFilter
  * @verbatim
+ * v4r4   29-Aug-2007  TU  : Updates to accommodate FSW B1-0-1 release
  * v4r3p4 28-Jun-2007 HMK  : Patch potential memory leak if one doesn't run
  *                           EbfWriter when running OnboardFilter
  * v4r3p3 10-May-2007  TU  : Fix bug in DFC which inadvertently scribbled on memory
