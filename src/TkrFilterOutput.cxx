@@ -275,13 +275,16 @@ void TkrFilterOutput::extractTkrTwrHitInfo(OnboardFilterTds::TowerHits* towerHit
 
         for(int layers=0; layers<36; layers++)
         {
-            towerHits->m_hits[towerId].cnt[layers] = ttr->layers[layers].cnt;
-            towerHits->m_hits[towerId].beg[layers] = 
-                   (TFC_hit*)malloc(towerHits->m_hits[towerId].cnt[layers]*sizeof(TFC_hit));
+            if (ttr->layers[layers].cnt > 0)
+            {
+                towerHits->m_hits[towerId].cnt[layers] = ttr->layers[layers].cnt;
+                towerHits->m_hits[towerId].beg[layers] = 
+                    (TFC_hit*)malloc(towerHits->m_hits[towerId].cnt[layers]*sizeof(TFC_hit));
             
-            memcpy(towerHits->m_hits[towerId].beg[layers],
+                memcpy(towerHits->m_hits[towerId].beg[layers],
                    ttr->layers[layers].beg,
                    towerHits->m_hits[towerId].cnt[layers]*sizeof(TFC_hit));
+            }
         }
 
         twrMsk = FFS_eliminate (twrMsk, towerId);
