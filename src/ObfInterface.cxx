@@ -479,7 +479,13 @@ void extractFilterInfo (EOVCallBackParams* callBack, EDS_fwIxb *ixb)
     OutputRtnVec& callBackVec = callBack->m_callBackVec;
     for(OutputRtnVec::iterator callBackIter = callBackVec.begin(); callBackIter != callBackVec.end(); callBackIter++)
     {
+        try{
         (*callBackIter)->eovProcessing(callBack->m_callBackParm, ixb);
+        }
+        catch(...)
+        {
+            int j = 0;
+        }
     }
     return;
 }
