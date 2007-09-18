@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: usher  Tue Sep 18 12:28:09 PDT 2007
+OnboardFilter/src
+
+Modified Files:
+	ObfInterface.cxx 
+Log Message:
+Fix mechanism for setting "pass through" for gamma filter, should fix discrepancy seen in gamma filter system tests
+    *
+------------------------------------------------------------
 TAG
 Tag name: v4r4p1, operation: add
 Package: OnboardFilter
