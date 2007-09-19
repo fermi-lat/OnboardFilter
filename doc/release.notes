@@ -2,6 +2,7 @@
  * @file release.notes
  * @brief Package OnboardFilter
  * @verbatim
+ * v4r4p3 19-Sep-2007  TU  : Ignore forward/backward link pointers in output of TFC_projectionCol for now
  * v4r4p2 18-Sep-2007  TU  : Fix mechanism for setting pass through mode for gamma filter
  * v4r4p1  6-Sep=2007  TU  : Fix possible memory leak in FilterStatus.h
  * v4r4   29-Aug-2007  TU  : Updates to accommodate FSW B1-0-1 release
