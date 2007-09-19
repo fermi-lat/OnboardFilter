@@ -118,8 +118,28 @@ void TkrFilterOutput::extractFilterTkrInfo(OnboardFilterTds::FilterStatus* filte
         //   printf("twrMsk %x ebftwrmsk %x \n",twrMsk,EBF_DIR_TEMS_TKR (dir->redux.ctids));
         filterStatus->setTmsk(EBF_DIR_TEMS_TKR (dir->redux.ctids));
 
-        const TFC_prjs& prjsRef = *prjs;
-        filterStatus->setProjections(prjsRef);
+        //const TFC_prjs& prjsRef = *prjs;
+        //filterStatus->setProjections(prjsRef);
+        TFC_prjs* tdsPrjs = filterStatus->getProjections();
+
+        // When FilterStatus is created/initialized, the memory locations are all zeroed. 
+        // Because of this we can just copy in the non-pointer values to fill out the projections
+        tdsPrjs->maxCnt = prjs->maxCnt;
+        tdsPrjs->curCnt = prjs->curCnt;
+        tdsPrjs->twrMsk = prjs->twrMsk;
+        memcpy(tdsPrjs->dir, prjs->dir, 16*sizeof(TFC_prjDir));
+
+        // Loop through and copy the valid projections (hopefully not many!)
+        for(int idx = 0; idx < prjs->curCnt; idx++)
+        {
+            // projection just in case...
+            if (idx > 999) break;
+
+            TFC_prj* tdsPrj = &tdsPrjs->prjs[idx];
+
+            memcpy(&tdsPrj->top, &prjs->prjs[idx].top, 
+                2*sizeof(TFC_prjPrms)+3*sizeof(int)+4*sizeof(unsigned char)+sizeof(unsigned)+18*sizeof(TFC_hit));
+        }
 
         int xy00Array[16];
         int xy11Array[16];
