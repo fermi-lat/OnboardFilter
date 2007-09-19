@@ -1,13 +1,4 @@
 ------------------------------------------------------------
-User: usher  Wed Sep 19 14:06:42 PDT 2007
-OnboardFilter/src
-
-Modified Files:
-	TkrFilterOutput.cxx 
-Log Message:
-Modify to ignore the link pointers in TFC_projections in order to keep root happy. JJ reports that there is no way we can tell when the pointers are valid or not as he has an internal (and non-accessible) table for them.
-    *
-------------------------------------------------------------
 TAG
 Tag name: v4r4p2, operation: add
 Package: OnboardFilter
