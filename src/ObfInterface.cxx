@@ -174,7 +174,7 @@ ObfInterface::~ObfInterface()
     return;
 }
 
-int ObfInterface::setupFilter(const std::string& filterName, int priority, unsigned vetoMask, bool clearVetoBits)
+int ObfInterface::setupFilter(const std::string& filterName, int priority, unsigned vetoMask, bool modifyVetoMask)
 {
     int filterId = -100;
 
@@ -224,14 +224,12 @@ int ObfInterface::setupFilter(const std::string& filterName, int priority, unsig
         filterId = EDS_fwHandlerServicesRegister (m_edsFw,  priority, gfcService, filter);
 
         // Modify the veto mask is requested (this means we are running "pass through" mode)
-//        if (clearVetoBits)
-//        {
+        if (modifyVetoMask)
+        {
             EFC_sampler* sampler = (EFC_sampler*)EFC_get(filter, EFC_OBJECT_K_SAMPLER);
 
             sampler->classes.enabled.all = vetoMask;
-
-//            sampler->vetoes.def = 0;
-//        }
+        }
 
         // Keep track of the pointer for deletion at end of processing
         m_filterVec.push_back(filter);
