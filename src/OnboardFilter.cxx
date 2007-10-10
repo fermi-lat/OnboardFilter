@@ -6,7 +6,7 @@
 
 \verbatim
 
-  CVS $Id: OnboardFilter.cxx,v 1.70 2007/06/29 02:56:14 heather Exp $
+  CVS $Id: OnboardFilter.cxx,v 1.71 2007/08/28 23:37:14 usher Exp $
 \endverbatim
                                                                           */
 /* ---------------------------------------------------------------------- */
@@ -173,7 +173,8 @@ StatusCode OnboardFilter::initialize()
     {
         unsigned vetoMask = m_passThrough ? 0 : ~m_gamBitsToIgnore & GFC_STATUS_M_VETOES;
 
-        int filterId = m_obfInterface->setupFilter("GammaFilter", priority++, vetoMask, m_passThrough);
+//        int filterId = m_obfInterface->setupFilter("GammaFilter", priority++, vetoMask, m_passThrough);
+        int filterId = m_obfInterface->setupFilter("GammaFilter", priority++, vetoMask, true);
 
         if (filterId == -100)
         {

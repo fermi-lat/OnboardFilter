@@ -8,7 +8,7 @@
 *
 * @authors T. Usher
 *
-* $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/ObfInterface.h,v 1.2 2006/12/20 18:59:00 usher Exp $
+* $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/ObfInterface.h,v 1.3 2007/01/29 18:06:34 usher Exp $
 */
 
 #ifndef __ObfInterface_H
@@ -50,7 +50,7 @@ public:
 
     ///@name access methods
     /// Set up a filter specified by its name
-    int  setupFilter(const std::string& filterName, int priority, unsigned vetoMask, bool clearVetoBits);
+    int  setupFilter(const std::string& filterName, int priority, unsigned vetoMask, bool modifyVetoMask);
 
     /// Set up the specific passthrough filter
     bool setupPassThrough(void* prm);
