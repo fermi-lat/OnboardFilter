@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: usher  Wed Oct 10 12:39:42 PDT 2007
+OnboardFilter/src
+
+Modified Files:
+	ObfInterface.cxx ObfInterface.h OnboardFilter.cxx 
+Log Message:
+Modifications to fix "veto mask" overwrite for filters other than gamma filter.
+    *
+------------------------------------------------------------
 TAG
 Tag name: v4r4p3, operation: add
 Package: OnboardFilter
