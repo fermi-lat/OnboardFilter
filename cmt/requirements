@@ -1,6 +1,6 @@
 package OnboardFilter
-version v4r4p4
-# $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/cmt/requirements,v 1.83 2007/09/19 21:09:23 usher Exp $
+version v4r5
+# $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/cmt/requirements,v 1.84 2007/10/10 19:41:14 usher Exp $
 
 author Richard Hughes <HUGHES@mps.ohio-state.edu>
 
@@ -17,6 +17,7 @@ apply_pattern package_header
 private
 use OnboardFilterTds v*
 use GlastSvc v*
+use gr_app v*
 
 macro OnboardFilter_cppflags "" \
    Linux "-DGLEAM -D__i386 -DEFC_FILTER -DMSG_ST -D__unix__  -DWUT_IMPLEMENTATION_PX "\
