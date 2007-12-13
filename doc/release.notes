@@ -2,6 +2,7 @@
  * @file release.notes
  * @brief Package OnboardFilter
  * @verbatim
+ * v4r6   13-Dec-2007  TU  : Emulate the Cal Hi Energy pass in GammaFilterOutput
  * v4r5   30-Oct-2007  HMK : Use gr_app
  * v4r4p4 10-Oct-2007  TU  : Prevent unwanted modification of veto mask during init for filters other than gamma
  * v4r4p3 19-Sep-2007  TU  : Ignore forward/backward link pointers in output of TFC_projectionCol for now
