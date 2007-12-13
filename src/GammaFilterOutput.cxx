@@ -62,8 +62,16 @@ void GammaFilterOutput::eovProcessing(void* callBackParm, EDS_fwIxb* ixb)
         // Remove any undesired veto bits from the "old school" status word **** 
         oldStatusWord = ~m_bitsToIgnore & oldStatusWord;
 
+        // This attempts to emulate the hi energy pass after the fact, allowing us to 
+        // continue running the full Gamma Filter processing... The prescription is as 
+        // defined by Patrck Smith in his confluence discussion page at 
+        // https://confluence.slac.stanford.edu/display/DC2/2007/12/12/Onboard+Filter+-+20GeV+Threshold+verification
+        // Any coding errors are mine (TU 12/12/07)
+        bool hiEPass =   (oldStatusWord & GFC_STATUS_M_HI_ENERGY) // if this bit is set then we want to pass the event
+                     && !(oldStatusWord & (GFC_STATUS_M_SPLASH_0 | GFC_STATUS_M_NOCALLO_FILTER_TILE)); // as long as these bits aren't set
+
         // If any unmasked veto bits are set then set the general event vetoed bit 
-        if (oldStatusWord & GFC_STATUS_M_VETOES)
+        if (oldStatusWord & GFC_STATUS_M_VETOES && !hiEPass)
         {
             oldStatusWord |= GFC_STATUS_M_VETOED;
             newStatusWord |= GFC_STATUS_M_VETOED;
