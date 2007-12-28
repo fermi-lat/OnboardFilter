@@ -249,7 +249,6 @@ void TkrFilterOutput::extractFilterTkrInfo(OnboardFilterTds::FilterStatus* filte
 void TkrFilterOutput::extractBestTrackInfo(OnboardFilterTds::FilterStatus* filterStatus, EDS_fwIxb *ixb)
 {
     // Local variables
-    int    flag    = 1;  // 0=choose longest tst hits morack; 1=choose track with
     int    xHits   = 0;
     int    yHits   = 0;
     double slopeXZ = 0.0;
@@ -262,7 +261,7 @@ void TkrFilterOutput::extractBestTrackInfo(OnboardFilterTds::FilterStatus* filte
 
     // use the trackProj class to do the real work here... but only if data...
     if (filterStatus->getTcids() > 0) 
-        m_trackProj->execute(flag, prjs, xHits, yHits, slopeXZ, slopeYZ, intXZ, intYZ);
+        m_trackProj->execute(prjs, xHits, yHits, slopeXZ, slopeYZ, intXZ, intYZ);
 
     filterStatus->setBestTrack(xHits, yHits, slopeXZ, slopeYZ, intXZ, intYZ);
 
