@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: usher  Fri Dec 28 11:03:42 PST 2007
+OnboardFilter/src
+
+Modified Files:
+	ObfInterface.cxx 
+Log Message:
+Comment out the previous (circa B1-0-1) attempt at using FSW statistics blocks, now broken in B1-0-6
+    *
+------------------------------------------------------------
 User: usher  Fri Dec 28 10:39:47 PST 2007
 OnboardFilter/src
 
