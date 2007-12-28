@@ -6,7 +6,7 @@
 
 \verbatim
 
-  CVS $Id: OnboardFilter.cxx,v 1.71 2007/08/28 23:37:14 usher Exp $
+  CVS $Id: OnboardFilter.cxx,v 1.72 2007/10/10 19:39:41 usher Exp $
 \endverbatim
                                                                           */
 /* ---------------------------------------------------------------------- */
@@ -38,7 +38,6 @@
 #include "CalFilterOutput.h"
 #include "TkrFilterOutput.h"
 #include "GemFilterOutput.h"
-
 
 class OnboardFilter:public Algorithm
 {
@@ -86,6 +85,12 @@ private:
     std::string m_FileName_Pedestals;
     std::string m_FileName_Gains;
 
+    // Running configurations
+    std::string m_GammaConfig;
+    std::string m_MipConfig;
+    std::string m_DgnConfig;
+    std::string m_HipConfig;
+
     ObfInterface* m_obfInterface;
 
     // Call back parm for holding pointers to output classes
@@ -120,7 +125,7 @@ OnboardFilter::OnboardFilter(const std::string& name, ISvcLocator *pSvcLocator) 
     declareProperty("RejectEvents",   m_rejectEvents       = false);
     declareProperty("GamFilterMask",  m_gamBitsToIgnore    = gamBitsToIgnore);
     declareProperty("PassThrough",    m_passThrough        = true);
-    declareProperty("gammaFilter",    m_gammaFilter        = true);
+    declareProperty("GAMMAFilter",    m_gammaFilter        = true);
     declareProperty("HFCFilter",      m_HFCFilter          = true);
     declareProperty("MIPFilter",      m_MIPFilter          = true);
     declareProperty("DFCFilter",      m_DFCFilter          = true);
@@ -128,6 +133,10 @@ OnboardFilter::OnboardFilter(const std::string& name, ISvcLocator *pSvcLocator) 
     declareProperty("TkrFilterInfo",  m_tkrFilterInfo      = true);
     declareProperty("GemFilterInfo",  m_gemFilterInfo      = true);
     declareProperty("TkrHitsInfo",    m_tkrHitsInfo        = false);
+    declareProperty("GammaConfig",    m_GammaConfig        = "GAMMA_normal");
+    declareProperty("HipConfig",      m_HipConfig          = "HIP_normal");
+    declareProperty("MipConfig",      m_MipConfig          = "MIP_off_axis");
+    declareProperty("DgnConfig",      m_DgnConfig          = "DGN_primitive");
     declareProperty("FailNoEbfData",  m_failNoEbfData      = false);
     declareProperty("FilterList",     m_filterList);
 
@@ -173,8 +182,7 @@ StatusCode OnboardFilter::initialize()
     {
         unsigned vetoMask = m_passThrough ? 0 : ~m_gamBitsToIgnore & GFC_STATUS_M_VETOES;
 
-//        int filterId = m_obfInterface->setupFilter("GammaFilter", priority++, vetoMask, m_passThrough);
-        int filterId = m_obfInterface->setupFilter("GammaFilter", priority++, vetoMask, true);
+        int filterId = m_obfInterface->setupFilter("GammaFilter", m_GammaConfig, priority++, vetoMask, true);
 
         if (filterId == -100)
         {
@@ -191,7 +199,7 @@ StatusCode OnboardFilter::initialize()
     {
         unsigned vetoMask = HFC_STATUS_M_VETO_DEF;
 
-        int filterId = m_obfInterface->setupFilter("HFCFilter", priority++, vetoMask, false);
+        int filterId = m_obfInterface->setupFilter("HipFilter", m_HipConfig, priority++, vetoMask, false);
 
         if (filterId == -100)
         {
@@ -208,7 +216,7 @@ StatusCode OnboardFilter::initialize()
     {
         unsigned vetoMask = MFC_STATUS_M_VETO_DEF;
 
-        int filterId = m_obfInterface->setupFilter("MipFilter", priority++, vetoMask, false);
+        int filterId = m_obfInterface->setupFilter("MipFilter", m_MipConfig, priority++, vetoMask, false);
 
         if (filterId == -100)
         {
@@ -225,7 +233,7 @@ StatusCode OnboardFilter::initialize()
     {
         unsigned vetoMask = DFC_STATUS_M_VETO_DEF;
 
-        int filterId = m_obfInterface->setupFilter("DFCFilter", priority++, vetoMask, false);
+        int filterId = m_obfInterface->setupFilter("DgnFilter", m_DgnConfig, priority++, vetoMask, false);
 
         if (filterId == -100)
         {
@@ -285,6 +293,9 @@ StatusCode OnboardFilter::initialize()
   
     return StatusCode::SUCCESS;
 }
+
+//#include <ios>
+//#include <iostream>
 
 StatusCode OnboardFilter::execute()
 {
