@@ -2,165 +2,159 @@
 // Module to combine 2D track projections
 //_____________________________________________________________________________
 
- 
-#include <iostream>
-#include <exception>
-//#include <_exception>
-//#include "/usr/products/Glast/GLAST_EXT/rh9_gcc32/ROOT/v4.02.00/root/cint/include/_exception.h"
 #include "trackProj.h"
 #include "EDS/FFS.h"
+#include <iostream>
+#include <exception>
+#include <cmath>
 
 //____________________________________________________________________________
 
-void trackProj::execute(int flag, const TFC_prjs *prjs,
-         int &xHits, int &yHits,
-         double &slopeXZ, double &slopeYZ,
-         double &intXZ, double &intYZ){
-//   printf("trackProj execute()");
+void trackProj::execute(const TFC_prjs* prjs, 
+                        int&            xHits, 
+                        int&            yHits, 
+                        double&         slopeXZ, 
+                        double&         slopeYZ,
+                        double&         intXZ, 
+                        double&         intYZ)
+{
+    // Initialize output in case of failure
+    xHits   = 0;
+    yHits   = 0;
+    slopeXZ = 0.0;
+    slopeYZ = 0.0;
+    intXZ   = 0.0;
+    intYZ   = 0.0;
 
-   xHits= 0;
-   yHits= 0;
-   slopeXZ = 0.0;
-   slopeYZ = 0.0;
-   intXZ = 0.0;
-   intYZ = 0.0;
+    int startPrj     = 0;
+    int maxTotalHits = 0; 
 
-   const TFC_prj *prj;
+    unsigned int tmsk = prjs->twrMsk << 16;
 
-   prj = prjs->prjs;   
-   int tmsk = prjs->twrMsk << 16;
-   int maxCnt = prjs->maxCnt;
-   int curCnt = prjs->curCnt;
-//   printf("Projections: tower mask %x maxCnt %d curCnt %d\n",tmsk,maxCnt,curCnt);
-   int xy = 1;
-   while (tmsk) {
-      int                      tower;
-      const TFC_prjDir *dir;
+    while (tmsk) 
+    {
+        int               tower = FFS(tmsk);
+        const TFC_prjDir* dir   = prjs->dir + tower;
+        const TFC_prj*    prj   = prjs->prjs + dir->idx;
+        int               xCnt  = dir->xCnt;
+        int               yCnt  = dir->yCnt;
 
-      tower = FFS (tmsk);     // get first bit set, this is the tower number
-      tmsk  = FFS_eliminate (tmsk, tower);  // eliminate bit corresponding to tower
+        tmsk  = FFS_eliminate (tmsk, tower);  // eliminate bit corresponding to tower
 
-      dir       = prjs->dir + tower;
-      prj = prjs->prjs + dir->idx;
-      int        xCnt;
-      int        yCnt;
-      int        tCnt;
+        /* Form the projection directory for this tower */
+        if (xCnt > 0 && yCnt > 0)
+        {
+            //Loop over the x projections
+            for(int xPrjIdx=startPrj; xPrjIdx<startPrj+xCnt; xPrjIdx++)
+            {
+                const TFC_prj& xPrj     = prjs->prjs[xPrjIdx];
+                unsigned int   xLyrMask = xPrj.layers;
+                int            xLayer   = xPrj.max;            // Highest hit
+                const TFC_hit& xHit     = xPrj.hits[xLayer];
+                
+                HepPoint3D point = findStripPosition(xHit.tower, xLayer, 0, xHit.strip);
+                
+                m_x[0]  = point.x();
+                m_xz[0] = point.z();
 
+                // Next layer with a valid hit
+                int nxtXLayer = xLayer;
+                while(!(xLyrMask & (1 << --nxtXLayer)) && nxtXLayer > 0);
 
-      /* Form the projection directory for this tower */
-      xCnt = dir->xCnt;
-      yCnt = dir->yCnt;
+                const TFC_hit& nxtXHit = xPrj.hits[nxtXLayer];
 
-      tCnt      = xCnt + yCnt;
-//      printf("   Tower %d xcnt %d ycnt %d tcnt %d\n",tower,xCnt,yCnt,tCnt);
-   }
+                point = findStripPosition(nxtXHit.tower, nxtXLayer, 0, nxtXHit.strip);
 
+                m_x[1]  = point.x();
+                m_xz[1] = point.z();
 
+                //Loop over the y projections
+                for(int yPrjIdx = startPrj+xCnt; yPrjIdx < startPrj+yCnt+xCnt; yPrjIdx++)
+                {
+                    const TFC_prj& yPrj     = prjs->prjs[yPrjIdx];
+                    unsigned int   yLyrMask = yPrj.layers;
+                    int            yLayer   = yPrj.max;            // Highest hit
+                    const TFC_hit& yHit     = yPrj.hits[yLayer];
 
-//Loop over the towers
-   int startPrj=0;
-   int maxTotalHits = 0; 
-   double maxLength=0;
-//   for(int tower=0;tower<16;tower++){
-//      HepPoint3D point;
-//      const TFC_projectionDir *dir = prjs->dir + tower;
-   tmsk = prjs->twrMsk << 16;
-   while (tmsk) {
-      int                      tower;
-      const TFC_prjDir *dir;
-      HepPoint3D point;
-      tower = FFS (tmsk);     // get first bit set, this is the tower number
-      tmsk  = FFS_eliminate (tmsk, tower);  // eliminate bit corresponding to tower
+                    // Condition that both projections begin in the same layer
+                    // Change this (12/18/07 TU) to allow starting in "near" layer AND
+                    // that the proposed track be longer than the current track
+//                    if( xLayer == yLayer && xPrj.nhits + yPrj.nhits > maxTotalHits)
+                    if( std::abs(xLayer - yLayer) < 2 && xPrj.nhits + yPrj.nhits > maxTotalHits)
+                    {
+                        point = findStripPosition(yHit.tower, yLayer, 1, yHit.strip);
 
-      dir       = prjs->dir + tower;
-      prj = prjs->prjs + dir->idx;
-      int        xCnt;
-      int        yCnt;
+                        m_y[0]  = point.y();
+                        m_yz[0] = point.z();
 
+                        // Next layer with a valid hit
+                        int nxtYLayer = yLayer;
+                        while(!(yLyrMask & (1 << --nxtYLayer)) && nxtYLayer > 0);
 
-      /* Form the projection directory for this tower */
-      xCnt = dir->xCnt;
-      yCnt = dir->yCnt;
-      if(dir->xCnt>0 && dir->yCnt>0){
-//         printf("tower %d xcnt %d yxnt %d\n",tower,dir->xCnt,dir->yCnt);
-         //Loop over the x projections
-         for(int xprj=startPrj;xprj<startPrj+dir->xCnt;xprj++){
+                        const TFC_hit& nxtYHit = yPrj.hits[nxtYLayer];
 
-            point=findStripPosition(tower,prjs->prjs[xprj].max,0,
-            prjs->prjs[xprj].hits[prjs->prjs[xprj].max].strip);
-            m_x[0]=point.x();
-            m_xz[0]=point.z();
-            point=findStripPosition(tower,prjs->prjs[xprj].max-1,0,
-            prjs->prjs[xprj].hits[prjs->prjs[xprj].max-1].strip);
-            m_x[1]=point.x();
-            m_xz[1]=point.z();
-//            printf("   xproj start layer %d hits %d\n",prjs->prjs[xprj].max,prjs->prjs[xprj].nhits);
-            //Loop over the y projections
-            for(int yprj=startPrj+dir->xCnt;yprj<startPrj+dir->yCnt+dir->xCnt;yprj++){
+                        point = findStripPosition(nxtYHit.tower, nxtYLayer, 1, nxtYHit.strip);
 
-//                  printf("      yproj start layer %d hits %d\n",prjs->prjs[yprj].max,prjs->prjs[yprj].nhits);
-                if(prjs->prjs[xprj].max==prjs->prjs[yprj].max){//if they start in the same layer
-                 
-                  point=findStripPosition(tower,prjs->prjs[yprj].max,
-                  1,prjs->prjs[yprj].hits[prjs->prjs[yprj].max].strip);
-                  m_y[0]=point.y();
-                  m_yz[0]=point.z();
-                  //printf("  findStripPosition tower %d max %d hits %d m_y[0] %f\n",
-                  //                     tower,prjs->prjs[yprj].max,
-                  //                      prjs->prjs[yprj].hits[0],m_y[0]);
-                  point=findStripPosition(tower,prjs->prjs[yprj].max-1,
-                  1,prjs->prjs[yprj].hits[prjs->prjs[yprj].max-1].strip);
-                  m_y[1]=point.y();
-                  m_yz[1]=point.z();
-                  //printf("  findStripPosition tower %d max %d hits %d m_y[1] %f\n",
-                  //                     tower,prjs->prjs[yprj].max-1,
-                  //                      prjs->prjs[yprj].hits[1],m_y[1]);
-                  unsigned char maxhits;
-                  if(prjs->prjs[xprj].nhits<prjs->prjs[yprj].nhits) {//they don't need the same number
-                     maxhits=prjs->prjs[xprj].nhits;              //of layers.  use the smaller number
-                  } else {                                             //of hits.
-                     maxhits=prjs->prjs[yprj].nhits;
-                  }
-                  point=findStripPosition(tower,prjs->prjs[xprj].max-(maxhits-1),
-                  0,prjs->prjs[xprj].hits[prjs->prjs[xprj].max-(maxhits-1)].strip);
-                  m_x[2]=point.x();
-                  m_xz[2]=point.z();
-                  point=findStripPosition(tower,prjs->prjs[yprj].max-(maxhits-1),
-                  1,prjs->prjs[yprj].hits[prjs->prjs[yprj].max-(maxhits-1)].strip);
-                  m_y[2]=point.y();
-                  m_yz[2]=point.z();
-                  for(int counter=0;counter<3;counter++) {
-                     m_zAvg[counter]=(m_xz[counter]+m_yz[counter])/2;
-                  }
-                  computeAngles(m_x[1]-m_x[0], m_xz[0]-m_xz[1], m_y[1]-m_y[0],
-                  m_yz[0]-m_yz[1], m_zAvg[0]-m_zAvg[1]);
-                  computeSlopeInt();
-                  computeLength();
-                  computeExtension();
-                  //Add track to TDS
-                  if((prjs->prjs[xprj].nhits+prjs->prjs[yprj].nhits) > maxTotalHits){                     //longest, not the track with the most
-                     maxTotalHits = prjs->prjs[xprj].nhits+prjs->prjs[yprj].nhits;
-                     xHits=prjs->prjs[xprj].nhits;
-                     yHits=prjs->prjs[yprj].nhits;
-                     slopeXZ = m_slopeXZ;
-                     slopeYZ = m_slopeYZ;
-                     intXZ = m_intXZ;
-                     intYZ = m_intYZ;
-                  }                                                         //at a shallow angle with only 3 hits,
-               }                                                           //and a short track with more than this.
-               //printf("end check on max\n");
-            } //printf("end yproj loop\n");
-         } //printf("end xproj loop\n");
-      }
-      //    startPrj+=(int)prjs->curCnt[tower];//I moved this 06/14/04 - DW
-      //printf("end check on proj\n");
-      startPrj+=dir->yCnt+dir->xCnt;
-   }
+                        m_y[1]  = point.y();
+                        m_yz[1] = point.z();
+
+                        // Try to set to common first valid hit
+                        // Note that this doesn't (yet) check that both projections have a valid hit in
+                        // this layer...
+                        int firstHit = xPrj.min;
+                        if (xPrj.min < yPrj.min) firstHit = yPrj.min; 
+
+                        const TFC_hit& botXHit = xPrj.hits[firstHit];
+
+                        point = findStripPosition(botXHit.tower, firstHit, 0, botXHit.strip);
+
+                        m_x[2]=point.x();
+                        m_xz[2]=point.z();
+
+                        const TFC_hit& botYHit = yPrj.hits[firstHit];
+
+                        point = findStripPosition(botYHit.tower, firstHit, 1, botYHit.strip);
+
+                        m_y[2]=point.y();
+                        m_yz[2]=point.z();
+
+                        for(int counter=0;counter<3;counter++) 
+                        {
+                            m_zAvg[counter] = (m_xz[counter] + m_yz[counter]) / 2;
+                        }
+
+                        computeAngles(m_x[1]-m_x[0], m_xz[0]-m_xz[1], m_y[1]-m_y[0],
+                            m_yz[0]-m_yz[1], m_zAvg[0]-m_zAvg[1]);
+
+                        computeSlopeInt();
+                        computeLength();
+                        computeExtension();
+
+                        //Add track to TDS
+                        if((xPrj.nhits + yPrj.nhits) > maxTotalHits)
+                        {                     //longest, not the track with the most
+                            maxTotalHits = xPrj.nhits + yPrj.nhits;
+                            xHits        = xPrj.nhits;
+                            yHits        = yPrj.nhits;
+                            slopeXZ      = m_slopeXZ;
+                            slopeYZ      = m_slopeYZ;
+                            intXZ        = m_intXZ;
+                            intYZ        = m_intYZ;
+                        }                                                   //at a shallow angle with only 3 hits,
+                    }                                                       //and a short track with more than this.
+                    //printf("end check on max\n");
+                } //printf("end yproj loop\n");
+            } //printf("end xproj loop\n");
+        }
+        //    startPrj+=(int)prjs->curCnt[tower];//I moved this 06/14/04 - DW
+        //printf("end check on proj\n");
+        startPrj+=yCnt + xCnt;
+    }
 //   if (maxTotalHits > 0) 
 //       printf("trackProj: found track: hitsX %d hits Y %d slopeX %f slopeY %f intX %f intY %f\n",
 //               xHits,yHits,slopeXZ,slopeYZ,intXZ,intYZ);
 
-   return;
+    return;
 }
 
 void trackProj::computeSlopeInt() {
@@ -276,6 +270,8 @@ void trackProj::computeExtension(){
   m_extendHigh[1]=length*sin(m_theta_rad)*sin(m_phi_rad)+m_y[2];
   m_extendHigh[2]=length*cos(m_theta_rad)+m_zAvg[2];
 }
+
+#include "LatGeometry.h"
 
 HepPoint3D trackProj::findStripPosition(int tower,
                                            int layer, int view, int hits){
