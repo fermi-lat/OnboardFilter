@@ -645,12 +645,13 @@ int passThrough (void        *unused,
   \param  reason The reason the stream is being flushed
                                                                           */
 /* ---------------------------------------------------------------------- */
-#include "statistics/GFC_statsPrint.h"
+//#include "statistics/GFC_statsPrint.h"
 
 int myOutputFlush (void* callBackPrm, int reason)
 {
     if (callBackPrm && reason < 0)
     {
+        /*
         EOVCallBackParams* eovParms = reinterpret_cast<EOVCallBackParams*>(callBackPrm);
         GFC_stats* stats = reinterpret_cast<GFC_stats*>(eovParms->m_statParms);
 
@@ -672,6 +673,7 @@ int myOutputFlush (void* callBackPrm, int reason)
         std::string outBuf(buf);
         std::cout.flush();
         std::cout.rdbuf(save);
+        */
     }
 
     return 0;
