@@ -8,7 +8,7 @@
 *
 * @authors T. Usher
 *
-* $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/ObfInterface.h,v 1.3 2007/01/29 18:06:34 usher Exp $
+* $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/ObfInterface.h,v 1.4 2007/10/10 19:39:41 usher Exp $
 */
 
 #ifndef __ObfInterface_H
@@ -50,7 +50,11 @@ public:
 
     ///@name access methods
     /// Set up a filter specified by its name
-    int  setupFilter(const std::string& filterName, int priority, unsigned vetoMask, bool modifyVetoMask);
+    int  setupFilter(const std::string& filterName, 
+                     const std::string& configuration, 
+                     int                priority, 
+                     unsigned           vetoMask, 
+                     bool               modifyVetoMask);
 
     /// Set up the specific passthrough filter
     bool setupPassThrough(void* prm);
@@ -92,6 +96,10 @@ private:
     // Map master schema to a file name
     typedef std::map<SchemaPair, std::string> IdToFileMap;
     IdToFileMap        m_idToFile;
+
+    // Map file name to EH_id enum value
+    typedef std::map<std::string, unsigned int> FileToEnumMap;
+    FileToEnumMap      m_fileToEnum;
 
     // Enable output to the "standard" Gaudi log stream
     MsgStream&         m_log;
