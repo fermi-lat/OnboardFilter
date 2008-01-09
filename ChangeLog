@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: usher  Wed Jan  9 12:56:15 PST 2008
+OnboardFilter/src
+
+Added Files:
+	GrbTrack.cxx GrbTrack.h 
+Log Message:
+New class which contains code extracted from the GRB filter for mating X and Y projections to form a track.
+    *
+------------------------------------------------------------
 TAG
 Tag name: v4r7, operation: add
 Package: OnboardFilter
