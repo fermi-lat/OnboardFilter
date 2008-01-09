@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: usher  Wed Jan  9 12:57:53 PST 2008
+OnboardFilter/src
+
+Modified Files:
+	FilterAlgTuple.cxx TkrFilterOutput.cxx TkrFilterOutput.h 
+Log Message:
+Modifications to include new GrbTracks class which uses FSW code extracted from the GRB filter for mating X and Y projections to form a best track
+    *
+------------------------------------------------------------
 User: usher  Wed Jan  9 12:56:15 PST 2008
 OnboardFilter/src
 
