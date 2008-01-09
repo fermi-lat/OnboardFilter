@@ -4,6 +4,7 @@
 
 #include "TkrFilterOutput.h"
 #include "trackProj.h"
+#include "GrbTrack.h"
 #include "OnboardFilterTds/FilterStatus.h"
 
 #include "GaudiKernel/MsgStream.h"
@@ -20,6 +21,7 @@
 TkrFilterOutput::TkrFilterOutput() 
 {
     m_trackProj = new trackProj();
+    m_grbTrack  = new GrbFindTrack();
 
     return;
 }
@@ -256,14 +258,31 @@ void TkrFilterOutput::extractBestTrackInfo(OnboardFilterTds::FilterStatus* filte
     double intXZ   = 0.0;
     double intYZ   = 0.0;
 
+    double trkSlpXZ = 0.;
+    double trkSlpYZ = 0.;
+    int    trkNX    = 0;
+    int    trkNY    = 0;
+
     // Get the projections 
     const TFC_prjs *prjs = (const TFC_prjs *)ixb->blk.ptrs[EFC_EDS_FW_OBJ_K_TFC_PRJS];
 
     // use the trackProj class to do the real work here... but only if data...
     if (filterStatus->getTcids() > 0) 
+    {
         m_trackProj->execute(prjs, xHits, yHits, slopeXZ, slopeYZ, intXZ, intYZ);
+        GrbTrack track = m_grbTrack->findTrack(ixb);
 
-    filterStatus->setBestTrack(xHits, yHits, slopeXZ, slopeYZ, intXZ, intYZ);
+        if (track.valid())
+        {
+            trkNX = track.getProjectionX()->nhits;
+            trkNY = track.getProjectionY()->nhits;
+            trkSlpXZ = static_cast<double>(track.get_dxzi()) / static_cast<double>(track.get_dzi());
+            trkSlpYZ = static_cast<double>(track.get_dyzi()) / static_cast<double>(track.get_dzi());
+            int j = 0;
+        }
+    }
+
+    filterStatus->setBestTrack(xHits, yHits, slopeXZ, slopeYZ, intXZ, intYZ, trkNX, trkNY, trkSlpXZ, trkSlpYZ);
 
     return;
 }
