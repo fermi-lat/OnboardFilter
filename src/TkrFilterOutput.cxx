@@ -267,7 +267,7 @@ void TkrFilterOutput::extractBestTrackInfo(OnboardFilterTds::FilterStatus* filte
     const TFC_prjs *prjs = (const TFC_prjs *)ixb->blk.ptrs[EFC_EDS_FW_OBJ_K_TFC_PRJS];
 
     // use the trackProj class to do the real work here... but only if data...
-    if (filterStatus->getTcids() > 0) 
+    if (filterStatus->getTcids()) 
     {
         m_trackProj->execute(prjs, xHits, yHits, slopeXZ, slopeYZ, intXZ, intYZ);
         GrbTrack track = m_grbTrack->findTrack(ixb);
