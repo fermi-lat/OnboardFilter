@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: usher  Fri Jan 11 13:31:04 PST 2008
+OnboardFilter/src
+
+Modified Files:
+	ObfInterface.cxx 
+Log Message:
+Change the way that the veto mask is disabled from overwriting it to using the veto bit prescaler (which we will move soon into a new GSW config file)
+    *
+------------------------------------------------------------
 User: usher  Fri Jan 11 13:29:32 PST 2008
 OnboardFilter/src
 
