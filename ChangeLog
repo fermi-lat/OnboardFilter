@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: usher  Fri Jan 11 13:31:53 PST 2008
+OnboardFilter/src
+
+Modified Files:
+	OnboardFilter.cxx 
+Log Message:
+Change scheme for vetoing an event to looking at the status byte. This enables prescaled events to behave properly (I think).
+    *
+------------------------------------------------------------
 User: usher  Fri Jan 11 13:31:04 PST 2008
 OnboardFilter/src
 
