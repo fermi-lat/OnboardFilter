@@ -1,4 +1,14 @@
 ------------------------------------------------------------
+User: usher  Fri Jan 11 13:32:28 PST 2008
+OnboardFilter/src
+
+Modified Files:
+	DFCFilterOutput.cxx GammaFilterOutput.cxx HFCFilterOutput.cxx 
+	MipFilterOutput.cxx 
+Log Message:
+Extract and save the filter id and status byte along with the status word
+    *
+------------------------------------------------------------
 User: usher  Fri Jan 11 13:31:53 PST 2008
 OnboardFilter/src
 
