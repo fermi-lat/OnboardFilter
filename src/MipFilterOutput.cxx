@@ -43,6 +43,7 @@ void MipFilterOutput::eovProcessing(void* callBackParm, EDS_fwIxb* ixb)
 
     // Retrieve the Gamma Filter Status Word
     EDS_rsdDsc*   rsdDsc       = ixb->rsd.dscs + m_offset;
+    unsigned char sb           = rsdDsc->sb;
     unsigned int* dscPtr       = (unsigned int*)rsdDsc->ptr;
     unsigned int  statusWord   = *dscPtr++;
 
@@ -50,11 +51,15 @@ void MipFilterOutput::eovProcessing(void* callBackParm, EDS_fwIxb* ixb)
     // in the event their was a veto
     if (m_passThrough)
     {
-        if (statusWord & MFC_STATUS_M_VETO_DEF) statusWord |= MFC_STATUS_M_VETOED;
+        if (statusWord & MFC_STATUS_M_VETO_DEF)
+        {
+            statusWord |= MFC_STATUS_M_VETOED;
+            sb         |= EDS_RSD_SB_M_VETOED;
+        }
     }
 
     // Create a new MIP Status TDS sub object
-    OnboardFilterTds::ObfMipStatus* mipStat = new OnboardFilterTds::ObfMipStatus(statusWord);
+    OnboardFilterTds::ObfMipStatus* mipStat = new OnboardFilterTds::ObfMipStatus(rsdDsc->id, statusWord, sb);
 
     // Add it to the TDS object
     obfFilterStatus->addFilterStatus(OnboardFilterTds::ObfFilterStatus::MipFilter, mipStat);
