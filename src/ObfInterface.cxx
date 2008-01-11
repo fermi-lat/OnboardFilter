@@ -309,7 +309,9 @@ int ObfInterface::setupFilter(const std::string& filterName,
         {
             EFC_sampler* sampler = (EFC_sampler*)EFC_get(filter, EFC_OBJECT_K_SAMPLER);
 
-            sampler->classes.enabled.all = vetoMask;
+            // Change what we do from modifying the veto mask to resetting the veto bit prescaler
+            // sampler->classes.enabled.all = vetoMask;
+            sampler->prescale.prescalers[0].refresh = 1;
 
             // Dig out the statistics block
 ////            EFC_result* results = (EFC_result*)EFC_get(filter, EFC_OBJECT_K_RESULT);
