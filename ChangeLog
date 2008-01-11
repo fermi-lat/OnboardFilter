@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: usher  Fri Jan 11 13:29:32 PST 2008
+OnboardFilter/src
+
+Modified Files:
+	TkrFilterOutput.cxx 
+Log Message:
+Fix bug which caused the "best track" finding routine to skip entirely tower 0
+    *
+------------------------------------------------------------
 TAG
 Tag name: v4r7p1, operation: add
 Package: OnboardFilter
