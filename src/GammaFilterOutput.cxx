@@ -51,6 +51,7 @@ void GammaFilterOutput::eovProcessing(void* callBackParm, EDS_fwIxb* ixb)
 
     // Retrieve the Gamma Filter Status Word
     EDS_rsdDsc*   rsdDsc        = ixb->rsd.dscs + m_offset;
+    unsigned char sb            = rsdDsc->sb;
     unsigned int* dscPtr        = (unsigned int*)rsdDsc->ptr;
     unsigned int  oldStatusWord = *dscPtr++;
     unsigned int  newStatusWord = oldStatusWord;
@@ -75,6 +76,7 @@ void GammaFilterOutput::eovProcessing(void* callBackParm, EDS_fwIxb* ixb)
         {
             oldStatusWord |= GFC_STATUS_M_VETOED;
             newStatusWord |= GFC_STATUS_M_VETOED;
+            sb            |= EDS_RSD_SB_M_VETOED;
         }
     }
 
@@ -82,7 +84,7 @@ void GammaFilterOutput::eovProcessing(void* callBackParm, EDS_fwIxb* ixb)
     filterStatus->setStageEnergy(*dscPtr);
 
     // Create a new Gamma Status TDS sub object
-    OnboardFilterTds::ObfGammaStatus* gamStat = new OnboardFilterTds::ObfGammaStatus(newStatusWord);
+    OnboardFilterTds::ObfGammaStatus* gamStat = new OnboardFilterTds::ObfGammaStatus(rsdDsc->id, newStatusWord, sb);
 
     // Add it to the TDS object
     obfFilterStatus->addFilterStatus(OnboardFilterTds::ObfFilterStatus::GammaFilter, gamStat);
