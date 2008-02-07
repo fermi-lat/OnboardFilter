@@ -1,35 +1,4 @@
 ------------------------------------------------------------
-User: usher  Thu Feb  7 11:51:37 PST 2008
-OnboardFilter/cmt
-
-Modified Files:
-	requirements 
-Log Message:
-Preparing to tag v4r8p0
-    *
-------------------------------------------------------------
-User: usher  Thu Feb  7 11:36:42 PST 2008
-OnboardFilter/src
-
-Added Files:
-	GammaFilterCfgPrms.cxx GammaFilterCfgPrms.h IFilterCfgPrms.h 
-Log Message:
-Initial import on an interface class allowing one to modify the parameters for a given filter's configuration. The input parameters can then be set by Job Options parameters when defined. Also import an implementation for two parameters of the Gamma Filter.
-    *
-------------------------------------------------------------
-User: usher  Thu Feb  7 11:33:16 PST 2008
-OnboardFilter/src
-
-Modified Files:
-	CalFilterOutput.cxx DFCFilterOutput.cxx GammaFilterOutput.cxx 
-	GemFilterOutput.cxx GrbTrack.cxx GrbTrack.h 
-	HFCFilterOutput.cxx LatGeometry.h MipFilterOutput.cxx 
-	ObfInterface.cxx ObfInterface.h OnboardFilter.cxx OutputRtn.h 
-	TkrFilterOutput.cxx TkrFilterOutput.h trackProj.cxx 
-	trackProj.h 
-Log Message:
-    *
-------------------------------------------------------------
 TAG
 Tag name: v4r7p2, operation: add
 Package: OnboardFilter
