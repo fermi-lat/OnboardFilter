@@ -1,4 +1,17 @@
 ------------------------------------------------------------
+User: usher  Thu Feb  7 11:33:16 PST 2008
+OnboardFilter/src
+
+Modified Files:
+	CalFilterOutput.cxx DFCFilterOutput.cxx GammaFilterOutput.cxx 
+	GemFilterOutput.cxx GrbTrack.cxx GrbTrack.h 
+	HFCFilterOutput.cxx LatGeometry.h MipFilterOutput.cxx 
+	ObfInterface.cxx ObfInterface.h OnboardFilter.cxx OutputRtn.h 
+	TkrFilterOutput.cxx TkrFilterOutput.h trackProj.cxx 
+	trackProj.h 
+Log Message:
+    *
+------------------------------------------------------------
 TAG
 Tag name: v4r7p2, operation: add
 Package: OnboardFilter
