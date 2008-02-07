@@ -1,4 +1,61 @@
 ------------------------------------------------------------
+TAG
+Tag name: v4r8p0, operation: add
+Package: OnboardFilter
+User: usher  Thu Feb  7 11:53:26 2008
+Files:
+  OnboardFilter/.cvsignore  1.2
+  OnboardFilter/ChangeLog  1.783
+  OnboardFilter/OnboardFilter/FilterAlg.h  1.6
+  OnboardFilter/OnboardFilter/FilterTracks.h  1.12
+  OnboardFilter/OnboardFilter/filter_rto.h  1.1
+  OnboardFilter/OnboardFilter/OnboardFilterTDS.h  1.3
+  OnboardFilter/OnboardFilter/FilterDisplay.h  1.6
+  OnboardFilter/cmt/.cvsignore  1.2
+  OnboardFilter/cmt/requirements  1.90
+  OnboardFilter/cmt/Makefile  1.4
+  OnboardFilter/doc/release.notes  1.72
+  OnboardFilter/doc/OnboardFilter.jpg  1.3
+  OnboardFilter/src/GemFilterOutput.cxx  1.2
+  OnboardFilter/src/GrbTrack.cxx  1.2
+  OnboardFilter/src/CalFilterOutput.cxx  1.2
+  OnboardFilter/src/FilterAlg.cxx  1.10
+  OnboardFilter/src/DFCFilterOutput.cxx  1.5
+  OnboardFilter/src/TkrFilterOutput.h  1.3
+  OnboardFilter/src/GemFilterOutput.h  1.1
+  OnboardFilter/src/GammaFilterCfgPrms.h  1.1
+  OnboardFilter/src/TkrFilterOutput.cxx  1.8
+  OnboardFilter/src/ObfInterface.h  1.6
+  OnboardFilter/src/GammaFilterOutput.cxx  1.7
+  OnboardFilter/src/FilterDisplay.cxx  1.8
+  OnboardFilter/src/DFCFilterOutput.h  1.2
+  OnboardFilter/src/OutputRtn.h  1.2
+  OnboardFilter/src/trackProj.h  1.4
+  OnboardFilter/src/HFCFilterOutput.cxx  1.3
+  OnboardFilter/src/OnboardFilter.cxx  1.75
+  OnboardFilter/src/MipFilterOutput.cxx  1.4
+  OnboardFilter/src/GammaFilterCfgPrms.cxx  1.1
+  OnboardFilter/src/HFCFilterOutput.h  1.1
+  OnboardFilter/src/ObfInterface.cxx  1.13
+  OnboardFilter/src/FilterAlg_projectionFind.h  1.1
+  OnboardFilter/src/FilterAlg_skirt.h  1.1
+  OnboardFilter/src/FilterAlg_acd.h  1.4
+  OnboardFilter/src/FilterAlgTuple.cxx  1.10
+  OnboardFilter/src/IFilterCfgPrms.h  1.1
+  OnboardFilter/src/MipFilterOutput.h  1.2
+  OnboardFilter/src/trackProj.cxx  1.5
+  OnboardFilter/src/GammaFilterOutput.h  1.3
+  OnboardFilter/src/FilterTracks.cxx  1.25
+  OnboardFilter/src/CalFilterOutput.h  1.1
+  OnboardFilter/src/.cvsignore  1.1
+  OnboardFilter/src/LatGeometry.h  1.2
+  OnboardFilter/src/GrbTrack.h  1.2
+  OnboardFilter/src/Dll/OnboardFilter_dll.cxx  1.5
+  OnboardFilter/src/Dll/OnboardFilter_load.cxx  1.8
+  OnboardFilter/src/test/jobOptions.txt  1.11
+
+    *
+------------------------------------------------------------
 User: usher  Thu Feb  7 11:51:38 PST 2008
 OnboardFilter/doc
 
