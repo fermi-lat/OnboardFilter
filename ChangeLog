@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: usher  Thu Feb  7 11:36:42 PST 2008
+OnboardFilter/src
+
+Added Files:
+	GammaFilterCfgPrms.cxx GammaFilterCfgPrms.h IFilterCfgPrms.h 
+Log Message:
+Initial import on an interface class allowing one to modify the parameters for a given filter's configuration. The input parameters can then be set by Job Options parameters when defined. Also import an implementation for two parameters of the Gamma Filter.
+    *
+------------------------------------------------------------
 User: usher  Thu Feb  7 11:33:16 PST 2008
 OnboardFilter/src
 
