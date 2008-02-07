@@ -8,7 +8,7 @@
 *
 * @authors T. Usher
 *
-* $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/ObfInterface.h,v 1.4 2007/10/10 19:39:41 usher Exp $
+* $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/ObfInterface.h,v 1.5 2007/12/28 18:39:47 usher Exp $
 */
 
 #ifndef __ObfInterface_H
@@ -34,16 +34,17 @@ namespace OnboardFilterTds {
 }
 
 class MsgStream;
-//class FilterTdsPointers;
+class ObfOutputCallBackParm;
 class EOVCallBackParams;
 class OutputRtn;
+class IFilterCfgPrms;
 
 // The class to interface to FSW version of Onboard Filter
 class ObfInterface
 {
 public:
     // constructors
-    ObfInterface(MsgStream& log, const std::string& filePath, void* callBackParm, int verbosity = 0);
+    ObfInterface(MsgStream& log, const std::string& filePath, ObfOutputCallBackParm* callBackParm, int verbosity = 0);
 
     // destructor
     virtual ~ObfInterface();
@@ -52,6 +53,7 @@ public:
     /// Set up a filter specified by its name
     int  setupFilter(const std::string& filterName, 
                      const std::string& configuration, 
+                     IFilterCfgPrms*    filterPrms,
                      int                priority, 
                      unsigned           vetoMask, 
                      bool               modifyVetoMask);
@@ -64,9 +66,11 @@ public:
 
     /// This will cause the filters to execute upon the given event
     /// Results will appear in the provided TDS output objects
-    unsigned int  filterEvent(EbfWriterTds::Ebf*              ebfData);
-//                              OnboardFilterTds::FilterStatus* filterStatus,
-//                              OnboardFilterTds::TowerHits*    towerHits);
+    unsigned int  filterEvent(EbfWriterTds::Ebf* ebfData);
+
+    /// Return a pointer to a given filter's configuration block
+    /// (must be typed by the user)
+    void* getFilterCfgPrm(int filterId);
 
     ///@name other methods
     /// Load shareable libraries
@@ -100,6 +104,11 @@ private:
     // Map file name to EH_id enum value
     typedef std::map<std::string, unsigned int> FileToEnumMap;
     FileToEnumMap      m_fileToEnum;
+
+    // Map between filter and its configuration
+    typedef std::map<unsigned short int, void*> IdToCfgMap;
+
+    IdToCfgMap         m_idToCfgMap;
 
     // Enable output to the "standard" Gaudi log stream
     MsgStream&         m_log;

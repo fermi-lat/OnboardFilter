@@ -42,7 +42,7 @@ void GammaFilterOutput::eovProcessing(void* callBackParm, EDS_fwIxb* ixb)
 ////    TDS_variables.status      = ixb->statusGamma;
 ////    TDS_variables.stageEnergy = ixb->stageEnergyGamma;
 
-    FilterTdsPointers* tdsPointers = (FilterTdsPointers*)callBackParm;
+    ObfOutputCallBackParm* tdsPointers = reinterpret_cast<ObfOutputCallBackParm*>(callBackParm);
 
     // Recover pointers to the TDS objects
     OnboardFilterTds::FilterStatus*    filterStatus    = tdsPointers->m_filterStatus;

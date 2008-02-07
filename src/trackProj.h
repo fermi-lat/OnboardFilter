@@ -14,11 +14,13 @@
 #include <fstream>
 #include <cmath>
 
+typedef struct _GFC_cfg         GFC_cfg;
+typedef struct _TFC_geometryTkr TFC_geometryTkr;
 
 class trackProj 
 { 
 public:
-    trackProj() {loadGeometry();}
+    trackProj(GFC_cfg* cfg);
     ~trackProj() {}
    
     void execute(const TFC_prjs *prjs, int &xHits, int &yHits, double &xzSlope, double &yzSlope,
@@ -45,14 +47,12 @@ private:
     */
     HepPoint3D findStripPosition(int tower, int layer, int view, int max);
 
-    void loadGeometry();
-
     double m_ZLayerInterceptsX[18];
     double m_ZLayerInterceptsY[18];
     double m_XviewIntersections[18];
     double m_YviewIntersections[18];
     double m_final_rhoX, m_final_rhoY, m_final_thetaX, m_final_thetaY;
-    int m_rho_indexX, m_rho_indexY, m_theta_indexX, m_theta_indexY;
+    int    m_rho_indexX, m_rho_indexY, m_theta_indexX, m_theta_indexY;
     double m_XviewZDist, m_YviewZDist, m_XviewXDist, m_YviewYDist, m_ZAvgDist;
     double m_XviewPrelimSlope, m_YviewPrelimSlope;
 
@@ -82,10 +82,7 @@ private:
     int m_zenith;
     //
     // Geometry
-    float tkr_zpos_xlayer[18];
-    float tkr_zpos_ylayer[18];
-    float tower_offset_x[16];
-    float tower_offset_y[16];
+    const TFC_geometryTkr* m_tkrGeo;
 };
 
 #endif

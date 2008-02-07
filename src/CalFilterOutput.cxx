@@ -35,7 +35,7 @@ CalFilterOutput::CalFilterOutput()
 void CalFilterOutput::eovProcessing(void* callBackParm, EDS_fwIxb* ixb)
 {
     // Extract output pointers info
-    FilterTdsPointers* tdsPointers = (FilterTdsPointers*)callBackParm;
+    ObfOutputCallBackParm* tdsPointers = reinterpret_cast<ObfOutputCallBackParm*>(callBackParm);
 
     // Recover pointers to the TDS objects
     OnboardFilterTds::FilterStatus* filterStatus = tdsPointers->m_filterStatus;
