@@ -2,6 +2,14 @@
 TAG
 Tag name: OnboardFilter-04-08-00, operation: add
 Package: OnboardFilter
+User: glastrm  Thu Feb  7 12:00:54 2008
+Files:
+
+    *
+------------------------------------------------------------
+TAG
+Tag name: OnboardFilter-04-08-00, operation: add
+Package: OnboardFilter
 User: glastrm  Thu Feb  7 12:00:48 2008
 Files:
   OnboardFilter/.cvsignore  1.2
