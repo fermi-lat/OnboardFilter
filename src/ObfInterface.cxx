@@ -1,6 +1,7 @@
 
 #include "ObfInterface.h" 
 #include "OutputRtn.h"
+#include "IFilterCfgPrms.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -112,14 +113,15 @@ public:
     EOVCallBackParams() : m_statParms(0), m_callBackParm(0) {m_callBackVec.clear();}
     ~EOVCallBackParams() {}
 
-    std::ostringstream  m_defaultStream;
-    void*               m_statParms;
-    void*               m_callBackParm;
-    OutputRtnVec        m_callBackVec;
+    std::ostringstream     m_defaultStream;
+    void*                  m_statParms;
+//    void*                  m_callBackParm;
+    ObfOutputCallBackParm* m_callBackParm;
+    OutputRtnVec           m_callBackVec;
 };
 
 
-ObfInterface::ObfInterface(MsgStream& log, const std::string& filePath, void* callBackParm, int verbosity) : 
+ObfInterface::ObfInterface(MsgStream& log, const std::string& filePath, ObfOutputCallBackParm* callBackParm, int verbosity) : 
               m_log(log), m_libraryPath(filePath), m_eventCount(0), 
               m_eventProcessed(0), m_eventBad(0), m_levels(0), m_verbosity(verbosity)
 {
@@ -172,6 +174,9 @@ ObfInterface::ObfInterface(MsgStream& log, const std::string& filePath, void* ca
     m_idToFile[SchemaPair(DGN_DB_SCHEMA,DGN_DB_INSTANCE_K_GROUND_HI)]          = "DGN_ground_hi";
     m_idToFile[SchemaPair(DGN_DB_SCHEMA,DGN_DB_INSTANCE_K_PRIMITIVE)]          = "DGN_primitive";
 
+    // Clear id to cfg map
+    m_idToCfgMap.clear();
+
     // EFC library already loaded (we link to it)
     // Load the other filter libraries
     loadLibrary ("hfc", m_verbosity);
@@ -219,7 +224,8 @@ ObfInterface::~ObfInterface()
 }
 
 int ObfInterface::setupFilter(const std::string& filterName, 
-                              const std::string& configuration, 
+                              const std::string& configuration,
+                              IFilterCfgPrms*    filterPrms,
                               int                priority, 
                               unsigned           vetoMask, 
                               bool               modifyVetoMask)
@@ -270,6 +276,8 @@ int ObfInterface::setupFilter(const std::string& filterName,
             m_log << MSG::ERROR << "Unable to find library for configuration: " << configuration << endreq;
             return filterId;
         }
+
+        m_log << MSG::INFO << "Setting up filter: " << filterName << ", with configuration: " << configuration << endreq;
         
         unsigned int key = EFR_keyGet (CDM_findDatabase (schemaPair.first, schemaPair.second), 0);
 
@@ -304,6 +312,12 @@ int ObfInterface::setupFilter(const std::string& filterName,
         // Post notification
         EDS_fwPostNotify (m_edsFw, EDS_FW_M_POST_0, EFC_DB_MODE_K_NORMAL);
 
+        // Store the configuration parameters for the output routines
+        m_idToCfgMap[filterId] = EFC_get(filter, EFC_OBJECT_K_FILTER_PRM);
+
+        // If requested, modify the configuration parameters
+        if (filterPrms) filterPrms->setCfgPrms(m_idToCfgMap[filterId]);
+
         // Modify the veto mask is requested (this means we are running "pass through" mode)
         if (modifyVetoMask)
         {
@@ -312,6 +326,8 @@ int ObfInterface::setupFilter(const std::string& filterName,
             // Change what we do from modifying the veto mask to resetting the veto bit prescaler
             // sampler->classes.enabled.all = vetoMask;
             sampler->prescale.prescalers[0].refresh = 1;
+
+            m_log << MSG::INFO << "Disabling veto mask for " << filterName << " by setting veto prescaler refresh to 1" << endreq;
 
             // Dig out the statistics block
 ////            EFC_result* results = (EFC_result*)EFC_get(filter, EFC_OBJECT_K_RESULT);
@@ -327,6 +343,18 @@ int ObfInterface::setupFilter(const std::string& filterName,
 
     return filterId;
 }
+
+void* ObfInterface::getFilterCfgPrm(int filterId)
+{
+    void* cfgPrms = 0;
+
+    IdToCfgMap::iterator idMapIter = m_idToCfgMap.find(filterId);
+
+    if (idMapIter != m_idToCfgMap.end()) cfgPrms = idMapIter->second;
+
+    return cfgPrms;
+}
+
 
 void ObfInterface::setEovOutputCallBack(OutputRtn* outRtn)
 {

@@ -6,7 +6,7 @@
 
 \verbatim
 
-  CVS $Id: OnboardFilter.cxx,v 1.73 2007/12/28 18:39:47 usher Exp $
+  CVS $Id: OnboardFilter.cxx,v 1.74 2008/01/11 21:31:53 usher Exp $
 \endverbatim
                                                                           */
 /* ---------------------------------------------------------------------- */
@@ -31,6 +31,7 @@
 #include "OnboardFilterTds/ObfFilterStatus.h"
 
 #include "ObfInterface.h"
+#include "GammaFilterCfgPrms.h"
 #include "GammaFilterOutput.h"
 #include "MipFilterOutput.h"
 #include "HFCFilterOutput.h"
@@ -59,42 +60,46 @@ private:
     /* ====================================================================== */
 
     // Filters to run 
-    bool        m_gammaFilter;
-    bool        m_HFCFilter;
-    bool        m_MIPFilter;
-    bool        m_DFCFilter;
-    bool        m_passThrough;
+    bool         m_gammaFilter;
+    bool         m_HFCFilter;
+    bool         m_MIPFilter;
+    bool         m_DFCFilter;
+    bool         m_passThrough;
 
     // Extra output call backs
-    bool        m_calFilterInfo;
-    bool        m_tkrFilterInfo;
-    bool        m_gemFilterInfo;
-    bool        m_tkrHitsInfo;
+    bool         m_calFilterInfo;
+    bool         m_tkrFilterInfo;
+    bool         m_gemFilterInfo;
+    bool         m_tkrHitsInfo;
 
-    int         m_mask;            //mask for setting filter to reject
-    bool        m_rejectEvents;    // Enables rejection of events from list of active filters
-    unsigned    m_gamBitsToIgnore; // This sets a mask of gamma filter veto bits to ignore
-    int         m_rejected;
-    int         m_noEbfData;
-    bool        m_failNoEbfData;
+    int          m_mask;            //mask for setting filter to reject
+    bool         m_rejectEvents;    // Enables rejection of events from list of active filters
+    unsigned     m_gamBitsToIgnore; // This sets a mask of gamma filter veto bits to ignore
+    int          m_rejected;
+    int          m_noEbfData;
+    bool         m_failNoEbfData;
+
+    // Changeable parameters for the gamma filter
+    unsigned int m_Zbottom_Emin;
+    unsigned int m_Tkr_ZeroEmin;
 
     // Path to shareables
-    std::string m_FileNamePath;
+    std::string  m_FileNamePath;
 
     // File name for peds/gains
-    std::string m_FileName_Pedestals;
-    std::string m_FileName_Gains;
+    std::string  m_FileName_Pedestals;
+    std::string  m_FileName_Gains;
 
     // Running configurations
-    std::string m_GammaConfig;
-    std::string m_MipConfig;
-    std::string m_DgnConfig;
-    std::string m_HipConfig;
+    std::string  m_GammaConfig;
+    std::string  m_MipConfig;
+    std::string  m_DgnConfig;
+    std::string  m_HipConfig;
 
     ObfInterface* m_obfInterface;
 
     // Call back parm for holding pointers to output classes
-    FilterTdsPointers* m_tdsPointers;
+    ObfOutputCallBackParm* m_tdsPointers;
 
     // The list of filters to use to reject events
     //typedef std::list<OnboardFilterTds::IObfStatus::FilterKeys> FilterList;
@@ -118,27 +123,30 @@ OnboardFilter::OnboardFilter(const std::string& name, ISvcLocator *pSvcLocator) 
                              | GFC_STATUS_M_SPLASH_1;
 
     // Properties for this algorithm
-    declareProperty("FileNamePath",   m_FileNamePath       = "$(FLIGHTCODELIBS)");
-    declareProperty("FileNamePeds",   m_FileName_Pedestals = "cal_db_pedestals");
-    declareProperty("FileNameGains",  m_FileName_Gains     = "cal_db_gains");
-    declareProperty("mask",           m_mask               = 0);      // Switching to using m_rejectEvents! TU 5/7/2007
-    declareProperty("RejectEvents",   m_rejectEvents       = false);
-    declareProperty("GamFilterMask",  m_gamBitsToIgnore    = gamBitsToIgnore);
-    declareProperty("PassThrough",    m_passThrough        = true);
-    declareProperty("GAMMAFilter",    m_gammaFilter        = true);
-    declareProperty("HFCFilter",      m_HFCFilter          = true);
-    declareProperty("MIPFilter",      m_MIPFilter          = true);
-    declareProperty("DFCFilter",      m_DFCFilter          = true);
-    declareProperty("CalFilterInfo",  m_calFilterInfo      = true);
-    declareProperty("TkrFilterInfo",  m_tkrFilterInfo      = true);
-    declareProperty("GemFilterInfo",  m_gemFilterInfo      = true);
-    declareProperty("TkrHitsInfo",    m_tkrHitsInfo        = false);
-    declareProperty("GammaConfig",    m_GammaConfig        = "GAMMA_normal");
-    declareProperty("HipConfig",      m_HipConfig          = "HIP_normal");
-    declareProperty("MipConfig",      m_MipConfig          = "MIP_off_axis");
-    declareProperty("DgnConfig",      m_DgnConfig          = "DGN_primitive");
-    declareProperty("FailNoEbfData",  m_failNoEbfData      = false);
-    declareProperty("FilterList",     m_filterList);
+    declareProperty("FileNamePath",    m_FileNamePath       = "$(FLIGHTCODELIBS)");
+    declareProperty("FileNamePeds",    m_FileName_Pedestals = "cal_db_pedestals");
+    declareProperty("FileNameGains",   m_FileName_Gains     = "cal_db_gains");
+    declareProperty("mask",            m_mask               = 0);      // Switching to using m_rejectEvents! TU 5/7/2007
+    declareProperty("RejectEvents",    m_rejectEvents       = false);
+    declareProperty("GamFilterMask",   m_gamBitsToIgnore    = gamBitsToIgnore);
+    declareProperty("PassThrough",     m_passThrough        = true);
+    declareProperty("GAMMAFilter",     m_gammaFilter        = true);
+    declareProperty("HFCFilter",       m_HFCFilter          = true);
+    declareProperty("MIPFilter",       m_MIPFilter          = true);
+    declareProperty("DFCFilter",       m_DFCFilter          = true);
+    declareProperty("CalFilterInfo",   m_calFilterInfo      = true);
+    declareProperty("TkrFilterInfo",   m_tkrFilterInfo      = true);
+    declareProperty("GemFilterInfo",   m_gemFilterInfo      = true);
+    declareProperty("TkrHitsInfo",     m_tkrHitsInfo        = false);
+    declareProperty("GammaConfig",     m_GammaConfig        = "GAMMA_normal");
+    declareProperty("HipConfig",       m_HipConfig          = "HIP_normal");
+    declareProperty("MipConfig",       m_MipConfig          = "MIP_off_axis");
+    declareProperty("DgnConfig",       m_DgnConfig          = "DGN_primitive");
+    declareProperty("FailNoEbfData",   m_failNoEbfData      = false);
+    declareProperty("FilterList",      m_filterList);
+
+    declareProperty("Zbottom_Emin",    m_Zbottom_Emin       = 0xFFFFFFFF);
+    declareProperty("Tkr_ZeroTkrEmin", m_Tkr_ZeroEmin       = 0xFFFFFFFF);
 
     // Set up the default to filter on Gamma and HFC filters
     m_filterList.clear();
@@ -159,7 +167,7 @@ StatusCode OnboardFilter::initialize()
     log << MSG::INFO << "Initializing Filter Settings" << endreq;
 
     // Get an instance of the local class to hold output pointers
-    m_tdsPointers = new FilterTdsPointers();
+    m_tdsPointers = new ObfOutputCallBackParm();
 
     // Load the external libraries
     int ret = facilities::Util::expandEnvVar(&m_FileNamePath);
@@ -177,20 +185,28 @@ StatusCode OnboardFilter::initialize()
     // Set variable for filter priority
     int priority = 0;
 
+    // Remember the id assigned to the gamma filter
+    int gammaFilterId = -1;
+
     // Set up the Gamma Filter and associated output
     if (m_gammaFilter)
     {
         unsigned vetoMask = m_passThrough ? 0 : ~m_gamBitsToIgnore & GFC_STATUS_M_VETOES;
 
-        int filterId = m_obfInterface->setupFilter("GammaFilter", m_GammaConfig, priority++, vetoMask, true);
+        // Set up the object allowing one to change gamma filter parameters
+        GammaFilterCfgPrms gamParms;
+        gamParms.set_Zbottom_Emin(m_Zbottom_Emin);
+        gamParms.set_Tkr_ZeroEmin(m_Tkr_ZeroEmin);
 
-        if (filterId == -100)
+        gammaFilterId = m_obfInterface->setupFilter("GammaFilter", m_GammaConfig, &gamParms, priority++, vetoMask, true);
+
+        if (gammaFilterId == -100)
         {
             log << MSG::ERROR << "Failed to initialize Gamma Filter" << endreq;
         }
 
         // Set the Gamma Filter output routine
-        OutputRtn* outRtn = new GammaFilterOutput(filterId, m_gamBitsToIgnore, m_passThrough);
+        OutputRtn* outRtn = new GammaFilterOutput(gammaFilterId, m_gamBitsToIgnore, m_passThrough);
         m_obfInterface->setEovOutputCallBack(outRtn);
     }
 
@@ -199,7 +215,7 @@ StatusCode OnboardFilter::initialize()
     {
         unsigned vetoMask = HFC_STATUS_M_VETO_DEF;
 
-        int filterId = m_obfInterface->setupFilter("HipFilter", m_HipConfig, priority++, vetoMask, false);
+        int filterId = m_obfInterface->setupFilter("HipFilter", m_HipConfig, 0, priority++, vetoMask, false);
 
         if (filterId == -100)
         {
@@ -216,7 +232,7 @@ StatusCode OnboardFilter::initialize()
     {
         unsigned vetoMask = MFC_STATUS_M_VETO_DEF;
 
-        int filterId = m_obfInterface->setupFilter("MipFilter", m_MipConfig, priority++, vetoMask, false);
+        int filterId = m_obfInterface->setupFilter("MipFilter", m_MipConfig, 0, priority++, vetoMask, false);
 
         if (filterId == -100)
         {
@@ -233,7 +249,7 @@ StatusCode OnboardFilter::initialize()
     {
         unsigned vetoMask = DFC_STATUS_M_VETO_DEF;
 
-        int filterId = m_obfInterface->setupFilter("DgnFilter", m_DgnConfig, priority++, vetoMask, false);
+        int filterId = m_obfInterface->setupFilter("DgnFilter", m_DgnConfig, 0, priority++, vetoMask, false);
 
         if (filterId == -100)
         {
@@ -253,7 +269,7 @@ StatusCode OnboardFilter::initialize()
     }
 
     // Extra filter output only if filters set up
-    if (priority >0)
+    if (priority > 0)
     {
         // Calorimater info if requested
         if (m_calFilterInfo)
@@ -265,7 +281,7 @@ StatusCode OnboardFilter::initialize()
         // Calorimater info if requested
         if (m_tkrFilterInfo)
         {
-            OutputRtn* outRtn = new TkrFilterOutput();
+            OutputRtn* outRtn = new TkrFilterOutput(m_obfInterface->getFilterCfgPrm(gammaFilterId));
             m_obfInterface->setEovOutputCallBack(outRtn);
         }
 

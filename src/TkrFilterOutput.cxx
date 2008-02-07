@@ -6,6 +6,7 @@
 #include "trackProj.h"
 #include "GrbTrack.h"
 #include "OnboardFilterTds/FilterStatus.h"
+#include "OnboardFilterTds/Obf_TFC_prjs.h"
 
 #include "GaudiKernel/MsgStream.h"
 
@@ -16,12 +17,16 @@
 #include "EDS/EDR_cal.h"
 #include "EDS/EDR_tkrUnpack.h"
 #include "EDS/FFS.h"
+#include "EFC_DB/EFC_DB_sampler.h"
+#include "EFC/src/GFC_def.h"
 
 // Constructor
-TkrFilterOutput::TkrFilterOutput() 
+TkrFilterOutput::TkrFilterOutput(void* cfgPrms) 
 {
-    m_trackProj = new trackProj();
-    m_grbTrack  = new GrbFindTrack();
+    m_cfgPrms   = reinterpret_cast<GFC*>(cfgPrms);
+
+    m_trackProj = new trackProj(m_cfgPrms->cfg);
+    m_grbTrack  = new GrbFindTrack(m_cfgPrms->cfg);
 
     return;
 }
@@ -40,17 +45,20 @@ TkrFilterOutput::TkrFilterOutput()
 void TkrFilterOutput::eovProcessing(void* callBackParm, EDS_fwIxb* ixb)
 {
     // Get pointer to the TDS info
-    FilterTdsPointers* tdsPointers = (FilterTdsPointers*)callBackParm;
+    ObfOutputCallBackParm* tdsPointers = reinterpret_cast<ObfOutputCallBackParm*>(callBackParm);
 
     // Recover pointers to the TDS objects
     OnboardFilterTds::FilterStatus* filterStatus = tdsPointers->m_filterStatus;
     OnboardFilterTds::TowerHits*    towerHits    = tdsPointers->m_towerHits;
 
-    // Get the standard tracker information
-    extractFilterTkrInfo(tdsPointers->m_filterStatus, ixb);
+    // Store the track information
+    storeTrackInfo(ixb);
 
     // Get the best track information
     extractBestTrackInfo(tdsPointers->m_filterStatus, ixb);
+
+    // Get the standard tracker information
+    extractFilterTkrInfo(tdsPointers->m_filterStatus, ixb);
 
     // If we have a hit info block then get that too
     if (tdsPointers->m_towerHits) {
@@ -63,9 +71,37 @@ void TkrFilterOutput::eovProcessing(void* callBackParm, EDS_fwIxb* ixb)
 
 void TkrFilterOutput::eorProcessing(MsgStream& log)
 {
+    // Recover 
     return;
 }
 
+void TkrFilterOutput::storeTrackInfo(EDS_fwIxb* ixb)
+{
+    // Check to see if there is any track information
+    EDR_tkr* tkr = ixb->blk.evt.tkr;
+
+    if (tkr->twrMap)
+    {
+        // Get the track projections
+        TFC_prjs *prjs = (TFC_prjs *)ixb->blk.ptrs[EFC_EDS_FW_OBJ_K_TFC_PRJS];
+
+        // Try mating XZ and YZ projections to form "best" tracks
+        GrbTrack track = m_grbTrack->findTrack(prjs);
+
+        // Test...
+        OnboardFilterTds::Obf_TFC_prjs reconObjects(prjs);
+
+        const TFC_prj& testprj = reconObjects.getPrj(0);
+
+        if (reconObjects.getCurCnt() > 1)
+        {
+            const TFC_prj& testprj2 = reconObjects.getPrj(1);
+            int j = 0;
+        }
+    }
+
+    return;
+}
 
 void TkrFilterOutput::extractFilterTkrInfo(OnboardFilterTds::FilterStatus* filterStatus, EDS_fwIxb *ixb)
 {
@@ -264,13 +300,14 @@ void TkrFilterOutput::extractBestTrackInfo(OnboardFilterTds::FilterStatus* filte
     int    trkNY    = 0;
 
     // Get the projections 
-    const TFC_prjs *prjs = (const TFC_prjs *)ixb->blk.ptrs[EFC_EDS_FW_OBJ_K_TFC_PRJS];
+    TFC_prjs *prjs = (TFC_prjs *)ixb->blk.ptrs[EFC_EDS_FW_OBJ_K_TFC_PRJS];
 
     // use the trackProj class to do the real work here... but only if data...
-    if (filterStatus->getTcids()) 
+    //if (filterStatus->getTcids()) 
+    if (prjs->curCnt > 0) 
     {
         m_trackProj->execute(prjs, xHits, yHits, slopeXZ, slopeYZ, intXZ, intYZ);
-        GrbTrack track = m_grbTrack->findTrack(ixb);
+        GrbTrack track = m_grbTrack->findTrack(prjs);
 
         if (track.valid())
         {

@@ -8,7 +8,7 @@
 *
 * @authors T. Usher
 *
-* $Header: /nfs/slac/g/glast/ground/cvs/TkrRecon/src/PatRec/VectorLinks/VecPoint.h,v 0.1 2006/03/21 01:12:37 usher Exp $
+* $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/OutputRtn.h,v 1.1 2006/12/12 22:19:04 usher Exp $
 */
 
 #ifndef __OutputRtn_H
@@ -18,14 +18,19 @@
 #include "OnboardFilterTds/ObfFilterStatus.h"
 
 // Define a utility class for the callback routines 
-class FilterTdsPointers
+class ObfOutputCallBackParm
 {
 public:
+
+    typedef std::map<unsigned short int, void*> SchemaToCfgMap;
+
     OnboardFilterTds::FilterStatus*    m_filterStatus;
     OnboardFilterTds::ObfFilterStatus* m_obfFilterStatus;
     OnboardFilterTds::TowerHits*       m_towerHits;
-    FilterTdsPointers() : m_filterStatus(0), m_towerHits(0) {}
-    ~FilterTdsPointers() {}
+    SchemaToCfgMap                     m_schemaToCfgMap;
+
+    ObfOutputCallBackParm() : m_filterStatus(0), m_towerHits(0) {m_schemaToCfgMap.clear();}
+    ~ObfOutputCallBackParm() {}
 };
 
 // Forward declarations

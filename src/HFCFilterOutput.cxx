@@ -35,7 +35,7 @@ HFCFilterOutput::HFCFilterOutput(int offset, bool passThrough) :
 void HFCFilterOutput::eovProcessing(void* callBackParm, EDS_fwIxb* ixb)
 {
     // Cast callBackParm
-    FilterTdsPointers* tdsPointers = (FilterTdsPointers*)callBackParm;
+    ObfOutputCallBackParm* tdsPointers = reinterpret_cast<ObfOutputCallBackParm*>(callBackParm);
 
     // Recover pointers to the TDS objects
     OnboardFilterTds::ObfFilterStatus* obfFilterStatus = tdsPointers->m_obfFilterStatus;
