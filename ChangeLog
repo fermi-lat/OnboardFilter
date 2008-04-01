@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: usher  Tue Apr  1 09:20:55 PDT 2008
+OnboardFilter/cmt
+
+Modified Files:
+	requirements 
+Log Message:
+First updates to go to B1-0-8, get ready to test on linux
+    *
+------------------------------------------------------------
 TAG
 Tag name: OnboardFilter-04-08-00, operation: add
 Package: OnboardFilter
