@@ -1,13 +1,10 @@
 package OnboardFilter
 version v4r8p0
-# $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/cmt/requirements,v 1.89 2008/01/11 22:09:54 usher Exp $
+# $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/cmt/requirements,v 1.90 2008/02/07 19:51:37 usher Exp $
 
-author Richard Hughes <HUGHES@mps.ohio-state.edu>
+author Tracy Usher <usher@SLAC.Stanford.edu>
 
 use EbfWriter           *
-use TkrUtil             *
-use GuiSvc              *
-use ntupleWriterSvc     *
 use obf v* IExternal 
 
 apply_pattern packageShr
@@ -16,11 +13,15 @@ apply_pattern package_header
 
 private
 use OnboardFilterTds v*
-use GlastSvc v*
+use CRflux v*
+use TkrDigi v*
+use AcdDigi v*
+use CalDigi v*
 use gr_app v*
 
 macro OnboardFilter_cppflags "" \
-   Linux "-DGLEAM -D__i386 -DEFC_FILTER -DMSG_ST -D__unix__  -DWUT_IMPLEMENTATION_PX "\
+#   Linux "-DGLEAM -D__i386 -DEFC_FILTER -DMSG_ST -D__unix__  -DWUT_IMPLEMENTATION_PX "\
+   Linux "-DGLEAM -D__i386 -DEFC_FILTER "\
    WIN32 " /D GLEAM /D__i386 /DEFC_FILTER  /D_WIN32"
 
 #    -nostdinc -I/usr/local/gcc-3.2.3/lib/gcc-lib/i686-pc-linux-gnu/3.2.3/include -I/usr/include"\
@@ -34,7 +35,7 @@ macro headers "" WIN32 "*.h"
 library OnboardFilter \
  -s=../OnboardFilter $(headers)\
  -s=../src *.cxx *.h \
- -s=../src/Dll *.cxx 
+ -s=Dll *.cxx 
  
 
 # use this only for the test. TODO: make it cleaner
@@ -44,7 +45,10 @@ public
 
 #set LD_LIBRARY_PATH ${ONBOARDFILTERROOT}/rh9_gcc32
 
-apply_pattern package_test
-set TESTJOBOPTIONS ${ONBOARDFILTERROOT}/src/test/jobOptions.txt
+#apply_pattern package_test
+set JOBOPTIONS ${ONBOARDFILTERROOT}/src/test/jobOptions.txt
+
+private
+application test_OnboardFilter ${GuiMain} test/*.cxx ${Win32Resource}
 
 
