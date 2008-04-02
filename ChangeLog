@@ -1,4 +1,15 @@
 ------------------------------------------------------------
+User: usher  Wed Apr  2 08:46:51 PDT 2008
+OnboardFilter/src/test
+
+Modified Files:
+	jobOptions.txt 
+Added Files:
+	test_OnboardFilter.cxx 
+Log Message:
+First updates to go to B1-0-8, get ready to test on linux
+    *
+------------------------------------------------------------
 User: usher  Wed Apr  2 08:46:50 PDT 2008
 OnboardFilter/src
 
