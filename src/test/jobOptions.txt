@@ -1,13 +1,7 @@
-
-//##############################################################
-//
-// Job options file for Gleam job
-
-//#include "basicOptions.txt"
 //##############################################################
 //
 // basic Job options file for a Gleam execution
-// $Header: /nfs/slac/g/glast/ground/cvs/Gleam/src/basicOptions.txt,v 1.79 2005/11/09 06:48:25 heather Exp $
+// $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/test/jobOptions.txt,v 1.114 2007/11/09 17:12:57 heather Exp $
 
 // primary DLLs, including auditor 
 
@@ -18,57 +12,82 @@ AuditorSvc.Auditors = {"ChronoAuditor"};
 // ----------------------------
 // setup basic event loop stuff
 //
-ApplicationMgr.ExtSvc = { 
-    "GlastEventSelector/EventSelector" , 
-    "EventCnvSvc"
-    };
+ApplicationMgr.ExtSvc = { "EventSelector/EventSelector" };
 
 EventPersistencySvc.CnvServices = {"EventCnvSvc"};
-EventSelector.Input = "NONE";
+EventSelector.Input = "SVC='DbEvtSelector'";
+EventSelector.PrintFreq = -1;
 
 
 // ----------------------------
 //  a structure for the topalg, using sequencer steps
 
 ApplicationMgr.TopAlg = {
-      "Sequencer/Top" };
+      "Sequencer/Event" };
 
-//the top sequence loop
-Top.Members={
-    "Sequencer/Generator"};
-
-Generator.Members = {
-    "FluxAlg", 
-    "PointInfoAlg",
-    "G4Generator",
-    "Sequencer/CalibrationUpdate",
+Event.Members = {
+    "Sequencer/Generation",
     "Sequencer/Digitization",
-    "Sequencer/EventDisplay",
-    "Sequencer/Triggered" };
-    
-// FluxAlg branch for "TimeTicks" 
-// (note that if you override Members, this must be too)
-Generator.BranchMembers = {"FluxAlg", "ExposureAlg"};
+    "Sequencer/TriggerTest",   // can reject events, set TriggerAlg.mask = 0 to pass all
+    "Sequencer/Triggered" 
+};
 
-// the sequence that is triggered with data
+Generation.Members = {
+    "FluxAlg", 
+    "G4Generator" };
+  
+// ----------------------------
+//  Digitization
+//
+ApplicationMgr.DLLs +={ "TkrDigi", "CalDigi", "AcdDigi", "TkrUtil", "AcdUtil", "G4Propagator"  };
+Digitization.Members = { 
+    "TkrDigiAlg", 
+    "CalDigiAlg",
+    "AcdDigiAlg"
+    };
+
+// this sequence contains the trigger test
+TriggerTest.Members = {"TriggerAlg" };
+
+// this sequence runs if the event passes the trigger
 Triggered.Members={
-    "Sequencer/Trigger",
-    "Sequencer/Reconstruction",
-    "Sequencer/RecoDisplay",
-    "Sequencer/Output" };
+    "Sequencer/Filter" // can also cause rejection
+ };
+
+// ----------------------------
+//  Trigger and livetime
+
+ApplicationMgr.DLLs +={ "Trigger"};
+ApplicationMgr.ExtSvc += { "LivetimeSvc"}; 
+LivetimeSvc.InterleaveMode = false; // interleave mode kills events on a statistical basis 
+TriggerAlg.mask = -1; // all bits on by default: reject if none set (e.g., missed)
+
+// The following is for the new Trigger Configuration Service
+TriggerAlg.engine="TrgConfigSvc"; // use TrgConfigSvc to configure trigger engines. The following options control the configuration:
+//TriggerAlg.applyPrescales=true; // do trigger engine based prescaling
+TriggerAlg.applyPrescales = false;
+//TriggerAlg.applyWindowMask=true; // only use event if the window was open
+//TriggerAlg.applyDeadtime=true; // throw away events if GEM is busy
+//TriggerAlg.useGltWordForData=true; //when prescaling data use Glt word instead of Gem word
+
+// ----------------------------
+//  onboard filter 
+
+ApplicationMgr.DLLs  += { "EbfWriter", "OnboardFilter"};
+Filter.Members       += {"EbfWriter", "OnboardFilter", "test_OnboardFilter"}; 
+OnboardFilter.mask=0; // all bits off by default: no rejection
 
 // ----------------------------
 //  Geometry definition
-//
+
 ApplicationMgr.DLLs += {"GlastSvc"};
 ApplicationMgr.ExtSvc += { "GlastDetSvc"};
 GlastDetSvc.topVolume="LAT"; 
 GlastDetSvc.xmlfile="$(XMLGEODBSROOT)/xml/flight/flightSegVols.xml";
 GlastDetSvc.visitorMode="recon";
 
-// ----------------------------
 //  Randoms definition
-//
+
 ApplicationMgr.ExtSvc += { "GlastRandomSvc"};
 
 // ----------------------------
@@ -76,123 +95,22 @@ ApplicationMgr.ExtSvc += { "GlastRandomSvc"};
 //
 //  get the parameters for simulation -- misnamed the file :-(
 #include "$G4GENERATORROOT/src/basicOptions.txt"
-ApplicationMgr.DLLs +={ "G4Propagator"};
 
 #include "$FLUXSVCROOT/src/defaultOptions.txt"
 FluxAlg.source_name="default";
+
+FluxSvc.source_lib += {"$(G4GENERATORROOT)/src/test/test_sources.xml"};
+FluxAlg.source_name="muon_pencil_angle";
 
 // add in CRflux option
 ApplicationMgr.DLLs +={ "CRflux" };
 FluxSvc.source_lib += {
     "$(CRFLUXROOT)/xml/source_library.xml"};
 
-//-----------------------------
-// These algorithms run before digitization or reconstruction
-//
-CalibrationUpdate.Members={
-    "TkrCalibAlg"     // found in TkrUtil
-    };
-
-
-// ----------------------------
-//  Digitization
-//
-ApplicationMgr.DLLs +={ "TkrDigi", "CalDigi", "AcdDigi"  };
-Digitization.Members = { 
-    "TkrDigiAlg", 
-    "CalDigiAlg", 
-    "AcdDigiAlg"
-    };
-//CalDigiAlg.RangeType="4Range";
-
-// ----------------------------
-//  Trigger calculation
-//
-ApplicationMgr.DLLs +={ "Trigger"};
-ApplicationMgr.ExtSvc += { "LivetimeSvc"};
-Trigger.Members = {"TriggerAlg"};
-TriggerAlg.mask = -1; // all bits on by default: reject if none set (e.g., missed)
-
-// ----------------------------
-//  onboard filter 
-//
-ApplicationMgr.DLLs += {"EbfWriter", "OnboardFilter"};
-//ApplicationMgr.DLLs += {"EbfWriter"};
-Trigger.Members += {"EbfWriter","OnboardFilter"};
-//Triggered.Members += {"FilterTracks","FilterAlg"};
-OnboardFilter.mask=0; // all bits off by default: no rejection
-
-
-// ----------------------------
-//  onboard filter 
-//
-// Veto mode
-//OnboardFilter.mask=65535; 
-//OnboardFilter.PassThrough=0; 
-//
-// Pass through mode
-OnboardFilter.mask=0; 
-OnboardFilter.PassThrough=1; 
-OnboardFilter.FileNameFilter="$ONBOARDFILTERROOT/rh9_gcc32/libOnboardFilter.so"; 
-OnboardFilter.FileNamePeds="$ONBOARDFILTERROOT/rh9_gcc32/libcal_db_pedestals.so"; 
-OnboardFilter.FileNameGains="$ONBOARDFILTERROOT/rh9_gcc32/libcal_db_gains.so"; 
-//OnboardFilter.FileNamePeds="$ONBOARDFILTERROOT/rh9_gcc32/libcal_db_pedestals_flight.so"; 
-//OnboardFilter.FileNameGains="$ONBOARDFILTERROOT/rh9_gcc32/libcal_db_gains_flight.so"; 
-
-
-// ----------------------------
-//   Reconstruction
-//
-ApplicationMgr.ExtSvc += { "GlastPropagatorSvc" };
-
-ApplicationMgr.DLLs +={ 
-    "CalRecon", "CalUtil", 
-    "TkrRecon", "TkrUtil"
-    };
-Reconstruction.Members={ 
-    "Sequencer/Cal1", 
-    "Sequencer/Tkr",
-    "Sequencer/Cal2",
-    "Sequencer/TkrIter",
-    "Sequencer/Acd"
-    };
-
-// First pass of Cal Recon - full recon...
-Cal1.Members = { 
-    "CalXtalRecAlg",
-    "CalClustersAlg/first",
-    "CalMipFinderAlg", 
-    "CalEventEnergyAlg/RawEnergy"
-    };
-
-// First pass of Tkr Recon
-Tkr.Members = {
-    "TkrReconAlg/FirstPass"
-    };
-
-// Second pass of Cal Recon - energy corrections only
-Cal2.Members = {
-    "CalEventEnergyAlg/second"
-    };
-TkrIter.Members = {
-    "TkrReconAlg/Iteration"
-    };
-
-// -------------------------------------------
-//          tracker services
-//
-ApplicationMgr.ExtSvc   += { "TkrGeometrySvc"};
-ApplicationMgr.ExtSvc   += { "TkrInitSvc"};
-
-// this fixes a HE track pattern recognition problem
-// *** it should be done in TkrRecon ***
-TkrFilterFirst.FilterToolName="TkrCalFilterTool";
-
 // -------------------------------------------
 //  Calibration sevices
 //
 #include "$CALIBSVCROOT/src/defaultOptions.txt"
-
 
 // -------------------------------------------
 //  Calorimeter services
@@ -200,124 +118,17 @@ TkrFilterFirst.FilterToolName="TkrCalFilterTool";
 ApplicationMgr.Dlls += {"CalXtalResponse"};
 #include "$CALXTALRESPONSEROOT/src/defaultOptions.txt"
 
-
-// ----------------------------
-//   ACD recon
-//
-ApplicationMgr.DLLs += {"AcdUtil", "AcdRecon"};
-Acd.Members = {"AcdReconAlg"};
-
-// Try to get those damn CT variables in the ntuple
-ClassifyAlg.TreeName="MeritTuple";
-ClassifyAlg.InfoPath="/usr/products/Glast/GlastRelease_v7r3p20/GlastClassify/v3r2/xml/";
-ClassifyAlg.xmlFileName="DC2_Analysis.xml";
-
-
-// ----------------------------
-//   Atwood's tuple and merit
-//
-ApplicationMgr.DLLs +=   {"AnalysisNtuple", "ntupleWriterSvc", "merit"};
-ApplicationMgr.ExtSvc += {"RootTupleSvc"};
-AnalysisNtupleAlg.tupleName = "MeritTuple";
-Triggered.Members +=     { "AnalysisNtupleAlg","meritAlg", "ClassifyAlg", "FT1Alg","glastNtuple" };
-glastNtuple.tupleName="myGlast.root";
-
-//-------------------------------------
-//   Merit configuration --  (use defaults)
-
-// ---------------------------- 
-//   Output
-//
-ApplicationMgr.DLLs +={"RootIo"}; 
-Output.Members = {     
-    "FhSetAlg",
-    "mcRootWriterAlg", 
-    "digiRootWriterAlg", 
-    "reconRootWriterAlg"};
-
-ApplicationMgr.DLLs += {"glastNtuple"};
-
 // output levels, including suppression to allow debug, info
-mcRootWriterAlg.OutputLevel=3;
-digiRootWriterAlg.OutputLevel=3;
-reconRootWriterAlg.OutputLevel=3;
 ToolSvc.OutputLevel=3;    // too verbose in debug
-CalClustersAlg.OutputLevel=4; // too much info
-TkrClusFirst.OutputLevel=4;
 CalDigiAlg.OutputLevel=4;
-TkrAlignmentSvc.OutputLevel=4;
-TkrGeometrySvc.OutputLevel=4;
 EbfWriter.OutputLevel=4;
-ToolSvc.LastLayerCorrTool.OutputLevel=4; 
 ToolSvc.OutputLevel=4;
 CalXtalRecAlg.OutputLevel=4;
-AcdReconAlg.OutputLevel=4; // suppress INFO complaint about no tracks
     
 // Set output level threshold (2=DEBUG, 3=INFO, 4=WARNING, 5=ERROR, 6=FATAL )
 MessageSvc.OutputLevel = 3;
 
-//==============================================================
-//
-// End of job options file
-//
-//##############################################################
-
-
-
-// Comment out this below to turn off GUI
-//#include "$GLEAMROOT/src/guiOptions.txt"
-
-
-// Use the standard sources
-//FluxAlg.source_name="muon_pencil_angle";
-FluxSvc.source_lib += {"./my_sources.xml"};
-//FluxAlg.sources={"back", "briantick1s"};
-//FluxAlg.sources={"briantick1s"};
-//FluxAlg.sources={"all_gamma"};
-//FluxAlg.source_name="gamma_1_gev_normal";
-FluxSvc.source_lib  += {"/scratch/kuehn/osc/kold_GlastRelease_v7r3p3/DataChallenge/v2r7/xml/datachallenge_library.xml"};
-
-FluxAlg.sources ={"CrProtonMix"};
-FluxAlg.sources+={"CrElectronMix"};
-FluxAlg.sources+={"CrPositronMix"};
-FluxAlg.sources+={"CrAlpha"};
-FluxAlg.sources+={"CrHeavyIon"};
-FluxAlg.sources+={"Earth10"};
-FluxAlg.sources+={"clock"};
-
-
-// Set the number of events
-ApplicationMgr.EvtMax  = 200;
-Output.Members = {"mcRootWriterAlg", "digiRootWriterAlg", "reconRootWriterAlg"};
-
-
-// Set Max size of EBF event (Default is 0x10000=65536...too small for full Encode Files)
-//                           (For Full Encode use 0x20000=131072...techically too big for LCB))
-EbfWriter.MaxEvtSize=65536;
-EbfWriter.WriteEbf=true;
-EbfWriter.StoreOnTds=true;
-EbfWriter.LdfFormat=false;
-
-// Set Flag for Creating/Writing FES Files
-// 0 = No FES output  1 = Generate FES Files
-EbfWriter.FESFiles=0;
-EbfWriter.FESVersion=2;
-
-// Set Encoding Flags (Debugging Datasets)
-// -1 = No Encoding (Use GLEAM Evt) 0 = Give Empty Cont. 1 = Full Enode 2 = Sparse Encode
-EbfWriter.TkrEncode=-1;
-EbfWriter.CalEncode=-1;
-EbfWriter.ReadFile=0;
-
-
-// Setup the output file names
-FesExposure.FileName="BackAvg_v8r0_V2p13_Attitude";
-EbfWriter.FileName="BackAvg_v8r0_V2p13";
-EbfWriter.FileDesc="Made with GLEAM v8r0";
-mcRootWriterAlg.mcRootFile="mc_BackAvg_v8r0_V2p13.root";
-digiRootWriterAlg.digiRootFile="digi_BackAvg_v8r0_V2p13.root";
-reconRootWriterAlg.ReconRootFile="reco_BackAvg_v8r0_V2p13.root";
-RootTupleSvc.filename="rTuple_BackAvg_v8r0_V2p13.root";
+ApplicationMgr.EvtMax  = 100;
 
 //==============================================================
 //

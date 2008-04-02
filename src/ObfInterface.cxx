@@ -183,6 +183,7 @@ ObfInterface::ObfInterface(MsgStream& log, const std::string& filePath, ObfOutpu
 
     // EFC library already loaded (we link to it)
     // Load the other filter libraries
+    loadLibrary ("gfc", m_verbosity);
     loadLibrary ("hfc", m_verbosity);
     loadLibrary ("mfc", m_verbosity);
     loadLibrary ("dfc", m_verbosity);
