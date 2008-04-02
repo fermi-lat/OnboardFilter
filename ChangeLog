@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: usher  Wed Apr  2 08:46:50 PDT 2008
+OnboardFilter/src
+
+Modified Files:
+	ObfInterface.cxx 
+Log Message:
+First updates to go to B1-0-8, get ready to test on linux
+    *
+------------------------------------------------------------
 User: usher  Tue Apr  1 09:20:55 PDT 2008
 OnboardFilter/src
 
