@@ -8,7 +8,7 @@
 
 #include "EFC/EFC_edsFw.h"
 #include "EDS/EBF_dir.h"
-#include "XFC/XFC/HFC_status.h"
+#include "XFC/HFC_status.h"
 
 // Constructor
 HFCFilterOutput::HFCFilterOutput(int offset, bool passThrough) : 

@@ -9,7 +9,7 @@
 
 #include "EFC/EFC_edsFw.h"
 #include "EDS/EBF_dir.h"
-#include "XFC/XFC/MFC_status.h"
+#include "XFC/MFC_status.h"
 
 // Constructor
 MipFilterOutput::MipFilterOutput(int offset, bool passThrough) : 

@@ -8,7 +8,7 @@
 *
 * @authors T. Usher
 *
-* $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/ObfInterface.h,v 1.5 2007/12/28 18:39:47 usher Exp $
+* $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/ObfInterface.h,v 1.6 2008/02/07 19:33:16 usher Exp $
 */
 
 #ifndef __ObfInterface_H
@@ -74,7 +74,7 @@ public:
 
     ///@name other methods
     /// Load shareable libraries
-    bool loadLibrary (const std::string& libraryName, int verbosity = 0);
+    bool loadLibrary (std::string libraryName, std::string libraryPath = "", int verbosity = 0);
     
     // Output status of counters
     void dumpCounters();
@@ -100,6 +100,10 @@ private:
     // Map master schema to a file name
     typedef std::map<SchemaPair, std::string> IdToFileMap;
     IdToFileMap        m_idToFile;
+
+    // Map filter schema to the file path
+    typedef std::map<unsigned short int, std::string> IdToPathMap;
+    IdToPathMap        m_idToPath;
 
     // Map file name to EH_id enum value
     typedef std::map<std::string, unsigned int> FileToEnumMap;

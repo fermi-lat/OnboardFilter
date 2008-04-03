@@ -6,7 +6,7 @@
 
 \verbatim
 
-  CVS $Id: OnboardFilter.cxx,v 1.74 2008/01/11 21:31:53 usher Exp $
+  CVS $Id: OnboardFilter.cxx,v 1.75 2008/02/07 19:33:16 usher Exp $
 \endverbatim
                                                                           */
 /* ---------------------------------------------------------------------- */
@@ -138,10 +138,10 @@ OnboardFilter::OnboardFilter(const std::string& name, ISvcLocator *pSvcLocator) 
     declareProperty("TkrFilterInfo",   m_tkrFilterInfo      = true);
     declareProperty("GemFilterInfo",   m_gemFilterInfo      = true);
     declareProperty("TkrHitsInfo",     m_tkrHitsInfo        = false);
-    declareProperty("GammaConfig",     m_GammaConfig        = "GAMMA_normal");
-    declareProperty("HipConfig",       m_HipConfig          = "HIP_normal");
-    declareProperty("MipConfig",       m_MipConfig          = "MIP_off_axis");
-    declareProperty("DgnConfig",       m_DgnConfig          = "DGN_primitive");
+    declareProperty("GammaConfig",     m_GammaConfig        = "gamma_normal");
+    declareProperty("HipConfig",       m_HipConfig          = "hip_normal");
+    declareProperty("MipConfig",       m_MipConfig          = "mip_off_axis");
+    declareProperty("DgnConfig",       m_DgnConfig          = "dgn_primitive");
     declareProperty("FailNoEbfData",   m_failNoEbfData      = false);
     declareProperty("FilterList",      m_filterList);
 

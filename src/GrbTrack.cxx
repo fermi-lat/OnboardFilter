@@ -3,9 +3,9 @@
 #include "EFC/TFC_prjDef.h"
 #include "EDS/FFS.h"
 #include "EFC_DB/EFC_DB_sampler.h"
-#include "EFC/src/GFC_def.h"
-#include "EFC/src/TFC_geometryDef.h"
-#include "GGF_DB/src/GEO_DB_data.h"
+#include "EFC/../src/GFC_def.h"
+#include "EFC/../src/TFC_geometryDef.h"
+#include "GGF_DB/../src/GEO_DB_data.h"
 
 
 #ifndef NULL

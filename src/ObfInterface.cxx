@@ -35,6 +35,7 @@
 #include "EDS/LCBV.h"
 
 #include "GaudiKernel/MsgStream.h"
+#include "facilities/Util.h"
 
 /* ---------------------------------------------------------------------- */
 
@@ -146,54 +147,63 @@ ObfInterface::ObfInterface(MsgStream& log, const std::string& filePath, ObfOutpu
     // Schema id to file names
     m_idToFile.clear();
 
-    m_idToFile[SchemaPair(GAMMA_DB_SCHEMA,GAMMA_DB_INSTANCE_K_MASTER)]          = "GAMMA_master";
-    m_idToFile[SchemaPair(GAMMA_DB_SCHEMA,GAMMA_DB_INSTANCE_K_NORMAL)]          = "GAMMA_normal";
-    m_idToFile[SchemaPair(GAMMA_DB_SCHEMA,GAMMA_DB_INSTANCE_K_NORMAL_LEAK)]     = "GAMMA_normal_leak";
-    m_idToFile[SchemaPair(GAMMA_DB_SCHEMA,GAMMA_DB_INSTANCE_K_CALIB)]           = "GAMMA_calib";
-    m_idToFile[SchemaPair(GAMMA_DB_SCHEMA,GAMMA_DB_INSTANCE_K_CALIB_LEAK)]      = "GAMMA_calib_leak";
-    m_idToFile[SchemaPair(GAMMA_DB_SCHEMA,GAMMA_DB_INSTANCE_K_CALIB_A)]         = "GAMMA_calib_a";
-    m_idToFile[SchemaPair(GAMMA_DB_SCHEMA,GAMMA_DB_INSTANCE_K_CALIB_A_LEAK)]    = "GAMMA_calib_a_leak";
-    m_idToFile[SchemaPair(GAMMA_DB_SCHEMA,GAMMA_DB_INSTANCE_K_EFF)]             = "GAMMA_eff";
-    m_idToFile[SchemaPair(GAMMA_DB_SCHEMA,GAMMA_DB_INSTANCE_K_EFF_TAPER)]       = "GAMMA_eff_taper";
-    m_idToFile[SchemaPair(GAMMA_DB_SCHEMA,GAMMA_DB_INSTANCE_K_NORMAL_LEAK_21A)] = "GAMMA_normal_leak_21a";
-    m_idToFile[SchemaPair(GAMMA_DB_SCHEMA,GAMMA_DB_INSTANCE_K_NORMAL_LEAK_17A)] = "GAMMA_normal_leak_17a";
+    m_idToFile[SchemaPair(GAMMA_DB_SCHEMA,GAMMA_DB_INSTANCE_K_MASTER)]          = "gamma_master";
+    m_idToFile[SchemaPair(GAMMA_DB_SCHEMA,GAMMA_DB_INSTANCE_K_NORMAL)]          = "gamma_normal";
+    m_idToFile[SchemaPair(GAMMA_DB_SCHEMA,GAMMA_DB_INSTANCE_K_NORMAL_LEAK)]     = "gamma_normal_leak";
+    m_idToFile[SchemaPair(GAMMA_DB_SCHEMA,GAMMA_DB_INSTANCE_K_CALIB)]           = "gamma_calib";
+    m_idToFile[SchemaPair(GAMMA_DB_SCHEMA,GAMMA_DB_INSTANCE_K_CALIB_LEAK)]      = "gamma_calib_leak";
+    m_idToFile[SchemaPair(GAMMA_DB_SCHEMA,GAMMA_DB_INSTANCE_K_CALIB_A)]         = "gamma_calib_a";
+    m_idToFile[SchemaPair(GAMMA_DB_SCHEMA,GAMMA_DB_INSTANCE_K_CALIB_A_LEAK)]    = "gamma_calib_a_leak";
+    m_idToFile[SchemaPair(GAMMA_DB_SCHEMA,GAMMA_DB_INSTANCE_K_EFF)]             = "gamma_eff";
+    m_idToFile[SchemaPair(GAMMA_DB_SCHEMA,GAMMA_DB_INSTANCE_K_EFF_TAPER)]       = "gamma_eff_taper";
+    m_idToFile[SchemaPair(GAMMA_DB_SCHEMA,GAMMA_DB_INSTANCE_K_NORMAL_LEAK_21A)] = "gamma_normal_leak_21a";
+    m_idToFile[SchemaPair(GAMMA_DB_SCHEMA,GAMMA_DB_INSTANCE_K_NORMAL_LEAK_17A)] = "gamma_normal_leak_17a";
 
-    m_idToFile[SchemaPair(MIP_DB_SCHEMA,MIP_DB_INSTANCE_K_MASTER)]              = "MIP_master";
-    m_idToFile[SchemaPair(MIP_DB_SCHEMA,MIP_DB_INSTANCE_K_ALL_AXIS)]            = "MIP_all_axis";
-    m_idToFile[SchemaPair(MIP_DB_SCHEMA,MIP_DB_INSTANCE_K_EFF_OFF_AXIS)]        = "MIP_eff_off_axis";
-    m_idToFile[SchemaPair(MIP_DB_SCHEMA,MIP_DB_INSTANCE_K_EFF_TAPER_OFF_AXIS)]  = "MIP_eff_taper_off_axis";
-    m_idToFile[SchemaPair(MIP_DB_SCHEMA,MIP_DB_INSTANCE_K_OFF_AXIS)]            = "MIP_off_axis";
+    m_idToFile[SchemaPair(MIP_DB_SCHEMA,MIP_DB_INSTANCE_K_MASTER)]              = "mip_master";
+    m_idToFile[SchemaPair(MIP_DB_SCHEMA,MIP_DB_INSTANCE_K_ALL_AXIS)]            = "mip_all_axis";
+    m_idToFile[SchemaPair(MIP_DB_SCHEMA,MIP_DB_INSTANCE_K_EFF_OFF_AXIS)]        = "mip_eff_off_axis";
+    m_idToFile[SchemaPair(MIP_DB_SCHEMA,MIP_DB_INSTANCE_K_EFF_TAPER_OFF_AXIS)]  = "mip_eff_taper_off_axis";
+    m_idToFile[SchemaPair(MIP_DB_SCHEMA,MIP_DB_INSTANCE_K_OFF_AXIS)]            = "mip_off_axis";
 
-    m_idToFile[SchemaPair(HIP_DB_SCHEMA,HIP_DB_INSTANCE_K_MASTER)]              = "HIP_master";
-    m_idToFile[SchemaPair(HIP_DB_SCHEMA,HIP_DB_INSTANCE_K_EFF)]                 = "HIP_eff";
-    m_idToFile[SchemaPair(HIP_DB_SCHEMA,HIP_DB_INSTANCE_K_EFF_TAPER)]           = "HIP_eff_taper";
-    m_idToFile[SchemaPair(HIP_DB_SCHEMA,HIP_DB_INSTANCE_K_LEO)]                 = "HIP_leo";
-    m_idToFile[SchemaPair(HIP_DB_SCHEMA,HIP_DB_INSTANCE_K_NORMAL)]              = "HIP_normal";
+    m_idToFile[SchemaPair(HIP_DB_SCHEMA,HIP_DB_INSTANCE_K_MASTER)]              = "hip_master";
+    m_idToFile[SchemaPair(HIP_DB_SCHEMA,HIP_DB_INSTANCE_K_EFF)]                 = "hip_eff";
+    m_idToFile[SchemaPair(HIP_DB_SCHEMA,HIP_DB_INSTANCE_K_EFF_TAPER)]           = "hip_eff_taper";
+    m_idToFile[SchemaPair(HIP_DB_SCHEMA,HIP_DB_INSTANCE_K_LEO)]                 = "hip_leo";
+    m_idToFile[SchemaPair(HIP_DB_SCHEMA,HIP_DB_INSTANCE_K_NORMAL)]              = "hip_normal";
   
-    m_idToFile[SchemaPair(DGN_DB_SCHEMA,DGN_DB_INSTANCE_K_MASTER)]              = "DGN_master";
-    m_idToFile[SchemaPair(DGN_DB_SCHEMA,DGN_DB_INSTANCE_K_GEM)]                 = "DGN_gem";
-    m_idToFile[SchemaPair(DGN_DB_SCHEMA,DGN_DB_INSTANCE_K_GEM_500)]             = "DGN_gem_500";
-    m_idToFile[SchemaPair(DGN_DB_SCHEMA,DGN_DB_INSTANCE_K_GEM_1000)]            = "DGN_gem_1000";
-    m_idToFile[SchemaPair(DGN_DB_SCHEMA,DGN_DB_INSTANCE_K_TKR)]                 = "DGN_tkr";
-    m_idToFile[SchemaPair(DGN_DB_SCHEMA,DGN_DB_INSTANCE_K_GROUND_HI)]           = "DGN_ground_hi";
-    m_idToFile[SchemaPair(DGN_DB_SCHEMA,DGN_DB_INSTANCE_K_PRIMITIVE)]           = "DGN_primitive";
+    m_idToFile[SchemaPair(DGN_DB_SCHEMA,DGN_DB_INSTANCE_K_MASTER)]              = "dgn_master";
+    m_idToFile[SchemaPair(DGN_DB_SCHEMA,DGN_DB_INSTANCE_K_GEM)]                 = "dgn_gem";
+    m_idToFile[SchemaPair(DGN_DB_SCHEMA,DGN_DB_INSTANCE_K_GEM_500)]             = "dgn_gem_500";
+    m_idToFile[SchemaPair(DGN_DB_SCHEMA,DGN_DB_INSTANCE_K_GEM_1000)]            = "dgn_gem_1000";
+    m_idToFile[SchemaPair(DGN_DB_SCHEMA,DGN_DB_INSTANCE_K_TKR)]                 = "dgn_tkr";
+    m_idToFile[SchemaPair(DGN_DB_SCHEMA,DGN_DB_INSTANCE_K_GROUND_HI)]           = "dgn_ground_hi";
+    m_idToFile[SchemaPair(DGN_DB_SCHEMA,DGN_DB_INSTANCE_K_PRIMITIVE)]           = "dgn_primitive";
+
+    // Schema to file path
+    m_idToPath.clear();
+
+    m_idToPath[GAMMA_DB_SCHEMA] = "$(OBFGFC_DBBINDIR)";
+    m_idToPath[MIP_DB_SCHEMA]   = "$(OBFXFC_DBBINDIR)";
+    m_idToPath[HIP_DB_SCHEMA]   = "$(OBFXFC_DBBINDIR)";
+    m_idToPath[DGN_DB_SCHEMA]   = "$(OBFXFC_DBBINDIR)";
 
     // Clear id to cfg map
     m_idToCfgMap.clear();
 
     // EFC library already loaded (we link to it)
     // Load the other filter libraries
-    loadLibrary ("gfc", m_verbosity);
-    loadLibrary ("hfc", m_verbosity);
-    loadLibrary ("mfc", m_verbosity);
-    loadLibrary ("dfc", m_verbosity);
+    loadLibrary ("gfc", "$(OBFEFCBINDIR)/gfc", m_verbosity);
+    loadLibrary ("hfc", "$(OBFXFCBINDIR)/hfc", m_verbosity);
+    //const char * path = ::getenv(hfcLib.c_str());
+    loadLibrary ("mfc", "$(OBFXFCBINDIR)/mfc", m_verbosity);
+    loadLibrary ("dfc", "$(OBFXFCBINDIR)/dfc", m_verbosity);
 /*
     // do we need this?
     std::string eds_db_File = m_FileNamePath + delim + "eds_db" + fType;
     loadLib (eds_db_File.c_str(),verbose,0);
 */
     // Load the Gleam geometry for fsw
-    loadLibrary ("ggf_db", m_verbosity);
+    loadLibrary ("geo_db_data", "$(OBFGGF_DBBINDIR)/geo_db_data", m_verbosity);
 
     /* Allocate and initialize the Event Data Services framework */
     /* - NOTE: these are C structures not C++ classes */
@@ -247,8 +257,11 @@ int ObfInterface::setupFilter(const std::string& filterName,
         //Look up the file name associated with this schema
         std::string fileName = m_idToFile[schemaPair];
 
+        // Look up the file path with this schema
+        std::string filePath = m_idToPath[schemaPair.first];
+
         // This is the master file name, load this library
-        loadLibrary(fileName, m_verbosity);
+        loadLibrary(fileName, filePath + "/" + fileName, m_verbosity);
 
         /* Find the Gamma filter and get it ready for action */
         const EFC_DB_Schema* schema = EFC_lookup (schemaPair.first, schemaPair.second);
@@ -272,7 +285,7 @@ int ObfInterface::setupFilter(const std::string& filterName,
             // Check if we have found our desired running configuration
             if (fileName == configuration) configIndex = pair.second;
 
-            loadLibrary(fileName, m_verbosity);
+            loadLibrary(fileName, filePath + "/" + fileName, m_verbosity);
         }
 
         // Make sure we found a valid configuration
@@ -404,21 +417,25 @@ bool ObfInterface::setupPassThrough(void* prm)
   \param  verbose      The verbosity level
                                                                           */
 /* ---------------------------------------------------------------------- */
-bool ObfInterface::loadLibrary (const std::string& libraryName, int verbosity)
+bool ObfInterface::loadLibrary (std::string libraryName, std::string libraryPath, int verbosity)
 {
     if (verbosity > 0) printf (" Loading: %s", libraryName.c_str());
 
-    // Ugly but effective...
-    #ifdef WIN32
-        std::string fType = ".dll";
-        std::string delim = "/";
-    #else
-        std::string fType = ".so";
-        std::string delim = "/lib";
-    #endif
+    // Expand the path if there is one
+    if (libraryPath != "")
+    {
+        facilities::Util::expandEnvVar(&libraryPath);
+    }
 
-    // Full file name with path
-    std::string fullFileName = m_libraryPath + delim + libraryName + fType;
+//    std::string fullFileName = libraryPath != "" ? libraryPath + "/" + libraryName + "/"
+    std::string fullFileName = libraryPath != "" ? libraryPath + "/" : "";
+
+    // Platform dependent section to paste it all together
+    #ifdef WIN32
+        fullFileName += libraryName + ".dll";
+    #else
+        fullFileName += "lib" + libraryName + ".so";
+    #endif
 
     // call CDM to load the library
     // Note that currently (12/4/06) cal_db will be zero even when library loads
