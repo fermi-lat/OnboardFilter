@@ -18,7 +18,7 @@
 #include "EDS/EDR_tkrUnpack.h"
 #include "EDS/FFS.h"
 #include "EFC_DB/EFC_DB_sampler.h"
-#include "EFC/src/GFC_def.h"
+#include "EFC/../src/GFC_def.h"
 
 // Constructor
 TkrFilterOutput::TkrFilterOutput(void* cfgPrms) 

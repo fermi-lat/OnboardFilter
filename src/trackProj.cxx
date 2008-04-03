@@ -5,13 +5,13 @@
 #include "trackProj.h"
 #include "EDS/FFS.h"
 #include "EFC_DB/EFC_DB_sampler.h"
-#include "EFC/src/GFC_def.h"
-#include "EFC/src/TFC_geometryDef.h"
+#include "EFC/../src/GFC_def.h"
+#include "EFC/../src/TFC_geometryDef.h"
 #include <iostream>
 #include <exception>
 #include <cmath>
 
-#include "GGF_DB/src/GEO_DB_data.h"
+#include "GGF_DB/../src/GEO_DB_data.h"
 
 //____________________________________________________________________________
 trackProj::trackProj(GFC_cfg* cfg) 
