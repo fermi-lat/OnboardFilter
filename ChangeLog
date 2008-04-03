@@ -1,4 +1,16 @@
 ------------------------------------------------------------
+User: usher  Thu Apr  3 13:14:46 PDT 2008
+OnboardFilter/src
+
+Modified Files:
+	DFCFilterOutput.cxx GammaFilterCfgPrms.cxx GrbTrack.cxx 
+	HFCFilterOutput.cxx MipFilterOutput.cxx ObfInterface.cxx 
+	ObfInterface.h OnboardFilter.cxx TkrFilterOutput.cxx 
+	trackProj.cxx 
+Log Message:
+First try at running off FSW built libraries on linux
+    *
+------------------------------------------------------------
 User: usher  Wed Apr  2 08:46:51 PDT 2008
 OnboardFilter/src/test
 
