@@ -21,7 +21,7 @@
 #include "XFC_DB/DGN_DB_instance.h"
 
 #include "EFC/EFC.h"
-#include "EFC/EFR_key.h"
+#include "LSE/LFR_key.h"
 
 //#include "EFC/EFC_edsFw.h"
 
@@ -263,8 +263,18 @@ int ObfInterface::setupFilter(const std::string& filterName,
         // This is the master file name, load this library
         loadLibrary(fileName, filePath + "/" + fileName, m_verbosity);
 
-        /* Find the Gamma filter and get it ready for action */
-        const EFC_DB_Schema* schema = EFC_lookup (schemaPair.first, schemaPair.second);
+        // Find the Master Schema for the desired filter and get it ready for action 
+        const EFC_DB_Schema* masterSchema = EFC_lookup (schemaPair.first, schemaPair.second);
+
+        // Make a local non-constant copy so that we can, if need be, modify things
+        EFC_DB_Schema  localMaster = *masterSchema;
+        EFC_DB_Schema* schema      = &localMaster;
+
+        // If no output asked for, reset to make sure we always get the status word
+        if (!schema->filter.rsd.nbytes)
+        {
+            schema->filter.rsd.nbytes = 4;
+        }
 
         // Keep track of the configuration index for setting running configuration
         unsigned short int configIndex = -1;
@@ -297,7 +307,7 @@ int ObfInterface::setupFilter(const std::string& filterName,
 
         m_log << MSG::INFO << "Setting up filter: " << filterName << ", with configuration: " << configuration << endreq;
         
-        unsigned int key = EFR_keyGet (CDM_findDatabase (schemaPair.first, schemaPair.second), 0);
+        unsigned int key = LFR_keyGet (CDM_findDatabase (schemaPair.first, schemaPair.second), 0);
 
         // Get a pointer to the "services" structure 
         const char*                            fnd      = schema->eds.get;
@@ -421,13 +431,6 @@ bool ObfInterface::loadLibrary (std::string libraryName, std::string libraryPath
 {
     if (verbosity > 0) printf (" Loading: %s", libraryName.c_str());
 
-    // Expand the path if there is one
-    if (libraryPath != "")
-    {
-        facilities::Util::expandEnvVar(&libraryPath);
-    }
-
-//    std::string fullFileName = libraryPath != "" ? libraryPath + "/" + libraryName + "/"
     std::string fullFileName = libraryPath != "" ? libraryPath + "/" : "";
 
     // Platform dependent section to paste it all together
@@ -436,6 +439,9 @@ bool ObfInterface::loadLibrary (std::string libraryName, std::string libraryPath
     #else
         fullFileName += "lib" + libraryName + ".so";
     #endif
+
+    // Expand any environment variables that might be in the name
+    facilities::Util::expandEnvVar(&fullFileName);
 
     // call CDM to load the library
     // Note that currently (12/4/06) cal_db will be zero even when library loads
@@ -730,3 +736,4 @@ int myOutputFlush (void* callBackPrm, int reason)
 
     return 0;
 }
+
