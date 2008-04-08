@@ -6,7 +6,7 @@
 
 \verbatim
 
-  CVS $Id: OnboardFilter.cxx,v 1.75 2008/02/07 19:33:16 usher Exp $
+  CVS $Id: OnboardFilter.cxx,v 1.76 2008/04/03 20:14:46 usher Exp $
 \endverbatim
                                                                           */
 /* ---------------------------------------------------------------------- */
@@ -87,7 +87,9 @@ private:
     std::string  m_FileNamePath;
 
     // File name for peds/gains
+    std::string  m_PathName_Pedestals;
     std::string  m_FileName_Pedestals;
+    std::string  m_PathName_Gains;
     std::string  m_FileName_Gains;
 
     // Running configurations
@@ -123,8 +125,9 @@ OnboardFilter::OnboardFilter(const std::string& name, ISvcLocator *pSvcLocator) 
                              | GFC_STATUS_M_SPLASH_1;
 
     // Properties for this algorithm
-    declareProperty("FileNamePath",    m_FileNamePath       = "$(FLIGHTCODELIBS)");
+    declareProperty("PathNamePeds",    m_PathName_Pedestals = "$(OBFCGB_DBBINDIR)");
     declareProperty("FileNamePeds",    m_FileName_Pedestals = "cal_db_pedestals");
+    declareProperty("PathNameGains",   m_PathName_Gains     = "$(OBFCGB_DBBINDIR)");
     declareProperty("FileNameGains",   m_FileName_Gains     = "cal_db_gains");
     declareProperty("mask",            m_mask               = 0);      // Switching to using m_rejectEvents! TU 5/7/2007
     declareProperty("RejectEvents",    m_rejectEvents       = false);
@@ -177,10 +180,12 @@ StatusCode OnboardFilter::initialize()
 
     // Load the correct calibration libraries
     std::string calPedFile = m_FileName_Pedestals;
-    m_obfInterface->loadLibrary(calPedFile);
+    std::string calPedPath = m_PathName_Pedestals + "/" + calPedFile;
+    m_obfInterface->loadLibrary(calPedFile, calPedPath);
     
     std::string calGainFile = m_FileName_Gains;
-    m_obfInterface->loadLibrary(calGainFile);
+    std::string calGainPath = m_PathName_Gains + "/" + calGainFile;
+    m_obfInterface->loadLibrary(calGainFile, calGainPath);
 
     // Set variable for filter priority
     int priority = 0;
