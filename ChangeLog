@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: usher  Wed Apr  9 13:40:21 PDT 2008
+OnboardFilter/src
+
+Modified Files:
+	ObfInterface.cxx ObfInterface.h OnboardFilter.cxx 
+Log Message:
+Before starting some major rearrangments... preserve the current state
+    *
+------------------------------------------------------------
 User: usher  Mon Apr  7 17:16:45 PDT 2008
 OnboardFilter/src
 
