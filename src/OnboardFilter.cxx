@@ -6,7 +6,7 @@
 
 \verbatim
 
-  CVS $Id: OnboardFilter.cxx,v 1.76 2008/04/03 20:14:46 usher Exp $
+  CVS $Id: OnboardFilter.cxx,v 1.77 2008/04/08 00:16:45 usher Exp $
 \endverbatim
                                                                           */
 /* ---------------------------------------------------------------------- */
@@ -82,9 +82,6 @@ private:
     // Changeable parameters for the gamma filter
     unsigned int m_Zbottom_Emin;
     unsigned int m_Tkr_ZeroEmin;
-
-    // Path to shareables
-    std::string  m_FileNamePath;
 
     // File name for peds/gains
     std::string  m_PathName_Pedestals;
@@ -172,11 +169,8 @@ StatusCode OnboardFilter::initialize()
     // Get an instance of the local class to hold output pointers
     m_tdsPointers = new ObfOutputCallBackParm();
 
-    // Load the external libraries
-    int ret = facilities::Util::expandEnvVar(&m_FileNamePath);
-
     // Get an instance of the filter interface
-    m_obfInterface = new ObfInterface(log, m_FileNamePath, m_tdsPointers);
+    m_obfInterface = new ObfInterface(log, m_tdsPointers);
 
     // Load the correct calibration libraries
     std::string calPedFile = m_FileName_Pedestals;

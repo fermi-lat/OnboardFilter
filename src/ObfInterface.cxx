@@ -122,8 +122,8 @@ public:
 };
 
 
-ObfInterface::ObfInterface(MsgStream& log, const std::string& filePath, ObfOutputCallBackParm* callBackParm, int verbosity) : 
-              m_log(log), m_libraryPath(filePath), m_eventCount(0), 
+ObfInterface::ObfInterface(MsgStream& log, ObfOutputCallBackParm* callBackParm, int verbosity) : 
+              m_log(log), m_eventCount(0), 
               m_eventProcessed(0), m_eventBad(0), m_levels(0), m_verbosity(verbosity)
 {
     // Call back routine control
@@ -197,11 +197,7 @@ ObfInterface::ObfInterface(MsgStream& log, const std::string& filePath, ObfOutpu
     //const char * path = ::getenv(hfcLib.c_str());
     loadLibrary ("mfc", "$(OBFXFCBINDIR)/mfc", m_verbosity);
     loadLibrary ("dfc", "$(OBFXFCBINDIR)/dfc", m_verbosity);
-/*
-    // do we need this?
-    std::string eds_db_File = m_FileNamePath + delim + "eds_db" + fType;
-    loadLib (eds_db_File.c_str(),verbose,0);
-*/
+
     // Load the Gleam geometry for fsw
     loadLibrary ("geo_db_data", "$(OBFGGF_DBBINDIR)/geo_db_data", m_verbosity);
 
@@ -223,7 +219,10 @@ ObfInterface::ObfInterface(MsgStream& log, const std::string& filePath, ObfOutpu
                          (EDS_fwPostFlushRtn)myOutputFlush,
                           m_callBack);
 
-    EDS_fwPostChange   (m_edsFw, EDS_FW_M_POST_0,  EDS_FW_M_POST_0  );
+    // Post notification
+    EDS_fwPostNotify(m_edsFw, EDS_FW_M_POST_0, EFC_DB_MODE_K_NORMAL);
+
+    EDS_fwPostChange(m_edsFw, EDS_FW_M_POST_0,  EDS_FW_M_POST_0  );
 
     // Clear vector of filter pointers
     m_filterVec.clear();
@@ -338,7 +337,7 @@ int ObfInterface::setupFilter(const std::string& filterName,
         EDS_fwHandlerSelect(m_edsFw, EDS_FW_MASK(target), EFC_DB_MODE_K_NORMAL);
 
         // Post notification
-        EDS_fwPostNotify (m_edsFw, EDS_FW_M_POST_0, EFC_DB_MODE_K_NORMAL);
+        //EDS_fwPostNotify (m_edsFw, EDS_FW_M_POST_0, EFC_DB_MODE_K_NORMAL);
 
         // Store the configuration parameters for the output routines
         m_idToCfgMap[filterId] = EFC_get(filter, EFC_OBJECT_K_FILTER_PRM);
