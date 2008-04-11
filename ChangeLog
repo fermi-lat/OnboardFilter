@@ -1,4 +1,15 @@
 ------------------------------------------------------------
+User: usher  Fri Apr 11 15:41:46 PDT 2008
+OnboardFilter/src
+
+Removed Files:
+	DFCFilterOutput.cxx DFCFilterOutput.h GammaFilterOutput.cxx 
+	GammaFilterOutput.h HFCFilterOutput.cxx HFCFilterOutput.h 
+	MipFilterOutput.cxx MipFilterOutput.h 
+Log Message:
+Move these output functions into the filter tools
+    *
+------------------------------------------------------------
 User: usher  Wed Apr  9 13:40:21 PDT 2008
 OnboardFilter/src
 
