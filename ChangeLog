@@ -1,4 +1,14 @@
 ------------------------------------------------------------
+User: usher  Mon Apr 21 15:03:34 PDT 2008
+OnboardFilter/src
+
+Removed Files:
+	CalFilterOutput.cxx CalFilterOutput.h GemFilterOutput.cxx 
+	GemFilterOutput.h TkrFilterOutput.cxx TkrFilterOutput.h 
+Log Message:
+Moving TDS output functions to filter tools
+    *
+------------------------------------------------------------
 User: usher  Fri Apr 11 15:41:46 PDT 2008
 OnboardFilter/src
 
