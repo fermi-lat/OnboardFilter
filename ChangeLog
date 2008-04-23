@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: usher  Wed Apr 23 11:41:25 PDT 2008
+OnboardFilter/src
+
+Removed Files:
+	FilterAlgTuple.cxx 
+Log Message:
+This was moved long ago to AnalysisNtuple
+    *
+------------------------------------------------------------
 User: usher  Mon Apr 21 15:03:34 PDT 2008
 OnboardFilter/src
 
