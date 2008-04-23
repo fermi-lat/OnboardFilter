@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: usher  Wed Apr 23 11:55:41 PDT 2008
+OnboardFilter/src
+
+Removed Files:
+	FilterAlg.cxx FilterTracks.cxx 
+Log Message:
+These have not been used in years...
+    *
+------------------------------------------------------------
 User: usher  Wed Apr 23 11:41:25 PDT 2008
 OnboardFilter/src
 
