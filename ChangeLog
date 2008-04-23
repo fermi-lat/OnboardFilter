@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: usher  Wed Apr 23 11:58:42 PDT 2008
+OnboardFilter/src
+
+Removed Files:
+	FilterDisplay.cxx 
+Log Message:
+This needs to be updated to FRED and moved to HepRepSvc
+    *
+------------------------------------------------------------
 User: usher  Wed Apr 23 11:58:00 PDT 2008
 OnboardFilter/src
 
