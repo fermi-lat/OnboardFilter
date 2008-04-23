@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: usher  Wed Apr 23 12:00:18 PDT 2008
+OnboardFilter/src
+
+Removed Files:
+	LatGeometry.h 
+Log Message:
+Now using the "correct" geometry header file in the FSW libraries
+    *
+------------------------------------------------------------
 User: usher  Wed Apr 23 11:58:42 PDT 2008
 OnboardFilter/src
 
