@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: usher  Wed Apr 23 11:58:00 PDT 2008
+OnboardFilter/src
+
+Removed Files:
+	FilterAlg_acd.h FilterAlg_projectionFind.h FilterAlg_skirt.h 
+Log Message:
+No longer used
+    *
+------------------------------------------------------------
 User: usher  Wed Apr 23 11:55:41 PDT 2008
 OnboardFilter/src
 
