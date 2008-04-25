@@ -1,5 +1,15 @@
 ------------------------------------------------------------
 User: usher  Fri Apr 25 16:19:25 PDT 2008
+OnboardFilter/src
+
+Modified Files:
+	GammaFilterCfgPrms.cxx GammaFilterCfgPrms.h GrbTrack.cxx 
+	ObfInterface.cxx ObfInterface.h OnboardFilter.cxx OutputRtn.h 
+Log Message:
+First updates in restructuring of OnboardFilter which should allow "easy" integration with Moot for configuration at initialization
+    *
+------------------------------------------------------------
+User: usher  Fri Apr 25 16:19:25 PDT 2008
 OnboardFilter/src/Dll
 
 Modified Files:
