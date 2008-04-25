@@ -67,6 +67,17 @@ GrbTrack GrbFindTrack::findTrack(TFC_prjs* projections)
         nx  = grbp_prjs[0].cnt;
         dxi = dcos_prepare (grbp_prjs[0].prjs, nx, m_dxy_scale);
 
+        // In addition, find the X intercept
+        const TFC_prj* xPrj     = grbp_prjs[0].prjs[0];
+        unsigned int   xLyrMask = xPrj->layers;
+        int            xLayer   = xPrj->max;            // Highest hit
+        const TFC_hit& xHit     = xPrj->hits[xLayer];
+                
+        HepPoint3D point = findStripPosition(xHit.tower, xLayer, 0, xHit.strip);
+
+        float xInt = point.x();
+        float zx   = point.z();
+
         /* Find the Y best projections */
         prjsSelect (&grbp_prjs[1],
                     topLayerMask <<  16, 
@@ -75,7 +86,15 @@ GrbTrack GrbFindTrack::findTrack(TFC_prjs* projections)
         dyi = dcos_prepare (grbp_prjs[1].prjs, ny, m_dxy_scale);
         dzi = m_dz_scale;
 
-        grbTrack = GrbTrack(grbp_prjs[0].prjs[0], grbp_prjs[1].prjs[0], dxi, dyi, dzi);
+        // In addition, find the Y intercept
+        const TFC_prj* yPrj     = grbp_prjs[1].prjs[0];
+        unsigned int   yLyrMask = yPrj->layers;
+        int            yLayer   = yPrj->max;            // Highest hit
+        const TFC_hit& yHit     = yPrj->hits[xLayer];
+                
+        point = findStripPosition(yHit.tower, yLayer, 0, yHit.strip);
+
+        grbTrack = GrbTrack(xPrj, yPrj, dxi, dyi, dzi);
     }
 
     return grbTrack;

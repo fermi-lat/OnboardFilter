@@ -8,13 +8,13 @@
 *
 * @authors T. Usher
 *
-* $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/OutputRtn.h,v 1.1 2006/12/12 22:19:04 usher Exp $
+* $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/OutputRtn.h,v 1.2 2008/02/07 19:33:16 usher Exp $
 */
 
 #ifndef __OutputRtn_H
 #define __OutputRtn_H
 
-#include "OnboardFilterTds/FilterStatus.h"
+//#include "OnboardFilterTds/FilterStatus.h"
 #include "OnboardFilterTds/ObfFilterStatus.h"
 
 // Define a utility class for the callback routines 
@@ -24,7 +24,7 @@ public:
 
     typedef std::map<unsigned short int, void*> SchemaToCfgMap;
 
-    OnboardFilterTds::FilterStatus*    m_filterStatus;
+    //OnboardFilterTds::FilterStatus*    m_filterStatus;
     OnboardFilterTds::ObfFilterStatus* m_obfFilterStatus;
     OnboardFilterTds::TowerHits*       m_towerHits;
     SchemaToCfgMap                     m_schemaToCfgMap;
