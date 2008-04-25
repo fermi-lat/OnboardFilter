@@ -1,4 +1,20 @@
 ------------------------------------------------------------
+User: usher  Fri Apr 25 16:21:53 PDT 2008
+OnboardFilter/src
+
+Added Files:
+	CalOutputTool.cxx DGNFilterLibsB1-0-8.cxx 
+	DGNFilterLibsB1-0-8.h DGNFilterTool.cxx FSWAuxLibsTool.cxx 
+	FilterTrackTool.cxx GammaFilterLibsB1-0-8.cxx 
+	GammaFilterLibsB1-0-8.h GammaFilterTool.cxx GemOutputTool.cxx 
+	HIPFilterLibsB1-0-8.cxx HIPFilterLibsB1-0-8.h 
+	HIPFilterTool.cxx IFilterLibs.h IFilterTool.h 
+	MIPFilterLibsB1-0-8.cxx MIPFilterLibsB1-0-8.h 
+	MIPFilterTool.cxx TkrOutputTool.cxx 
+Log Message:
+Interface to the various filters, and output from those files, is handled by Gaudi Tools now. This separates the configruation of each of the filters into modules that can be controlled via their own JO parameters. And makes it easier to configure the setup from the OnboardFilter algorthm.
+    *
+------------------------------------------------------------
 User: usher  Fri Apr 25 16:19:25 PDT 2008
 OnboardFilter/src/test
 
