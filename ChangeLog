@@ -1,5 +1,14 @@
 ------------------------------------------------------------
 User: usher  Fri Apr 25 16:19:25 PDT 2008
+OnboardFilter/src/test
+
+Modified Files:
+	jobOptions.txt 
+Log Message:
+First updates in restructuring of OnboardFilter which should allow "easy" integration with Moot for configuration at initialization
+    *
+------------------------------------------------------------
+User: usher  Fri Apr 25 16:19:25 PDT 2008
 OnboardFilter/src
 
 Modified Files:
