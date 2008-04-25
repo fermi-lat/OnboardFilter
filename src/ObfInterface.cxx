@@ -1,14 +1,16 @@
 
 #include "ObfInterface.h" 
-#include "OutputRtn.h"
+
+#include "IFilterTool.h"
 #include "IFilterCfgPrms.h"
+#include "IFilterLibs.h"
 
 #include <stdlib.h>
 #include <stdio.h>
 #include <errno.h>
+#include <sstream>
 
 #include "EbfWriter/Ebf.h"
-#include "OnboardFilterTds/FilterStatus.h"
 
 #include "EFC_DB/EFC_DB_schema.h"
 #include "GFC_DB/GFC_DB_schema.h"
@@ -22,10 +24,6 @@
 
 #include "EFC/EFC.h"
 #include "LSE/LFR_key.h"
-
-//#include "EFC/EFC_edsFw.h"
-
-//#include "EFC/GFC_stats.h"
 
 #include "CDM/CDM_pubdefs.h"
 #include "CMX/CMX_lookupPub.h"
@@ -52,154 +50,38 @@ static int          myOutputFlush (void *unused, int reason);
 static int          passThrough (void *unused, unsigned int nbytes, EBF_pkt *pkt, EBF_siv siv, EDS_fwIxb ixb);
 
 /* ---------------------------------------------------------------------- */
-// Local struct definition for veto mask (must be better way...)
-typedef struct _EFC_samplerPrescaleCounter
-{
-  unsigned int countdown;   /*!< Current countdown value                  */
-  unsigned int   refresh;   /*!< Refresh value                            */
-} EFC_samplerPrescaleCounter;
-
-typedef struct _EFC_samplerPrescaleCtx
-{
-    EFC_samplerPrescaleCounter
-                         in;    /*!< Input prescaler                      */
-    EFC_samplerPrescaleCounter
-                        out;    /*!< Output prescaler                     */
-    EFC_classes     enabled;    /*!< The classes of enabled prescalers    */
-    EFC_samplerPrescaleCounter
-              prescalers[32];   /*!< The prescales for each status bit
-                                     an additional one for the output 
-                                     prescaling                           */
-} EFC_samplerPrescaleCtx;
-
-typedef struct _EFC_samplerClasses
-{
-    EFC_classes   defined; /*!< The set of defined class of bits          */
-    EFC_classes   enabled; /*!< The set so enabled class of bits          */
-} EFC_samplerClasses;
-
-typedef struct _EFC_sampler
-{
-    EFC_samplerPrescaleCtx  prescale; /*!< The prescale context           */
-    EFC_samplerClasses       classes; /*!< The status word classes        */
-} EFC_sampler;
-
-/* ---------------------------------------------------------------------- */
-typedef struct _EFC_result
-{
-                                /*   Static context                       */
-  void*               allocRtn; /*!< Routine to alloc an array of results */
-  void               *allocPrm; /*!< Arbitrary alloc parameter            */
-  void*                postRtn; /*!< Routine to post an array of results  */
-  void                *postPrm; /*!< Arbitrary post parameter             */
-  int                      cnt; /*!< Number of result vectors in an array */
-
-                                /*   Dynamic context                      */
-  void                    *beg; /*!< The first result vector              */
-  void                    *cur; /*!< The current result vector            */
-  unsigned int            left; /*!< The number result vectors left       */
-  unsigned int            size; /*!< The size,in bytes, of a result vector*/
-  unsigned int      flushLimit; /*!< The number of result vectors to post
-                                     before issuing a flush               */
-  unsigned int       flushLeft; /*!< The number of result vectors to go
-                                     before issuing a flush               */
-} EFC_result;
-/* ---------------------------------------------------------------------- */
 
 /* ---------------------------------------------------------------------- */
 // Local utility class for handling output call back routines at end of event
 class EOVCallBackParams
 {
 public:
-    EOVCallBackParams() : m_statParms(0), m_callBackParm(0) {m_callBackVec.clear();}
+//    EOVCallBackParams() : m_statParms(0), m_callBackParm(0) {m_callBackVec.clear();}
+    EOVCallBackParams() : m_statParms(0) {m_callBackVec.clear();}
     ~EOVCallBackParams() {}
 
     std::ostringstream     m_defaultStream;
     void*                  m_statParms;
-//    void*                  m_callBackParm;
-    ObfOutputCallBackParm* m_callBackParm;
     OutputRtnVec           m_callBackVec;
 };
 
+ObfInterface* ObfInterface::m_instance = 0;
 
-ObfInterface::ObfInterface(MsgStream& log, ObfOutputCallBackParm* callBackParm, int verbosity) : 
-              m_log(log), m_eventCount(0), 
-              m_eventProcessed(0), m_eventBad(0), m_levels(0), m_verbosity(verbosity)
+ObfInterface* ObfInterface::instance()
+{
+    if (!m_instance) m_instance = new ObfInterface();
+    return m_instance;
+}
+
+ObfInterface::ObfInterface() : m_eventCount(0), m_eventProcessed(0), m_eventBad(0), m_levels(0), m_verbosity(0)
 {
     // Call back routine control
     m_callBack = new EOVCallBackParams();
-    //m_callBack->m_tdsPointers = m_tdsPointers;
-    m_callBack->m_callBackParm = callBackParm;
 
-    // Set up the map of allowed schema's 
-    m_schemaMap.clear();
-
-    m_schemaMap["GammaFilter"] = SchemaPair(GAMMA_DB_SCHEMA, GAMMA_DB_INSTANCE_K_MASTER);
-    m_schemaMap["MipFilter"]   = SchemaPair(MIP_DB_SCHEMA,   MIP_DB_INSTANCE_K_MASTER);
-    m_schemaMap["HipFilter"]   = SchemaPair(HIP_DB_SCHEMA,   HIP_DB_INSTANCE_K_MASTER);
-    m_schemaMap["DgnFilter"]   = SchemaPair(DGN_DB_SCHEMA,   DGN_DB_INSTANCE_K_MASTER);
-
-    m_fileToEnum["GammaFilter"] = EH_ID_K_GAMMA;
-    m_fileToEnum["MipFilter"]   = EH_ID_K_MIP;
-    m_fileToEnum["HipFilter"]   = EH_ID_K_HIP;
-    m_fileToEnum["DgnFilter"]   = EH_ID_K_DGN;
-
-    // Schema id to file names
-    m_idToFile.clear();
-
-    m_idToFile[SchemaPair(GAMMA_DB_SCHEMA,GAMMA_DB_INSTANCE_K_MASTER)]          = "gamma_master";
-    m_idToFile[SchemaPair(GAMMA_DB_SCHEMA,GAMMA_DB_INSTANCE_K_NORMAL)]          = "gamma_normal";
-    m_idToFile[SchemaPair(GAMMA_DB_SCHEMA,GAMMA_DB_INSTANCE_K_NORMAL_LEAK)]     = "gamma_normal_leak";
-    m_idToFile[SchemaPair(GAMMA_DB_SCHEMA,GAMMA_DB_INSTANCE_K_CALIB)]           = "gamma_calib";
-    m_idToFile[SchemaPair(GAMMA_DB_SCHEMA,GAMMA_DB_INSTANCE_K_CALIB_LEAK)]      = "gamma_calib_leak";
-    m_idToFile[SchemaPair(GAMMA_DB_SCHEMA,GAMMA_DB_INSTANCE_K_CALIB_A)]         = "gamma_calib_a";
-    m_idToFile[SchemaPair(GAMMA_DB_SCHEMA,GAMMA_DB_INSTANCE_K_CALIB_A_LEAK)]    = "gamma_calib_a_leak";
-    m_idToFile[SchemaPair(GAMMA_DB_SCHEMA,GAMMA_DB_INSTANCE_K_EFF)]             = "gamma_eff";
-    m_idToFile[SchemaPair(GAMMA_DB_SCHEMA,GAMMA_DB_INSTANCE_K_EFF_TAPER)]       = "gamma_eff_taper";
-    m_idToFile[SchemaPair(GAMMA_DB_SCHEMA,GAMMA_DB_INSTANCE_K_NORMAL_LEAK_21A)] = "gamma_normal_leak_21a";
-    m_idToFile[SchemaPair(GAMMA_DB_SCHEMA,GAMMA_DB_INSTANCE_K_NORMAL_LEAK_17A)] = "gamma_normal_leak_17a";
-
-    m_idToFile[SchemaPair(MIP_DB_SCHEMA,MIP_DB_INSTANCE_K_MASTER)]              = "mip_master";
-    m_idToFile[SchemaPair(MIP_DB_SCHEMA,MIP_DB_INSTANCE_K_ALL_AXIS)]            = "mip_all_axis";
-    m_idToFile[SchemaPair(MIP_DB_SCHEMA,MIP_DB_INSTANCE_K_EFF_OFF_AXIS)]        = "mip_eff_off_axis";
-    m_idToFile[SchemaPair(MIP_DB_SCHEMA,MIP_DB_INSTANCE_K_EFF_TAPER_OFF_AXIS)]  = "mip_eff_taper_off_axis";
-    m_idToFile[SchemaPair(MIP_DB_SCHEMA,MIP_DB_INSTANCE_K_OFF_AXIS)]            = "mip_off_axis";
-
-    m_idToFile[SchemaPair(HIP_DB_SCHEMA,HIP_DB_INSTANCE_K_MASTER)]              = "hip_master";
-    m_idToFile[SchemaPair(HIP_DB_SCHEMA,HIP_DB_INSTANCE_K_EFF)]                 = "hip_eff";
-    m_idToFile[SchemaPair(HIP_DB_SCHEMA,HIP_DB_INSTANCE_K_EFF_TAPER)]           = "hip_eff_taper";
-    m_idToFile[SchemaPair(HIP_DB_SCHEMA,HIP_DB_INSTANCE_K_LEO)]                 = "hip_leo";
-    m_idToFile[SchemaPair(HIP_DB_SCHEMA,HIP_DB_INSTANCE_K_NORMAL)]              = "hip_normal";
-  
-    m_idToFile[SchemaPair(DGN_DB_SCHEMA,DGN_DB_INSTANCE_K_MASTER)]              = "dgn_master";
-    m_idToFile[SchemaPair(DGN_DB_SCHEMA,DGN_DB_INSTANCE_K_GEM)]                 = "dgn_gem";
-    m_idToFile[SchemaPair(DGN_DB_SCHEMA,DGN_DB_INSTANCE_K_GEM_500)]             = "dgn_gem_500";
-    m_idToFile[SchemaPair(DGN_DB_SCHEMA,DGN_DB_INSTANCE_K_GEM_1000)]            = "dgn_gem_1000";
-    m_idToFile[SchemaPair(DGN_DB_SCHEMA,DGN_DB_INSTANCE_K_TKR)]                 = "dgn_tkr";
-    m_idToFile[SchemaPair(DGN_DB_SCHEMA,DGN_DB_INSTANCE_K_GROUND_HI)]           = "dgn_ground_hi";
-    m_idToFile[SchemaPair(DGN_DB_SCHEMA,DGN_DB_INSTANCE_K_PRIMITIVE)]           = "dgn_primitive";
-
-    // Schema to file path
-    m_idToPath.clear();
-
-    m_idToPath[GAMMA_DB_SCHEMA] = "$(OBFGFC_DBBINDIR)";
-    m_idToPath[MIP_DB_SCHEMA]   = "$(OBFXFC_DBBINDIR)";
-    m_idToPath[HIP_DB_SCHEMA]   = "$(OBFXFC_DBBINDIR)";
-    m_idToPath[DGN_DB_SCHEMA]   = "$(OBFXFC_DBBINDIR)";
-
-    // Clear id to cfg map
-    m_idToCfgMap.clear();
-
-    // EFC library already loaded (we link to it)
-    // Load the other filter libraries
-    loadLibrary ("gfc", "$(OBFEFCBINDIR)/gfc", m_verbosity);
-    loadLibrary ("hfc", "$(OBFXFCBINDIR)/hfc", m_verbosity);
-    //const char * path = ::getenv(hfcLib.c_str());
-    loadLibrary ("mfc", "$(OBFXFCBINDIR)/mfc", m_verbosity);
-    loadLibrary ("dfc", "$(OBFXFCBINDIR)/dfc", m_verbosity);
-
-    // Load the Gleam geometry for fsw
-    loadLibrary ("geo_db_data", "$(OBFGGF_DBBINDIR)/geo_db_data", m_verbosity);
+    m_schemaToEnum[GAMMA_DB_SCHEMA] = EH_ID_K_GAMMA;
+    m_schemaToEnum[MIP_DB_SCHEMA]   = EH_ID_K_MIP;
+    m_schemaToEnum[HIP_DB_SCHEMA]   = EH_ID_K_HIP;
+    m_schemaToEnum[DGN_DB_SCHEMA]   = EH_ID_K_DGN;
 
     /* Allocate and initialize the Event Data Services framework */
     /* - NOTE: these are C structures not C++ classes */
@@ -207,8 +89,6 @@ ObfInterface::ObfInterface(MsgStream& log, ObfOutputCallBackParm* callBackParm, 
 
     EDS_fwConstruct (m_edsFw, NULL, NULL, NULL);
     EDS_fwFreeSet   (m_edsFw, (LCBV_pktsRngFreeCb)dummyFreeRtn, NULL);  
-
-    // Set up the output handler here (actual call back routines will be set up)
 
     // Register the "post" routine to handle end of event processing
     EDS_fwPostRegister   (m_edsFw,
@@ -225,7 +105,7 @@ ObfInterface::ObfInterface(MsgStream& log, ObfOutputCallBackParm* callBackParm, 
     EDS_fwPostChange(m_edsFw, EDS_FW_M_POST_0,  EDS_FW_M_POST_0  );
 
     // Clear vector of filter pointers
-    m_filterVec.clear();
+    m_filterMap.clear();
 
     return;
 }
@@ -237,153 +117,71 @@ ObfInterface::~ObfInterface()
     return;
 }
 
-int ObfInterface::setupFilter(const std::string& filterName, 
-                              const std::string& configuration,
-                              IFilterCfgPrms*    filterPrms,
-                              int                priority, 
-                              unsigned           vetoMask, 
-                              bool               modifyVetoMask)
+int ObfInterface::setupFilter(const EFC_DB_Schema* schema,
+                              unsigned short int   configIndex)
 {
     int filterId = -100;
 
-    // Associate the filter name to a schema, if none then exit
-    SchemaMap::iterator schemaIter = m_schemaMap.find(filterName);
+    // Attempt to trap any dprintf or printf output in fsw code
+    // Create a local buffer and store the current state of stdout
+    char buf[100000];
+    buf[0] = 0;
+    FILE myFile = *stdout;
 
-    if (schemaIter != m_schemaMap.end())
-    {
-        SchemaPair schemaPair = schemaIter->second;
+    // Redirect output to our local buffer
+    setvbuf(stdout, buf, _IOFBF, 100000);
 
-        //Look up the file name associated with this schema
-        std::string fileName = m_idToFile[schemaPair];
+    // Retrieve the key to our filter
+    unsigned int key = LFR_keyGet (CDM_findDatabase (schema->filter.id, configIndex), 0);
 
-        // Look up the file path with this schema
-        std::string filePath = m_idToPath[schemaPair.first];
+    // Get a pointer to the "services" structure 
+    const char*                            fnd      = schema->eds.get;
+    EDS_DB_handlerServicesGet              get      = (const EDS_DB_HandlerConstructServices*(*)(void*)) CMX_lookupSymbol(fnd);
+    const EDS_DB_HandlerConstructServices *services = (EDS_DB_HandlerConstructServices *)get (0);
 
-        // This is the master file name, load this library
-        loadLibrary(fileName, filePath + "/" + fileName, m_verbosity);
+    // Look up the target mask for this filter
+    unsigned int target = m_schemaToEnum[schema->filter.id];
 
-        // Find the Master Schema for the desired filter and get it ready for action 
-        const EFC_DB_Schema* masterSchema = EFC_lookup (schemaPair.first, schemaPair.second);
+    // Allocate memory for the Filter and then initialize it
+    EFC* filter = (EFC *) malloc(services->sizeOf (schema, NULL));
+    const EDS_fwHandlerServicesX1* gfcService = services->construct (filter, target, schema, key, NULL, m_edsFw);
+    EFC_report (filter, -1);
 
-        // Make a local non-constant copy so that we can, if need be, modify things
-        EFC_DB_Schema  localMaster = *masterSchema;
-        EFC_DB_Schema* schema      = &localMaster;
+    /* Register and enable the filter */
+    filterId = EDS_fwHandlerServicesRegisterX1 (m_edsFw,  target, gfcService, filter);
 
-        // If no output asked for, reset to make sure we always get the status word
-        if (!schema->filter.rsd.nbytes)
-        {
-            schema->filter.rsd.nbytes = 4;
-        }
+    // Keep track of the pointer for deletion at end of processing
+    m_filterMap[schema->filter.id] = filter;
 
-        // Keep track of the configuration index for setting running configuration
-        unsigned short int configIndex = -1;
+    // Associate a configuration with our run mode
+    EDS_fwHandlerAssociate(m_edsFw, EDS_FW_MASK(target), EFC_DB_MODE_K_NORMAL, configIndex );
 
-        // Load any dependent libraries called for by the master configuration
-        for (int idx = 0; idx < schema->filter.cnt; idx++)
-        {
-            SchemaPair pair(schemaPair.first, schema->filter.instances[idx]);
-            
-            fileName = m_idToFile[pair];
+    // enable the filter
+    EDS_fwHandlerChange(m_edsFw, EDS_FW_MASK(target), EDS_FW_MASK(target) );
 
-            if (fileName == "")
-            {
-                m_log << MSG::ERROR << "Unrecognized Schema for dependent library: " << fileName << endreq;
-                return filterId;
-            }
+    // Select the mode we want
+    EDS_fwHandlerSelect(m_edsFw, EDS_FW_MASK(target), EFC_DB_MODE_K_NORMAL);
 
-            // Check if we have found our desired running configuration
-            if (fileName == configuration) configIndex = pair.second;
-
-            loadLibrary(fileName, filePath + "/" + fileName, m_verbosity);
-        }
-
-        // Make sure we found a valid configuration
-        if (configIndex < 0)
-        {
-            m_log << MSG::ERROR << "Unable to find library for configuration: " << configuration << endreq;
-            return filterId;
-        }
-
-        m_log << MSG::INFO << "Setting up filter: " << filterName << ", with configuration: " << configuration << endreq;
-        
-        unsigned int key = LFR_keyGet (CDM_findDatabase (schemaPair.first, schemaPair.second), 0);
-
-        // Get a pointer to the "services" structure 
-        const char*                            fnd      = schema->eds.get;
-        EDS_DB_handlerServicesGet              get      = (const EDS_DB_HandlerConstructServices*(*)(void*)) CMX_lookupSymbol(fnd);
-        const EDS_DB_HandlerConstructServices *services = (EDS_DB_HandlerConstructServices *)get (0);
-
-        // Look up the target mask for this filter
-        unsigned int target = m_fileToEnum[filterName];
-
-        // Allocate memory for the Filter and then initialize it
-        EFC* filter = (EFC *) malloc(services->sizeOf (schema, NULL));
-        const EDS_fwHandlerServicesX1* gfcService = services->construct (filter, target, schema, key, NULL, m_edsFw);
-        EFC_report (filter, -1);
-
-        /* Register and enable the filter */
-        filterId = EDS_fwHandlerServicesRegisterX1 (m_edsFw,  target, gfcService, filter);
-
-        // Keep track of the pointer for deletion at end of processing
-        m_filterVec.push_back(filter);
-
-        // Associate a configuration with our run mode
-        EDS_fwHandlerAssociate(m_edsFw, EDS_FW_MASK(target), EFC_DB_MODE_K_NORMAL, configIndex );
-
-        // enable the filter
-        EDS_fwHandlerChange(m_edsFw, EDS_FW_MASK(target), EDS_FW_MASK(target) );
-
-        // Select the mode we want
-        EDS_fwHandlerSelect(m_edsFw, EDS_FW_MASK(target), EFC_DB_MODE_K_NORMAL);
-
-        // Post notification
-        //EDS_fwPostNotify (m_edsFw, EDS_FW_M_POST_0, EFC_DB_MODE_K_NORMAL);
-
-        // Store the configuration parameters for the output routines
-        m_idToCfgMap[filterId] = EFC_get(filter, EFC_OBJECT_K_FILTER_PRM);
-
-        // If requested, modify the configuration parameters
-        if (filterPrms) filterPrms->setCfgPrms(m_idToCfgMap[filterId]);
-
-        // Modify the veto mask is requested (this means we are running "pass through" mode)
-        if (modifyVetoMask)
-        {
-            EFC_sampler* sampler = (EFC_sampler*)EFC_get(filter, EFC_OBJECT_K_SAMPLER);
-
-            // Change what we do from modifying the veto mask to resetting the veto bit prescaler
-            // sampler->classes.enabled.all = vetoMask;
-            sampler->prescale.prescalers[0].refresh = 1;
-
-            m_log << MSG::INFO << "Disabling veto mask for " << filterName << " by setting veto prescaler refresh to 1" << endreq;
-
-            // Dig out the statistics block
-////            EFC_result* results = (EFC_result*)EFC_get(filter, EFC_OBJECT_K_RESULT);
-////            m_callBack->m_statParms     = results->postPrm;
-////            //m_callBack->m_defaultStream = &m_log.stream();
-////            GFC_statsClear((GFC_stats*)results->postPrm);
-        }
-    }
-    else
-    {
-        m_log << MSG::ERROR << "Unrecognized Filter Name: " << filterName << endreq;
-    }
+    // Restore the output stream
+    *stdout = myFile;
 
     return filterId;
 }
 
-void* ObfInterface::getFilterCfgPrm(int filterId)
+void* ObfInterface::getFilterPrm(unsigned short filterSchemaId, int type)
 {
-    void* cfgPrms = 0;
+    void* filterPrms = 0;
 
-    IdToCfgMap::iterator idMapIter = m_idToCfgMap.find(filterId);
+    FilterMap::iterator mapIter = m_filterMap.find(filterSchemaId);
 
-    if (idMapIter != m_idToCfgMap.end()) cfgPrms = idMapIter->second;
+    if (mapIter != m_filterMap.end()) filterPrms = EFC_get(mapIter->second, (EFC_OBJECT_K)type);
 
-    return cfgPrms;
+    return filterPrms;
 }
 
 
-void ObfInterface::setEovOutputCallBack(OutputRtn* outRtn)
+//void ObfInterface::setEovOutputCallBack(OutputRtn* outRtn)
+void ObfInterface::setEovOutputCallBack(IFilterTool* outRtn)
 {
     if (outRtn) m_callBack->m_callBackVec.push_back(outRtn);
 
@@ -451,6 +249,51 @@ bool ObfInterface::loadLibrary (std::string libraryName, std::string libraryPath
     return cal_db != NULL;
 }
 
+const EFC_DB_Schema& ObfInterface::loadFilterLibs(IFilterLibs* filterLibs, int verbosity)
+{
+    const std::string basePath = filterLibs->ConfigBasePath() + "/";
+
+    // Load the library containing the filter code
+    loadLibrary (filterLibs->FilterLibName(), filterLibs->FilterLibPath(), verbosity);
+
+    // Locate the Gamma filter's master configuration file
+    loadLibrary(filterLibs->MasterConfigName(), basePath + filterLibs->MasterConfigName(), m_verbosity);
+
+    // Find the Master Schema for the desired filter and get it ready for action 
+    const EFC_DB_Schema* masterSchema = EFC_lookup (filterLibs->FilterSchema(), filterLibs->MasterConfigInstance());
+
+    // Make a local non-constant copy so that we can, if need be, modify things
+    filterLibs->setMasterConfiguration(masterSchema);
+    EFC_DB_Schema& master = filterLibs->getMasterConfiguration();
+
+    // If no output asked for, reset to make sure we always get the status word
+    if (!master.filter.rsd.nbytes)
+    {
+        master.filter.rsd.nbytes = 4;
+    }
+
+    // Load any dependent libraries called for by the master configuration
+    for (int idx = 0; idx < master.filter.cnt; idx++)
+    {
+        SchemaPair pair(master.filter.id, master.filter.instances[idx]);
+            
+        //std::string& fileName = m_idToFile[pair];
+        IdToFileMap::const_iterator idIter = filterLibs->getIdToFileMap().find(pair);
+        if (idIter == filterLibs->getIdToFileMap().end())
+        {
+            std::stringstream errorString;
+            errorString << "Unable to find file for configuration: " << pair.second;
+            throw ObfException(errorString.str());
+        }
+
+        const std::string& fileName = idIter->second;
+
+        loadLibrary(fileName, basePath + fileName, verbosity);
+    }
+
+    return master;
+}
+
 
 /* ---------------------------------------------------------------------- *//*!
 
@@ -475,12 +318,7 @@ unsigned int ObfInterface::filterEvent(EbfWriterTds::Ebf* ebfData)
     char         *data = ebfData->get(length);
 
     // This can't happen (flw!)
-    if(length==0)
-    {
-        m_log << MSG::WARNING << "Event has no EBF data. Ignoring" << endreq;
-
-        return filterStatus;
-    }
+    if(length==0) throw ObfException("Warning: Event has no EBF data. Ignoring...");
 
     // The data variable points to the head of our EBF_ptks 
     // What follows here will create the EBF_pkts object in C++ (as opposed to C)
@@ -500,11 +338,15 @@ unsigned int ObfInterface::filterEvent(EbfWriterTds::Ebf* ebfData)
     int numPkts = EBF_pktsCount (pkts);
     if (numPkts < 1)
     {
+        std::stringstream errorString;
+
         m_eventBad++;
 
-        m_log << MSG::WARNING << "eventbad " << m_eventBad << " count " << m_eventCount<< endreq;
+        errorString << "EBF_pktsCount returns no packets in event. eventbad: " << m_eventBad << ", count: " << m_eventCount;
+        //m_log << MSG::WARNING << "eventbad " << m_eventBad << " count " << m_eventCount<< endreq;
+        throw ObfException(errorString.str());
 
-        return filterStatus;
+        //return filterStatus;
     }
 
     m_eventProcessed++;
@@ -528,8 +370,11 @@ unsigned int ObfInterface::filterEvent(EbfWriterTds::Ebf* ebfData)
         // Another warm and fuzzy cross check (ie it can't happen in simulation)
         if (ebw.bf.proto != 1)
         {
-            m_log << MSG::WARNING << "Wrong Pkt Protot! ebw.bf.proto=" << ebw.bf.proto << " count " << m_eventCount<< endreq;
-            break;
+            std::stringstream errorString;
+
+            errorString << "Wrong Pkt Proto! ebw.bf.proto=" << ebw.bf.proto << " count " << m_eventCount;
+
+            throw ObfException(errorString.str());
         }
 
         /* 
@@ -593,10 +438,9 @@ void ObfInterface::setMessageLevels (MessageObjLevels lvl)
 
 void ObfInterface::dumpCounters()
 {
-    m_log << MSG::INFO << "ObfInterface::finalize: events total " << m_eventCount <<
-           "; processed " << m_eventCount << "; bad " << m_eventBad << endreq;
-//    m_log << MSG::INFO << "Rejected " << m_rejected << " triggers using mask " << m_mask  << endreq;
-    m_log << MSG::INFO;
+//    m_log << MSG::INFO << "ObfInterface::finalize: events total " << m_eventCount <<
+//           "; processed " << m_eventCount << "; bad " << m_eventBad << endreq;
+//    m_log << MSG::INFO;
 
     // Ok, now dump the JJ's statistics block
     ////myOutputFlush (m_callBack, -1);
@@ -605,9 +449,9 @@ void ObfInterface::dumpCounters()
     // No EFC_deconstruct to call 
     free(m_edsFw);
 
-    for(std::vector<EFC*>::iterator filterIter = m_filterVec.begin(); filterIter != m_filterVec.end(); filterIter++)
+    for(FilterMap::iterator filterIter = m_filterMap.begin(); filterIter != m_filterMap.end(); filterIter++)
     {
-        EFC* efc = *filterIter;
+        EFC* efc = filterIter->second;
         free(efc);
     }
 
@@ -615,7 +459,7 @@ void ObfInterface::dumpCounters()
     OutputRtnVec& callBackVec = m_callBack->m_callBackVec;
     for(OutputRtnVec::iterator callBackIter = callBackVec.begin(); callBackIter != callBackVec.end(); callBackIter++)
     {
-        (*callBackIter)->eorProcessing(m_log);
+        (*callBackIter)->eorProcessing();
     }
 
     return;
@@ -629,7 +473,7 @@ void extractFilterInfo (EOVCallBackParams* callBack, EDS_fwIxb *ixb)
     for(OutputRtnVec::iterator callBackIter = callBackVec.begin(); callBackIter != callBackVec.end(); callBackIter++)
     {
         try{
-        (*callBackIter)->eovProcessing(callBack->m_callBackParm, ixb);
+        (*callBackIter)->eoeProcessing(ixb);
         }
         catch(...)
         {
@@ -730,7 +574,7 @@ int myOutputFlush (void* callBackPrm, int reason)
         std::string outBuf(buf);
         std::cout.flush();
         std::cout.rdbuf(save);
-        */
+        //*/
     }
 
     return 0;

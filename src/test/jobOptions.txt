@@ -1,7 +1,7 @@
 //##############################################################
 //
 // basic Job options file for a Gleam execution
-// $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/test/jobOptions.txt,v 1.114 2007/11/09 17:12:57 heather Exp $
+// $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/test/jobOptions.txt,v 1.12 2008/04/02 15:46:51 usher Exp $
 
 // primary DLLs, including auditor 
 
@@ -75,7 +75,6 @@ TriggerAlg.applyPrescales = false;
 
 ApplicationMgr.DLLs  += { "EbfWriter", "OnboardFilter"};
 Filter.Members       += {"EbfWriter", "OnboardFilter", "test_OnboardFilter"}; 
-OnboardFilter.mask=0; // all bits off by default: no rejection
 
 // ----------------------------
 //  Geometry definition
@@ -124,11 +123,17 @@ CalDigiAlg.OutputLevel=4;
 EbfWriter.OutputLevel=4;
 ToolSvc.OutputLevel=4;
 CalXtalRecAlg.OutputLevel=4;
+ToolSvc.GammaFilterTool.OutputLevel=2;
+ToolSvc.DGNFilterTool.OutputLevel=2;
+ToolSvc.HIPFilterTool.OutputLevel=2;
+ToolSvc.MIPFilterTool.OutputLevel=2;
     
 // Set output level threshold (2=DEBUG, 3=INFO, 4=WARNING, 5=ERROR, 6=FATAL )
 MessageSvc.OutputLevel = 3;
 
 ApplicationMgr.EvtMax  = 100;
+
+ToolSvc.GammaFilterTool.Configuration = "GAMMA_DB_INSTANCE_K_NORMAL_LEAK";
 
 //==============================================================
 //
