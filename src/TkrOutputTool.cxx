@@ -1,7 +1,7 @@
 /**  @file TkrOutputTool.cxx
     @brief implementation of class TkrOutputTool
     
-  $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/TkrOutputTool.cxx,v 1.1 2008/04/25 23:21:53 usher Exp $  
+  $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/TkrOutputTool.cxx,v 1.2 2008/05/16 18:00:42 usher Exp $  
 */
 
 #include "IFilterTool.h"
@@ -39,7 +39,7 @@
 #include "EFC_DB/EFC_DB_sampler.h"
 #include "EFC/../src/GFC_def.h"
 
-#include "EFC/EFC.h"
+#include "FSWHeaders/EFC.h"
 
 // Useful stuff! 
 #include <map>

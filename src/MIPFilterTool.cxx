@@ -1,7 +1,7 @@
 /**  @file MIPFilterTool.cxx
     @brief implementation of class MIPFilterTool
     
-  $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/MIPFilterTool.cxx,v 1.2 2008/05/16 18:00:42 usher Exp $  
+  $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/MIPFilterTool.cxx,v 1.3 2008/05/16 18:23:56 usher Exp $  
 */
 
 #include "IFilterTool.h"
@@ -29,7 +29,7 @@
 #include "XFC_DB/MIP_DB_instance.h"
 #include "XFC/MFC_status.h"
 
-#include "EFC/EFC.h"
+#include "FSWHeaders/EFC.h"
 #include "LSE/LFR_key.h"
 
 // FSW include but made local do to keyword usage
