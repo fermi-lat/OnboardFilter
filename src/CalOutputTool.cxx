@@ -1,7 +1,7 @@
 /**  @file CalOutputTool.cxx
     @brief implementation of class CalOutputTool
     
-  $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/CalOutputTool.cxx,v 1.1 2008/04/25 23:21:52 usher Exp $  
+  $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/CalOutputTool.cxx,v 1.2 2008/05/16 18:00:42 usher Exp $  
 */
 
 #include "IFilterTool.h"
@@ -65,14 +65,14 @@ public:
     // Set Mode and Configuration for a given filter
     void setModeAndConfig(unsigned int mode, unsigned int config) {return;}
 
-    // Dump out the running configuration
-    void dumpConfiguration();
-
     // This defines the method called for end of event processing
     virtual void eoeProcessing(EDS_fwIxb* ixb);
 
     // This for end of run processing
     virtual void eorProcessing();
+
+    // Dump out the running configuration
+    void dumpConfiguration();
 
 private:
 

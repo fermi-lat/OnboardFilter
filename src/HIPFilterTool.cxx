@@ -1,7 +1,7 @@
 /**  @file HIPFilterTool.cxx
     @brief implementation of class HIPFilterTool
     
-  $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/HIPFilterTool.cxx,v 1.4 2008/05/16 19:28:42 usher Exp $  
+  $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/HIPFilterTool.cxx,v 1.5 2008/05/16 20:09:16 usher Exp $  
 */
 
 #include "IFilterTool.h"
@@ -66,14 +66,14 @@ public:
     // Set Mode and Configuration for a given filter
     virtual void setModeAndConfig(unsigned int mode, unsigned int config);
 
-    // Dump out the running configuration
-    virtual void dumpConfiguration();
-
     // This defines the method called for end of event processing
     virtual void eoeProcessing(EDS_fwIxb* ixb);
 
     // This for end of run processing
     virtual void eorProcessing();
+
+    // Dump out the running configuration
+    virtual void dumpConfiguration();
 
 private:
 
