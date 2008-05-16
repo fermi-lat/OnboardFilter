@@ -22,7 +22,7 @@
 #include "XFC_DB/DFC_DB_schema.h"
 #include "XFC_DB/DGN_DB_instance.h"
 
-#include "EFC/EFC.h"
+#include "FSWHeaders/EFC.h"
 #include "LSE/LFR_key.h"
 
 #include "FSWHeaders/CDM_pubdefs.h"

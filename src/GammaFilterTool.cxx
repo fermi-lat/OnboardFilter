@@ -1,7 +1,7 @@
 /**  @file GammaFilterTool.cxx
     @brief implementation of class GammaFilterTool
     
-  $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/GammaFilterTool.cxx,v 1.2 2008/05/16 18:00:42 usher Exp $  
+  $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/GammaFilterTool.cxx,v 1.3 2008/05/16 18:23:55 usher Exp $  
 */
 
 #include "IFilterTool.h"
@@ -30,7 +30,7 @@
 #include "GFC_DB/GAMMA_DB_instance.h"
 #include "EFC/GFC_status.h"
 
-#include "EFC/EFC.h"
+#include "FSWHeaders/EFC.h"
 #include "LSE/LFR_key.h"
 
 // FSW include but made local do to keyword usage

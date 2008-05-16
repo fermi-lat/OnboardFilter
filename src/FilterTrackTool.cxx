@@ -1,7 +1,7 @@
 /**  @file FilterTrackTool.cxx
     @brief implementation of class FilterTrackTool
     
-  $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/FilterTrackTool.cxx,v 1.1 2008/04/25 23:21:52 usher Exp $  
+  $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/FilterTrackTool.cxx,v 1.2 2008/05/16 18:00:42 usher Exp $  
 */
 
 #include "IFilterTool.h"
@@ -39,7 +39,7 @@
 #include "EFC/TFC_prjDef.h"
 #include "EFC/EFC_edsFw.h"
 
-#include "EFC/EFC.h"
+#include "FSWHeaders/EFC.h"
 
 // HepPoint3D
 #include "CLHEP/Geometry/Point3D.h"
