@@ -1,7 +1,7 @@
 /**  @file GammaFilterTool.cxx
     @brief implementation of class GammaFilterTool
     
-  $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/GammaFilterTool.cxx,v 1.5 2008/05/16 20:09:16 usher Exp $  
+  $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/GammaFilterTool.cxx,v 1.6 2008/05/16 20:15:45 usher Exp $  
 */
 
 #include "IFilterTool.h"
@@ -337,8 +337,11 @@ void GammaFilterTool::dumpConfiguration()
 {
     MsgStream log(msgSvc(), name());
 
+    unsigned short mode2cfg = m_filterLibs->getMasterConfiguration().filter.mode2cfg[0];
+    std::string    config   = m_filterLibs->getInstanceIdString(mode2cfg);
+
     log << MSG::INFO << "Gamma Filter Setup - FSW release " << m_filterLibs->FlightSoftwareRelease() << "\n"
-        << "   Using configuration: " << m_filterLibs->getInstanceIdString(m_filterLibs->getMasterConfiguration().filter.mode2cfg[0]) << endreq;
+        << "   Using configuration: " << config << endreq;
 
     return;
 }
