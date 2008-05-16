@@ -1,6 +1,6 @@
 #include "GrbTrack.h"
 
-#include "EFC/TFC_prjDef.h"
+#include "FSWHeaders/TFC_prjDef.h"
 #include "EDS/FFS.h"
 #include "EFC_DB/EFC_DB_sampler.h"
 #include "EFC/../src/GFC_def.h"

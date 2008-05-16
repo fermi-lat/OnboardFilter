@@ -2,7 +2,7 @@
 #define GrbFindTrack_h
 
 // obf Track definitions
-#include "EFC/TFC_prjDef.h"
+#include "FSWHeaders/TFC_prjDef.h"
 #include "EFC/EFC_edsFw.h"
 
 // HepPoint3D

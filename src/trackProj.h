@@ -1,7 +1,7 @@
 #ifndef TRACKPROJ
 #define TRACKPROJ
 
-#include "EFC/TFC_prjDef.h"
+#include "FSWHeaders/TFC_prjDef.h"
 
 #include "CLHEP/Geometry/Transform3D.h"
 #include "CLHEP/Vector/Rotation.h"
