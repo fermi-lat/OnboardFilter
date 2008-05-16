@@ -1,7 +1,7 @@
 /**  @file FilterTrackTool.cxx
     @brief implementation of class FilterTrackTool
     
-  $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/FilterTrackTool.cxx,v 1.2 2008/05/16 18:00:42 usher Exp $  
+  $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/FilterTrackTool.cxx,v 1.3 2008/05/16 19:28:42 usher Exp $  
 */
 
 #include "IFilterTool.h"
@@ -33,10 +33,10 @@
 #include "EFC_DB/EFC_DB_sampler.h"
 #include "EFC/../src/GFC_def.h"
 #include "EFC/../src/TFC_geometryDef.h"
-#include "GGF_DB/../src/GEO_DB_data.h"
+#include "src/GEO_DB_data.h"
 
 // obf Track definitions
-#include "EFC/TFC_prjDef.h"
+#include "FSWHeaders/TFC_prjDef.h"
 #include "EFC/EFC_edsFw.h"
 
 #include "FSWHeaders/EFC.h"
