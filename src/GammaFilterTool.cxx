@@ -1,7 +1,7 @@
 /**  @file GammaFilterTool.cxx
     @brief implementation of class GammaFilterTool
     
-  $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/GammaFilterTool.cxx,v 1.0 2008/02/08 21:32:11 usher Exp $  
+  $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/GammaFilterTool.cxx,v 1.1 2008/04/25 23:21:52 usher Exp $  
 */
 
 #include "IFilterTool.h"
@@ -63,6 +63,9 @@ public:
 
     /// @brief Finalize method for the tool
     StatusCode finalize();
+
+    // Set Mode and Configuration for a given filter
+    void setModeAndConfig(unsigned int mode, unsigned int config);
 
     // Dump out the running configuration
     void dumpConfiguration();
@@ -217,13 +220,13 @@ StatusCode GammaFilterTool::initialize()
         {
             unsigned short int configId = m_filterLibs->getInstanceId(m_configToRun.value());
 
-            if (configId != m_filterLibs->getMasterConfiguration().filter.mode2cfg[0])
-                m_filterLibs->getMasterConfiguration().filter.mode2cfg[0] = configId;
+            if (configId != m_filterLibs->getMasterConfiguration().filter.mode2cfg[EFC_DB_MODE_K_NORMAL])
+                m_filterLibs->getMasterConfiguration().filter.mode2cfg[EFC_DB_MODE_K_NORMAL] = configId;
         }
 
-        // Retrieve the mode to configure for normal running 
+        // Retrieve the configuration to use for normal mode
         // *** need to set up for other modes as well ***
-        unsigned char configToRun = master.filter.mode2cfg[0];
+        unsigned char configToRun = master.filter.mode2cfg[EFC_DB_MODE_K_NORMAL];
 
         // Set up the filter including the configuration to run
         m_filterId = obf->setupFilter(&master, configToRun);
@@ -234,6 +237,23 @@ StatusCode GammaFilterTool::initialize()
             log << MSG::ERROR << "Failed to initialize Gamma Filter" << endreq;
             return StatusCode::FAILURE;
         }
+
+        // Bit mask for this filter
+        unsigned int target = obf->getFilterTargetMask(master.filter.id);
+
+        // Loop through and associate configurations to modes
+        for (int modeIdx = 0; modeIdx < EFC_DB_MODE_K_CNT; modeIdx++)
+        {
+            unsigned int configuration = m_filterLibs->getMasterConfiguration().filter.mode2cfg[modeIdx];
+
+            obf->associateConfigToMode(target, modeIdx, configuration);
+        }
+
+        // Enable the filter
+        obf->enableDisableFilter(target, target);
+
+        // Set the default mode to run
+        obf->selectFiltermode(target, EFC_DB_MODE_K_NORMAL);
 
         // Set up the object allowing one to change gamma filter parameters
         GammaFilterCfgPrms gamParms;
@@ -292,6 +312,24 @@ StatusCode GammaFilterTool::finalize ()
     StatusCode  status = StatusCode::SUCCESS;
     
     return status;
+}
+
+// Set Mode and Configuration for a given filter
+void GammaFilterTool::setModeAndConfig(unsigned int mode, unsigned int config)
+{
+    // Get ObfInterface pointer
+    ObfInterface* obf = ObfInterface::instance();
+
+    // Bit mask for this filter
+    unsigned int target = m_filterLibs->getMasterConfiguration().filter.id;
+
+    // Associate the configuration to the mode (and vice versa)
+    obf->associateConfigToMode(target, mode, config);
+
+    // Set the default mode to run
+    obf->selectFiltermode(target, mode);
+
+    return;
 }
 
 // This routine for dumping to log file the configuration being run

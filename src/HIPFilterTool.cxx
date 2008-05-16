@@ -1,7 +1,7 @@
 /**  @file HIPFilterTool.cxx
     @brief implementation of class HIPFilterTool
     
-  $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/HIPFilterTool.cxx,v 1.0 2008/02/08 21:32:11 usher Exp $  
+  $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/HIPFilterTool.cxx,v 1.1 2008/04/25 23:21:52 usher Exp $  
 */
 
 #include "IFilterTool.h"
@@ -62,6 +62,9 @@ public:
 
     /// @brief Finalize method for the tool
     StatusCode finalize();
+
+    // Set Mode and Configuration for a given filter
+    void setModeAndConfig(unsigned int mode, unsigned int config);
 
     // Dump out the running configuration
     void dumpConfiguration();
@@ -149,16 +152,31 @@ StatusCode HIPFilterTool::initialize()
         m_filterLibs = new HIPFilterLibsB1_0_8();
         const EFC_DB_Schema& master = obf->loadFilterLibs(m_filterLibs, m_verbosity);
 
-        // Retrieve the mode to configure for normal running
-        unsigned char modeToRun = master.filter.mode2cfg[0];
+        // Retrieve the configuration to use for normal mode
+        unsigned char configToRun = master.filter.mode2cfg[EFC_DB_MODE_K_NORMAL];
 
-        m_filterId = obf->setupFilter(&master, modeToRun);
+        m_filterId = obf->setupFilter(&master, configToRun);
 
         if (m_filterId == -100)
         {
             log << MSG::ERROR << "Failed to initialize Diagnostic Filter" << endreq;
             return StatusCode::FAILURE;
         }
+
+        // Bit mask for this filter
+        unsigned int target = obf->getFilterTargetMask(master.filter.id);
+
+        // Loop through and associate configurations to modes and enable the filter for that mode
+        for (int modeIdx = 0; modeIdx < EFC_DB_MODE_K_CNT; modeIdx++)
+        {
+            unsigned int configuration = m_filterLibs->getMasterConfiguration().filter.mode2cfg[modeIdx];
+
+            obf->associateConfigToMode(target, modeIdx, configuration);
+            obf->enableDisableFilter(target, target);
+        }
+
+        // Set the default mode to run
+        obf->selectFiltermode(target, EFC_DB_MODE_K_NORMAL);
 
         // If we are "leaking" all events then modify here
         // Note: this is standard mode of running for GSW version of obf
@@ -188,6 +206,24 @@ StatusCode HIPFilterTool::finalize ()
     StatusCode  status = StatusCode::SUCCESS;
     
     return status;
+}
+
+// Set Mode and Configuration for a given filter
+void HIPFilterTool::setModeAndConfig(unsigned int mode, unsigned int config)
+{
+    // Get ObfInterface pointer
+    ObfInterface* obf = ObfInterface::instance();
+
+    // Bit mask for this filter
+    unsigned int target = m_filterLibs->getMasterConfiguration().filter.id;
+
+    // Associate the configuration to the mode (and vice versa)
+    obf->associateConfigToMode(target, mode, config);
+
+    // Set the default mode to run
+    obf->selectFiltermode(target, mode);
+
+    return;
 }
 
 // This routine for dumping to log file the configuration being run

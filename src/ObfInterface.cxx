@@ -83,6 +83,30 @@ ObfInterface::ObfInterface() : m_eventCount(0), m_eventProcessed(0), m_eventBad(
     m_schemaToEnum[HIP_DB_SCHEMA]   = EH_ID_K_HIP;
     m_schemaToEnum[DGN_DB_SCHEMA]   = EH_ID_K_DGN;
 
+    // Provide a mechanism to convert an instance typedef to a string (for convenience)
+    m_modeEnumToStringMap.clear();
+
+    m_modeEnumToStringMap[EFC_DB_MODE_K_NORMAL]   = "EFC_DB_MODE_K_NORMAL";
+    m_modeEnumToStringMap[EFC_DB_MODE_K_TOO]      = "EFC_DB_MODE_K_TOO";
+    m_modeEnumToStringMap[EFC_DB_MODE_K_ARR]      = "EFC_DB_MODE_K_ARR";
+    m_modeEnumToStringMap[EFC_DB_MODE_K_RSVD3]    = "EFC_DB_MODE_K_RSVD3";
+    m_modeEnumToStringMap[EFC_DB_MODE_K_RSVD4]    = "EFC_DB_MODE_K_RSVD4";
+    m_modeEnumToStringMap[EFC_DB_MODE_K_RSVD5]    = "EFC_DB_MODE_K_RSVD5";
+    m_modeEnumToStringMap[EFC_DB_MODE_K_RSVD6]    = "EFC_DB_MODE_K_RSVD6";
+    m_modeEnumToStringMap[EFC_DB_MODE_K_RSVD7]    = "EFC_DB_MODE_K_RSVD7";
+
+    // go the other way
+    m_modeStringToEnumMap.clear();
+
+    m_modeStringToEnumMap["EFC_DB_MODE_K_NORMAL"] = EFC_DB_MODE_K_NORMAL;
+    m_modeStringToEnumMap["EFC_DB_MODE_K_TOO"]    = EFC_DB_MODE_K_TOO;
+    m_modeStringToEnumMap["EFC_DB_MODE_K_ARR"]    = EFC_DB_MODE_K_ARR;
+    m_modeStringToEnumMap["EFC_DB_MODE_K_RSVD3"]  = EFC_DB_MODE_K_RSVD3;
+    m_modeStringToEnumMap["EFC_DB_MODE_K_RSVD4"]  = EFC_DB_MODE_K_RSVD4;
+    m_modeStringToEnumMap["EFC_DB_MODE_K_RSVD5"]  = EFC_DB_MODE_K_RSVD5;
+    m_modeStringToEnumMap["EFC_DB_MODE_K_RSVD6"]  = EFC_DB_MODE_K_RSVD6;
+    m_modeStringToEnumMap["EFC_DB_MODE_K_RSVD7"]  = EFC_DB_MODE_K_RSVD7;
+
     /* Allocate and initialize the Event Data Services framework */
     /* - NOTE: these are C structures not C++ classes */
     m_edsFw = (EDS_fw*) malloc(EDS_fwSizeof ());
@@ -154,18 +178,53 @@ int ObfInterface::setupFilter(const EFC_DB_Schema* schema,
     m_filterMap[schema->filter.id] = filter;
 
     // Associate a configuration with our run mode
-    EDS_fwHandlerAssociate(m_edsFw, EDS_FW_MASK(target), EFC_DB_MODE_K_NORMAL, configIndex );
+    //EDS_fwHandlerAssociate(m_edsFw, EDS_FW_MASK(target), EFC_DB_MODE_K_NORMAL, configIndex );
+    //EDS_fwHandlerAssociate(m_edsFw, target, EFC_DB_MODE_K_NORMAL, configIndex );
 
     // enable the filter
-    EDS_fwHandlerChange(m_edsFw, EDS_FW_MASK(target), EDS_FW_MASK(target) );
+    //EDS_fwHandlerChange(m_edsFw, EDS_FW_MASK(target), EDS_FW_MASK(target) );
+    //EDS_fwHandlerChange(m_edsFw, target, target );
 
     // Select the mode we want
-    EDS_fwHandlerSelect(m_edsFw, EDS_FW_MASK(target), EFC_DB_MODE_K_NORMAL);
+    //EDS_fwHandlerSelect(m_edsFw, EDS_FW_MASK(target), EFC_DB_MODE_K_NORMAL);
+    //EDS_fwHandlerSelect(m_edsFw, target, EFC_DB_MODE_K_NORMAL);
 
     // Restore the output stream
     *stdout = myFile;
 
     return filterId;
+}
+
+/// Associate a given (set of) filter(s) configuration with a mode
+unsigned int ObfInterface::associateConfigToMode(unsigned int targets, unsigned int mode, unsigned int configuration)
+{
+    // Associate a configuration with our run mode
+    return EDS_fwHandlerAssociate(m_edsFw, targets, mode, configuration );
+}
+
+
+/// Enable/Disable filter(s)
+unsigned int ObfInterface::enableDisableFilter(unsigned int targets, unsigned int mask)
+{
+    // enable the filter
+    return EDS_fwHandlerChange(m_edsFw, targets, mask );
+}
+
+/// Set current mode for a given (set of) filter(s)
+unsigned int ObfInterface::selectFiltermode(unsigned int targets, unsigned int mode)
+{
+    // Select the mode we want
+    return EDS_fwHandlerSelect(m_edsFw, targets, mode);
+}
+    
+/// Return a "target" mask given a filter's schema id
+unsigned int ObfInterface::getFilterTargetMask(unsigned short int schemaId) const
+{
+    SchemaToEnumMap::const_iterator idIter = m_schemaToEnum.find(schemaId);
+
+    if (idIter != m_schemaToEnum.end()) return EDS_FW_MASK(idIter->second);
+
+    return 0;
 }
 
 void* ObfInterface::getFilterPrm(unsigned short filterSchemaId, int type)
