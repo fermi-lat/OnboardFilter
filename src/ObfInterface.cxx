@@ -25,7 +25,7 @@
 #include "EFC/EFC.h"
 #include "LSE/LFR_key.h"
 
-#include "CDM/CDM_pubdefs.h"
+#include "FSWHeaders/CDM_pubdefs.h"
 #include "CMX/CMX_lookupPub.h"
 
 #include "EDS/io/EBF_evts.h"
