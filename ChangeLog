@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: usher  Fri May 16 13:30:57 PDT 2008
+OnboardFilter/src
+
+Modified Files:
+	GammaFilterTool.cxx 
+Log Message:
+Why does this crash on linux?
+    *
+------------------------------------------------------------
 User: usher  Fri May 16 13:18:57 PDT 2008
 OnboardFilter/src
 
