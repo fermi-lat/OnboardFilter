@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: usher  Fri May 16 12:25:04 PDT 2008
+OnboardFilter/src/FSWHeaders
+
+Added Files:
+	EFC.h TFC_prjDef.h 
+Log Message:
+Two more needed files (this is because we are trying to build against linux repositories and these files are missing some C++ stuff..._
+    *
+------------------------------------------------------------
 User: usher  Fri May 16 11:23:56 PDT 2008
 OnboardFilter/src/FSWHeaders
 
