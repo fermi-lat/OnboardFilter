@@ -1,4 +1,14 @@
 ------------------------------------------------------------
+User: usher  Fri May 16 11:23:56 PDT 2008
+OnboardFilter/src
+
+Modified Files:
+	DGNFilterTool.cxx FSWAuxLibsTool.cxx GammaFilterTool.cxx 
+	HIPFilterTool.cxx MIPFilterTool.cxx ObfInterface.cxx 
+Log Message:
+CDM_pubdefs.h contains a variable named "new" which the C++ compiler doesn't like... move a "fixed" version of CDM_pubdefs into our FSWHeaders folder and use it. *** this needs review ****
+    *
+------------------------------------------------------------
 User: usher  Fri May 16 11:02:40 PDT 2008
 OnboardFilter/src/FSWHeaders
 
