@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: usher  Fri May 16 11:02:40 PDT 2008
+OnboardFilter/src/FSWHeaders
+
+Added Files:
+	EFC_sampler.h 
+Log Message:
+Not sure if this is the right way to do this, but create a folder for "inaccessible" FSW header files that we need
+    *
+------------------------------------------------------------
 User: usher  Fri May 16 11:01:47 PDT 2008
 OnboardFilter/src/FSWHeaders
 
