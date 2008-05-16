@@ -1,7 +1,7 @@
 /**  @file GammaFilterTool.cxx
     @brief implementation of class GammaFilterTool
     
-  $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/GammaFilterTool.cxx,v 1.3 2008/05/16 18:23:55 usher Exp $  
+  $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/GammaFilterTool.cxx,v 1.4 2008/05/16 19:28:42 usher Exp $  
 */
 
 #include "IFilterTool.h"
@@ -65,10 +65,10 @@ public:
     StatusCode finalize();
 
     // Set Mode and Configuration for a given filter
-    void setModeAndConfig(unsigned int mode, unsigned int config);
+    virtual void setModeAndConfig(unsigned int mode, unsigned int config);
 
     // Dump out the running configuration
-    void dumpConfiguration();
+    virtual void dumpConfiguration();
 
     // This defines the method called for end of event processing
     virtual void eoeProcessing(EDS_fwIxb* ixb);
