@@ -1,4 +1,14 @@
 ------------------------------------------------------------
+User: usher  Fri May 16 13:09:16 PDT 2008
+OnboardFilter/src
+
+Modified Files:
+	DGNFilterTool.cxx GammaFilterTool.cxx HIPFilterTool.cxx 
+	MIPFilterTool.cxx 
+Log Message:
+add virtual in front of function defs...
+    *
+------------------------------------------------------------
 User: usher  Fri May 16 12:45:34 PDT 2008
 OnboardFilter/src
 
