@@ -11,7 +11,7 @@
 #include <exception>
 #include <cmath>
 
-#include "GGF_DB/../src/GEO_DB_data.h"
+#include "src/GEO_DB_data.h" // was GGF/.../src
 
 //____________________________________________________________________________
 trackProj::trackProj(GFC_cfg* cfg) 
