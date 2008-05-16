@@ -1,4 +1,15 @@
 ------------------------------------------------------------
+User: usher  Fri May 16 12:28:42 PDT 2008
+OnboardFilter/src
+
+Modified Files:
+	DGNFilterTool.cxx FilterTrackTool.cxx GammaFilterTool.cxx 
+	HIPFilterTool.cxx MIPFilterTool.cxx ObfInterface.cxx 
+	TkrOutputTool.cxx 
+Log Message:
+Use local EFC.h file
+    *
+------------------------------------------------------------
 User: usher  Fri May 16 12:25:04 PDT 2008
 OnboardFilter/src/FSWHeaders
 
