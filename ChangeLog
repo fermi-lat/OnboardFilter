@@ -1,4 +1,14 @@
 ------------------------------------------------------------
+User: usher  Fri May 16 13:15:45 PDT 2008
+OnboardFilter/src
+
+Modified Files:
+	DGNFilterTool.cxx GammaFilterTool.cxx HIPFilterTool.cxx 
+	MIPFilterTool.cxx 
+Log Message:
+Ordering of virtual functions is important?
+    *
+------------------------------------------------------------
 User: usher  Fri May 16 13:09:16 PDT 2008
 OnboardFilter/src
 
