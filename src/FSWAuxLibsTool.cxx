@@ -1,7 +1,7 @@
 /**  @file FSWAuxLibsTool.cxx
     @brief implementation of class FSWAuxLibsTool
     
-  $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/FSWAuxLibsTool.cxx,v 1.0 2008/02/08 21:32:11 usher Exp $  
+  $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/FSWAuxLibsTool.cxx,v 1.1 2008/04/25 23:21:52 usher Exp $  
 */
 
 #include "IFilterTool.h"
@@ -42,6 +42,9 @@ public:
 
     /// @brief Finalize method for the tool
     StatusCode finalize();
+
+    // Set Mode and Configuration for a given filter
+    void setModeAndConfig(unsigned int mode, unsigned int config) {return;}
 
     // Dump out the running configuration
     void dumpConfiguration();
