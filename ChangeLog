@@ -1,4 +1,16 @@
 ------------------------------------------------------------
+User: usher  Fri May 16 11:00:42 PDT 2008
+OnboardFilter/src
+
+Modified Files:
+	CalOutputTool.cxx DGNFilterTool.cxx FSWAuxLibsTool.cxx 
+	FilterTrackTool.cxx GammaFilterTool.cxx GemOutputTool.cxx 
+	HIPFilterTool.cxx IFilterTool.h MIPFilterTool.cxx 
+	ObfInterface.cxx ObfInterface.h TkrOutputTool.cxx 
+Log Message:
+Latest updates for new scheme, to check on linux
+    *
+------------------------------------------------------------
 User: usher  Fri Apr 25 16:21:53 PDT 2008
 OnboardFilter/src
 
