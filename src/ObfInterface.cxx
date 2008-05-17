@@ -148,12 +148,14 @@ int ObfInterface::setupFilter(const EFC_DB_Schema* schema,
 
     // Attempt to trap any dprintf or printf output in fsw code
     // Create a local buffer and store the current state of stdout
+#ifdef _WIN32
     char buf[100000];
     buf[0] = 0;
     FILE myFile = *stdout;
 
     // Redirect output to our local buffer
     setvbuf(stdout, buf, _IOFBF, 100000);
+#endif
 
     // Retrieve the key to our filter
     unsigned int key = LFR_keyGet (CDM_findDatabase (schema->filter.id, configIndex), 0);
@@ -190,7 +192,9 @@ int ObfInterface::setupFilter(const EFC_DB_Schema* schema,
     //EDS_fwHandlerSelect(m_edsFw, target, EFC_DB_MODE_K_NORMAL);
 
     // Restore the output stream
+#ifdef _WIN32
     *stdout = myFile;
+#endif
 
     return filterId;
 }
