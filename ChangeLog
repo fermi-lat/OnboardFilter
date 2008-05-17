@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: usher  Fri May 16 19:12:21 PDT 2008
+OnboardFilter/src
+
+Modified Files:
+	ObfInterface.cxx 
+Log Message:
+Buffer redirect a problem on linux?
+    *
+------------------------------------------------------------
 User: usher  Fri May 16 13:30:57 PDT 2008
 OnboardFilter/src
 
