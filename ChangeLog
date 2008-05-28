@@ -1,5 +1,15 @@
 ------------------------------------------------------------
 User: usher  Wed May 28 16:45:42 PDT 2008
+OnboardFilter/src
+
+Modified Files:
+	DGNFilterTool.cxx GammaFilterTool.cxx HIPFilterTool.cxx 
+	MIPFilterTool.cxx 
+Log Message:
+First integration with moot for setting filter configurations at initialization
+    *
+------------------------------------------------------------
+User: usher  Wed May 28 16:45:42 PDT 2008
 OnboardFilter/cmt
 
 Modified Files:
