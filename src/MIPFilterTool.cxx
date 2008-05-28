@@ -1,7 +1,7 @@
 /**  @file MIPFilterTool.cxx
     @brief implementation of class MIPFilterTool
     
-  $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/MIPFilterTool.cxx,v 1.5 2008/05/16 20:09:16 usher Exp $  
+  $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/MIPFilterTool.cxx,v 1.6 2008/05/16 20:15:45 usher Exp $  
 */
 
 #include "IFilterTool.h"
@@ -11,6 +11,10 @@
 #include "GaudiKernel/SmartDataPtr.h"
 #include "GaudiKernel/GaudiException.h" 
 #include "GaudiKernel/IDataProviderSvc.h"
+
+// Moot stuff for discerning filter configurations
+#include "CalibData/Moot/MootData.h"
+#include "CalibSvc/IMootSvc.h"
 
 #include "Event/TopLevel/Event.h"
 #include "Event/TopLevel/EventModel.h"
@@ -89,7 +93,7 @@ private:
 
     //****** This section for controlling implementation of Gamma Filter
     // Filter ID returned from EDS_fw after initialization
-    int               m_filterId;
+    int               m_handlerId;
 
     //****** This section contains various useful member variables
     // Counters to keep track of bit frequency during a given run
@@ -101,6 +105,9 @@ private:
 
     /// Pointer to the Gaudi data provider service
     IDataProviderSvc* m_dataSvc;
+
+    /// MootSvc for filter configurations
+    IMootSvc*         m_mootSvc;
 };
 
 static ToolFactory<MIPFilterTool> s_factory;
@@ -144,6 +151,13 @@ StatusCode MIPFilterTool::initialize()
         return sc;
     }
 
+    // Recover MootSvc
+    if (StatusCode sc = service("MootSvc", m_mootSvc, true) == StatusCode::FAILURE)
+    {
+        log << MSG::INFO << "Moot service not found, using default configurations" << endreq;
+        return sc;
+    }
+
     try
     {
         // Get ObfInterface pointer
@@ -155,9 +169,9 @@ StatusCode MIPFilterTool::initialize()
         // Retrieve the configuration to configure for normal mode
         unsigned char configToRun = master.filter.mode2cfg[EFC_DB_MODE_K_NORMAL];
 
-        m_filterId = obf->setupFilter(&master, configToRun);
+        m_handlerId = obf->setupFilter(&master, configToRun);
 
-        if (m_filterId == -100)
+        if (m_handlerId == -100)
         {
             log << MSG::ERROR << "Failed to initialize Diagnostic Filter" << endreq;
             return StatusCode::FAILURE;
@@ -166,10 +180,39 @@ StatusCode MIPFilterTool::initialize()
         // Bit mask for this filter
         unsigned int target = obf->getFilterTargetMask(master.filter.id);
 
+        // Are we using moot and is this an active filter?
+        bool activeFilter = false;
+
+        if (m_mootSvc)
+        {
+            std::vector<CalibData::MootFilterCfg> filterCfgVec;
+            unsigned int filterCnt = m_mootSvc->getActiveFilters(filterCfgVec);
+            
+            for(std::vector<CalibData::MootFilterCfg>::const_iterator filterIter = filterCfgVec.begin();
+                filterIter != filterCfgVec.end(); filterIter++)
+            {
+                if (filterIter->getSchemaId() == m_filterLibs->FilterSchema())
+                {
+                    activeFilter = true;
+                    break;
+                }
+            }
+        }
+
         // Loop through and associate configurations to modes and enable the filter for that mode
         for (int modeIdx = 0; modeIdx < EFC_DB_MODE_K_CNT; modeIdx++)
         {
             unsigned int configuration = m_filterLibs->getMasterConfiguration().filter.mode2cfg[modeIdx];
+
+            // If MootSvc configured and filter is active then attempt to retrieve the information from moot
+            if (activeFilter)
+            {
+                std::string filterName = "";
+                CalibData::MootFilterCfg* mootCfg = m_mootSvc->getActiveFilter(modeIdx, m_handlerId, filterName);
+
+                // Returned configuration for this handler and mode 
+                if (mootCfg) configuration = mootCfg->getInstanceId();
+            }
 
             obf->associateConfigToMode(target, modeIdx, configuration);
             obf->enableDisableFilter(target, target);
@@ -241,7 +284,7 @@ void MIPFilterTool::dumpConfiguration()
 void MIPFilterTool::eoeProcessing(EDS_fwIxb* ixb)
 {
     // Retrieve the Gamma Filter Status Word
-    EDS_rsdDsc*   rsdDsc       = ixb->rsd.dscs + m_filterId;
+    EDS_rsdDsc*   rsdDsc       = ixb->rsd.dscs + m_handlerId;
     unsigned char sb           = rsdDsc->sb;
     unsigned int* dscPtr       = (unsigned int*)rsdDsc->ptr;
     unsigned int  statusWord   = *dscPtr++;

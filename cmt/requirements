@@ -1,11 +1,12 @@
 package OnboardFilter
 version v4r8p1
-# $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/cmt/requirements,v 1.91 2008/04/01 16:20:55 usher Exp $
+# $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/cmt/requirements,v 1.92 2008/05/21 16:19:36 usher Exp $
 
 author Tracy Usher <usher@SLAC.Stanford.edu>
 
 use EbfWriter           *
-use obf v* IExternal 
+use obf v* IExternal
+use CalibSvc * 
 
 apply_pattern packageShr
 apply_pattern package_include
