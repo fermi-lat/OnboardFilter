@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: usher  Wed May 28 16:45:42 PDT 2008
+OnboardFilter/cmt
+
+Modified Files:
+	requirements 
+Log Message:
+First integration with moot for setting filter configurations at initialization
+    *
+------------------------------------------------------------
 TAG
 Tag name: OnboardFilter-04-08-01, operation: add
 Package: OnboardFilter
