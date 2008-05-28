@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: usher  Wed May 28 16:46:27 PDT 2008
+OnboardFilter/src/test
+
+Modified Files:
+	jobOptions.txt 
+Log Message:
+First integration with moot for setting filter configurations at initialization
+    *
+------------------------------------------------------------
 User: usher  Wed May 28 16:45:42 PDT 2008
 OnboardFilter/src
 
