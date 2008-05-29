@@ -1,4 +1,14 @@
 ------------------------------------------------------------
+User: usher  Wed May 28 17:03:35 PDT 2008
+OnboardFilter/src
+
+Modified Files:
+	DGNFilterTool.cxx GammaFilterTool.cxx HIPFilterTool.cxx 
+	MIPFilterTool.cxx 
+Log Message:
+Output output statements when moot sets configurations for a given mode
+    *
+------------------------------------------------------------
 User: usher  Wed May 28 16:46:27 PDT 2008
 OnboardFilter/src/test
 
