@@ -1,7 +1,7 @@
 /**  @file MIPFilterTool.cxx
     @brief implementation of class MIPFilterTool
     
-  $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/MIPFilterTool.cxx,v 1.6 2008/05/16 20:15:45 usher Exp $  
+  $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/MIPFilterTool.cxx,v 1.7 2008/05/28 23:45:42 usher Exp $  
 */
 
 #include "IFilterTool.h"
@@ -194,6 +194,7 @@ StatusCode MIPFilterTool::initialize()
                 if (filterIter->getSchemaId() == m_filterLibs->FilterSchema())
                 {
                     activeFilter = true;
+                    log << MSG::INFO << "Moot has filter " <<  filterIter->getName() << " as active" << endreq;
                     break;
                 }
             }
@@ -211,7 +212,11 @@ StatusCode MIPFilterTool::initialize()
                 CalibData::MootFilterCfg* mootCfg = m_mootSvc->getActiveFilter(modeIdx, m_handlerId, filterName);
 
                 // Returned configuration for this handler and mode 
-                if (mootCfg) configuration = mootCfg->getInstanceId();
+                if (mootCfg)
+                {
+                    configuration = mootCfg->getInstanceId();
+                    log << MSG::INFO << "Moot: mode " << modeIdx << " associated with configuration:\n" << mootCfg->getSrcPath() << endreq;
+                }
             }
 
             obf->associateConfigToMode(target, modeIdx, configuration);
