@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: usher  Fri May 30 08:53:39 PDT 2008
+OnboardFilter/src/test
+
+Modified Files:
+	jobOptions.txt 
+Log Message:
+Use moot's production archive by default in test program
+    *
+------------------------------------------------------------
 TAG
 Tag name: OnboardFilter-04-09-00, operation: add
 Package: OnboardFilter
