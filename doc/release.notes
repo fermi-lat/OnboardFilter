@@ -2,6 +2,7 @@
  * @file release.notes
  * @brief Package OnboardFilter
  * @verbatim
+ * v4r9p1 30-May-2008  TU  : Fix test program job options file to use moot production archive
  * v4r9p0 29-May-2008  TU  : Tag initial connection to moot for testing across platforms
  * v4r8p1 21-May-2008  TU  : Initial updates for B1-0-8, prior to including Moot
  * v4r8p0  7-Feb-2008  TU  : Implement mechanism to change filter configuration paramters via job options
