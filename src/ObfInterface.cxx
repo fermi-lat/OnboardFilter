@@ -148,7 +148,7 @@ int ObfInterface::setupFilter(const EFC_DB_Schema* schema,
 
     // Attempt to trap any dprintf or printf output in fsw code
     // Create a local buffer and store the current state of stdout
-#ifdef _WIN32
+#ifdef _WIN32__
     char buf[100000];
     buf[0] = 0;
     FILE myFile = *stdout;
@@ -192,7 +192,7 @@ int ObfInterface::setupFilter(const EFC_DB_Schema* schema,
     //EDS_fwHandlerSelect(m_edsFw, target, EFC_DB_MODE_K_NORMAL);
 
     // Restore the output stream
-#ifdef _WIN32
+#ifdef _WIN32__
     *stdout = myFile;
 #endif
 
@@ -352,6 +352,10 @@ const EFC_DB_Schema& ObfInterface::loadFilterLibs(IFilterLibs* filterLibs, int v
         const std::string& fileName = idIter->second;
 
         loadLibrary(fileName, basePath + fileName, verbosity);
+
+        // Look up the configruation
+        const EFC_DB_Schema* thisSchema = EFC_lookup (filterLibs->FilterSchema(), pair.second);
+        int j = 0;
     }
 
     return master;

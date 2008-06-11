@@ -1,7 +1,7 @@
 /**  @file HIPFilterTool.cxx
     @brief implementation of class HIPFilterTool
     
-  $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/HIPFilterTool.cxx,v 1.7 2008/05/28 23:45:42 usher Exp $  
+  $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/HIPFilterTool.cxx,v 1.8 2008/05/29 00:03:35 usher Exp $  
 */
 
 #include "IFilterTool.h"
@@ -14,7 +14,7 @@
 
 // Moot stuff for discerning filter configurations
 #include "CalibData/Moot/MootData.h"
-#include "CalibSvc/IMootSvc.h"
+#include "MootSvc/IMootSvc.h"
 
 #include "Event/TopLevel/Event.h"
 #include "Event/TopLevel/EventModel.h"
@@ -67,8 +67,8 @@ public:
     /// @brief Finalize method for the tool
     StatusCode finalize();
 
-    // Set Mode and Configuration for a given filter
-    virtual void setModeAndConfig(unsigned int mode, unsigned int config);
+    // Set Mode for a given filter
+    virtual void setMode(unsigned int mode);
 
     // This defines the method called for end of event processing
     virtual void eoeProcessing(EDS_fwIxb* ixb);
@@ -95,6 +95,10 @@ private:
     // Filter ID returned from EDS_fw after initialization
     int               m_handlerId;
 
+    // Current mode and configuration
+    unsigned short    m_curConfig;
+    unsigned short    m_curMode;
+
     //****** This section contains various useful member variables
     // Counters to keep track of bit frequency during a given run
     int               m_vetoBits[17];   //array to count # of times each veto bit was set
@@ -118,6 +122,8 @@ HIPFilterTool::HIPFilterTool(const std::string& type,
                                  const std::string& name, 
                                  const IInterface* parent) :
                                  AlgTool(type, name, parent)
+                               , m_curConfig(0)
+                               , m_curMode(EFC_DB_MODE_K_NORMAL)
 {
     //Declare the additional interface
     declareInterface<IFilterTool>(this);
@@ -151,11 +157,28 @@ StatusCode HIPFilterTool::initialize()
         return sc;
     }
 
-    // Recover MootSvc
-    if (StatusCode sc = service("MootSvc", m_mootSvc, true) == StatusCode::FAILURE)
+    // Attempt to retrieve the JO parameter "UseMootSvc" from OnboardFilter
+    bool useMootSvc = false;
+    try
     {
-        log << MSG::INFO << "Moot service not found, using default configurations" << endreq;
-        return sc;
+        if (IProperty* parentProp = dynamic_cast<IProperty*>(const_cast<IInterface*>(parent())))
+        {
+            SimplePropertyRef<bool> useMoot("UseMootConfig", useMootSvc);
+            StatusCode sc = parentProp->getProperty(&useMoot);
+        }
+    }
+    // If the above fails then it throws an exception. I think that can't happen here, but if it 
+    // does then we'll proceed ahead without Moot...
+    catch(...) {}
+
+    // If OnboardFilter says we are using Moot then try to look it up
+    if (useMootSvc)
+    {
+        if (StatusCode sc = service("MootSvc", m_mootSvc) == StatusCode::FAILURE)
+        {
+            log << MSG::ERROR << "Unable to retrieve MootSvc" << endreq;
+            return sc;
+        }
     }
 
     try
@@ -220,22 +243,13 @@ StatusCode HIPFilterTool::initialize()
             }
 
             obf->associateConfigToMode(target, modeIdx, configuration);
-            obf->enableDisableFilter(target, target);
         }
 
-        // Set the default mode to run
-        obf->selectFiltermode(target, EFC_DB_MODE_K_NORMAL);
+        // Enable the filter
+        obf->enableDisableFilter(target, target);
 
-        // If we are "leaking" all events then modify here
-        // Note: this is standard mode of running for GSW version of obf
-        if (m_leakAllEvents)
-        {
-            // Modify the veto mask is requested (this means we are running "pass through" mode)
-            EFC_sampler* sampler = (EFC_sampler*)obf->getFilterPrm(master.filter.id, EFC_OBJECT_K_SAMPLER);
-
-            // Set filter to leak all events
-            sampler->prescale.prescalers[0].refresh = 1;
-        }
+        // Call setMode to do the rest
+        setMode(m_curMode);
 
         // Set the Gamma Filter output routine
         obf->setEovOutputCallBack(this);
@@ -257,19 +271,35 @@ StatusCode HIPFilterTool::finalize ()
 }
 
 // Set Mode and Configuration for a given filter
-void HIPFilterTool::setModeAndConfig(unsigned int mode, unsigned int config)
+void HIPFilterTool::setMode(unsigned int mode)
 {
+    // Output what we are doing...
+    MsgStream log(msgSvc(), name());
+
+    log << MSG::INFO << "Received request to change mode from " << m_curMode << " to " << mode << endreq;
+
     // Get ObfInterface pointer
     ObfInterface* obf = ObfInterface::instance();
 
-    // Bit mask for this filter
-    unsigned int target = m_filterLibs->getMasterConfiguration().filter.id;
+    // Schema id
+    unsigned short int masterId = m_filterLibs->getMasterConfiguration().filter.id;
 
-    // Associate the configuration to the mode (and vice versa)
-    obf->associateConfigToMode(target, mode, config);
+    // Bit mask for this filter
+    unsigned int target = obf->getFilterTargetMask(masterId);
 
     // Set the default mode to run
     obf->selectFiltermode(target, mode);
+
+    // If we are "leaking" all events then modify here
+    // Note: this is standard mode of running for GSW version of obf
+    if (m_leakAllEvents)
+    {
+        // Modify the veto mask is requested (this means we are running "pass through" mode)
+        EFC_sampler* sampler = (EFC_sampler*)obf->getFilterPrm(masterId, EFC_OBJECT_K_SAMPLER);
+
+        // Set filter to leak all events
+        sampler->prescale.prescalers[0].refresh = 1;
+    }
 
     return;
 }
@@ -309,10 +339,10 @@ void HIPFilterTool::eoeProcessing(EDS_fwIxb* ixb)
     SmartDataPtr<OnboardFilterTds::ObfFilterStatus> obfFilterStatus(m_dataSvc,"/Event/Filter/ObfFilterStatus");
 
     // Create a new HFC status TDS sub object
-    OnboardFilterTds::ObfHFCStatus* hfcStat = new OnboardFilterTds::ObfHFCStatus(rsdDsc->id, statusWord, sb);
+    OnboardFilterTds::ObfHipStatus* hfcStat = new OnboardFilterTds::ObfHipStatus(rsdDsc->id, statusWord, sb);
 
     // Add it to the TDS object
-    obfFilterStatus->addFilterStatus(OnboardFilterTds::ObfFilterStatus::HFCFilter, hfcStat);
+    obfFilterStatus->addFilterStatus(OnboardFilterTds::ObfFilterStatus::HIPFilter, hfcStat);
 
     // Increment counters accordingly
     if((statusWord & HFC_STATUS_M_STAGE_GEM) != 0)      m_statusBits[0]++;

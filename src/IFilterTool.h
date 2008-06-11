@@ -2,7 +2,7 @@
 
     @brief declaration of the IBkgndSelectTool class
 
-$Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/IFilterTool.h,v 1.1 2008/04/25 23:21:52 usher Exp $
+$Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/IFilterTool.h,v 1.2 2008/05/16 18:00:42 usher Exp $
 
 */
 
@@ -33,8 +33,8 @@ public:
     // Retrieve interface ID
     static const InterfaceID& interfaceID() { return IID_IFilterTool; }
 
-    // Set Mode and Configuration for a given filter
-    virtual void setModeAndConfig(unsigned int mode, unsigned int config) = 0;
+    // Set the Mode for a given filter
+    virtual void setMode(unsigned int mode) = 0;
 
     // This defines the method called for end of event processing
     virtual void eoeProcessing(EDS_fwIxb* ixb) = 0;
