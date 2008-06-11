@@ -1,5 +1,17 @@
 ------------------------------------------------------------
 User: usher  Wed Jun 11 12:23:18 PDT 2008
+OnboardFilter/src
+
+Modified Files:
+	CalOutputTool.cxx DGNFilterTool.cxx FSWAuxLibsTool.cxx 
+	FilterTrackTool.cxx GammaFilterTool.cxx GemOutputTool.cxx 
+	HIPFilterTool.cxx IFilterTool.h MIPFilterTool.cxx 
+	ObfInterface.cxx OnboardFilter.cxx TkrOutputTool.cxx 
+Log Message:
+Final (?) round of integration of Moot and mode setting from the data stream. First round of testing in the real system
+    *
+------------------------------------------------------------
+User: usher  Wed Jun 11 12:23:18 PDT 2008
 OnboardFilter/cmt
 
 Modified Files:
