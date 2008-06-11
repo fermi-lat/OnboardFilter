@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: usher  Wed Jun 11 12:24:02 PDT 2008
+OnboardFilter/src/test
+
+Modified Files:
+	jobOptions.txt 
+Log Message:
+Final (?) round of integration of Moot and mode setting from the data stream. First round of testing in the real system
+    *
+------------------------------------------------------------
 User: usher  Wed Jun 11 12:23:18 PDT 2008
 OnboardFilter/src
 
