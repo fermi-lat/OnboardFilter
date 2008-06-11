@@ -2,6 +2,7 @@
  * @file release.notes
  * @brief Package OnboardFilter
  * @verbatim
+ * v4r10p1 11-Jun-2008  TU  : Forget to set UseMootConfig to true, initialize params in Tools
  * v4r10p0 11-Jun-2008  TU  : Final (?) integration of Moot and using data to set the run mode 
  * v4r9p1  30-May-2008  TU  : Fix test program job options file to use moot production archive
  * v4r9p0  29-May-2008  TU  : Tag initial connection to moot for testing across platforms
