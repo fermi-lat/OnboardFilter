@@ -6,7 +6,7 @@
 
 \verbatim
 
-  CVS $Id: OnboardFilter.cxx,v 1.79 2008/04/25 23:19:25 usher Exp $
+  CVS $Id: OnboardFilter.cxx,v 1.80 2008/06/11 19:23:18 usher Exp $
 \endverbatim
                                                                           */
 /* ---------------------------------------------------------------------- */
@@ -117,7 +117,7 @@ OnboardFilter::OnboardFilter(const std::string& name, ISvcLocator *pSvcLocator) 
     // Properties for this algorithm
     // Parameter: UseMootConfig
     // Default is to NOT expect to use Moot for configuration information - use master configuration or JO
-    declareProperty("UseMootConfig",    m_mootConfig         = false);
+    declareProperty("UseMootConfig",    m_mootConfig         = true);
     // Parameter: RejectEvents
     // Default is to not use this algorithm to accept/reject events (for MC production running)
     declareProperty("RejectEvents",     m_rejectEvents       = false);

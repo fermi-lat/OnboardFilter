@@ -1,7 +1,7 @@
 /**  @file HIPFilterTool.cxx
     @brief implementation of class HIPFilterTool
     
-  $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/HIPFilterTool.cxx,v 1.8 2008/05/29 00:03:35 usher Exp $  
+  $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/HIPFilterTool.cxx,v 1.9 2008/06/11 19:23:18 usher Exp $  
 */
 
 #include "IFilterTool.h"
@@ -124,6 +124,7 @@ HIPFilterTool::HIPFilterTool(const std::string& type,
                                  AlgTool(type, name, parent)
                                , m_curConfig(0)
                                , m_curMode(EFC_DB_MODE_K_NORMAL)
+                               , m_mootSvc(0)
 {
     //Declare the additional interface
     declareInterface<IFilterTool>(this);
