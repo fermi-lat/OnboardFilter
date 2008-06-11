@@ -1,6 +1,6 @@
 package OnboardFilter
 version v4r9p1
-# $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/cmt/requirements,v 1.94 2008/05/29 20:12:31 usher Exp $
+# $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/cmt/requirements,v 1.95 2008/05/30 15:56:02 usher Exp $
 
 author Tracy Usher <usher@SLAC.Stanford.edu>
 
@@ -14,6 +14,7 @@ apply_pattern package_header
 
 private
 use OnboardFilterTds v*
+use MootSvc v*
 use CRflux v*
 use TkrDigi v*
 use AcdDigi v*

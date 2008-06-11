@@ -1,7 +1,7 @@
 /**  @file GammaFilterTool.cxx
     @brief implementation of class GammaFilterTool
     
-  $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/GammaFilterTool.cxx,v 1.9 2008/05/28 23:45:42 usher Exp $  
+  $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/GammaFilterTool.cxx,v 1.10 2008/05/29 00:03:35 usher Exp $
 */
 
 #include "IFilterTool.h"
@@ -14,7 +14,7 @@
 
 // Moot stuff for discerning filter configurations
 #include "CalibData/Moot/MootData.h"
-#include "CalibSvc/IMootSvc.h"
+#include "MootSvc/IMootSvc.h"
 
 #include "Event/TopLevel/Event.h"
 #include "Event/TopLevel/EventModel.h"
@@ -69,7 +69,7 @@ public:
     StatusCode finalize();
 
     // Set Mode and Configuration for a given filter
-    virtual void setModeAndConfig(unsigned int mode, unsigned int config);
+    virtual void setMode(unsigned int mode);
 
     // This defines the method called for end of event processing
     virtual void eoeProcessing(EDS_fwIxb* ixb);
@@ -123,6 +123,10 @@ private:
     // Filter ID returned from EDS_fw after initialization
     int               m_handlerId;
 
+    // Current mode and configuration
+    unsigned short    m_curConfig;
+    unsigned short    m_curMode;
+
     //****** This section contains various useful member variables
     // Counters to keep track of bit frequency during a given run
     int               m_vetoBits[17];   //array to count # of times each veto bit was set
@@ -146,6 +150,8 @@ GammaFilterTool::GammaFilterTool(const std::string& type,
                                  const std::string& name, 
                                  const IInterface* parent) :
                                  AlgTool(type, name, parent)
+                               , m_curConfig(0)
+                               , m_curMode(EFC_DB_MODE_K_NORMAL)
                                , m_filterLibs(0)
                                , m_mootSvc(0)
 {
@@ -210,11 +216,28 @@ StatusCode GammaFilterTool::initialize()
         return sc;
     }
 
-    // Recover MootSvc
-    if (StatusCode sc = service("MootSvc", m_mootSvc, true) == StatusCode::FAILURE)
+    // Attempt to retrieve the JO parameter "UseMootSvc" from OnboardFilter
+    bool useMootSvc = false;
+    try
     {
-        log << MSG::INFO << "Moot service not found, using default configurations" << endreq;
-        return sc;
+        if (IProperty* parentProp = dynamic_cast<IProperty*>(const_cast<IInterface*>(parent())))
+        {
+            SimplePropertyRef<bool> useMoot("UseMootConfig", useMootSvc);
+            StatusCode sc = parentProp->getProperty(&useMoot);
+        }
+    }
+    // If the above fails then it throws an exception. I think that can't happen here, but if it 
+    // does then we'll proceed ahead without Moot...
+    catch(...) {}
+
+    // If OnboardFilter says we are using Moot then try to look it up
+    if (useMootSvc)
+    {
+        if (StatusCode sc = service("MootSvc", m_mootSvc) == StatusCode::FAILURE)
+        {
+            log << MSG::ERROR << "Unable to retrieve MootSvc" << endreq;
+            return sc;
+        }
     }
 
     try
@@ -235,16 +258,15 @@ StatusCode GammaFilterTool::initialize()
         {
             unsigned short int configId = m_filterLibs->getInstanceId(m_configToRun.value());
 
-            if (configId != m_filterLibs->getMasterConfiguration().filter.mode2cfg[EFC_DB_MODE_K_NORMAL])
-                m_filterLibs->getMasterConfiguration().filter.mode2cfg[EFC_DB_MODE_K_NORMAL] = configId;
+            if (configId != m_filterLibs->getMasterConfiguration().filter.mode2cfg[m_curMode]) 
+                m_filterLibs->getMasterConfiguration().filter.mode2cfg[m_curMode] = configId;
         }
 
-        // Retrieve the configuration to use for normal mode
-        // *** need to set up for other modes as well ***
-        unsigned char configToRun = master.filter.mode2cfg[EFC_DB_MODE_K_NORMAL];
+        // Default value of current config
+        m_curConfig = m_filterLibs->getMasterConfiguration().filter.mode2cfg[m_curMode];
 
         // Set up the filter including the configuration to run
-        m_handlerId = obf->setupFilter(&master, configToRun);
+        m_handlerId = obf->setupFilter(&master, m_curConfig);
 
         // Hmm... should replace this with a try-catch?
         if (m_handlerId == -100)
@@ -259,14 +281,17 @@ StatusCode GammaFilterTool::initialize()
         // Are we using moot and is this an active filter?
         bool activeFilter = false;
 
+        // If we have moot we need to get the list of active filters and see if we are one of them
         if (m_mootSvc)
         {
             std::vector<CalibData::MootFilterCfg> filterCfgVec;
             unsigned int filterCnt = m_mootSvc->getActiveFilters(filterCfgVec);
             
+            // Loop through the returned list of active filters
             for(std::vector<CalibData::MootFilterCfg>::const_iterator filterIter = filterCfgVec.begin();
                 filterIter != filterCfgVec.end(); filterIter++)
             {
+                // Are we active?
                 if (filterIter->getSchemaId() == m_filterLibs->FilterSchema())
                 {
                     activeFilter = true;
@@ -302,48 +327,8 @@ StatusCode GammaFilterTool::initialize()
         // Enable the filter
         obf->enableDisableFilter(target, target);
 
-        // Set the default mode to run
-        obf->selectFiltermode(target, EFC_DB_MODE_K_NORMAL);
-
-        // Set up the object allowing one to change gamma filter parameters
-        GammaFilterCfgPrms gamParms;
-        gamParms.set_Acd_TopSideEmax(m_Acd_TopSideEmax);
-        gamParms.set_Acd_TopSideFilterEmax(m_Acd_TopSideFilterEmax);
-        gamParms.set_Acd_SplashEmax(m_Acd_TopSideFilterEmax);
-        gamParms.set_Acd_SplashCount(m_Acd_TopSideFilterEmax);
-        gamParms.set_Atf_Emax(m_Atf_Emax);
-        gamParms.set_Zbottom_Emin(m_Zbottom_Emin);
-        gamParms.set_Cal_Epass(m_Cal_Epass);
-        gamParms.set_Cal_Emin(m_Cal_Emin);
-        gamParms.set_Cal_Emax(m_Cal_Emax);
-        gamParms.set_Cal_Layer0RatioLo(m_Cal_Layer0RatioLo);
-        gamParms.set_Cal_Layer0RatioHi(m_Cal_Layer0RatioHi);
-        gamParms.set_Tkr_Row2Emax(m_Tkr_Row2Emax);
-        gamParms.set_Tkr_Row01Emax(m_Tkr_Row01Emax);
-        gamParms.set_Tkr_TopEmax(m_Tkr_TopEmax);
-        gamParms.set_Tkr_ZeroTkrEmin(m_Tkr_ZeroTkrEmin);
-        gamParms.set_Tkr_TwoTkrEmax(m_Tkr_TwoTkrEmax);
-        gamParms.set_Tkr_SkirtEmax(m_Tkr_SkirtEmax);
-
-        // Get the Gamma Filter parameter block
-        void* gammaCfgPrms = obf->getFilterPrm(master.filter.id, EFC_OBJECT_K_FILTER_PRM);
-
-        // This will modify any configuration parameters that are not 0xFFFFFFFF
-        gamParms.setCfgPrms(gammaCfgPrms);
-
-        // If we are "leaking" all events, or if we are disabling vetoes, then modify here
-        // Note: Leaking all events is the default mode of running for GSW version of obf
-        if (m_leakAllEvents || m_gamBitsToIgnore)
-        {
-            // Modify the veto mask is requested (this means we are running "pass through" mode)
-            EFC_sampler* sampler = (EFC_sampler*)obf->getFilterPrm(master.filter.id, EFC_OBJECT_K_SAMPLER);
-
-            // Set filter to leak all events
-            if (m_leakAllEvents) sampler->prescale.prescalers[0].refresh = 1;
-
-            // Modify the bits to ignore in the filter
-            if (m_gamBitsToIgnore) sampler->classes.enabled.all &= ~m_gamBitsToIgnore;
-        }
+        // Use set mode to do the rest here
+        setMode(m_curMode);
 
         // Set the Gamma Filter output routine
         obf->setEovOutputCallBack(this);
@@ -365,19 +350,71 @@ StatusCode GammaFilterTool::finalize ()
 }
 
 // Set Mode and Configuration for a given filter
-void GammaFilterTool::setModeAndConfig(unsigned int mode, unsigned int config)
+void GammaFilterTool::setMode(unsigned int mode)
 {
+    // Output what we are doing...
+    MsgStream log(msgSvc(), name());
+
+    log << MSG::INFO << "Received request to change mode from " << m_curMode << " to " << mode << endreq;
+
     // Get ObfInterface pointer
     ObfInterface* obf = ObfInterface::instance();
 
-    // Bit mask for this filter
-    unsigned int target = m_filterLibs->getMasterConfiguration().filter.id;
+    // Schema id
+    unsigned short int masterId = m_filterLibs->getMasterConfiguration().filter.id;
 
-    // Associate the configuration to the mode (and vice versa)
-    obf->associateConfigToMode(target, mode, config);
+    // Bit mask for this filter
+    unsigned int target = obf->getFilterTargetMask(masterId);
 
     // Set the default mode to run
     obf->selectFiltermode(target, mode);
+
+    // Set up the object allowing one to change gamma filter parameters
+    // But only if running outside of Moot
+    if (!m_mootSvc)
+    {
+        GammaFilterCfgPrms gamParms;
+        gamParms.set_Acd_TopSideEmax(m_Acd_TopSideEmax);
+        gamParms.set_Acd_TopSideFilterEmax(m_Acd_TopSideFilterEmax);
+        gamParms.set_Acd_SplashEmax(m_Acd_TopSideFilterEmax);
+        gamParms.set_Acd_SplashCount(m_Acd_TopSideFilterEmax);
+        gamParms.set_Atf_Emax(m_Atf_Emax);
+        gamParms.set_Zbottom_Emin(m_Zbottom_Emin);
+        gamParms.set_Cal_Epass(m_Cal_Epass);
+        gamParms.set_Cal_Emin(m_Cal_Emin);
+        gamParms.set_Cal_Emax(m_Cal_Emax);
+        gamParms.set_Cal_Layer0RatioLo(m_Cal_Layer0RatioLo);
+        gamParms.set_Cal_Layer0RatioHi(m_Cal_Layer0RatioHi);
+        gamParms.set_Tkr_Row2Emax(m_Tkr_Row2Emax);
+        gamParms.set_Tkr_Row01Emax(m_Tkr_Row01Emax);
+        gamParms.set_Tkr_TopEmax(m_Tkr_TopEmax);
+        gamParms.set_Tkr_ZeroTkrEmin(m_Tkr_ZeroTkrEmin);
+        gamParms.set_Tkr_TwoTkrEmax(m_Tkr_TwoTkrEmax);
+        gamParms.set_Tkr_SkirtEmax(m_Tkr_SkirtEmax);
+
+        // Get the Gamma Filter parameter block
+        void* gammaCfgPrms = obf->getFilterPrm(masterId, EFC_OBJECT_K_FILTER_PRM);
+
+        // This will modify any configuration parameters that are not 0xFFFFFFFF
+        gamParms.setCfgPrms(gammaCfgPrms);
+    }
+
+    // If we are "leaking" all events, or if we are disabling vetoes, then modify here
+    // Note: Leaking all events is the default mode of running for GSW version of obf
+    if (m_leakAllEvents || m_gamBitsToIgnore)
+    {
+        // Modify the veto mask is requested (this means we are running "pass through" mode)
+        EFC_sampler* sampler = (EFC_sampler*)obf->getFilterPrm(masterId, EFC_OBJECT_K_SAMPLER);
+
+        // Set filter to leak all events
+        if (m_leakAllEvents) sampler->prescale.prescalers[0].refresh = 1;
+
+        // Modify the bits to ignore in the filter
+        if (m_gamBitsToIgnore) sampler->classes.enabled.all &= ~m_gamBitsToIgnore;
+    }
+
+    // And, of course, reset the mode
+    m_curMode = mode;
 
     return;
 }

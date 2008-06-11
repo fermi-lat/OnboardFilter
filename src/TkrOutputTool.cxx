@@ -1,7 +1,7 @@
 /**  @file TkrOutputTool.cxx
     @brief implementation of class TkrOutputTool
     
-  $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/TkrOutputTool.cxx,v 1.3 2008/05/16 19:28:42 usher Exp $  
+  $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/TkrOutputTool.cxx,v 1.4 2008/05/16 20:18:57 usher Exp $  
 */
 
 #include "IFilterTool.h"
@@ -67,8 +67,8 @@ public:
     /// @brief Finalize method for the tool
     StatusCode finalize();
 
-    // Set Mode and Configuration for a given filter
-    void setModeAndConfig(unsigned int mode, unsigned int config) {return;}
+    // Set Mode for a given filter
+    void setMode(unsigned int mode) {return;}
 
     // This defines the method called for end of event processing
     virtual void eoeProcessing(EDS_fwIxb* ixb);
