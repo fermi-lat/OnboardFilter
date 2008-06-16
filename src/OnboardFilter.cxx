@@ -6,7 +6,7 @@
 
 \verbatim
 
-  CVS $Id: OnboardFilter.cxx,v 1.80 2008/06/11 19:23:18 usher Exp $
+  CVS $Id: OnboardFilter.cxx,v 1.81 2008/06/11 20:24:57 usher Exp $
 \endverbatim
                                                                           */
 /* ---------------------------------------------------------------------- */
@@ -116,16 +116,17 @@ OnboardFilter::OnboardFilter(const std::string& name, ISvcLocator *pSvcLocator) 
 
     // Properties for this algorithm
     // Parameter: UseMootConfig
-    // Default is to NOT expect to use Moot for configuration information - use master configuration or JO
+    // Default is to expect TO use Moot for configuration information
+    // MUST SET FALSE IN JO FILE for other than pipeline running
     declareProperty("UseMootConfig",    m_mootConfig         = true);
     // Parameter: RejectEvents
-    // Default is to not use this algorithm to accept/reject events (for MC production running)
+    // Default is TO NOT use this algorithm to accept/reject events (for MC production running)
     declareProperty("RejectEvents",     m_rejectEvents       = false);
     // Parameter: PassThrough
-    // Dafault is to configure the "pass through" filter for running
+    // Dafault is TO configure the "pass through" filter for running
     declareProperty("PassThrough",      m_passThrough        = true);
     // Parameter: FailNoEbfData
-    // Default is to not fail the algorithm if ebf data is missing
+    // Default is TO NOT fail the algorithm if ebf data is missing
     declareProperty("FailNoEbfData",    m_failNoEbfData      = false);
     // Parameter: ActiveFilterList
     // This contains the list of filters which are "active" (participate in accept/reject events)

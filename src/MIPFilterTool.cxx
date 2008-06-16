@@ -1,7 +1,7 @@
 /**  @file MIPFilterTool.cxx
     @brief implementation of class MIPFilterTool
     
-  $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/MIPFilterTool.cxx,v 1.9 2008/06/11 19:23:18 usher Exp $  
+  $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/MIPFilterTool.cxx,v 1.10 2008/06/11 20:24:57 usher Exp $  
 */
 
 #include "IFilterTool.h"
@@ -91,6 +91,9 @@ private:
     // Configuring the Diagnostic Filter
     bool              m_leakAllEvents;   // If true then GSW running of diagnostic Filter will leak all events
 
+    // Which filter configuration to run
+    StringProperty    m_configToRun;
+
     //****** This section for controlling implementation of Gamma Filter
     // Filter ID returned from EDS_fw after initialization
     int               m_handlerId;
@@ -130,7 +133,12 @@ MIPFilterTool::MIPFilterTool(const std::string& type,
     declareInterface<IFilterTool>(this);
 
     // declare properties with setProperties calls
-    declareProperty("LeakAllEvents", m_leakAllEvents = false);
+    // Paramter: LeakAllEvents
+    // Default is TO "leak" (pass status/filter information) all events
+    declareProperty("LeakAllEvents", m_leakAllEvents = true);
+    // Parameter: Configuration
+    // Overrides the default configuration given in the Master Configuration file
+    declareProperty("Configuration", m_configToRun   = "");
     
     // zero our counters
     memset(m_vetoBits,   0, 17*sizeof(int));
@@ -189,6 +197,15 @@ StatusCode MIPFilterTool::initialize()
 
         m_filterLibs = new MIPFilterLibsB1_0_8();
         const EFC_DB_Schema& master = obf->loadFilterLibs(m_filterLibs, m_verbosity);
+
+        // Check to see what mode we want to run... (if a different one requested via JO parameter)
+        if (m_configToRun.value() != "")
+        {
+            unsigned short int configId = m_filterLibs->getInstanceId(m_configToRun.value());
+
+            if (configId != m_filterLibs->getMasterConfiguration().filter.mode2cfg[m_curMode]) 
+                m_filterLibs->getMasterConfiguration().filter.mode2cfg[m_curMode] = configId;
+        }
 
         // Retrieve the configuration to configure for normal mode
         unsigned char configToRun = master.filter.mode2cfg[EFC_DB_MODE_K_NORMAL];
@@ -340,7 +357,7 @@ void MIPFilterTool::eoeProcessing(EDS_fwIxb* ixb)
     SmartDataPtr<OnboardFilterTds::ObfFilterStatus> obfFilterStatus(m_dataSvc,"/Event/Filter/ObfFilterStatus");
 
     // Create a new MIP Status TDS sub object
-    OnboardFilterTds::ObfMipStatus* mipStat = new OnboardFilterTds::ObfMipStatus(rsdDsc->id, statusWord, sb);
+    OnboardFilterTds::ObfMipStatus* mipStat = new OnboardFilterTds::ObfMipStatus(rsdDsc->id, statusWord, sb, 0);
 
     // Add it to the TDS object
     obfFilterStatus->addFilterStatus(OnboardFilterTds::ObfFilterStatus::MIPFilter, mipStat);
