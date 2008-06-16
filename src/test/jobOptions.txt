@@ -1,7 +1,7 @@
 //##############################################################
 //
 // basic Job options file for a Gleam execution
-// $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/test/jobOptions.txt,v 1.15 2008/05/30 15:53:39 usher Exp $
+// $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/test/jobOptions.txt,v 1.16 2008/06/11 19:24:02 usher Exp $
 
 // primary DLLs, including auditor 
 
@@ -139,7 +139,7 @@ MessageSvc.OutputLevel = 3;
 ApplicationMgr.EvtMax  = 100;
 
 //ToolSvc.GammaFilterTool.Configuration = "GAMMA_DB_INSTANCE_K_NORMAL_LEAK";
-OnboardFilter.UseMootConfig=true;
+OnboardFilter.UseMootConfig=false;
 
 //==============================================================
 //
