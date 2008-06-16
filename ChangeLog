@@ -1,4 +1,14 @@
 ------------------------------------------------------------
+User: usher  Mon Jun 16 15:14:11 PDT 2008
+OnboardFilter/src
+
+Modified Files:
+	DGNFilterTool.cxx GammaFilterTool.cxx HIPFilterTool.cxx 
+	MIPFilterTool.cxx OnboardFilter.cxx 
+Log Message:
+Modifications for changes to ObfFilterStatus including placeholder for prescaler info, also added ability for all filters to change default config via job options
+    *
+------------------------------------------------------------
 TAG
 Tag name: OnboardFilter-04-10-01, operation: add
 Package: OnboardFilter
