@@ -6,7 +6,7 @@
 
 \verbatim
 
-  CVS $Id: OnboardFilter.cxx,v 1.81 2008/06/11 20:24:57 usher Exp $
+  CVS $Id: OnboardFilter.cxx,v 1.82 2008/06/16 22:14:11 usher Exp $
 \endverbatim
                                                                           */
 /* ---------------------------------------------------------------------- */
@@ -79,29 +79,29 @@ private:
 
     // "Active" Filters are those which participate in the decision to reject events
     typedef std::vector<unsigned int> ActiveFilterVec;
-    ActiveFilterVec m_activeFilters;
+    ActiveFilterVec  m_activeFilters;
 
     // Set up some counters for keeping track of various things we might encounter
-    int             m_rejected;        // # events rejected by filters
-    int             m_noEbfData;       // # events with no ebf data (MC only? Trigger reject)
-    bool            m_failNoEbfData;   // If we don't have ebf data should we crash?
+    int              m_rejected;        // # events rejected by filters
+    int              m_noEbfData;       // # events with no ebf data (MC only? Trigger reject)
+    bool             m_failNoEbfData;   // If we don't have ebf data should we crash?
 
     // Now to member variables
     // Pointer to the obf interface
-    ObfInterface*   m_obfInterface;
+    ObfInterface*    m_obfInterface;
 
     // Pointer to MootSvc
-    IMootSvc*       m_mootSvc;
+    IMootSvc*        m_mootSvc;
 
     // Map to relate filter schema ids to "our" filter tool names
     typedef std::map<unsigned int, std::string> IdToNameMap;
-    IdToNameMap     m_idToToolNameMap;
+    IdToNameMap      m_idToToolNameMap;
 
     // Cache the "current mode" we are running
-    int             m_curMode;
+    enums::Lsf::Mode m_curMode;
 
     // Cache our initialization status
-    bool            m_initialized;
+    bool             m_initialized;
 };
 
 
@@ -111,7 +111,7 @@ const IAlgFactory& OnboardFilterFactory = Factory;
 //FilterInfo OnboardFilter::myFilterInfo;
 
 OnboardFilter::OnboardFilter(const std::string& name, ISvcLocator *pSvcLocator) : Algorithm(name,pSvcLocator), 
-          m_rejected(0), m_noEbfData(0), m_curMode(-1), m_mootSvc(0), m_initialized(false)
+          m_rejected(0), m_noEbfData(0), m_curMode(enums::Lsf::NoMode), m_mootSvc(0), m_initialized(false)
 {
 
     // Properties for this algorithm
@@ -185,6 +185,28 @@ StatusCode OnboardFilter::initialize()
         log << MSG::ERROR << "Failed to load the FSW Auxiliary libraries" << endreq;
         return scTool;
     }
+        
+    // Recover MootSvc
+    if (StatusCode sc = service("MootSvc", m_mootSvc, true) == StatusCode::FAILURE)
+    {
+        // Let the world there was no moot found
+        log << MSG::INFO << "Moot service not found, using default configurations" << endreq;
+    }
+
+    // Check if MootSvc was not found but we expect to use it
+    if (!m_mootSvc && m_mootConfig.value())
+    {
+        // Anders suggests that if we asked for moot and its not there then we should "crash"
+        log << MSG::ERROR << "UseMootConfig set true but no moot service found, exiting..." << endreq;
+        return StatusCode::FAILURE;
+    }
+
+    // If MootSvc is present then use it to set UseMootConfig
+    if (m_mootSvc)
+    {
+        if (m_mootSvc->noMoot()) m_mootConfig = false;
+        else                     m_mootConfig = true;
+    }
 
     // If we are not using Moot then go ahead and initialize now
     if (!m_mootConfig.value()) sc = initFilters();
@@ -202,14 +224,6 @@ StatusCode OnboardFilter::initFilters()
     // If using moot to configure for the filter configuration then do here
     if (m_mootConfig.value())
     {
-        // Recover MootSvc
-        if (StatusCode sc = service("MootSvc", m_mootSvc, true) == StatusCode::FAILURE)
-        {
-            // Anders suggests that if we asked for moot and its not there then we should "crash"
-            log << MSG::ERROR << "Moot service not found, using default configurations" << endreq;
-            return sc;
-        }
-
         // Get back the list of active filters
         std::vector<CalibData::MootFilterCfg> filterCfgVec;
         unsigned int filterCnt = m_mootSvc->getActiveFilters(filterCfgVec);
@@ -321,7 +335,7 @@ StatusCode OnboardFilter::execute()
                 std::string filterTool = nameIter->second;
 
                 // Look up the tool and check we found it... just in case...
-                if (StatusCode sc = toolSvc()->retrieveTool(filterTool, toolPtr) == StatusCode::FAILURE)
+                if (StatusCode sc = toolSvc()->retrieveTool(filterTool, toolPtr, this) == StatusCode::FAILURE)
                 {
                     log << MSG::ERROR << "Failed to find the " << filterTool << " tool" << endreq;
                     return sc;
