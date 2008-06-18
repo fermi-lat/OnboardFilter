@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: usher  Tue Jun 17 17:37:45 PDT 2008
+OnboardFilter/src
+
+Modified Files:
+	OnboardFilter.cxx 
+Log Message:
+Fixing bug with mode change crash problem fixed
+    *
+------------------------------------------------------------
 TAG
 Tag name: OnboardFilter-04-10-02, operation: add
 Package: OnboardFilter
