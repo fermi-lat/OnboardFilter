@@ -1,31 +1,4 @@
 ------------------------------------------------------------
-User: usher  Tue Jun 17 17:40:11 PDT 2008
-OnboardFilter/doc
-
-Modified Files:
-	release.notes 
-Log Message:
-preparing to tag v2r10p3
-    *
-------------------------------------------------------------
-User: usher  Tue Jun 17 17:40:11 PDT 2008
-OnboardFilter/cmt
-
-Modified Files:
-	requirements 
-Log Message:
-preparing to tag v2r10p3
-    *
-------------------------------------------------------------
-User: usher  Tue Jun 17 17:37:45 PDT 2008
-OnboardFilter/src
-
-Modified Files:
-	OnboardFilter.cxx 
-Log Message:
-Fixing bug with mode change crash problem fixed
-    *
-------------------------------------------------------------
 TAG
 Tag name: OnboardFilter-04-10-02, operation: add
 Package: OnboardFilter
