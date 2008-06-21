@@ -1,7 +1,7 @@
 //##############################################################
 //
 // basic Job options file for a Gleam execution
-// $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/test/jobOptions.txt,v 1.16 2008/06/11 19:24:02 usher Exp $
+// $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/test/jobOptions.txt,v 1.17 2008/06/16 22:16:22 usher Exp $
 
 // primary DLLs, including auditor 
 
@@ -72,11 +72,12 @@ TriggerAlg.applyPrescales = false;
 
 // ----------------------------
 //  onboard filter 
-
-ApplicationMgr.DLLs += {"MootSvc"};
-ApplicationMgr.ExtSvc += {"MootSvc"};
-MootSvc.MootArchive = "C:/Glast/moot/srcArchive-test";
-MootSvc.MootConfigKey = 145;
+//
+// Set up Moot service if wanted for testing
+////ApplicationMgr.DLLs += {"MootSvc"};
+////ApplicationMgr.ExtSvc += {"MootSvc"};
+////MootSvc.MootArchive = "C:/Glast/moot/srcArchive-test";
+////MootSvc.MootConfigKey = 145;
 
 ApplicationMgr.DLLs  += { "EbfWriter", "OnboardFilter"};
 Filter.Members       += {"EbfWriter", "OnboardFilter", "test_OnboardFilter"}; 
