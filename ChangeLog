@@ -1,31 +1,4 @@
 ------------------------------------------------------------
-User: usher  Sat Jun 21 05:45:24 PDT 2008
-OnboardFilter/doc
-
-Modified Files:
-	release.notes 
-Log Message:
-Preparing to tag v4r10p4
-    *
-------------------------------------------------------------
-User: usher  Sat Jun 21 05:45:24 PDT 2008
-OnboardFilter/cmt
-
-Modified Files:
-	requirements 
-Log Message:
-Preparing to tag v4r10p4
-    *
-------------------------------------------------------------
-User: usher  Sat Jun 21 05:43:07 PDT 2008
-OnboardFilter/src/test
-
-Modified Files:
-	jobOptions.txt 
-Log Message:
-Remove references to Moot to fix test program
-    *
-------------------------------------------------------------
 TAG
 Tag name: OnboardFilter-04-10-03, operation: add
 Package: OnboardFilter
