@@ -2,6 +2,7 @@
  * @file release.notes
  * @brief Package OnboardFilter
  * @verbatim
+ * v4r10p4 21-Jun-2008  TU  : Fix unit test
  * v4r10p3 17-Jun-2008  TU  : Fix problem with tool ownership that caused crash on mode changes
  * v4r10p2 16-Jun-2008  TU  : Modifications for new ObfFilterStatus updates
  * v4r10p1 11-Jun-2008  TU  : Forget to set UseMootConfig to true, initialize params in Tools
