@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: usher  Sat Jun 21 05:43:07 PDT 2008
+OnboardFilter/src/test
+
+Modified Files:
+	jobOptions.txt 
+Log Message:
+Remove references to Moot to fix test program
+    *
+------------------------------------------------------------
 TAG
 Tag name: OnboardFilter-04-10-03, operation: add
 Package: OnboardFilter
