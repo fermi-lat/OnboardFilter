@@ -1,4 +1,63 @@
 ------------------------------------------------------------
+TAG
+Tag name: v4r10p5, operation: add
+Package: OnboardFilter
+User: usher  Sun Jun 22 06:49:34 2008
+Files:
+  OnboardFilter/.cvsignore  1.2
+  OnboardFilter/ChangeLog  1.888
+  OnboardFilter/OnboardFilter/FilterAlg.h  1.6
+  OnboardFilter/OnboardFilter/FilterTracks.h  1.12
+  OnboardFilter/OnboardFilter/filter_rto.h  1.1
+  OnboardFilter/OnboardFilter/OnboardFilterTDS.h  1.3
+  OnboardFilter/OnboardFilter/FilterDisplay.h  1.6
+  OnboardFilter/cmt/.cvsignore  1.2
+  OnboardFilter/cmt/requirements  1.102
+  OnboardFilter/cmt/Makefile  1.4
+  OnboardFilter/doc/release.notes  1.81
+  OnboardFilter/doc/OnboardFilter.jpg  1.3
+  OnboardFilter/src/GammaFilterTool.cxx  1.12
+  OnboardFilter/src/GrbTrack.cxx  1.6
+  OnboardFilter/src/ObfInterface.cxx  1.24
+  OnboardFilter/src/HIPFilterLibsB1-0-8.h  1.1
+  OnboardFilter/src/DGNFilterLibsB1-0-8.cxx  1.1
+  OnboardFilter/src/HIPFilterLibsB1-0-8.cxx  1.1
+  OnboardFilter/src/IFilterLibs.h  1.1
+  OnboardFilter/src/IFilterTool.h  1.3
+  OnboardFilter/src/GammaFilterLibsB1-0-8.h  1.1
+  OnboardFilter/src/CalOutputTool.cxx  1.4
+  OnboardFilter/src/IFilterCfgPrms.h  1.1
+  OnboardFilter/src/GammaFilterCfgPrms.h  1.2
+  OnboardFilter/src/TkrOutputTool.cxx  1.5
+  OnboardFilter/src/GammaFilterLibsB1-0-8.cxx  1.1
+  OnboardFilter/src/FSWAuxLibsTool.cxx  1.5
+  OnboardFilter/src/trackProj.cxx  1.7
+  OnboardFilter/src/ObfInterface.h  1.10
+  OnboardFilter/src/MIPFilterLibsB1-0-8.h  1.1
+  OnboardFilter/src/GemOutputTool.cxx  1.4
+  OnboardFilter/src/OutputRtn.h  1.3
+  OnboardFilter/src/MIPFilterTool.cxx  1.11
+  OnboardFilter/src/DGNFilterLibsB1-0-8.h  1.1
+  OnboardFilter/src/FilterTrackTool.cxx  1.6
+  OnboardFilter/src/trackProj.h  1.5
+  OnboardFilter/src/.cvsignore  1.1
+  OnboardFilter/src/HIPFilterTool.cxx  1.11
+  OnboardFilter/src/DGNFilterTool.cxx  1.11
+  OnboardFilter/src/OnboardFilter.cxx  1.83
+  OnboardFilter/src/MIPFilterLibsB1-0-8.cxx  1.1
+  OnboardFilter/src/GammaFilterCfgPrms.cxx  1.3
+  OnboardFilter/src/GrbTrack.h  1.3
+  OnboardFilter/src/Dll/OnboardFilter_dll.cxx  1.5
+  OnboardFilter/src/Dll/OnboardFilter_load.cxx  1.9
+  OnboardFilter/src/FSWHeaders/TFC_prjDef.h  1.1
+  OnboardFilter/src/FSWHeaders/EFC_sampler.h  1.1
+  OnboardFilter/src/FSWHeaders/CDM_pubdefs.h  1.1
+  OnboardFilter/src/FSWHeaders/EFC.h  1.1
+  OnboardFilter/src/test/jobOptions.txt  1.19
+  OnboardFilter/src/test/test_OnboardFilter.cxx  1.1
+
+    *
+------------------------------------------------------------
 User: usher  Sun Jun 22 06:48:15 PDT 2008
 OnboardFilter/doc
 
