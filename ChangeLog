@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: usher  Sun Jun 22 06:45:57 PDT 2008
+OnboardFilter/src/test
+
+Modified Files:
+	jobOptions.txt 
+Log Message:
+This should fix the test program
+    *
+------------------------------------------------------------
 TAG
 Tag name: OnboardFilter-04-10-04, operation: add
 Package: OnboardFilter
