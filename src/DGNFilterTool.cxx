@@ -1,7 +1,7 @@
 /**  @file DGNFilterTool.cxx
     @brief implementation of class DGNFilterTool
     
-  $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/DGNFilterTool.cxx,v 1.11 2008/06/16 22:14:10 usher Exp $  
+  $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/DGNFilterTool.cxx,v 1.12 2008/06/25 03:34:37 usher Exp $  
 */
 
 #include "IFilterTool.h"
@@ -138,6 +138,8 @@ DGNFilterTool::DGNFilterTool(const std::string& type,
     // Parameter: Configuration
     // Overrides the default configuration given in the Master Configuration file
     declareProperty("Configuration", m_configToRun   = "");
+
+    declareProperty("verbosity",     m_verbosity     = 0);
     
     // zero our counters
     memset(m_vetoBits,   0, 17*sizeof(int));

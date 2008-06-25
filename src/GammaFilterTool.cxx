@@ -1,7 +1,7 @@
 /**  @file GammaFilterTool.cxx
     @brief implementation of class GammaFilterTool
     
-  $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/GammaFilterTool.cxx,v 1.12 2008/06/16 22:14:10 usher Exp $
+  $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/GammaFilterTool.cxx,v 1.13 2008/06/25 03:34:37 usher Exp $
 */
 
 #include "IFilterTool.h"
@@ -195,6 +195,8 @@ GammaFilterTool::GammaFilterTool(const std::string& type,
     declareProperty("Tkr_ZeroTkrEmin",       m_Tkr_ZeroTkrEmin       = 0xFFFFFFFF);
     declareProperty("Tkr_TwoTkrEmax",        m_Tkr_TwoTkrEmax        = 0xFFFFFFFF);
     declareProperty("Tkr_SkirtEmax",         m_Tkr_SkirtEmax         = 0xFFFFFFFF);
+
+    declareProperty("verbosity",             m_verbosity             = 0);
 
     // zero our counters
     memset(m_vetoBits,   0, 17*sizeof(int));
