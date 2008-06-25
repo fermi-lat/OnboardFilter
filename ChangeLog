@@ -1,4 +1,14 @@
 ------------------------------------------------------------
+User: usher  Tue Jun 24 22:24:06 PDT 2008
+OnboardFilter/src
+
+Modified Files:
+	DGNFilterTool.cxx GammaFilterTool.cxx HIPFilterTool.cxx 
+	MIPFilterTool.cxx 
+Log Message:
+Fix the renegade and misleading output of failed library load in log files
+    *
+------------------------------------------------------------
 User: usher  Tue Jun 24 20:34:37 PDT 2008
 OnboardFilter/src
 
