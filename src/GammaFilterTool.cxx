@@ -1,7 +1,7 @@
 /**  @file GammaFilterTool.cxx
     @brief implementation of class GammaFilterTool
     
-  $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/GammaFilterTool.cxx,v 1.11 2008/06/11 19:23:18 usher Exp $
+  $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/GammaFilterTool.cxx,v 1.12 2008/06/16 22:14:10 usher Exp $
 */
 
 #include "IFilterTool.h"
@@ -413,7 +413,7 @@ void GammaFilterTool::setMode(unsigned int mode)
         EFC_sampler* sampler = (EFC_sampler*)obf->getFilterPrm(masterId, EFC_OBJECT_K_SAMPLER);
 
         // Set filter to leak all events
-        if (m_leakAllEvents) sampler->prescale.prescalers[0].refresh = 1;
+        ////if (m_leakAllEvents) sampler->prescale.prescalers[0].refresh = 1;
 
         // Modify the bits to ignore in the filter
         if (m_gamBitsToIgnore) sampler->classes.enabled.all &= ~m_gamBitsToIgnore;
