@@ -1,7 +1,7 @@
 /**  @file DGNFilterTool.cxx
     @brief implementation of class DGNFilterTool
     
-  $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/DGNFilterTool.cxx,v 1.10 2008/06/11 20:24:57 usher Exp $  
+  $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/DGNFilterTool.cxx,v 1.11 2008/06/16 22:14:10 usher Exp $  
 */
 
 #include "IFilterTool.h"
@@ -315,7 +315,7 @@ void DGNFilterTool::setMode(unsigned int mode)
         EFC_sampler* sampler = (EFC_sampler*)obf->getFilterPrm(masterId, EFC_OBJECT_K_SAMPLER);
 
         // Set filter to leak all events
-        sampler->prescale.prescalers[0].refresh = 1;
+        ////sampler->prescale.prescalers[0].refresh = 1;
     }
 
     m_curMode = mode;
