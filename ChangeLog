@@ -1,4 +1,14 @@
 ------------------------------------------------------------
+User: usher  Tue Jun 24 20:34:37 PDT 2008
+OnboardFilter/src
+
+Modified Files:
+	DGNFilterTool.cxx GammaFilterTool.cxx HIPFilterTool.cxx 
+	MIPFilterTool.cxx 
+Log Message:
+Temporary kludge to fix the summary byte
+    *
+------------------------------------------------------------
 TAG
 Tag name: OnboardFilter-04-10-05, operation: add
 Package: OnboardFilter
