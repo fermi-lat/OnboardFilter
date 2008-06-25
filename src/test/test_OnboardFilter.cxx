@@ -1,4 +1,4 @@
-// $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/test/test_OnboardFilter.cxx,v 1.1 2008/04/02 15:46:51 usher Exp $
+// $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/test/test_OnboardFilter.cxx,v 1.2 2008/06/25 15:18:51 usher Exp $
 // Include files
 // Gaudi system includes
 #include "GaudiKernel/MsgStream.h"
@@ -22,7 +22,7 @@
 *
 * @author Tracy Usher
 *
-* $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/test/test_OnboardFilter.cxx,v 1.1 2008/04/02 15:46:51 usher Exp $
+* $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/test/test_OnboardFilter.cxx,v 1.2 2008/06/25 15:18:51 usher Exp $
 */
 
 class test_OnboardFilter : public Algorithm {
@@ -75,7 +75,7 @@ StatusCode test_OnboardFilter::execute()
     
     StatusCode  sc = StatusCode::SUCCESS;
     MsgStream   log( msgSvc(), name() );
-    log << MSG::INFO << endreq <<  "Call " << ++m_count << ": " ;
+    log << MSG::INFO  <<  "Call " << ++m_count << endreq ;
     
     // First, the collection of TkrDigis is retrieved from the TDS
     SmartDataPtr<OnboardFilterTds::ObfFilterStatus> obfFilterStatus(eventSvc(),"/Event/Filter/ObfFilterStatus");
@@ -93,33 +93,41 @@ StatusCode test_OnboardFilter::execute()
     // We do this one by one explicitly for now. Start with the results of the gamma filter
     if ((tdsStatus = obfFilterStatus->getFilterStatus(OnboardFilterTds::ObfFilterStatus::GammaFilter)))
     {
+        unsigned int status  = tdsStatus->getStatusWord();
+        unsigned int summary = tdsStatus->getFiltersb();
         log << MSG::INFO << "*** Gamma Filter ***" << endreq;
-        log << MSG::INFO << "    Status Word: " << std::hex << tdsStatus->getStatusWord() << 
-                            ", Summary Byte: " << std::hex << tdsStatus->getFiltersb() << endreq;
+        log << MSG::INFO << "    Status Word: " << std::hex << status << 
+                            ", Summary Byte: " << std::hex << summary << endreq;
     }
 
     // MIP Filter
     if ((tdsStatus = obfFilterStatus->getFilterStatus(OnboardFilterTds::ObfFilterStatus::MIPFilter)))
     {
+        unsigned int status  = tdsStatus->getStatusWord();
+        unsigned int summary = tdsStatus->getFiltersb();
         log << MSG::INFO << "*** MIP Filter ***" << endreq;
-        log << MSG::INFO << "    Status Word: " << std::hex << tdsStatus->getStatusWord() << 
-                            ", Summary Byte: " << std::hex << tdsStatus->getFiltersb() << endreq;
+        log << MSG::INFO << "    Status Word: " << std::hex << status << 
+                            ", Summary Byte: " << std::hex << summary << endreq;
     }
 
     // HIP Filter
     if ((tdsStatus = obfFilterStatus->getFilterStatus(OnboardFilterTds::ObfFilterStatus::HIPFilter)))
     {
+        unsigned int status  = tdsStatus->getStatusWord();
+        unsigned int summary = tdsStatus->getFiltersb();
         log << MSG::INFO << "*** Gamma Filter ***" << endreq;
-        log << MSG::INFO << "    Status Word: " << std::hex << tdsStatus->getStatusWord() << 
-                            ", Summary Byte: " << std::hex << tdsStatus->getFiltersb() << endreq;
+        log << MSG::INFO << "    Status Word: " << std::hex << status << 
+                            ", Summary Byte: " << std::hex << summary << endreq;
     }
 
     // DGN Filter
     if ((tdsStatus = obfFilterStatus->getFilterStatus(OnboardFilterTds::ObfFilterStatus::DGNFilter)))
     {
+        unsigned int status  = tdsStatus->getStatusWord();
+        unsigned int summary = tdsStatus->getFiltersb();
         log << MSG::INFO << "*** DGN Filter ***" << endreq;
-        log << MSG::INFO << "    Status Word: " << std::hex << tdsStatus->getStatusWord() << 
-                            ", Summary Byte: " << std::hex << tdsStatus->getFiltersb() << endreq;
+        log << MSG::INFO << "    Status Word: " << std::hex << status << 
+                            ", Summary Byte: " << std::hex << summary << endreq;
     }
     
     return sc;
