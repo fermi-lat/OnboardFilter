@@ -1,7 +1,7 @@
 /**  @file GammaFilterTool.cxx
     @brief implementation of class GammaFilterTool
     
-  $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/GammaFilterTool.cxx,v 1.13 2008/06/25 03:34:37 usher Exp $
+  $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/GammaFilterTool.cxx,v 1.14 2008/06/25 05:24:06 usher Exp $
 */
 
 #include "IFilterTool.h"
@@ -166,7 +166,7 @@ GammaFilterTool::GammaFilterTool(const std::string& type,
     // ****DO NOT CHANGE unless you know what you are doing ! *****
     // Paramter: LeakAllEvents
     // Default is TO "leak" (pass status/filter information) all events
-    declareProperty("LeakAllEvents",         m_leakAllEvents         = true);
+    declareProperty("LeakAllEvents",         m_leakAllEvents         = false);
     // Parameter: Configuration
     // Overrides the default configuration given in the Master Configuration file
     declareProperty("Configuration",         m_configToRun           = "");
@@ -419,6 +419,8 @@ void GammaFilterTool::setMode(unsigned int mode)
 
         // Modify the bits to ignore in the filter
         if (m_gamBitsToIgnore) sampler->classes.enabled.all &= ~m_gamBitsToIgnore;
+
+        m_gamBitsToIgnore = ~sampler->classes.enabled.vetoes & sampler->classes.defined.vetoes;
     }
 
     // And, of course, reset the mode

@@ -1,7 +1,7 @@
 /**  @file HIPFilterTool.cxx
     @brief implementation of class HIPFilterTool
     
-  $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/HIPFilterTool.cxx,v 1.12 2008/06/25 03:34:37 usher Exp $  
+  $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/HIPFilterTool.cxx,v 1.13 2008/06/25 05:24:06 usher Exp $  
 */
 
 #include "IFilterTool.h"
@@ -135,7 +135,7 @@ HIPFilterTool::HIPFilterTool(const std::string& type,
     // declare properties with setProperties calls
     // Paramter: LeakAllEvents
     // Default is TO "leak" (pass status/filter information) all events
-    declareProperty("LeakAllEvents", m_leakAllEvents = true);
+    declareProperty("LeakAllEvents", m_leakAllEvents = false);
     // Parameter: Configuration
     // Overrides the default configuration given in the Master Configuration file
     declareProperty("Configuration", m_configToRun   = "");

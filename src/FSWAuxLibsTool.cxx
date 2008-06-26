@@ -1,7 +1,7 @@
 /**  @file FSWAuxLibsTool.cxx
     @brief implementation of class FSWAuxLibsTool
     
-  $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/FSWAuxLibsTool.cxx,v 1.4 2008/05/16 20:18:57 usher Exp $  
+  $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/FSWAuxLibsTool.cxx,v 1.5 2008/06/11 19:23:18 usher Exp $  
 */
 
 #include "IFilterTool.h"
@@ -88,10 +88,10 @@ FSWAuxLibsTool::FSWAuxLibsTool(const std::string& type,
     // declare properties with setProperties calls
     // See the file EFC/src/GFC_def.h for the definition of these variables
     // ****DO NOT CHANGE unless you know what you are doing ! *****
-    declareProperty("PathNamePeds",     m_PathName_Pedestals = "$(OBFCGB_DBBINDIR)");
-    declareProperty("FileNamePeds",     m_FileName_Pedestals = "cal_db_pedestals");
-    declareProperty("PathNameGains",    m_PathName_Gains     = "$(OBFCGB_DBBINDIR)");
-    declareProperty("FileNameGains",    m_FileName_Gains     = "cal_db_gains");
+    declareProperty("PathNamePeds",     m_PathName_Pedestals = "$(OBFCPP_DBBINDIR)/cal_db_pedestals");
+    declareProperty("FileNamePeds",     m_FileName_Pedestals = "cal_db_pedestals_flight");
+    declareProperty("PathNameGains",    m_PathName_Gains     = "$(OBFCPG_DBBINDIR)/cal_db_gains");
+    declareProperty("FileNameGains",    m_FileName_Gains     = "cal_db_gains_flight");
 
     return;
 }
@@ -115,11 +115,11 @@ StatusCode FSWAuxLibsTool::initialize()
 
         // Load the correct calibration libraries
         std::string calPedFile = m_FileName_Pedestals;
-        std::string calPedPath = m_PathName_Pedestals + "/" + calPedFile;
+        std::string calPedPath = m_PathName_Pedestals;         // + "/" + calPedFile;
         obf->loadLibrary(calPedFile, calPedPath);
     
         std::string calGainFile = m_FileName_Gains;
-        std::string calGainPath = m_PathName_Gains + "/" + calGainFile;
+        std::string calGainPath = m_PathName_Gains;            // + "/" + calGainFile;
         obf->loadLibrary(calGainFile, calGainPath);
 
         // Load the Gleam geometry for fsw
