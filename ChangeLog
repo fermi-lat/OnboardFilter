@@ -1,4 +1,14 @@
 ------------------------------------------------------------
+User: usher  Thu Jun 26 05:50:58 PDT 2008
+OnboardFilter/src
+
+Modified Files:
+	FSWAuxLibsTool.cxx GammaFilterTool.cxx HIPFilterTool.cxx 
+	MIPFilterTool.cxx 
+Log Message:
+Make "Leak All Events' false by default, update default pedestals
+    *
+------------------------------------------------------------
 TAG
 Tag name: OnboardFilter-04-10-06, operation: add
 Package: OnboardFilter
