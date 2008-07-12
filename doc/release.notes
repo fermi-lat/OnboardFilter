@@ -2,6 +2,8 @@
  * @file release.notes
  * @brief Package OnboardFilter
  * @verbatim
+ * v4r11p0 12-Jul-2008  TU  : Modify filter tools to no longer "leak" events (for MC), default MC mode like data
+ *                            and also change default pedestal/gain file names to get "right" ones on linux
  * v4r10p7 26-Jun-2008  TU  : Make "leak all events" false by default, updates for flight pedestal/gain
  * v4r10p6 25-Jun-2008  TU  : More verbiage for the test program, "fix" summary byte
  * v4r10p5 22-Jun-2008  TU  : This time for sure
