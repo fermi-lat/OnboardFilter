@@ -1,7 +1,7 @@
 /**  @file FSWAuxLibsTool.cxx
     @brief implementation of class FSWAuxLibsTool
     
-  $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/FSWAuxLibsTool.cxx,v 1.5 2008/06/11 19:23:18 usher Exp $  
+  $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/FSWAuxLibsTool.cxx,v 1.6 2008/06/26 12:50:58 usher Exp $  
 */
 
 #include "IFilterTool.h"
@@ -89,9 +89,9 @@ FSWAuxLibsTool::FSWAuxLibsTool(const std::string& type,
     // See the file EFC/src/GFC_def.h for the definition of these variables
     // ****DO NOT CHANGE unless you know what you are doing ! *****
     declareProperty("PathNamePeds",     m_PathName_Pedestals = "$(OBFCPP_DBBINDIR)/cal_db_pedestals");
-    declareProperty("FileNamePeds",     m_FileName_Pedestals = "cal_db_pedestals_flight");
+    declareProperty("FileNamePeds",     m_FileName_Pedestals = "cal_db_pedestals");
     declareProperty("PathNameGains",    m_PathName_Gains     = "$(OBFCPG_DBBINDIR)/cal_db_gains");
-    declareProperty("FileNameGains",    m_FileName_Gains     = "cal_db_gains_flight");
+    declareProperty("FileNameGains",    m_FileName_Gains     = "cal_db_gains");
 
     return;
 }
