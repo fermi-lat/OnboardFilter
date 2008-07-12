@@ -1,7 +1,7 @@
 /**  @file GammaFilterTool.cxx
     @brief implementation of class GammaFilterTool
     
-  $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/GammaFilterTool.cxx,v 1.14 2008/06/25 05:24:06 usher Exp $
+  $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/GammaFilterTool.cxx,v 1.15 2008/06/26 12:50:58 usher Exp $
 */
 
 #include "IFilterTool.h"
@@ -93,8 +93,14 @@ private:
     StringProperty    m_configToRun;
 
     // Configuring the Gamma Filter
-    unsigned          m_gamBitsToIgnore; // This sets a mask of gamma filter veto bits to ignore
+    unsigned int      m_gamBitsToIgnore; // This sets a mask of gamma filter veto bits to ignore
+    bool              m_runAllStages;    // Run all stages of filter for diagnostics...
     bool              m_leakAllEvents;   // If true then GSW running of Gamma Filter will leak all events
+
+    // Keeping track of the veto bits (necessary if running all stages)
+    unsigned int      m_filterVetoMask;  // This is what the filter wanted to use
+
+    unsigned int      m_gamBitsOriginal; // If ignoring bits, save the original state
 
     // Changeable parameters for the gamma filter
     // See the file EFC/src/GFC_def.h for the definition of these variables
@@ -129,8 +135,7 @@ private:
 
     //****** This section contains various useful member variables
     // Counters to keep track of bit frequency during a given run
-    int               m_vetoBits[17];   //array to count # of times each veto bit was set
-    int               m_statusBits[15]; //array to count # of times each veto bit was set
+    int               m_statusBits[32]; //array to count # of times each bit in status word is set
 
     // Pointer to the filter library class with release specific information
     IFilterLibs*      m_filterLibs;
@@ -150,6 +155,8 @@ GammaFilterTool::GammaFilterTool(const std::string& type,
                                  const std::string& name, 
                                  const IInterface* parent) :
                                  AlgTool(type, name, parent)
+                               , m_filterVetoMask(0)
+                               , m_gamBitsOriginal(0)
                                , m_curConfig(0)
                                , m_curMode(EFC_DB_MODE_K_NORMAL)
                                , m_filterLibs(0)
@@ -164,8 +171,11 @@ GammaFilterTool::GammaFilterTool(const std::string& type,
     // declare properties with setProperties calls
     // See the file EFC/src/GFC_def.h for the definition of these variables
     // ****DO NOT CHANGE unless you know what you are doing ! *****
+    // Parameter: RunAllStages
+    // Default is not run the filter in data mode, we do NOT run all stages
+    declareProperty("RunAllStages",          m_runAllStages          = false);
     // Paramter: LeakAllEvents
-    // Default is TO "leak" (pass status/filter information) all events
+    // Default is TO "leak" (pass status/filter information) all events (DEPRECATED)
     declareProperty("LeakAllEvents",         m_leakAllEvents         = false);
     // Parameter: Configuration
     // Overrides the default configuration given in the Master Configuration file
@@ -199,8 +209,7 @@ GammaFilterTool::GammaFilterTool(const std::string& type,
     declareProperty("verbosity",             m_verbosity             = 0);
 
     // zero our counters
-    memset(m_vetoBits,   0, 17*sizeof(int));
-    memset(m_statusBits, 0, 15*sizeof(int));
+    memset(m_statusBits, 0, 32*sizeof(int));    
 
     return;
 }
@@ -363,7 +372,16 @@ void GammaFilterTool::setMode(unsigned int mode)
     // Output what we are doing...
     MsgStream log(msgSvc(), name());
 
-    log << MSG::INFO << "Received request to change mode from " << m_curMode << " to " << mode << endreq;
+    std::string modeDesc[] = {"EFC_DB_MODE_K_NORMAL",
+                              "EFC_DB_MODE_K_TOO",
+                              "EFC_DB_MODE_K_ARR",
+                              "EFC_DB_MODE_K_RSVD3",
+                              "EFC_DB_MODE_K_RSVD4",
+                              "EFC_DB_MODE_K_RSVD5",
+                              "EFC_DB_MODE_K_RSVD6",
+                              "EFC_DB_MODE_K_RSVD7" };
+
+    log << MSG::INFO << "Received request to change mode from " << modeDesc[m_curMode] << " to " << modeDesc[mode] << endreq;
 
     // Get ObfInterface pointer
     ObfInterface* obf = ObfInterface::instance();
@@ -407,20 +425,23 @@ void GammaFilterTool::setMode(unsigned int mode)
         gamParms.setCfgPrms(gammaCfgPrms);
     }
 
-    // If we are "leaking" all events, or if we are disabling vetoes, then modify here
-    // Note: Leaking all events is the default mode of running for GSW version of obf
-    if (m_leakAllEvents || m_gamBitsToIgnore)
+    // If we are disabling vetoes, or if we are trying to run all stages of filter, then modify here
+    if (m_runAllStages || m_gamBitsToIgnore)
     {
         // Modify the veto mask is requested (this means we are running "pass through" mode)
         EFC_sampler* sampler = (EFC_sampler*)obf->getFilterPrm(masterId, EFC_OBJECT_K_SAMPLER);
 
-        // Set filter to leak all events
-        ////if (m_leakAllEvents) sampler->prescale.prescalers[0].refresh = 1;
+        // If running all stages of the filter then get the veto mask (since we'll need to apply it in the end)
+        if (m_runAllStages)
+        {
+            // What did the filter want to use as a veto mask?
+            m_filterVetoMask = sampler->classes.enabled.all;
 
-        // Modify the bits to ignore in the filter
-        if (m_gamBitsToIgnore) sampler->classes.enabled.all &= ~m_gamBitsToIgnore;
-
-        m_gamBitsToIgnore = ~sampler->classes.enabled.vetoes & sampler->classes.defined.vetoes;
+            // Set the filter's veto mask to zero so it won't reject events
+            sampler->classes.enabled.all = 0;
+        }
+        // Otherwise, modify the bits to ignore in the filter's veto mask
+        else sampler->classes.enabled.all &= ~m_gamBitsToIgnore;
     }
 
     // And, of course, reset the mode
@@ -451,12 +472,12 @@ void GammaFilterTool::eoeProcessing(EDS_fwIxb* ixb)
     unsigned char sb            = rsdDsc->sb;
     unsigned int* dscPtr        = (unsigned int*)rsdDsc->ptr;
     unsigned int  oldStatusWord = *dscPtr++;
-    unsigned int  newStatusWord = oldStatusWord;
+    unsigned int  statusWord    = oldStatusWord;
     unsigned int  energy        = *dscPtr;
 
     // If we are leaking all events then we need to manually set the veto bit
     // in the event their was a veto
-    if (m_leakAllEvents)
+    if (m_runAllStages)
     {
         // Remove any undesired veto bits from the "old school" status word **** 
         oldStatusWord = ~m_gamBitsToIgnore & oldStatusWord;
@@ -466,14 +487,15 @@ void GammaFilterTool::eoeProcessing(EDS_fwIxb* ixb)
         // defined by Patrck Smith in his confluence discussion page at 
         // https://confluence.slac.stanford.edu/display/DC2/2007/12/12/Onboard+Filter+-+20GeV+Threshold+verification
         // Any coding errors are mine (TU 12/12/07)
-        bool hiEPass =   (oldStatusWord & GFC_STATUS_M_HI_ENERGY) // if this bit is set then we want to pass the event
-                     && !(oldStatusWord & (GFC_STATUS_M_SPLASH_0 | GFC_STATUS_M_NOCALLO_FILTER_TILE)); // as long as these bits aren't set
+        // This is now implemented in FSW B1-0-8 so remove from here
+        //bool hiEPass =   (oldStatusWord & GFC_STATUS_M_HI_ENERGY) // if this bit is set then we want to pass the event
+        //             && !(oldStatusWord & (GFC_STATUS_M_SPLASH_0 | GFC_STATUS_M_NOCALLO_FILTER_TILE)); // as long as these bits aren't set
 
         // If any unmasked veto bits are set then set the general event vetoed bit 
-        if (oldStatusWord & GFC_STATUS_M_VETOES && !hiEPass)
+        if (oldStatusWord & m_filterVetoMask) // && !hiEPass)
         {
             oldStatusWord |= GFC_STATUS_M_VETOED;
-            newStatusWord |= GFC_STATUS_M_VETOED;
+            statusWord    |= GFC_STATUS_M_VETOED;
             sb            |= EDS_RSD_SB_M_VETOED;
         }
     }
@@ -482,42 +504,13 @@ void GammaFilterTool::eoeProcessing(EDS_fwIxb* ixb)
     SmartDataPtr<OnboardFilterTds::ObfFilterStatus> obfFilterStatus(m_dataSvc,"/Event/Filter/ObfFilterStatus");
 
     // Create a new Gamma Status TDS sub object
-    OnboardFilterTds::ObfGammaStatus* gamStat = new OnboardFilterTds::ObfGammaStatus(rsdDsc->id, newStatusWord, sb, 0, energy);
+    OnboardFilterTds::ObfGammaStatus* gamStat = new OnboardFilterTds::ObfGammaStatus(rsdDsc->id, statusWord, sb, 0, energy);
 
     // Add it to the TDS object
     obfFilterStatus->addFilterStatus(OnboardFilterTds::ObfFilterStatus::GammaFilter, gamStat);
 
-    // Increment counters accordingly
-    if((oldStatusWord & GFC_STATUS_M_GEM_THROTTLE) != 0)        m_statusBits[0]++;
-    if((oldStatusWord & GFC_STATUS_M_GEM_TKR) != 0)             m_statusBits[1]++;
-    if((oldStatusWord & GFC_STATUS_M_GEM_CALLO) != 0)           m_statusBits[2]++;
-    if((oldStatusWord & GFC_STATUS_M_GEM_CALHI) != 0)           m_statusBits[3]++;
-    if((oldStatusWord & GFC_STATUS_M_GEM_CNO) != 0)             m_statusBits[4]++;
-    if((oldStatusWord & GFC_STATUS_M_ACD_TOP) != 0)             m_statusBits[5]++;
-    if((oldStatusWord & GFC_STATUS_M_ACD_SIDE) != 0)            m_statusBits[6]++;
-    if((oldStatusWord & GFC_STATUS_M_ACD_SIDE_FILTER) != 0)     m_statusBits[7]++;
-    if((oldStatusWord & GFC_STATUS_M_TKR_EQ_1) != 0)            m_statusBits[8]++;
-    if((oldStatusWord & GFC_STATUS_M_TKR_GE_2) != 0)            m_statusBits[9]++;
-    if((oldStatusWord & GFC_STATUS_M_HI_ENERGY) != 0)           m_statusBits[10]++;
-
-    if((oldStatusWord & GFC_STATUS_M_TKR_LT_2_ELO) != 0)        m_vetoBits[0]++;
-    if((oldStatusWord & GFC_STATUS_M_TKR_SKIRT) != 0)           m_vetoBits[1]++;
-    if((oldStatusWord & GFC_STATUS_M_TKR_EQ_0) != 0)            m_vetoBits[2]++;
-    if((oldStatusWord & GFC_STATUS_M_TKR_ROW2) != 0)            m_vetoBits[3]++;
-    if((oldStatusWord & GFC_STATUS_M_TKR_ROW01) != 0)           m_vetoBits[4]++;
-    if((oldStatusWord & GFC_STATUS_M_TKR_TOP) != 0)             m_vetoBits[5]++;
-    if((oldStatusWord & GFC_STATUS_M_ZBOTTOM) != 0)             m_vetoBits[6]++;
-    if((oldStatusWord & GFC_STATUS_M_EL0_ETOT_HI) != 0)         m_vetoBits[7]++;
-    if((oldStatusWord & GFC_STATUS_M_EL0_ETOT_LO) != 0)         m_vetoBits[8]++;
-    if((oldStatusWord & GFC_STATUS_M_SIDE) != 0)                m_vetoBits[9]++;
-    if((oldStatusWord & GFC_STATUS_M_TOP) != 0)                 m_vetoBits[10]++;
-    if((oldStatusWord & GFC_STATUS_M_SPLASH_1) != 0)            m_vetoBits[11]++;
-    if((oldStatusWord & GFC_STATUS_M_E350_FILTER_TILE) != 0)    m_vetoBits[12]++;
-    if((oldStatusWord & GFC_STATUS_M_E0_TILE) != 0)             m_vetoBits[13]++;
-    if((oldStatusWord & GFC_STATUS_M_SPLASH_0) != 0)            m_vetoBits[14]++;
-    if((oldStatusWord & GFC_STATUS_M_NOCALLO_FILTER_TILE) != 0) m_vetoBits[15]++;
-
-    if((oldStatusWord & GFC_STATUS_M_VETOED) != 0)              m_vetoBits[16]++;
+    // Accumulate the status bit hits
+    for(int ib = 0; ib < 32; ib++) if (statusWord & 1 << ib) m_statusBits[ib]++;
 
     return;
 }
@@ -527,41 +520,49 @@ void GammaFilterTool::eorProcessing()
 {
     MsgStream log(msgSvc(), name());
 
+    // Descriptor for each bit
+    std::string statusBitDesc[] = {"GFC_STATUS_M_GEM_THROTTLE       ",
+                                   "GFC_STATUS_M_GEM_TKR            ",
+                                   "GFC_STATUS_M_GEM_CALLO          ",
+                                   "GFC_STATUS_M_GEM_CALHI          ",
+                                   "GFC_STATUS_M_GEM_CNO            ",
+                                   "GFC_STATUS_M_ACD_TOP            ",
+                                   "GFC_STATUS_M_ACD_SIDE           ",
+                                   "GFC_STATUS_M_ACD_SIDE_FILTER    ",
+                                   "GFC_STATUS_M_TKR_EQ_1           ",
+                                   "GFC_STATUS_M_TKR_GE_2           ",
+                                   "GFC_STATUS_M_HI_ENERGY          ",
+                                   "GFC_STATUS_M_RSVD_11            ",
+                                   "GFC_STATUS_M_RSVD_12            ",
+                                   "GFC_STATUS_M_RSVD_13            ",
+                                   "GFC_STATUS_M_ERR_CTB            ",
+                                   "GFC_STATUS_M_TKR_LT_2_ELO       ",
+                                   "GFC_STATUS_M_TKR_SKIRT          ",
+                                   "GFC_STATUS_M_TKR_EQ_0           ",
+                                   "GFC_STATUS_M_TKR_ROW2           ",
+                                   "GFC_STATUS_M_TKR_ROW01          ",
+                                   "GFC_STATUS_M_TKR_TOP            ",
+                                   "GFC_STATUS_M_ZBOTTOM            ",
+                                   "GFC_STATUS_M_EL0_ETOT_HI        ",
+                                   "GFC_STATUS_M_EL0_ETOT_LO        ",
+                                   "GFC_STATUS_M_SIDE               ",
+                                   "GFC_STATUS_M_TOP                ",
+                                   "GFC_STATUS_M_SPLASH_1           ",
+                                   "GFC_STATUS_M_E350_FILTER_TILE   ",
+                                   "GFC_STATUS_M_E0_TILE            ",
+                                   "GFC_STATUS_M_SPLASH_0           ",
+                                   "GFC_STATUS_M_NOCALLO_FILTER_TILE",
+                                   "GFC_STATUS_M_VETOED             " };
+
     // Output the bit frequency table
-    log << MSG::INFO << "-- Gamma Filter bit frequency table -- \n"
-        << "    Status Bit                         Value \n" 
-        << "    GFC_STATUS_M_ACD             " << m_statusBits[0] << "\n"       
-        << "    GFC_STATUS_M_DIR             " << m_statusBits[1] << "\n"       
-        << "    GFC_STATUS_M_ATF             " << m_statusBits[2] << "\n"      
-        << "    GFC_STATUS_M_CAL1            " << m_statusBits[3] << "\n"
-        << "    GFC_STATUS_M_TKR             " << m_statusBits[4] << "\n"
-        << "    GFC_STATUS_M_ACD_TOP         " << m_statusBits[5] << "\n"
-        << "    GFC_STATUS_M_ACD_SIDE        " << m_statusBits[6] << "\n"
-        << "    GFC_STATUS_M_ACD_SIDE_FILTER " << m_statusBits[7] << "\n"
-        << "    GFC_STATUS_M_TKR_POSSIBLE    " << m_statusBits[8] << "\n"
-        << "    GFC_STATUS_M_TKR_TRIGGER     " << m_statusBits[9] << "\n"
-        << "    GFC_STATUS_M_HI_ENERGY       " << m_statusBits[10] << "\n"
-    
-        << "    Veto Bit Summary" << "\n"
-        << "    Trigger Name                           Count\n" << "\n"
-        << "    GFC_STATUS_M_TKR_LT_2_ELO        " << m_vetoBits[0] << "\n"
-        << "    GFC_STATUS_M_TKR_SKIRT           " << m_vetoBits[1] << "\n"
-        << "    GFC_STATUS_M_TKR_EQ_0            " << m_vetoBits[2] << "\n"
-        << "    GFC_STATUS_M_TKR_ROW2            " << m_vetoBits[3] << "\n"
-        << "    GFC_STATUS_M_TKR_ROW01           " << m_vetoBits[4] << "\n"
-        << "    GFC_STATUS_M_TKR_TOP             " << m_vetoBits[5] << "\n"
-        << "    GFC_STATUS_M_ZBOTTOM             " << m_vetoBits[6] << "\n"
-        << "    GFC_STATUS_M_EL0_ETOT_90         " << m_vetoBits[7] << "\n"
-        << "    GFC_STATUS_M_EL0_ETOT_01         " << m_vetoBits[8] << "\n"
-        << "    GFC_STATUS_M_SIDE                " << m_vetoBits[9] << "\n"
-        << "    GFC_STATUS_M_TOP                 " << m_vetoBits[10] << "\n"
-        << "    GFC_STATUS_M_SPLASH_1            " << m_vetoBits[11] << "\n"
-        << "    GFC_STATUS_M_E350_FILTER_TILE    " << m_vetoBits[12] << "\n"
-        << "    GFC_STATUS_M_E0_TILE             " << m_vetoBits[13] << "\n"
-        << "    GFC_STATUS_M_SPLASH_0            " << m_vetoBits[14] << "\n"
-        << "    GFC_STATUS_M_NOCALLO_FILTER_TILE " << m_vetoBits[15] << "\n"
-        << "    GFC_STATUS_M_VETOED              " << m_vetoBits[16] << "\n"
-        << endreq;
+    log << MSG::INFO << "-- Gamma Filter Status Word bit frequency table -- \n";
+
+    for(int ib = 0; ib < 32; ib++)
+    {
+        log << "    " << statusBitDesc[ib] << " = " << m_statusBits[ib] << "\n";
+    }
+
+    log  << endreq;
 
     return;
 }

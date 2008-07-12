@@ -1,7 +1,7 @@
 /**  @file DGNFilterTool.cxx
     @brief implementation of class DGNFilterTool
     
-  $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/DGNFilterTool.cxx,v 1.12 2008/06/25 03:34:37 usher Exp $  
+  $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/DGNFilterTool.cxx,v 1.13 2008/06/25 05:24:06 usher Exp $  
 */
 
 #include "IFilterTool.h"
@@ -133,7 +133,7 @@ DGNFilterTool::DGNFilterTool(const std::string& type,
 
     // declare properties with setProperties calls
     // Paramter: LeakAllEvents
-    // Default is TO "leak" (pass status/filter information) all events
+    // Default is TO "leak" (pass status/filter information) all events (DEPRECATED)
     declareProperty("LeakAllEvents", m_leakAllEvents = false);
     // Parameter: Configuration
     // Overrides the default configuration given in the Master Configuration file
@@ -295,7 +295,16 @@ void DGNFilterTool::setMode(unsigned int mode)
     // Output what we are doing...
     MsgStream log(msgSvc(), name());
 
-    log << MSG::INFO << "Received request to change mode from " << m_curMode << " to " << mode << endreq;
+    std::string modeDesc[] = {"EFC_DB_MODE_K_NORMAL",
+                              "EFC_DB_MODE_K_TOO",
+                              "EFC_DB_MODE_K_ARR",
+                              "EFC_DB_MODE_K_RSVD3",
+                              "EFC_DB_MODE_K_RSVD4",
+                              "EFC_DB_MODE_K_RSVD5",
+                              "EFC_DB_MODE_K_RSVD6",
+                              "EFC_DB_MODE_K_RSVD7" };
+
+    log << MSG::INFO << "Received request to change mode from " << modeDesc[m_curMode] << " to " << modeDesc[mode] << endreq;
 
     // Get ObfInterface pointer
     ObfInterface* obf = ObfInterface::instance();
@@ -344,17 +353,6 @@ void DGNFilterTool::eoeProcessing(EDS_fwIxb* ixb)
     unsigned char sb         = rsdDsc->sb;
     unsigned int* dscPtr     = (unsigned int*)rsdDsc->ptr;
     unsigned int  statusWord = *dscPtr++;
-
-    // If we are running pass through mode then we need to manually set the veto bit
-    // in the event their was a veto
-    if (m_leakAllEvents)
-    {
-        if (statusWord & DFC_STATUS_M_VETO_DEF)
-        {
-            statusWord |= DFC_STATUS_M_VETOED;
-            sb         |= EDS_RSD_SB_M_VETOED;
-        }
-    }
 
     // Retrieve the output status TDS container object
     SmartDataPtr<OnboardFilterTds::ObfFilterStatus> obfFilterStatus(m_dataSvc,"/Event/Filter/ObfFilterStatus");
