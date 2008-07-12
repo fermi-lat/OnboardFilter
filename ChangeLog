@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: usher  Sat Jul 12 09:14:38 PDT 2008
+OnboardFilter/src
+
+Modified Files:
+	FSWAuxLibsTool.cxx 
+Log Message:
+Modify default pedestal and gain file names to be sure to get the right ones on linux
+    *
+------------------------------------------------------------
 User: usher  Fri Jul 11 17:03:48 PDT 2008
 OnboardFilter/src
 
