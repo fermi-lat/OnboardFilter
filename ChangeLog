@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: usher  Fri Jul 11 17:03:48 PDT 2008
+OnboardFilter/src
+
+Modified Files:
+	DGNFilterTool.cxx GammaFilterTool.cxx HIPFilterTool.cxx 
+	MIPFilterTool.cxx 
+Log Message:
+    *
+------------------------------------------------------------
 TAG
 Tag name: OnboardFilter-04-10-07, operation: add
 Package: OnboardFilter
