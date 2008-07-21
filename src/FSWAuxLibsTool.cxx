@@ -1,7 +1,7 @@
 /**  @file FSWAuxLibsTool.cxx
     @brief implementation of class FSWAuxLibsTool
     
-  $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/FSWAuxLibsTool.cxx,v 1.6 2008/06/26 12:50:58 usher Exp $  
+  $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/FSWAuxLibsTool.cxx,v 1.7 2008/07/12 16:14:38 usher Exp $  
 */
 
 #include "IFilterTool.h"
@@ -88,9 +88,9 @@ FSWAuxLibsTool::FSWAuxLibsTool(const std::string& type,
     // declare properties with setProperties calls
     // See the file EFC/src/GFC_def.h for the definition of these variables
     // ****DO NOT CHANGE unless you know what you are doing ! *****
-    declareProperty("PathNamePeds",     m_PathName_Pedestals = "$(OBFCPP_DBBINDIR)/cal_db_pedestals");
+    declareProperty("PathNamePeds",     m_PathName_Pedestals = "$(OBFCOP_DBBINDIR)/cal_db_pedestals");
     declareProperty("FileNamePeds",     m_FileName_Pedestals = "cal_db_pedestals");
-    declareProperty("PathNameGains",    m_PathName_Gains     = "$(OBFCPG_DBBINDIR)/cal_db_gains");
+    declareProperty("PathNameGains",    m_PathName_Gains     = "$(OBFCOG_DBBINDIR)/cal_db_gains");
     declareProperty("FileNameGains",    m_FileName_Gains     = "cal_db_gains");
 
     return;
@@ -116,10 +116,16 @@ StatusCode FSWAuxLibsTool::initialize()
         // Load the correct calibration libraries
         std::string calPedFile = m_FileName_Pedestals;
         std::string calPedPath = m_PathName_Pedestals;         // + "/" + calPedFile;
+
+        log << MSG::INFO << "Loading CAL pedestal file: " << calPedFile << ", path: " << calPedPath << endreq;
+
         obf->loadLibrary(calPedFile, calPedPath);
     
         std::string calGainFile = m_FileName_Gains;
         std::string calGainPath = m_PathName_Gains;            // + "/" + calGainFile;
+
+        log << MSG::INFO << "Loading CAL gain file: " << calGainFile << ", path: " << calGainPath << endreq;
+
         obf->loadLibrary(calGainFile, calGainPath);
 
         // Load the Gleam geometry for fsw

@@ -4,7 +4,7 @@
 
 #include "GammaFilterLibsB1-0-8.h"
 
-#include "GFC_DB/GFC_DB_schema.h"
+#include "GFC_DB/GFC_DB_V1_schema.h"
 #include "GFC_DB/GAMMA_DB_instance.h"
 
 GammaFilterLibsB1_0_8::GammaFilterLibsB1_0_8()
