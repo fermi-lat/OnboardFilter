@@ -1,4 +1,14 @@
 ------------------------------------------------------------
+User: usher  Mon Jul 21 16:06:48 PDT 2008
+OnboardFilter/src
+
+Modified Files:
+	FSWAuxLibsTool.cxx GammaFilterLibsB1-0-8.cxx 
+	GammaFilterTool.cxx ObfInterface.cxx 
+Log Message:
+First updates for B1-1-0
+    *
+------------------------------------------------------------
 User: glastrm  Mon Jul 21 08:17:33 PDT 2008
 GlastRelease-scons/OnboardFilter/src/test
 
