@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: glastrm  Mon Jul 21 08:17:33 PDT 2008
+GlastRelease-scons/OnboardFilter/src/test
+
+Modified Files:
+	jobOptions.txt 
+Log Message:
+Removed dependency on CMT env variables
+    *
+------------------------------------------------------------
 TAG
 Tag name: OnboardFilter-04-11-00, operation: add
 Package: OnboardFilter
