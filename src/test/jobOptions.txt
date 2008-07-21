@@ -1,7 +1,7 @@
 //##############################################################
 //
 // basic Job options file for a Gleam execution
-// $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/test/jobOptions.txt,v 1.18 2008/06/21 12:43:07 usher Exp $
+// $Header: /nfs/slac/g/glast/ground/cvs/GlastRelease-scons/OnboardFilter/src/test/jobOptions.txt,v 1.19 2008/06/22 13:45:56 usher Exp $
 
 // primary DLLs, including auditor 
 
@@ -92,7 +92,7 @@ Filter.Members       += {"EbfWriter", "OnboardFilter", "test_OnboardFilter"};
 ApplicationMgr.DLLs += {"GlastSvc"};
 ApplicationMgr.ExtSvc += { "GlastDetSvc"};
 GlastDetSvc.topVolume="LAT"; 
-GlastDetSvc.xmlfile="$(XMLGEODBSROOT)/xml/flight/flightSegVols.xml";
+GlastDetSvc.xmlfile="$(XMLGEODBSXMLPATH)/flight/flightSegVols.xml";
 GlastDetSvc.visitorMode="recon";
 
 //  Randoms definition
@@ -114,7 +114,7 @@ FluxAlg.source_name="muon_pencil_angle";
 // add in CRflux option
 ApplicationMgr.DLLs +={ "CRflux" };
 FluxSvc.source_lib += {
-    "$(CRFLUXROOT)/xml/source_library.xml"};
+    "$(CRFLUXXMLPATH)/source_library.xml"};
 
 // -------------------------------------------
 //  Calibration sevices
