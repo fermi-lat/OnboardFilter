@@ -1,4 +1,16 @@
 ------------------------------------------------------------
+User: usher  Tue Jul 22 13:28:51 PDT 2008
+OnboardFilter/src
+
+Added Files:
+	DGNFilterLibsB1-1-0.cxx DGNFilterLibsB1-1-0.h 
+	GammaFilterLibsB1-1-0.cxx GammaFilterLibsB1-1-0.h 
+	HIPFilterLibsB1-1-0.cxx HIPFilterLibsB1-1-0.h 
+	MIPFilterLibsB1-1-0.cxx MIPFilterLibsB1-1-0.h 
+Log Message:
+Import files for setting up B1-1-0
+    *
+------------------------------------------------------------
 User: usher  Tue Jul 22 13:11:08 PDT 2008
 OnboardFilter/src/FSWHeaders
 
