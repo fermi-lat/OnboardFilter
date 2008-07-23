@@ -1,4 +1,66 @@
 ------------------------------------------------------------
+TAG
+Tag name: v4r11p1, operation: add
+Package: OnboardFilter
+User: usher  Wed Jul 23 12:06:57 2008
+Files:
+  OnboardFilter/.cvsignore  1.2
+  OnboardFilter/ChangeLog  1.926
+  OnboardFilter/OnboardFilter/FilterAlg.h  1.6
+  OnboardFilter/OnboardFilter/FilterTracks.h  1.12
+  OnboardFilter/OnboardFilter/filter_rto.h  1.1
+  OnboardFilter/OnboardFilter/OnboardFilterTDS.h  1.3
+  OnboardFilter/OnboardFilter/FilterDisplay.h  1.6
+  OnboardFilter/cmt/.cvsignore  1.2
+  OnboardFilter/cmt/requirements  1.106
+  OnboardFilter/cmt/Makefile  1.4
+  OnboardFilter/doc/release.notes  1.85
+  OnboardFilter/doc/OnboardFilter.jpg  1.3
+  OnboardFilter/src/GrbTrack.cxx  1.6
+  OnboardFilter/src/HIPFilterLibsB1-0-8.h  1.1
+  OnboardFilter/src/IFilterTool.h  1.3
+  OnboardFilter/src/CalOutputTool.cxx  1.4
+  OnboardFilter/src/MIPFilterLibsB1-1-0.cxx  1.1
+  OnboardFilter/src/GammaFilterCfgPrms.h  1.2
+  OnboardFilter/src/ObfInterface.h  1.10
+  OnboardFilter/src/MIPFilterLibsB1-0-8.h  1.1
+  OnboardFilter/src/GammaFilterLibsB1-1-0.cxx  1.1
+  OnboardFilter/src/OutputRtn.h  1.3
+  OnboardFilter/src/MIPFilterTool.cxx  1.15
+  OnboardFilter/src/trackProj.h  1.5
+  OnboardFilter/src/MIPFilterLibsB1-1-0.h  1.1
+  OnboardFilter/src/HIPFilterTool.cxx  1.15
+  OnboardFilter/src/OnboardFilter.cxx  1.83
+  OnboardFilter/src/GammaFilterCfgPrms.cxx  1.3
+  OnboardFilter/src/DGNFilterLibsB1-0-8.cxx  1.1
+  OnboardFilter/src/DGNFilterLibsB1-1-0.h  1.1
+  OnboardFilter/src/HIPFilterLibsB1-0-8.cxx  1.1
+  OnboardFilter/src/IFilterLibs.h  1.1
+  OnboardFilter/src/HIPFilterLibsB1-1-0.cxx  1.1
+  OnboardFilter/src/GammaFilterLibsB1-0-8.h  1.1
+  OnboardFilter/src/IFilterCfgPrms.h  1.1
+  OnboardFilter/src/GammaFilterLibsB1-1-0.h  1.1
+  OnboardFilter/src/TkrOutputTool.cxx  1.5
+  OnboardFilter/src/DGNFilterLibsB1-1-0.cxx  1.1
+  OnboardFilter/src/trackProj.cxx  1.7
+  OnboardFilter/src/GemOutputTool.cxx  1.4
+  OnboardFilter/src/FilterTrackTool.cxx  1.7
+  OnboardFilter/src/DGNFilterLibsB1-0-8.h  1.1
+  OnboardFilter/src/.cvsignore  1.1
+  OnboardFilter/src/DGNFilterTool.cxx  1.14
+  OnboardFilter/src/GrbTrack.h  1.3
+  OnboardFilter/src/HIPFilterLibsB1-1-0.h  1.1
+  OnboardFilter/src/MIPFilterLibsB1-0-8.cxx  1.1
+  OnboardFilter/src/Dll/OnboardFilter_dll.cxx  1.5
+  OnboardFilter/src/Dll/OnboardFilter_load.cxx  1.9
+  OnboardFilter/src/FSWHeaders/TFC_prjDef.h  1.1
+  OnboardFilter/src/FSWHeaders/CDM_pubdefs.h  1.1
+  OnboardFilter/src/FSWHeaders/EFC.h  1.1
+  OnboardFilter/src/test/jobOptions.txt  1.20
+  OnboardFilter/src/test/test_OnboardFilter.cxx  1.3
+
+    *
+------------------------------------------------------------
 User: usher  Wed Jul 23 11:59:28 PDT 2008
 OnboardFilter/doc
 
