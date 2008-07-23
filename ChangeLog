@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: usher  Wed Jul 23 11:52:41 PDT 2008
+OnboardFilter/src
+
+Modified Files:
+	FilterTrackTool.cxx 
+Log Message:
+Fixing number of hits on the tracks and x intercept position
+    *
+------------------------------------------------------------
 User: usher  Tue Jul 22 13:28:51 PDT 2008
 OnboardFilter/src
 
