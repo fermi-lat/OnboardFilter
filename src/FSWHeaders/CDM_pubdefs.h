@@ -6,11 +6,11 @@
 \brief Public include file for CDM package.
 
 \verbatim
-CVS $Id: CDM_pubdefs.h,v 1.6 2006/09/15 00:17:45 apw Exp $
+CVS $Id: CDM_pubdefs.h,v 1.1 2008/05/16 18:23:56 usher Exp $
 \endverbatim
 *//*-------------------------------------------------------------------------*/
 
-#include "CMX/CMX_asBuiltPub.h"
+#include "CAB/CAB_asBuiltPub.h"
 
 #ifdef __cplusplus
 extern "C" {
