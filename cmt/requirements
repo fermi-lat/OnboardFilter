@@ -1,6 +1,6 @@
 package OnboardFilter
-version v4r11p1
-# $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/cmt/requirements,v 1.105 2008/07/12 16:19:10 usher Exp $
+version v4r12p0
+# $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/cmt/requirements,v 1.106 2008/07/23 18:59:28 usher Exp $
 
 author Tracy Usher <usher@SLAC.Stanford.edu>
 
