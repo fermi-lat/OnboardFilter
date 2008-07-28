@@ -1,4 +1,22 @@
 ------------------------------------------------------------
+User: usher  Mon Jul 28 16:17:40 PDT 2008
+OnboardFilter/src
+
+Modified Files:
+	DGNFilterLibsB1-0-8.cxx DGNFilterLibsB1-0-8.h 
+	DGNFilterLibsB1-1-0.cxx DGNFilterLibsB1-1-0.h 
+	GammaFilterLibsB1-0-8.cxx GammaFilterLibsB1-0-8.h 
+	GammaFilterLibsB1-1-0.cxx GammaFilterLibsB1-1-0.h 
+	GammaFilterTool.cxx HIPFilterLibsB1-0-8.cxx 
+	HIPFilterLibsB1-0-8.h HIPFilterLibsB1-1-0.cxx 
+	HIPFilterLibsB1-1-0.h HIPFilterTool.cxx IFilterLibs.h 
+	MIPFilterLibsB1-0-8.cxx MIPFilterLibsB1-0-8.h 
+	MIPFilterLibsB1-1-0.cxx MIPFilterLibsB1-1-0.h 
+	MIPFilterTool.cxx 
+Log Message:
+Move labels for end of run output into the version specific classes to allow for bit definition changes.
+    *
+------------------------------------------------------------
 TAG
 Tag name: OnboardFilter-04-12-00, operation: add
 Package: OnboardFilter
