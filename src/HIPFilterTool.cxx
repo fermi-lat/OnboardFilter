@@ -1,7 +1,7 @@
 /**  @file HIPFilterTool.cxx
     @brief implementation of class HIPFilterTool
     
-  $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/HIPFilterTool.cxx,v 1.14 2008/06/26 12:50:58 usher Exp $  
+  $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/HIPFilterTool.cxx,v 1.15 2008/07/12 00:03:48 usher Exp $  
 */
 
 #include "IFilterTool.h"
@@ -104,8 +104,7 @@ private:
 
     //****** This section contains various useful member variables
     // Counters to keep track of bit frequency during a given run
-    int               m_vetoBits[17];   //array to count # of times each veto bit was set
-    int               m_statusBits[15]; //array to count # of times each veto bit was set
+    int               m_statusBits[32]; //array to count # of times each veto bit was set
 
     // Pointer to the filter library class with release specific information
     IFilterLibs*      m_filterLibs;
@@ -143,8 +142,7 @@ HIPFilterTool::HIPFilterTool(const std::string& type,
     declareProperty("verbosity",     m_verbosity     = 0);
     
     // zero our counters
-    memset(m_vetoBits,   0, 17*sizeof(int));
-    memset(m_statusBits, 0, 15*sizeof(int));
+    memset(m_statusBits, 0, 32*sizeof(int));
 
     return;
 }
@@ -362,24 +360,8 @@ void HIPFilterTool::eoeProcessing(EDS_fwIxb* ixb)
     // Add it to the TDS object
     obfFilterStatus->addFilterStatus(OnboardFilterTds::ObfFilterStatus::HIPFilter, hfcStat);
 
-    // Increment counters accordingly
-    if((statusWord & HFC_STATUS_M_STAGE_GEM) != 0)      m_statusBits[0]++;
-    if((statusWord & HFC_STATUS_M_STAGE_DIR) != 0)      m_statusBits[1]++;
-    if((statusWord & HFC_STATUS_M_STAGE_CAL) != 0)      m_statusBits[2]++;
-    if((statusWord & HFC_STATUS_M_STAGE_CAL_ECHK) != 0) m_statusBits[3]++;
-    if((statusWord & HFC_STATUS_M_STAGE_CAL_LCHK) != 0) m_statusBits[4]++;
-    if((statusWord & HFC_STATUS_M_MULTI_PKT) != 0)      m_statusBits[5]++;
-    if((statusWord & HFC_STATUS_M_ERR_CAL) != 0)        m_statusBits[6]++;
-    if((statusWord & HFC_STATUS_M_ERR_CTB) != 0)        m_statusBits[7]++;
-    if((statusWord & HFC_STATUS_M_ERR_DIR) != 0)        m_statusBits[8]++;
-
-    if((statusWord & HFC_STATUS_M_LYR_ENERGY) != 0)     m_vetoBits[0]++;
-    if((statusWord & HFC_STATUS_M_LYR_COUNTS) != 0)     m_vetoBits[1]++;
-    if((statusWord & HFC_STATUS_M_GEM_NOTKR) != 0)      m_vetoBits[2]++;
-    if((statusWord & HFC_STATUS_M_GEM_NOCALLO) != 0)    m_vetoBits[3]++;
-    if((statusWord & HFC_STATUS_M_GEM_NOCNO) != 0)      m_vetoBits[4]++;
-
-    if((statusWord & HFC_STATUS_M_VETOED) != 0)         m_vetoBits[16]++;
+    // Accumulate the status bit hits
+    for(int ib = 0; ib < 32; ib++) if (statusWord & 1 << ib) m_statusBits[ib]++;
 
     return;
 }
@@ -390,27 +372,14 @@ void HIPFilterTool::eorProcessing()
     MsgStream log(msgSvc(), name());
 
     // Output the bit frequency table
-    log << MSG::INFO << "-- HFC Filter bit frequency table -- \n" 
-        << "    Status Bit                         Value\n"
-        << "    HFC_STATUS_M_STAGE_GEM             " << m_statusBits[0] << "\n"       
-        << "    HFC_STATUS_M_STAGE_DIR             " << m_statusBits[1] << "\n"       
-        << "    HFC_STATUS_M_STAGE_CAL             " << m_statusBits[2] << "\n"      
-        << "    HFC_STATUS_M_STAGE_CAL_ECHK        " << m_statusBits[3] << "\n"
-        << "    HFC_STATUS_M_STAGE_CAL_LCHK        " << m_statusBits[4] << "\n"
-        << "    HFC_STATUS_M_MULTI_PKT             " << m_statusBits[5] << "\n"
-        << "    HFC_STATUS_M_ERR_CAL               " << m_statusBits[6] << "\n"
-        << "    HFC_STATUS_M_ERR_CTB               " << m_statusBits[7] << "\n"
-        << "    HFC_STATUS_M_ERR_DIR               " << m_statusBits[8] << "\n"
-    
-        << "    Veto Bit Summary" << "\n"
-        << "    Trigger Name                           Count\n" << "\n"
-        << "    HFC_STATUS_M_LYR_ENERGY            " << m_vetoBits[0] << "\n"
-        << "    HFC_STATUS_M_LYR_COUNTS            " << m_vetoBits[1] << "\n"
-        << "    HFC_STATUS_M_GEM_NOTKR             " << m_vetoBits[2] << "\n"
-        << "    HFC_STATUS_M_GEM_NOCALLO           " << m_vetoBits[3] << "\n"
-        << "    HFC_STATUS_M_NOCNO                 " << m_vetoBits[4] << "\n"
-        << "    HFC_STATUS_M_VETOED                " << m_vetoBits[16] << "\n"
-        << endreq;
+    log << MSG::INFO << "-- HIP Filter Status Word bit frequency table -- \n";
+
+    for(int ib = 0; ib < 32; ib++)
+    {
+        log << "    " << m_filterLibs->getStatWordDesc(ib) << " = " << m_statusBits[ib] << "\n";
+    }
+
+    log  << endreq;
 
     return;
 }

@@ -64,6 +64,40 @@ HIPFilterLibsB1_1_0::HIPFilterLibsB1_1_0()
     // Set EFC_DB_Schema filter id and cnt to "bad" values
     m_schema.filter.id  = 0xFFFF;
     m_schema.filter.cnt = 0;
+
+    // Descriptor for each bit
+    m_statusWordStringVec.push_back("HFC_STATUS_M_STAGE_GEM          ");
+    m_statusWordStringVec.push_back("HFC_STATUS_M_STAGE_DIR          ");
+    m_statusWordStringVec.push_back("HFC_STATUS_M_STAGE_CAL          ");
+    m_statusWordStringVec.push_back("HFC_STATUS_M_STAGE_CAL_ECHK     ");
+    m_statusWordStringVec.push_back("HFC_STATUS_M_STAGE_CAL_LCHK     ");
+    m_statusWordStringVec.push_back("HFC_STATUS_M_MULTI_PKT          ");
+    m_statusWordStringVec.push_back("HFC_STATUS_M_ERR_CAL            ");
+    m_statusWordStringVec.push_back("HFC_STATUS_M_ERR_CTB            ");
+    m_statusWordStringVec.push_back("HFC_STATUS_M_ERR_DIR            ");
+    m_statusWordStringVec.push_back("HFC_STATUS_M_RSVD_09            ");
+    m_statusWordStringVec.push_back("HFC_STATUS_M_RSVD_10            ");
+    m_statusWordStringVec.push_back("HFC_STATUS_M_RSVD_11            ");
+    m_statusWordStringVec.push_back("HFC_STATUS_M_RSVD_12            ");
+    m_statusWordStringVec.push_back("HFC_STATUS_M_RSVD_13            ");
+    m_statusWordStringVec.push_back("HFC_STATUS_M_RSVD_14            ");
+    m_statusWordStringVec.push_back("HFC_STATUS_M_RSVD_15            ");
+    m_statusWordStringVec.push_back("HFC_STATUS_M_RSVD_16            ");
+    m_statusWordStringVec.push_back("HFC_STATUS_M_RSVD_17            ");
+    m_statusWordStringVec.push_back("HFC_STATUS_M_RSVD_18            ");
+    m_statusWordStringVec.push_back("HFC_STATUS_M_RSVD_19            ");
+    m_statusWordStringVec.push_back("HFC_STATUS_M_RSVD_20            ");
+    m_statusWordStringVec.push_back("HFC_STATUS_M_RSVD_21            ");
+    m_statusWordStringVec.push_back("HFC_STATUS_M_RSVD_22            ");
+    m_statusWordStringVec.push_back("HFC_STATUS_M_RSVD_23            ");
+    m_statusWordStringVec.push_back("HFC_STATUS_M_RSVD_24            ");
+    m_statusWordStringVec.push_back("HFC_STATUS_M_RSVD_25            ");
+    m_statusWordStringVec.push_back("HFC_STATUS_M_LYR_ENERGY         ");
+    m_statusWordStringVec.push_back("HFC_STATUS_M_LYR_COUNTS         ");
+    m_statusWordStringVec.push_back("HFC_STATUS_M_GEM_NOTKR          ");
+    m_statusWordStringVec.push_back("HFC_STATUS_M_GEM_NOCALLO        ");
+    m_statusWordStringVec.push_back("HFC_STATUS_M_GEM_NOCNO          ");
+    m_statusWordStringVec.push_back("HFC_STATUS_M_VETOED             ");
 }
 
 HIPFilterLibsB1_1_0::~HIPFilterLibsB1_1_0()
@@ -90,4 +124,12 @@ const unsigned short int HIPFilterLibsB1_1_0::getInstanceId(const std::string& i
     if (idIter != m_instanceStringToIdMap.end()) typeId = idIter->second;
 
     return typeId;
+}
+
+// Return string description of a given bit in status word
+const std::string& HIPFilterLibsB1_1_0::getStatWordDesc(int idx) const
+{
+    if (idx < 0 || idx >= m_statusWordStringVec.size()) return "";
+
+    return m_statusWordStringVec[idx];
 }
