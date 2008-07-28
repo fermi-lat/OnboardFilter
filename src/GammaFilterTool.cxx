@@ -1,7 +1,7 @@
 /**  @file GammaFilterTool.cxx
     @brief implementation of class GammaFilterTool
     
-  $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/GammaFilterTool.cxx,v 1.16 2008/07/12 00:03:48 usher Exp $
+  $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/GammaFilterTool.cxx,v 1.17 2008/07/21 23:06:48 usher Exp $
 */
 
 #include "IFilterTool.h"
@@ -114,6 +114,7 @@ private:
     unsigned int      m_Zbottom_Emin;
 
     unsigned int      m_Cal_Epass;
+    unsigned int      m_Cal_Eveto;
     unsigned int      m_Cal_Emin;
     unsigned int      m_Cal_Emax;
     unsigned int      m_Cal_Layer0RatioLo;
@@ -194,6 +195,7 @@ GammaFilterTool::GammaFilterTool(const std::string& type,
     declareProperty("Zbottom_Emin",          m_Zbottom_Emin          = 0xFFFFFFFF);
 
     declareProperty("Cal_Epass",             m_Cal_Epass             = 0xFFFFFFFF);
+    declareProperty("Cal_Eveto",             m_Cal_Eveto             = 0xFFFFFFFF);
     declareProperty("Cal_Emin",              m_Cal_Emin              = 0xFFFFFFFF);
     declareProperty("Cal_Emax",              m_Cal_Emax              = 0xFFFFFFFF);
     declareProperty("Cal_Layer0RatioLo",     m_Cal_Layer0RatioLo     = 0xFFFFFFFF);
@@ -520,46 +522,12 @@ void GammaFilterTool::eorProcessing()
 {
     MsgStream log(msgSvc(), name());
 
-    // Descriptor for each bit
-    std::string statusBitDesc[] = {"GFC_STATUS_M_GEM_THROTTLE       ",
-                                   "GFC_STATUS_M_GEM_TKR            ",
-                                   "GFC_STATUS_M_GEM_CALLO          ",
-                                   "GFC_STATUS_M_GEM_CALHI          ",
-                                   "GFC_STATUS_M_GEM_CNO            ",
-                                   "GFC_STATUS_M_ACD_TOP            ",
-                                   "GFC_STATUS_M_ACD_SIDE           ",
-                                   "GFC_STATUS_M_ACD_SIDE_FILTER    ",
-                                   "GFC_STATUS_M_TKR_EQ_1           ",
-                                   "GFC_STATUS_M_TKR_GE_2           ",
-                                   "GFC_STATUS_M_HI_ENERGY          ",
-                                   "GFC_STATUS_M_RSVD_11            ",
-                                   "GFC_STATUS_M_RSVD_12            ",
-                                   "GFC_STATUS_M_RSVD_13            ",
-                                   "GFC_STATUS_M_ERR_CTB            ",
-                                   "GFC_STATUS_M_TKR_LT_2_ELO       ",
-                                   "GFC_STATUS_M_TKR_SKIRT          ",
-                                   "GFC_STATUS_M_TKR_EQ_0           ",
-                                   "GFC_STATUS_M_TKR_ROW2           ",
-                                   "GFC_STATUS_M_TKR_ROW01          ",
-                                   "GFC_STATUS_M_TKR_TOP            ",
-                                   "GFC_STATUS_M_ZBOTTOM            ",
-                                   "GFC_STATUS_M_EL0_ETOT_HI        ",
-                                   "GFC_STATUS_M_EL0_ETOT_LO        ",
-                                   "GFC_STATUS_M_SIDE               ",
-                                   "GFC_STATUS_M_TOP                ",
-                                   "GFC_STATUS_M_SPLASH_1           ",
-                                   "GFC_STATUS_M_E350_FILTER_TILE   ",
-                                   "GFC_STATUS_M_E0_TILE            ",
-                                   "GFC_STATUS_M_SPLASH_0           ",
-                                   "GFC_STATUS_M_NOCALLO_FILTER_TILE",
-                                   "GFC_STATUS_M_VETOED             " };
-
     // Output the bit frequency table
     log << MSG::INFO << "-- Gamma Filter Status Word bit frequency table -- \n";
 
     for(int ib = 0; ib < 32; ib++)
     {
-        log << "    " << statusBitDesc[ib] << " = " << m_statusBits[ib] << "\n";
+        log << "    " << m_filterLibs->getStatWordDesc(ib) << " = " << m_statusBits[ib] << "\n";
     }
 
     log  << endreq;

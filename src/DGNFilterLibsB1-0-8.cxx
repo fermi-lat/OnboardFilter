@@ -97,3 +97,11 @@ const unsigned short int DGNFilterLibsB1_0_8::getInstanceId(const std::string& i
 
     return typeId;
 }
+
+// Return string description of a given bit in status word
+const std::string& DGNFilterLibsB1_0_8::getStatWordDesc(int idx) const
+{
+    if (idx < 0 || idx >= m_statusWordStringVec.size()) return "";
+
+    return m_statusWordStringVec[idx];
+}

@@ -5,13 +5,14 @@
 *
 * @authors T. Usher
 *
-* $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/IFilterLibs.h,v 1.1 2008/02/07 19:36:42 usher Exp $
+* $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/IFilterLibs.h,v 1.1 2008/04/25 23:21:52 usher Exp $
 */
 
 #ifndef __IFilterLibs_H
 #define __IFilterLibs_H
 
 #include <string>
+#include <vector>
 #include <map>
 
 typedef std::pair<unsigned short int, unsigned short int> SchemaPair;
@@ -55,6 +56,9 @@ public:
 
     // Other way, given instance id string, return the typedef
     virtual const unsigned short int getInstanceId(const std::string& id) const = 0;
+
+    // Return string description of a given bit in status word
+    virtual const std::string& getStatWordDesc(int idx) const = 0;
 
     // Create a copy of the master configuration file that can be modified
     virtual void setMasterConfiguration(const EFC_DB_Schema* schema) = 0;

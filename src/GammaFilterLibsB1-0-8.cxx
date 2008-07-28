@@ -82,6 +82,40 @@ GammaFilterLibsB1_0_8::GammaFilterLibsB1_0_8()
     // Set EFC_DB_Schema filter id and cnt to "bad" values
     m_schema.filter.id  = 0xFFFF;
     m_schema.filter.cnt = 0;
+
+    // Descriptor for each bit
+    m_statusWordStringVec.push_back("GFC_V1_STATUS_M_GEM_THROTTLE       ");
+    m_statusWordStringVec.push_back("GFC_V1_STATUS_M_GEM_TKR            ");
+    m_statusWordStringVec.push_back("GFC_V1_STATUS_M_GEM_CALLO          ");
+    m_statusWordStringVec.push_back("GFC_V1_STATUS_M_GEM_CALHI          ");
+    m_statusWordStringVec.push_back("GFC_V1_STATUS_M_GEM_CNO            ");
+    m_statusWordStringVec.push_back("GFC_V1_STATUS_M_ACD_TOP            ");
+    m_statusWordStringVec.push_back("GFC_V1_STATUS_M_ACD_SIDE           ");
+    m_statusWordStringVec.push_back("GFC_V1_STATUS_M_ACD_SIDE_FILTER    ");
+    m_statusWordStringVec.push_back("GFC_V1_STATUS_M_TKR_EQ_1           ");
+    m_statusWordStringVec.push_back("GFC_V1_STATUS_M_TKR_GE_2           ");
+    m_statusWordStringVec.push_back("GFC_V1_STATUS_M_HI_ENERGY          ");
+    m_statusWordStringVec.push_back("GFC_V1_STATUS_M_RSVD_11            ");
+    m_statusWordStringVec.push_back("GFC_V1_STATUS_M_RSVD_12            ");
+    m_statusWordStringVec.push_back("GFC_V1_STATUS_M_RSVD_13            ");
+    m_statusWordStringVec.push_back("GFC_V1_STATUS_M_ERR_CTB            ");
+    m_statusWordStringVec.push_back("GFC_V1_STATUS_M_TKR_LT_2_ELO       ");
+    m_statusWordStringVec.push_back("GFC_V1_STATUS_M_TKR_SKIRT          ");
+    m_statusWordStringVec.push_back("GFC_V1_STATUS_M_TKR_EQ_0           ");
+    m_statusWordStringVec.push_back("GFC_V1_STATUS_M_TKR_ROW2           ");
+    m_statusWordStringVec.push_back("GFC_V1_STATUS_M_TKR_ROW01          ");
+    m_statusWordStringVec.push_back("GFC_V1_STATUS_M_TKR_TOP            ");
+    m_statusWordStringVec.push_back("GFC_V1_STATUS_M_ZBOTTOM            ");
+    m_statusWordStringVec.push_back("GFC_V1_STATUS_M_EL0_ETOT_HI        ");
+    m_statusWordStringVec.push_back("GFC_V1_STATUS_M_EL0_ETOT_LO        ");
+    m_statusWordStringVec.push_back("GFC_V1_STATUS_M_SIDE               ");
+    m_statusWordStringVec.push_back("GFC_V1_STATUS_M_TOP                ");
+    m_statusWordStringVec.push_back("GFC_V1_STATUS_M_SPLASH_1           ");
+    m_statusWordStringVec.push_back("GFC_V1_STATUS_M_E350_FILTER_TILE   ");
+    m_statusWordStringVec.push_back("GFC_V1_STATUS_M_E0_TILE            ");
+    m_statusWordStringVec.push_back("GFC_V1_STATUS_M_SPLASH_0           ");
+    m_statusWordStringVec.push_back("GFC_V1_STATUS_M_NOCALLO_FILTER_TILE");
+    m_statusWordStringVec.push_back("GFC_V1_STATUS_M_VETOED             ");
 }
 
 GammaFilterLibsB1_0_8::~GammaFilterLibsB1_0_8()
@@ -108,4 +142,12 @@ const unsigned short int GammaFilterLibsB1_0_8::getInstanceId(const std::string&
     if (idIter != m_instanceStringToIdMap.end()) typeId = idIter->second;
 
     return typeId;
+}
+
+// Return string description of a given bit in status word
+const std::string& GammaFilterLibsB1_0_8::getStatWordDesc(int idx) const
+{
+    if (idx < 0 || idx >= m_statusWordStringVec.size()) return "";
+
+    return m_statusWordStringVec[idx];
 }

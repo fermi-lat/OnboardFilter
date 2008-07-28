@@ -6,7 +6,7 @@
 *
 * @authors T. Usher
 *
-* $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/GammaFilterCfgPrms.h,v 1.1 2008/02/07 19:36:42 usher Exp $
+* $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/GammaFilterLibsB1-0-8.h,v 1.1 2008/04/25 23:21:52 usher Exp $
 */
 
 #ifndef __GammaFilterLibsB1_0_8_H
@@ -49,6 +49,9 @@ public:
     // Other way, given instance id string, return the typedef
     virtual const unsigned short int getInstanceId(const std::string& id) const;
 
+    // Return string description of a given bit in status word
+    virtual const std::string& getStatWordDesc(int idx) const;
+
     // Create a copy of the master configuration file that can be modified
     virtual void setMasterConfiguration(const EFC_DB_Schema* schema) {m_schema = *schema;}
 
@@ -68,6 +71,7 @@ private:
     std::string                               m_dummy;
     std::map<unsigned short int, std::string> m_instanceIdToStringMap;
     std::map<std::string, unsigned short int> m_instanceStringToIdMap;
+    std::vector<std::string>                  m_statusWordStringVec;
 
     EFC_DB_Schema      m_schema;
 };
