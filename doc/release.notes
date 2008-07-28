@@ -2,6 +2,7 @@
  * @file release.notes
  * @brief Package OnboardFilter
  * @verbatim
+ * v4r12p0 28-Jul-2008  TU  : First tag for B1-1-0
  * v4r11p1 23-Jul-2008  TU  : Fix y intercept and number of hits on tracks (when there are tracks)
  * v4r11p0 12-Jul-2008  TU  : Modify filter tools to no longer "leak" events (for MC), default MC mode like data
  *                            and also change default pedestal/gain file names to get "right" ones on linux
