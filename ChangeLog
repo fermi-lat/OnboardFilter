@@ -1,13 +1,4 @@
 ------------------------------------------------------------
-User: usher  Thu Jul 31 21:01:15 PDT 2008
-OnboardFilter/src
-
-Modified Files:
-	OnboardFilter.cxx 
-Log Message:
-Fix faux pas calling MootSvc when I know better
-    *
-------------------------------------------------------------
 TAG
 Tag name: OnboardFilter-04-12-01, operation: add
 Package: OnboardFilter
