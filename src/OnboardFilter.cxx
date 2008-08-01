@@ -6,7 +6,7 @@
 
 \verbatim
 
-  CVS $Id: OnboardFilter.cxx,v 1.82 2008/06/16 22:14:11 usher Exp $
+  CVS $Id: OnboardFilter.cxx,v 1.83 2008/06/18 00:37:45 usher Exp $
 \endverbatim
                                                                           */
 /* ---------------------------------------------------------------------- */
@@ -82,6 +82,7 @@ private:
     ActiveFilterVec  m_activeFilters;
 
     // Set up some counters for keeping track of various things we might encounter
+    int              m_events;          // # events run through filter
     int              m_rejected;        // # events rejected by filters
     int              m_noEbfData;       // # events with no ebf data (MC only? Trigger reject)
     bool             m_failNoEbfData;   // If we don't have ebf data should we crash?
@@ -111,7 +112,7 @@ const IAlgFactory& OnboardFilterFactory = Factory;
 //FilterInfo OnboardFilter::myFilterInfo;
 
 OnboardFilter::OnboardFilter(const std::string& name, ISvcLocator *pSvcLocator) : Algorithm(name,pSvcLocator), 
-          m_rejected(0), m_noEbfData(0), m_curMode(enums::Lsf::NoMode), m_mootSvc(0), m_initialized(false)
+          m_events(0), m_rejected(0), m_noEbfData(0), m_curMode(enums::Lsf::NoMode), m_mootSvc(0), m_initialized(false)
 {
 
     // Properties for this algorithm
@@ -305,49 +306,77 @@ StatusCode OnboardFilter::execute()
             log << MSG::INFO << "Detected a mode change from MetaEvent datagram, changing from " << m_curMode 
                 << " to " << mode << endreq;
 
-            // Look up from MootSvc the list of active filters (in case it changes) 
-            std::vector<CalibData::MootFilterCfg> filterCfgVec;
-            unsigned int filterCnt = m_mootSvc->getActiveFilters(filterCfgVec);
-
-            // Clear the active filter list and re-populate from Moot...
-            m_activeFilters.clear();
-
-            // Filter Tool pointer...
-            IFilterTool* toolPtr = 0;
-
-            // Loop through the available moot configurations. 
-            for(std::vector<CalibData::MootFilterCfg>::const_iterator filterIter = filterCfgVec.begin();
-                filterIter != filterCfgVec.end(); filterIter++)
+            // If moot is controlling the configuration, then go through here to set the modes
+            if (m_mootConfig.value())
             {
-                log << MSG::INFO << "Moot has filter " <<  filterIter->getName() << " as active" << endreq;
-                m_activeFilters.push_back(filterIter->getSchemaId());
+                // Look up from MootSvc the list of active filters (in case it changes) 
+                std::vector<CalibData::MootFilterCfg> filterCfgVec;
+                unsigned int filterCnt = m_mootSvc->getActiveFilters(filterCfgVec);
 
-                // Use the schema id to retrieve the tool name to change the mode for 
-                IdToNameMap::iterator nameIter = m_idToToolNameMap.find(filterIter->getSchemaId());
+                // Clear the active filter list and re-populate from Moot...
+                m_activeFilters.clear();
 
-                // Ok, this just can't happen, right?
-                if (nameIter == m_idToToolNameMap.end())
+                // Filter Tool pointer...
+                IFilterTool* toolPtr = 0;
+
+                // Loop through the available moot configurations. 
+                for(std::vector<CalibData::MootFilterCfg>::const_iterator filterIter = filterCfgVec.begin();
+                    filterIter != filterCfgVec.end(); filterIter++)
                 {
-                    log << MSG::ERROR << "Cannot translate Moot schema id " << filterIter->getSchemaId() << endreq;
-                    return StatusCode::FAILURE;
+                    log << MSG::INFO << "Moot has filter " <<  filterIter->getName() << " as active" << endreq;
+                    m_activeFilters.push_back(filterIter->getSchemaId());
+
+                    // Use the schema id to retrieve the tool name to change the mode for 
+                    IdToNameMap::iterator nameIter = m_idToToolNameMap.find(filterIter->getSchemaId());
+
+                    // Ok, this just can't happen, right?
+                    if (nameIter == m_idToToolNameMap.end())
+                    {
+                        log << MSG::ERROR << "Cannot translate Moot schema id " << filterIter->getSchemaId() << endreq;
+                        return StatusCode::FAILURE;
+                    }
+
+                    std::string filterTool = nameIter->second;
+
+                    // Look up the tool and check we found it... just in case...
+                    if (StatusCode sc = toolSvc()->retrieveTool(filterTool, toolPtr, this) == StatusCode::FAILURE)
+                    {
+                        log << MSG::ERROR << "Failed to find the " << filterTool << " tool" << endreq;
+                        return sc;
+                    }
+
+                    // Finally... set the new mode
+                    toolPtr->setMode(mode);
                 }
-
-                std::string filterTool = nameIter->second;
-
-                // Look up the tool and check we found it... just in case...
-                if (StatusCode sc = toolSvc()->retrieveTool(filterTool, toolPtr, this) == StatusCode::FAILURE)
+            }
+            // If no moot, then set the mode for all the filters we have set up
+            else
+            {
+                // Loop through the list of filters to configure
+                IFilterTool* toolPtr    = 0;
+                int          nFilters   = 0;
+                const std::vector<std::string>& filterList = m_filterList;
+                for(std::vector<std::string>::const_iterator filterIter = filterList.begin(); filterIter != filterList.end(); filterIter++)
                 {
-                    log << MSG::ERROR << "Failed to find the " << filterTool << " tool" << endreq;
-                    return sc;
-                }
+                    std::string filterTool = *filterIter + "Tool";
 
-                // Finally... set the new mode
-                toolPtr->setMode(mode);
+                    if (StatusCode sc = toolSvc()->retrieveTool(filterTool, toolPtr, this) == StatusCode::FAILURE)
+                    {
+                        log << MSG::ERROR << "Failed to initialize the " << *filterIter << " tool" << endreq;
+                        return sc;
+                    }
+
+                    // Dump the initialized configuration
+                    toolPtr->setMode(mode);
+                }
             }
 
             m_curMode = mode;
         }
     }
+
+    // Keep track of number of events
+    m_events++;
 
     // Back to event processing, first check for the ebf data
     SmartDataPtr<EbfWriterTds::Ebf> ebfData(eventSvc(),"/Event/Filter/Ebf");
