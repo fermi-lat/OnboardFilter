@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: ecephas  Wed Aug 20 11:33:59 PDT 2008
+GlastRelease-scons/OnboardFilter
+
+Modified Files:
+	SConscript 
+Log Message:
+Made formatting changes and combined mulitple 'listFiles' calls into one call.
+    *
+------------------------------------------------------------
 User: ecephas  Fri Aug 15 14:42:36 PDT 2008
 GlastRelease-scons/OnboardFilter
 
