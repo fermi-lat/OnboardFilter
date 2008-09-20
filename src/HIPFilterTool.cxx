@@ -1,7 +1,7 @@
 /**  @file HIPFilterTool.cxx
     @brief implementation of class HIPFilterTool
     
-  $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/HIPFilterTool.cxx,v 1.15 2008/07/12 00:03:48 usher Exp $  
+  $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/HIPFilterTool.cxx,v 1.16 2008/07/28 23:17:39 usher Exp $  
 */
 
 #include "IFilterTool.h"
@@ -40,7 +40,7 @@
 #include "FSWHeaders/EFC_sampler.h"
 
 // Contains all info for a particular filter's release
-#include "HIPFilterLibsB1-0-8.h"
+#include "HIPFilterLibsB1-1-3.h"
 
 // Useful stuff! 
 #include <map>
@@ -195,7 +195,7 @@ StatusCode HIPFilterTool::initialize()
         // Get ObfInterface pointer
         ObfInterface* obf = ObfInterface::instance();
 
-        m_filterLibs = new HIPFilterLibsB1_0_8();
+        m_filterLibs = new HIPFilterLibsB1_1_3();
         const EFC_DB_Schema& master = obf->loadFilterLibs(m_filterLibs, m_verbosity);
 
         // Check to see what mode we want to run... (if a different one requested via JO parameter)

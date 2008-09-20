@@ -1,7 +1,7 @@
 /**  @file GammaFilterTool.cxx
     @brief implementation of class GammaFilterTool
     
-  $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/GammaFilterTool.cxx,v 1.17 2008/07/21 23:06:48 usher Exp $
+  $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/GammaFilterTool.cxx,v 1.18 2008/07/28 23:17:39 usher Exp $
 */
 
 #include "IFilterTool.h"
@@ -41,7 +41,7 @@
 #include "FSWHeaders/EFC_sampler.h"
 
 // Contains all info for a particular filter's release
-#include "GammaFilterLibsB1-1-0.h"
+#include "GammaFilterLibsB1-1-3.h"
 
 // Useful stuff! 
 #include <map>
@@ -267,7 +267,7 @@ StatusCode GammaFilterTool::initialize()
         // Create the object which contains the release specific information for the Gamma Filter
         // This includes the library containing the filter code as well as the libraries which 
         // define the running configurations. 
-        m_filterLibs = new GammaFilterLibsB1_1_0();
+        m_filterLibs = new GammaFilterLibsB1_1_3();
 
         // Load the necessary libraries and obtain the master configuration file
         const EFC_DB_Schema& master = obf->loadFilterLibs(m_filterLibs, m_verbosity);
@@ -437,10 +437,10 @@ void GammaFilterTool::setMode(unsigned int mode)
         if (m_runAllStages)
         {
             // What did the filter want to use as a veto mask?
-            m_filterVetoMask = sampler->classes.enabled.all;
+            m_filterVetoMask = sampler->classes.enabled.vetoes;
 
             // Set the filter's veto mask to zero so it won't reject events
-            sampler->classes.enabled.all = 0;
+            sampler->classes.enabled.all &= ~m_filterVetoMask;
         }
         // Otherwise, modify the bits to ignore in the filter's veto mask
         else sampler->classes.enabled.all &= ~m_gamBitsToIgnore;
