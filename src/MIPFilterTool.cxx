@@ -1,7 +1,7 @@
 /**  @file MIPFilterTool.cxx
     @brief implementation of class MIPFilterTool
     
-  $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/MIPFilterTool.cxx,v 1.16 2008/07/28 23:17:39 usher Exp $  
+  $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/MIPFilterTool.cxx,v 1.17 2008/09/20 18:14:22 usher Exp $  
 */
 
 #include "IFilterTool.h"
@@ -40,7 +40,7 @@
 #include "FSWHeaders/EFC_sampler.h"
 
 // Contains all info for a particular filter's release
-#include "MIPFilterLibsB1-1-3.h"
+#include "MIPFilterLibsB1-1-2.h"
 
 // Useful stuff! 
 #include <map>
@@ -195,7 +195,7 @@ StatusCode MIPFilterTool::initialize()
         // Get ObfInterface pointer
         ObfInterface* obf = ObfInterface::instance();
 
-        m_filterLibs = new MIPFilterLibsB1_1_3();
+        m_filterLibs = new MIPFilterLibsB1_1_2();
         const EFC_DB_Schema& master = obf->loadFilterLibs(m_filterLibs, m_verbosity);
 
         // Check to see what mode we want to run... (if a different one requested via JO parameter)
