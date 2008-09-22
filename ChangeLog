@@ -1,4 +1,17 @@
 ------------------------------------------------------------
+User: usher  Mon Sep 22 15:41:48 PDT 2008
+OnboardFilter/src
+
+Removed Files:
+      Tag: v4r13p0
+	DGNFilterLibsB1-1-3.cxx DGNFilterLibsB1-1-3.h 
+	GammaFilterLibsB1-1-3.cxx GammaFilterLibsB1-1-3.h 
+	HIPFilterLibsB1-1-3.cxx HIPFilterLibsB1-1-3.h 
+	MIPFilterLibsB1-1-3.cxx MIPFilterLibsB1-1-3.h 
+Log Message:
+Preparing to tag v4r13p1
+    *
+------------------------------------------------------------
 User: usher  Mon Sep 22 15:41:47 PDT 2008
 OnboardFilter/doc
 
