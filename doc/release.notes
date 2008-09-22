@@ -3,6 +3,7 @@
  * @brief Package OnboardFilter
  * @verbatim
  *
+ * v4r13p1 22-Sep-2008  TU  : Remove the B1-1-3 files that got tagged by mistake
  * v4r13p0 22-Sep-2008  TU  : FSW B1-1-2 (almost no changes really)
  * v4r12p2 31-Jul-2008  TU  : Don't call MootSvc when its not active
  * v4r12p1 28-Jul-2008  TU  : Move output strings for status word bits to version dependent classes
