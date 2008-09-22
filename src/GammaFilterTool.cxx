@@ -1,7 +1,7 @@
 /**  @file GammaFilterTool.cxx
     @brief implementation of class GammaFilterTool
     
-  $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/GammaFilterTool.cxx,v 1.18 2008/07/28 23:17:39 usher Exp $
+  $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/GammaFilterTool.cxx,v 1.19 2008/09/20 18:14:22 usher Exp $
 */
 
 #include "IFilterTool.h"
@@ -30,9 +30,7 @@
 #include "FSWHeaders/CDM_pubdefs.h"
 #include "EFC_DB/EFC_DB_schema.h"
 #include "EFC_DB/EH_ids.h"
-#include "GFC_DB/GFC_DB_V2_schema.h"
 #include "GFC_DB/GAMMA_DB_instance.h"
-#include "EFC/GFC_V2_status.h"
 
 #include "FSWHeaders/EFC.h"
 #include "LSE/LFR_key.h"
@@ -496,8 +494,8 @@ void GammaFilterTool::eoeProcessing(EDS_fwIxb* ixb)
         // If any unmasked veto bits are set then set the general event vetoed bit 
         if (oldStatusWord & m_filterVetoMask) // && !hiEPass)
         {
-            oldStatusWord |= GFC_V2_STATUS_M_VETOED;
-            statusWord    |= GFC_V2_STATUS_M_VETOED;
+            oldStatusWord |= GFC_V3_STATUS_M_VETOED;
+            statusWord    |= GFC_V3_STATUS_M_VETOED;
             sb            |= EDS_RSD_SB_M_VETOED;
         }
     }

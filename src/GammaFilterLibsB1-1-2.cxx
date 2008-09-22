@@ -2,15 +2,15 @@
 #include <stdio.h>
 #include <errno.h>
 
-#include "GammaFilterLibsB1-1-3.h"
+#include "GammaFilterLibsB1-1-2.h"
 
-#include "GFC_DB/GFC_DB_V3_schema.h"
+#include "GFC_DB/GFC_DB_V2_schema.h"
 #include "GFC_DB/GAMMA_DB_instance.h"
 
-GammaFilterLibsB1_1_3::GammaFilterLibsB1_1_3()
+GammaFilterLibsB1_1_2::GammaFilterLibsB1_1_2()
 {
     // Release for this setup 
-    m_release        = "B1-1-3";
+    m_release        = "B1-1-2";
 
     // The Filter library name
     m_libName        = "gfc";
@@ -88,47 +88,47 @@ GammaFilterLibsB1_1_3::GammaFilterLibsB1_1_3()
     // Strings for output at end of processing
 
     // Descriptor for each bit
-    m_statusWordStringVec.push_back("GFC_V3_STATUS_M_GEM_THROTTLE       ");
-    m_statusWordStringVec.push_back("GFC_V3_STATUS_M_GEM_TKR            ");
-    m_statusWordStringVec.push_back("GFC_V3_STATUS_M_GEM_CALLO          ");
-    m_statusWordStringVec.push_back("GFC_V3_STATUS_M_GEM_CALHI          ");
-    m_statusWordStringVec.push_back("GFC_V3_STATUS_M_GEM_CNO            ");
-    m_statusWordStringVec.push_back("GFC_V3_STATUS_M_ACD_TOP            ");
-    m_statusWordStringVec.push_back("GFC_V3_STATUS_M_ACD_SIDE           ");
-    m_statusWordStringVec.push_back("GFC_V3_STATUS_M_ACD_SIDE_FILTER    ");
-    m_statusWordStringVec.push_back("GFC_V3_STATUS_M_TKR_EQ_1           ");
-    m_statusWordStringVec.push_back("GFC_V3_STATUS_M_TKR_GE_2           ");
-    m_statusWordStringVec.push_back("GFC_V3_STATUS_M_RSVD_10            ");
-    m_statusWordStringVec.push_back("GFC_V3_STATUS_M_TKR_LT_2_ELO       ");
-    m_statusWordStringVec.push_back("GFC_V3_STATUS_M_TKR_SKIRT          ");
-    m_statusWordStringVec.push_back("GFC_V3_STATUS_M_TKR_EQ_0           ");
-    m_statusWordStringVec.push_back("GFC_V3_STATUS_M_TKR_ROW2           ");
-    m_statusWordStringVec.push_back("GFC_V3_STATUS_M_TKR_ROW01          ");
-    m_statusWordStringVec.push_back("GFC_V3_STATUS_M_TKR_TOP            ");
-    m_statusWordStringVec.push_back("GFC_V3_STATUS_M_SIDE               ");
-    m_statusWordStringVec.push_back("GFC_V3_STATUS_M_TOP                ");
-    m_statusWordStringVec.push_back("GFC_V3_STATUS_M_ZBOTTOM            ");
-    m_statusWordStringVec.push_back("GFC_V3_STATUS_M_ERR_CTB            ");
-    m_statusWordStringVec.push_back("GFC_V3_STATUS_M_SPLASH_1           ");
-    m_statusWordStringVec.push_back("GFC_V3_STATUS_M_E350_FILTER_TILE   ");
-    m_statusWordStringVec.push_back("GFC_V3_STATUS_M_E0_TILE            ");
-    m_statusWordStringVec.push_back("GFC_V3_STATUS_M_EL0_ETOT_HI        ");
-    m_statusWordStringVec.push_back("GFC_V3_STATUS_M_EL0_ETOT_LO        ");
-    m_statusWordStringVec.push_back("GFC_V3_STATUS_M_LO_ENERGY          ");
-    m_statusWordStringVec.push_back("GFC_V3_STATUS_M_HI_ENERGY          ");
-    m_statusWordStringVec.push_back("GFC_V3_STATUS_M_SPLASH_0           ");
-    m_statusWordStringVec.push_back("GFC_V3_STATUS_M_NOCALLO_FILTER_TILE");
-    m_statusWordStringVec.push_back("GFC_V3_STATUS_M_NON_PHYSICS        ");
-    m_statusWordStringVec.push_back("GFC_V3_STATUS_M_VETOED             ");
+    m_statusWordStringVec.push_back("GFC_V2_STATUS_M_GEM_THROTTLE       ");
+    m_statusWordStringVec.push_back("GFC_V2_STATUS_M_GEM_TKR            ");
+    m_statusWordStringVec.push_back("GFC_V2_STATUS_M_GEM_CALLO          ");
+    m_statusWordStringVec.push_back("GFC_V2_STATUS_M_GEM_CALHI          ");
+    m_statusWordStringVec.push_back("GFC_V2_STATUS_M_GEM_CNO            ");
+    m_statusWordStringVec.push_back("GFC_V2_STATUS_M_ACD_TOP            ");
+    m_statusWordStringVec.push_back("GFC_V2_STATUS_M_ACD_SIDE           ");
+    m_statusWordStringVec.push_back("GFC_V2_STATUS_M_ACD_SIDE_FILTER    ");
+    m_statusWordStringVec.push_back("GFC_V2_STATUS_M_TKR_EQ_1           ");
+    m_statusWordStringVec.push_back("GFC_V2_STATUS_M_TKR_GE_2           ");
+    m_statusWordStringVec.push_back("GFC_V2_STATUS_M_RSVD_10            ");
+    m_statusWordStringVec.push_back("GFC_V2_STATUS_M_RSVD_11            ");
+    m_statusWordStringVec.push_back("GFC_V2_STATUS_M_ERR_CTB            ");
+    m_statusWordStringVec.push_back("GFC_V2_STATUS_M_TKR_LT_2_ELO       ");
+    m_statusWordStringVec.push_back("GFC_V2_STATUS_M_TKR_SKIRT          ");
+    m_statusWordStringVec.push_back("GFC_V2_STATUS_M_TKR_EQ_0           ");
+    m_statusWordStringVec.push_back("GFC_V2_STATUS_M_TKR_ROW2           ");
+    m_statusWordStringVec.push_back("GFC_V2_STATUS_M_TKR_ROW01          ");
+    m_statusWordStringVec.push_back("GFC_V2_STATUS_M_TKR_TOP            ");
+    m_statusWordStringVec.push_back("GFC_V2_STATUS_M_ZBOTTOM            ");
+    m_statusWordStringVec.push_back("GFC_V2_STATUS_M_EL0_ETOT_HI        ");
+    m_statusWordStringVec.push_back("GFC_V2_STATUS_M_EL0_ETOT_LO        ");
+    m_statusWordStringVec.push_back("GFC_V2_STATUS_M_HI_ENERGY          ");
+    m_statusWordStringVec.push_back("GFC_V2_STATUS_M_LO_ENERGY          ");
+    m_statusWordStringVec.push_back("GFC_V2_STATUS_M_SIDE               ");
+    m_statusWordStringVec.push_back("GFC_V2_STATUS_M_TOP                ");
+    m_statusWordStringVec.push_back("GFC_V2_STATUS_M_SPLASH_1           ");
+    m_statusWordStringVec.push_back("GFC_V2_STATUS_M_E350_FILTER_TILE   ");
+    m_statusWordStringVec.push_back("GFC_V2_STATUS_M_E0_TILE            ");
+    m_statusWordStringVec.push_back("GFC_V2_STATUS_M_SPLASH_0           ");
+    m_statusWordStringVec.push_back("GFC_V2_STATUS_M_NOCALLO_FILTER_TILE");
+    m_statusWordStringVec.push_back("GFC_V2_STATUS_M_VETOED             ");
 
 }
 
-GammaFilterLibsB1_1_3::~GammaFilterLibsB1_1_3()
+GammaFilterLibsB1_1_2::~GammaFilterLibsB1_1_2()
 {
 }
 
 // Given instance id typedef, return the string version of it
-const std::string& GammaFilterLibsB1_1_3::getInstanceIdString(unsigned short int id) const
+const std::string& GammaFilterLibsB1_1_2::getInstanceIdString(unsigned short int id) const
 {
     std::map<unsigned short int, std::string>::const_iterator idIter = m_instanceIdToStringMap.find(id);
 
@@ -138,7 +138,7 @@ const std::string& GammaFilterLibsB1_1_3::getInstanceIdString(unsigned short int
 }
 
 // Other way, given instance id string, return the typedef
-const unsigned short int GammaFilterLibsB1_1_3::getInstanceId(const std::string& id) const
+const unsigned short int GammaFilterLibsB1_1_2::getInstanceId(const std::string& id) const
 {
     unsigned short int typeId = -1;
 
@@ -150,7 +150,7 @@ const unsigned short int GammaFilterLibsB1_1_3::getInstanceId(const std::string&
 }
 
 // Return string description of a given bit in status word
-const std::string& GammaFilterLibsB1_1_3::getStatWordDesc(int idx) const
+const std::string& GammaFilterLibsB1_1_2::getStatWordDesc(int idx) const
 {
     if (idx < 0 || idx >= m_statusWordStringVec.size()) return "";
 
