@@ -1,4 +1,18 @@
 ------------------------------------------------------------
+User: usher  Mon Sep 22 12:38:20 PDT 2008
+OnboardFilter/src
+
+Modified Files:
+	DGNFilterTool.cxx GammaFilterTool.cxx HIPFilterTool.cxx 
+	MIPFilterTool.cxx 
+Added Files:
+	DGNFilterLibsB1-1-2.cxx DGNFilterLibsB1-1-2.h 
+	HIPFilterLibsB1-1-2.cxx HIPFilterLibsB1-1-2.h 
+	MIPFilterLibsB1-1-2.cxx MIPFilterLibsB1-1-2.h 
+Log Message:
+These updates are for FSW release B1-1-2
+    *
+------------------------------------------------------------
 User: usher  Mon Sep 22 09:27:54 PDT 2008
 OnboardFilter/src
 
