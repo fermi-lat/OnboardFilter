@@ -1,4 +1,15 @@
 ------------------------------------------------------------
+User: usher  Mon Sep 22 09:27:54 PDT 2008
+OnboardFilter/src
+
+Modified Files:
+	GammaFilterLibsB1-1-3.cxx GammaFilterTool.cxx 
+Added Files:
+	GammaFilterLibsB1-1-2.cxx GammaFilterLibsB1-1-2.h 
+Log Message:
+Add in some updates to handle B1-1-2 (is this ever to be used?)
+    *
+------------------------------------------------------------
 User: usher  Sat Sep 20 11:14:22 PDT 2008
 OnboardFilter/src
 
