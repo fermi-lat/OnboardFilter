@@ -1,7 +1,7 @@
 /**  @file GammaFilterTool.cxx
     @brief implementation of class GammaFilterTool
     
-  $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/GammaFilterTool.cxx,v 1.19 2008/09/20 18:14:22 usher Exp $
+  $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/GammaFilterTool.cxx,v 1.20 2008/09/22 16:27:54 usher Exp $
 */
 
 #include "IFilterTool.h"
@@ -39,7 +39,7 @@
 #include "FSWHeaders/EFC_sampler.h"
 
 // Contains all info for a particular filter's release
-#include "GammaFilterLibsB1-1-3.h"
+#include "GammaFilterLibsB1-1-2.h"
 
 // Useful stuff! 
 #include <map>
@@ -265,7 +265,7 @@ StatusCode GammaFilterTool::initialize()
         // Create the object which contains the release specific information for the Gamma Filter
         // This includes the library containing the filter code as well as the libraries which 
         // define the running configurations. 
-        m_filterLibs = new GammaFilterLibsB1_1_3();
+        m_filterLibs = new GammaFilterLibsB1_1_2();
 
         // Load the necessary libraries and obtain the master configuration file
         const EFC_DB_Schema& master = obf->loadFilterLibs(m_filterLibs, m_verbosity);
@@ -494,8 +494,8 @@ void GammaFilterTool::eoeProcessing(EDS_fwIxb* ixb)
         // If any unmasked veto bits are set then set the general event vetoed bit 
         if (oldStatusWord & m_filterVetoMask) // && !hiEPass)
         {
-            oldStatusWord |= GFC_V3_STATUS_M_VETOED;
-            statusWord    |= GFC_V3_STATUS_M_VETOED;
+            oldStatusWord |= GFC_V2_STATUS_M_VETOED;
+            statusWord    |= GFC_V2_STATUS_M_VETOED;
             sb            |= EDS_RSD_SB_M_VETOED;
         }
     }

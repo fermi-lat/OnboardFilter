@@ -1,7 +1,7 @@
 /**  @file DGNFilterTool.cxx
     @brief implementation of class DGNFilterTool
     
-  $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/DGNFilterTool.cxx,v 1.14 2008/07/12 00:03:48 usher Exp $  
+  $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/DGNFilterTool.cxx,v 1.15 2008/09/20 18:14:22 usher Exp $  
 */
 
 #include "IFilterTool.h"
@@ -40,7 +40,7 @@
 #include "FSWHeaders/EFC_sampler.h"
 
 // Contains all info for a particular filter's release
-#include "DGNFilterLibsB1-1-3.h"
+#include "DGNFilterLibsB1-1-2.h"
 
 // Useful stuff! 
 #include <map>
@@ -196,7 +196,7 @@ StatusCode DGNFilterTool::initialize()
         // Get ObfInterface pointer
         ObfInterface* obf = ObfInterface::instance();
 
-        m_filterLibs = new DGNFilterLibsB1_1_3();
+        m_filterLibs = new DGNFilterLibsB1_1_2();
         const EFC_DB_Schema& master = obf->loadFilterLibs(m_filterLibs, m_verbosity);
 
         // Check to see what mode we want to run... (if a different one requested via JO parameter)
