@@ -1,4 +1,12 @@
 ------------------------------------------------------------
+User: glastrm  Mon Sep 22 13:30:18 PDT 2008
+OnboardFilter
+
+Modified Files:
+	SConscript 
+Log Message:
+    *
+------------------------------------------------------------
 TAG
 Tag name: v4r13p0, operation: add
 Package: OnboardFilter
