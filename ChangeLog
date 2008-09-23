@@ -1,4 +1,18 @@
 ------------------------------------------------------------
+User: usher  Mon Sep 22 20:08:12 PDT 2008
+OnboardFilter/src
+
+Modified Files:
+	GammaFilterTool.cxx 
+Added Files:
+	DGNFilterLibsB1-1-3.cxx DGNFilterLibsB1-1-3.h 
+	GammaFilterLibsB1-1-3.cxx GammaFilterLibsB1-1-3.h 
+	HIPFilterLibsB1-1-3.cxx HIPFilterLibsB1-1-3.h 
+	MIPFilterLibsB1-1-3.cxx MIPFilterLibsB1-1-3.h 
+Log Message:
+Restoring changes necessary for B1-1-3
+    *
+------------------------------------------------------------
 TAG
 Tag name: OnboardFilter-04-13-01, operation: add
 Package: OnboardFilter
