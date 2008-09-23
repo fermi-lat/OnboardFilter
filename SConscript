@@ -1,7 +1,7 @@
 # -*- python -*-
-# $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/SConscript,v 1.3 2008/09/22 20:30:18 glastrm Exp $
+# $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/SConscript,v 1.4 2008/09/22 23:30:17 glastrm Exp $
 # Authors: Tracy Usher <usher@SLAC.Stanford.edu>
-# Version: OnboardFilter-04-13-01
+# Version: OnboardFilter-04-14-00
 Import('baseEnv')
 Import('listFiles')
 Import('packages')
