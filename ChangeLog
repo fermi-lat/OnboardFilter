@@ -1,4 +1,19 @@
 ------------------------------------------------------------
+User: ecephas  Wed Oct 22 10:12:28 PDT 2008
+GlastRelease-scons/OnboardFilter
+
+Modified Files:
+	OnboardFilterLib.py 
+Log Message:
+Added the following libraries:
+
+     env.Tool('addLibrary', library = env['obfLibs'])
+     env.Tool('addLibrary', library = env['gaudiLibs'])
+     env.Tool('OnboardFilterTdsLib')
+     env.Tool('addLibrary', library = env['rootLibs'])
+
+    *
+------------------------------------------------------------
 User: ecephas  Wed Oct 22 10:11:38 PDT 2008
 GlastRelease-scons/OnboardFilter
 
