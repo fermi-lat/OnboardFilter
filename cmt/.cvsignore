@@ -1,5 +1,0 @@
-setup.*
-cleanup.*
-*.mak
-NMake
-*.make
