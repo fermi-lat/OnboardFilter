@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: ecephas  Mon Dec  8 13:40:05 PST 2008
+GlastRelease-scons/OnboardFilter
+
+Modified Files:
+	SConscript 
+Log Message:
+Check in SConscript for OnboardFilter v4r14 (for branch-tag, GlastReleasev15r49) 
+    *
+------------------------------------------------------------
 User: ecephas  Wed Oct 22 10:12:28 PDT 2008
 GlastRelease-scons/OnboardFilter
 
