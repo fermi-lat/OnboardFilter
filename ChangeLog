@@ -2,6 +2,16 @@
 TAG
 Tag name: OnboardFilter-04-14-00, operation: mov
 Package: OnboardFilter
+User: glast  Mon Dec  8 16:19:04 2008
+Files:
+  OnboardFilter/OnboardFilterLib.py  1.2
+  OnboardFilter/OnboardFilterLib.py  1.2
+
+    *
+------------------------------------------------------------
+TAG
+Tag name: OnboardFilter-04-14-00, operation: mov
+Package: OnboardFilter
 User: glast  Mon Dec  8 14:41:26 2008
 Files:
   OnboardFilter/SConscript  1.7
