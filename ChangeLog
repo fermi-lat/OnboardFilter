@@ -2,6 +2,22 @@
 TAG
 Tag name: OnboardFilter-04-14-01, operation: add
 Package: OnboardFilter
+User: glastrm  Fri Dec 19 11:31:18 2008
+Files:
+  OnboardFilter/src/Dll/OnboardFilter_dll.cxx  1.5
+  OnboardFilter/src/Dll/OnboardFilter_load.cxx  1.9
+  OnboardFilter/src/FSWHeaders/TFC_prjDef.h  1.1
+  OnboardFilter/src/FSWHeaders/EFC_sampler.h  1.2
+  OnboardFilter/src/FSWHeaders/CDM_pubdefs.h  1.2
+  OnboardFilter/src/FSWHeaders/EFC.h  1.1
+  OnboardFilter/src/test/jobOptions.txt  1.21
+  OnboardFilter/src/test/test_OnboardFilter.cxx  1.3
+
+    *
+------------------------------------------------------------
+TAG
+Tag name: OnboardFilter-04-14-01, operation: add
+Package: OnboardFilter
 User: glastrm  Fri Dec 19 11:31:13 2008
 Files:
 
