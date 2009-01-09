@@ -1,5 +1,27 @@
 ------------------------------------------------------------
 TAG
+Tag name: GlastRelease-15-50-10, operation: del
+Package: OnboardFilter
+User: glastrm  Fri Jan  9 08:30:40 2009
+Files:
+  OnboardFilter/OnboardFilterLib.py  1.1
+  OnboardFilter/.cvsignore  1.2
+  OnboardFilter/ChangeLog  1.973
+  OnboardFilter/SConscript  1.8
+  OnboardFilter/OnboardFilter/FilterAlg.h  1.6
+  OnboardFilter/OnboardFilter/FilterTracks.h  1.12
+  OnboardFilter/OnboardFilter/filter_rto.h  1.1
+  OnboardFilter/OnboardFilter/OnboardFilterTDS.h  1.3
+  OnboardFilter/OnboardFilter/FilterDisplay.h  1.6
+  OnboardFilter/cmt/.cvsignore  1.2
+  OnboardFilter/cmt/requirements  1.113
+  OnboardFilter/cmt/Makefile  1.4
+  OnboardFilter/doc/release.notes  1.92
+  OnboardFilter/doc/OnboardFilter.jpg  1.3
+
+    *
+------------------------------------------------------------
+TAG
 Tag name: GlastRelease-15-50-10, operation: add
 Package: OnboardFilter
 User: glastrm  Thu Jan  8 15:04:47 2009
