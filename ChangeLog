@@ -1,4 +1,17 @@
 ------------------------------------------------------------
+TAG
+Tag name: OnboardFilter-04-14-00, operation: mov
+Package: OnboardFilter
+User: glastrm  Thu Jan 22 16:31:38 2009
+Files:
+  OnboardFilter/SConscript  1.9
+  OnboardFilter/SConscript  1.9
+  OnboardFilter/SConscript  1.9
+  OnboardFilter/OnboardFilterLib.py  1.2
+  OnboardFilter/OnboardFilterLib.py  1.2
+
+    *
+------------------------------------------------------------
 User: ecephas  Thu Jan 22 16:07:12 PST 2009
 GlastRelease-scons/OnboardFilter
 
