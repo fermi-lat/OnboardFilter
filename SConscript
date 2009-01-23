@@ -1,5 +1,5 @@
 # -*- python -*-
-# $Header: /nfs/slac/g/glast/ground/cvs/GlastRelease-scons/OnboardFilter/SConscript,v 1.5 2008/09/23 04:30:12 glastrm Exp $
+# $Header: /nfs/slac/g/glast/ground/cvs/GlastRelease-scons/OnboardFilter/SConscript,v 1.6 2008/10/22 17:11:38 ecephas Exp $
 # Authors: Tracy Usher <usher@SLAC.Stanford.edu>
 # Version: OnboardFilter-04-14-00
 Import('baseEnv')
@@ -27,3 +27,7 @@ test_OnboardFilter = progEnv.GaudiProgram('test_OnboardFilter', listFiles(['src/
 progEnv.Tool('registerObjects', package = 'OnboardFilter', libraries = [OnboardFilter], 
 	testApps = [test_OnboardFilter], 
 	includes = listFiles(['OnboardFilter/*.h']))
+
+
+
+
