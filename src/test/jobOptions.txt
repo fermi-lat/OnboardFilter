@@ -1,7 +1,7 @@
 //##############################################################
 //
 // basic Job options file for a Gleam execution
-// $Header: /nfs/slac/g/glast/ground/cvs/GlastRelease-scons/OnboardFilter/src/test/jobOptions.txt,v 1.19 2008/06/22 13:45:56 usher Exp $
+// $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/test/jobOptions.txt,v 1.20 2008/07/21 15:17:33 glastrm Exp $
 
 // primary DLLs, including auditor 
 
@@ -60,7 +60,7 @@ Triggered.Members={
 ApplicationMgr.DLLs +={ "Trigger"};
 ApplicationMgr.ExtSvc += { "LivetimeSvc"}; 
 LivetimeSvc.InterleaveMode = false; // interleave mode kills events on a statistical basis 
-TriggerAlg.mask = -1; // all bits on by default: reject if none set (e.g., missed)
+TriggerAlg.mask = "0xffffffff"; // all bits on by default: reject if none set (e.g., missed)
 
 // The following is for the new Trigger Configuration Service
 TriggerAlg.engine="ConfigSvc"; // use TrgConfigSvc to configure trigger engines. The following options control the configuration:
