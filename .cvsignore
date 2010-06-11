@@ -5,3 +5,5 @@ Visual
 setup.*
 *.mak*
 VC*
+build
+*.pyc
