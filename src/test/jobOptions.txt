@@ -1,7 +1,7 @@
 //##############################################################
 //
 // basic Job options file for a Gleam execution
-// $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/test/jobOptions.txt,v 1.21 2008/12/19 17:14:17 usher Exp $
+// $Header: /nfs/slac/g/glast/ground/cvs/GlastRelease-scons/OnboardFilter/src/test/jobOptions.txt,v 1.22 2009/09/15 18:13:37 heather Exp $
 
 // primary DLLs, including auditor 
 
@@ -70,9 +70,9 @@ TriggerAlg.applyPrescales = false;
 //TriggerAlg.applyDeadtime=true; // throw away events if GEM is busy
 //TriggerAlg.useGltWordForData=true; //when prescaling data use Glt word instead of Gem word
 
-#include "$MOOTSVCROOT/src/defaultOptions.txt"
+#include "$MOOTSVCJOBOPTIONSPATH/defaultOptions.txt"
 // Configuration.  This gets the configuration from files in the release
-#include "$CONFIGSVCROOT/src/configOptions_noMoot.txt"
+#include "$CONFIGSVCJOBOPTIONSPATH/configOptions_noMoot.txt"
 
 // ----------------------------
 //  onboard filter 
@@ -103,9 +103,9 @@ ApplicationMgr.ExtSvc += { "GlastRandomSvc"};
 //  Generation and simulation
 //
 //  get the parameters for simulation -- misnamed the file :-(
-#include "$G4GENERATORROOT/src/basicOptions.txt"
+#include "$G4GENERATORJOBOPTIONSPATH/basicOptions.txt"
 
-#include "$FLUXSVCROOT/src/defaultOptions.txt"
+#include "$FLUXSVCJOBOPTIONSPATH/defaultOptions.txt"
 FluxAlg.source_name="default";
 
 FluxSvc.source_lib += {"$(G4GENERATORROOT)/src/test/test_sources.xml"};
@@ -125,7 +125,7 @@ FluxSvc.source_lib += {
 //  Calorimeter services
 //
 ApplicationMgr.Dlls += {"CalXtalResponse"};
-#include "$CALXTALRESPONSEROOT/src/defaultOptions.txt"
+#include "$CALXTALRESPONSEJOBOPTIONSPATH/defaultOptions.txt"
 
 // output levels, including suppression to allow debug, info
 ToolSvc.OutputLevel=3;    // too verbose in debug
