@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: jrb  Tue Jun 15 17:36:31 PDT 2010
+GlastRelease-scons/OnboardFilter/src
+
+Modified Files:
+	FSWAuxLibsTool.cxx 
+Log Message:
+for SCons, don't need no stinking environment variables
+    *
+------------------------------------------------------------
 TAG
 Tag name: OnboardFilter-04-14-03, operation: add
 Package: OnboardFilter
