@@ -1,5 +1,5 @@
 # -*- python -*-
-# $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/SConscript,v 1.12 2010/06/12 22:39:02 jrb Exp $
+# $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/SConscript,v 1.13 2010/09/01 06:17:33 jrb Exp $
 # Authors: Tracy Usher <usher@SLAC.Stanford.edu>
 # Version: OnboardFilter-04-14-04
 Import('baseEnv')
@@ -25,7 +25,7 @@ OnboardFilter = libEnv.SharedLibrary('OnboardFilter', listFiles(['src/*.cxx',
 						'src/Dll/*.cxx']))
 
 progEnv.Tool('OnboardFilterLib')
-test_OnboardFilter = progEnv.GaudiProgram('test_OnboardFilter', listFiles(['src/test/*.cxx']), test=1, package='OnboardBilter')
+test_OnboardFilter = progEnv.GaudiProgram('test_OnboardFilter', listFiles(['src/test/*.cxx']), test=1, package='OnboardFilter')
 
 progEnv.Tool('registerTargets', package = 'OnboardFilter',
 	     libraryCxts = [[OnboardFilter, libEnv]], 
