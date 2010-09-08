@@ -1,7 +1,7 @@
 //##############################################################
 //
 // basic Job options file for a Gleam execution
-// $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/test/jobOptions.txt,v 1.23 2010/06/12 01:38:26 jrb Exp $
+// $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/test/jobOptions.txt,v 1.24 2010/09/08 06:36:53 jrb Exp $
 
 // primary DLLs, including auditor 
 
@@ -109,7 +109,7 @@ ApplicationMgr.ExtSvc += { "GlastRandomSvc"};
 FluxAlg.source_name="default";
 
 //FluxSvc.source_lib += {"$(G4GENERATORROOT)/src/test/test_sources.xml"};
-FluxSvc.source_lib += {"$(G4GENERATORJOBOPTIONSPATH)/test/test_sources.xml"};
+FluxSvc.source_lib += {"$(G4GENERATORXMLPATH)/test_sources.xml"};
 FluxAlg.source_name="muon_pencil_angle";
 
 // add in CRflux option
