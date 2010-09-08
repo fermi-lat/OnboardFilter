@@ -1,7 +1,7 @@
 //##############################################################
 //
 // basic Job options file for a Gleam execution
-// $Header: /nfs/slac/g/glast/ground/cvs/GlastRelease-scons/OnboardFilter/src/test/jobOptions.txt,v 1.22 2009/09/15 18:13:37 heather Exp $
+// $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/test/jobOptions.txt,v 1.23 2010/06/12 01:38:26 jrb Exp $
 
 // primary DLLs, including auditor 
 
@@ -108,7 +108,8 @@ ApplicationMgr.ExtSvc += { "GlastRandomSvc"};
 #include "$FLUXSVCJOBOPTIONSPATH/defaultOptions.txt"
 FluxAlg.source_name="default";
 
-FluxSvc.source_lib += {"$(G4GENERATORROOT)/src/test/test_sources.xml"};
+//FluxSvc.source_lib += {"$(G4GENERATORROOT)/src/test/test_sources.xml"};
+FluxSvc.source_lib += {"$(G4GENERATORJOBOPTIONSPATH)/test/test_sources.xml"};
 FluxAlg.source_name="muon_pencil_angle";
 
 // add in CRflux option
@@ -119,7 +120,7 @@ FluxSvc.source_lib += {
 // -------------------------------------------
 //  Calibration sevices
 //
-#include "$CALIBSVCROOT/src/defaultOptions.txt"
+#include "$CALIBSVCJOBOPTIONSPATH/defaultOptions.txt"
 
 // -------------------------------------------
 //  Calorimeter services
