@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: jrb  Tue Sep  7 23:36:53 PDT 2010
+OnboardFilter
+
+Modified Files:
+	SConscript 
+Log Message:
+Fixes for test program
+    *
+------------------------------------------------------------
 TAG
 Tag name: OnboardFilter-04-14-04, operation: add
 Package: OnboardFilter
