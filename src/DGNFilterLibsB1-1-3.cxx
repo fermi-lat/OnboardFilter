@@ -15,11 +15,16 @@ DGNFilterLibsB1_1_3::DGNFilterLibsB1_1_3()
     // The Filter library name
     m_libName        = "dfc";
 
+#ifdef SCons
     // Path to this library
-    m_libPath        = "$(OBFXFCBINDIR)/dfc";
-
+    m_libPath        = "$(OBFLDPATH)";
     // Path to the master configuration file
+    m_configBasePath = "$(OBFLDPATH)";
+#else
+    m_libPath        = "$(OBFXFCBINDIR)/dfc";
     m_configBasePath = "$(OBFXFC_DBBINDIR)";
+#endif
+
 
     // Name of the master configuration file
     m_masterName     = "dgn_master";

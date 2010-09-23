@@ -15,11 +15,16 @@ GammaFilterLibsB1_1_2::GammaFilterLibsB1_1_2()
     // The Filter library name
     m_libName        = "gfc";
 
+#ifndef SCons
     // Path to this library
     m_libPath        = "$(OBFEFCBINDIR)/gfc";
 
     // Path to the master configuration file
     m_configBasePath = "$(OBFGFC_DBBINDIR)";
+#else
+    m_libPath ="$(OBFLDPATH)";
+    m_configBasePath="$(OBFLDPATH)";
+#endif
 
     // Name of the master configuration file
     m_masterName     = "gamma_master";

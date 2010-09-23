@@ -1,7 +1,7 @@
 /**  @file FSWAuxLibsTool.cxx
     @brief implementation of class FSWAuxLibsTool
     
-  $Header: /nfs/slac/g/glast/ground/cvs/GlastRelease-scons/OnboardFilter/src/FSWAuxLibsTool.cxx,v 1.8 2008/07/21 23:06:48 usher Exp $  
+  $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/FSWAuxLibsTool.cxx,v 1.9 2010/06/16 00:36:31 jrb Exp $  
 */
 
 #include "IFilterTool.h"
@@ -91,14 +91,14 @@ FSWAuxLibsTool::FSWAuxLibsTool(const std::string& type,
 #ifndef SCons
     declareProperty("PathNamePeds",     m_PathName_Pedestals = "$(OBFCOP_DBBINDIR)/cal_db_pedestals");
 #else
-    declareProperty("PathNamePeds",     m_PathName_Pedestals = "");
+    declareProperty("PathNamePeds",     m_PathName_Pedestals = "$(OBFLDPATH)");
 #endif
 
     declareProperty("FileNamePeds",     m_FileName_Pedestals = "cal_db_pedestals");
 #ifndef SCons
     declareProperty("PathNameGains",    m_PathName_Gains     = "$(OBFCOG_DBBINDIR)/cal_db_gains");
 #else
-    declareProperty("PathNameGains",    m_PathName_Gains     = "");
+    declareProperty("PathNameGains",    m_PathName_Gains     = "$(OBFLDPATH)");
 #endif
 
     declareProperty("FileNameGains",    m_FileName_Gains     = "cal_db_gains");
@@ -142,7 +142,7 @@ StatusCode FSWAuxLibsTool::initialize()
 #ifndef SCons
         obf->loadLibrary ("geo_db_data", "$(OBFGGF_DBBINDIR)/geo_db_data");
 #else
-        obf->loadLibrary ("geo_db_data", "");
+        obf->loadLibrary ("geo_db_data", "$(OBFLDPATH)");
 #endif
     }
     catch(ObfInterface::ObfException& obfException)
