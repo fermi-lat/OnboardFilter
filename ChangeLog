@@ -1,4 +1,17 @@
 ------------------------------------------------------------
+User: jrb  Thu Sep 23 14:39:56 PDT 2010
+OnboardFilter/src
+
+Modified Files:
+	DGNFilterLibsB1-1-2.cxx DGNFilterLibsB1-1-3.cxx 
+	FSWAuxLibsTool.cxx GammaFilterLibsB1-1-2.cxx 
+	GammaFilterLibsB1-1-3.cxx HIPFilterLibsB1-1-2.cxx 
+	HIPFilterLibsB1-1-3.cxx MIPFilterLibsB1-1-2.cxx 
+	MIPFilterLibsB1-1-3.cxx ObfInterface.cxx 
+Log Message:
+For SCons dynamically-loaded libraries are in a different place
+    *
+------------------------------------------------------------
 TAG
 Tag name: OnboardFilter-04-14-02-gr01, operation: add
 Package: OnboardFilter
