@@ -320,8 +320,11 @@ const EFC_DB_Schema& ObfInterface::loadFilterLibs(IFilterLibs* filterLibs, int v
     loadLibrary (filterLibs->FilterLibName(), filterLibs->FilterLibPath(), verbosity);
 
     // Locate the Gamma filter's master configuration file
+#ifndef SCons
     loadLibrary(filterLibs->MasterConfigName(), basePath + filterLibs->MasterConfigName(), m_verbosity);
-
+#else
+    loadLibrary(filterLibs->MasterConfigName(), filterLibs->FilterLibPath(), m_verbosity);
+#endif
     // Find the Master Schema for the desired filter and get it ready for action 
     const EFC_DB_Schema* masterSchema = EFC_lookup (filterLibs->FilterSchema(), filterLibs->MasterConfigInstance());
 
@@ -350,8 +353,11 @@ const EFC_DB_Schema& ObfInterface::loadFilterLibs(IFilterLibs* filterLibs, int v
         }
 
         const std::string& fileName = idIter->second;
-
+#ifndef SCons
         loadLibrary(fileName, basePath + fileName, verbosity);
+#else
+        loadLibrary(fileName, filterLibs->FilterLibPath(), verbosity);
+#endif
 
         // Look up the configruation
         const EFC_DB_Schema* thisSchema = EFC_lookup (filterLibs->FilterSchema(), pair.second);
