@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: jrb  Fri Oct  1 16:35:34 PDT 2010
+GlastRelease-scons/OnboardFilter
+
+Modified Files:
+	OnboardFilterLib.py 
+Log Message:
+exclude non-Windows stuff from link
+    *
+------------------------------------------------------------
 TAG
 Tag name: OnboardFilter-04-14-06, operation: add
 Package: OnboardFilter
