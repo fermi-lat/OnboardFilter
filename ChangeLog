@@ -1,4 +1,14 @@
 ------------------------------------------------------------
+User: heather  Fri Oct  8 09:39:12 PDT 2010
+OnboardFilter
+
+Modified Files:
+      Tag: GlastReleasev18r7p1
+	SConscript 
+Log Message:
+gaudi updates
+    *
+------------------------------------------------------------
 User: jrb  Fri Oct  1 16:35:34 PDT 2010
 GlastRelease-scons/OnboardFilter
 
