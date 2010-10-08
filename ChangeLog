@@ -1,4 +1,17 @@
 ------------------------------------------------------------
+User: heather  Fri Oct  8 09:39:13 PDT 2010
+OnboardFilter/src
+
+Modified Files:
+      Tag: GlastReleasev18r7p1
+	CalOutputTool.cxx DGNFilterTool.cxx FSWAuxLibsTool.cxx 
+	FilterTrackTool.cxx GammaFilterTool.cxx GemOutputTool.cxx 
+	HIPFilterTool.cxx MIPFilterTool.cxx OnboardFilter.cxx 
+	TkrOutputTool.cxx 
+Log Message:
+gaudi updates
+    *
+------------------------------------------------------------
 User: heather  Fri Oct  8 09:39:12 PDT 2010
 OnboardFilter/doc
 
