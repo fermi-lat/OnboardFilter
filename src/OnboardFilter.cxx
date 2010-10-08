@@ -6,7 +6,7 @@
 
 \verbatim
 
-  CVS $Id: OnboardFilter.cxx,v 1.83 2008/06/18 00:37:45 usher Exp $
+  CVS $Id: OnboardFilter.cxx,v 1.84.244.1 2010/09/18 03:51:22 heather Exp $
 \endverbatim
                                                                           */
 /* ---------------------------------------------------------------------- */
@@ -107,9 +107,11 @@ private:
 
 
 
-static const AlgFactory<OnboardFilter> Factory;
-const IAlgFactory& OnboardFilterFactory = Factory;
+//static const AlgFactory<OnboardFilter> Factory;
+//const IAlgFactory& OnboardFilterFactory = Factory;
 //FilterInfo OnboardFilter::myFilterInfo;
+
+DECLARE_ALGORITHM_FACTORY(OnboardFilter);
 
 OnboardFilter::OnboardFilter(const std::string& name, ISvcLocator *pSvcLocator) : Algorithm(name,pSvcLocator), 
           m_events(0), m_rejected(0), m_noEbfData(0), m_curMode(enums::Lsf::NoMode), m_mootSvc(0), m_initialized(false)
