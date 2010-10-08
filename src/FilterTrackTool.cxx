@@ -1,7 +1,7 @@
 /**  @file FilterTrackTool.cxx
     @brief implementation of class FilterTrackTool
     
-  $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/FilterTrackTool.cxx,v 1.6 2008/06/11 19:23:18 usher Exp $  
+  $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/FilterTrackTool.cxx,v 1.7.248.1 2010/09/18 03:51:22 heather Exp $  
 */
 
 #include "IFilterTool.h"
@@ -137,8 +137,9 @@ private:
     const TFC_geometryTkr* m_tkrGeo;
 };
 
-static ToolFactory<FilterTrackTool> s_factory;
-const IToolFactory& FilterTrackToolFactory = s_factory;
+//static ToolFactory<FilterTrackTool> s_factory;
+//const IToolFactory& FilterTrackToolFactory = s_factory;
+DECLARE_TOOL_FACTORY(FilterTrackTool);
 //------------------------------------------------------------------------
 
 FilterTrackTool::FilterTrackTool(const std::string& type, 
