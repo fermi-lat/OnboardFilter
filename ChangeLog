@@ -1,4 +1,14 @@
 ------------------------------------------------------------
+User: jrb  Wed Oct 20 11:30:37 PDT 2010
+GlastRelease-scons/OnboardFilter
+
+Modified Files:
+      Tag: GlastReleasev18r7p1
+	SConscript 
+Log Message:
+Get SCons to make rootmap
+    *
+------------------------------------------------------------
 TAG
 Tag name: OnboardFilter-04-14-04-gr01, operation: add
 Package: OnboardFilter
