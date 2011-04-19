@@ -23,7 +23,7 @@
 #include "XFC_DB/DGN_DB_instance.h"
 
 #include "FSWHeaders/EFC.h"
-#include "LSE/LFR_key.h"
+#include "EFC/EFR_key.h"
 
 #include "FSWHeaders/CDM_pubdefs.h"
 #include "CAB/CAB_lookupPub.h"
@@ -158,7 +158,7 @@ int ObfInterface::setupFilter(const EFC_DB_Schema* schema,
 #endif
 
     // Retrieve the key to our filter
-    unsigned int key = LFR_keyGet (CDM_findDatabase (schema->filter.id, configIndex), 0);
+    unsigned int key = EFR_keyGet (CDM_findDatabase (schema->filter.id, configIndex), 0);
 
     // Get a pointer to the "services" structure 
     const char*                            fnd      = schema->eds.get;
@@ -408,6 +408,8 @@ unsigned int ObfInterface::filterEvent(EbfWriterTds::Ebf* ebfData)
     EBF_pkts      pkts = pktsu.ll;
 
     // Get a warm and fuzzy feeling by doing a simple check...
+    /*********************************************************************
+    // No longer needed
     int numPkts = EBF_pktsCount (pkts);
     if (numPkts < 1)
     {
@@ -421,6 +423,7 @@ unsigned int ObfInterface::filterEvent(EbfWriterTds::Ebf* ebfData)
 
         //return filterStatus;
     }
+    *********************************************************************/
 
     m_eventProcessed++;
 

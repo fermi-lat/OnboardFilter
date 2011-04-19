@@ -3,7 +3,7 @@
 //_____________________________________________________________________________
 
 #include "trackProj.h"
-#include "EDS/FFS.h"
+#include <PBI/FFS.ih>
 #include "EFC_DB/EFC_DB_sampler.h"
 #include "EFC/../src/GFC_def.h"
 #include "EFC/../src/TFC_geometryDef.h"
@@ -47,13 +47,13 @@ void trackProj::execute(const TFC_prjs* prjs,
 
     while (tmsk) 
     {
-        int               tower = FFS(tmsk);
+        int               tower = FFSL(tmsk);
         const TFC_prjDir* dir   = prjs->dir + tower;
         const TFC_prj*    prj   = prjs->prjs + dir->idx;
         int               xCnt  = dir->xCnt;
         int               yCnt  = dir->yCnt;
 
-        tmsk  = FFS_eliminate (tmsk, tower);  // eliminate bit corresponding to tower
+        tmsk  = FFSL_eliminate (tmsk, tower);  // eliminate bit corresponding to tower
 
         /* Form the projection directory for this tower */
         if (xCnt > 0 && yCnt > 0)
