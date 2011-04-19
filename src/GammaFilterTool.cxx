@@ -1,7 +1,7 @@
 /**  @file GammaFilterTool.cxx
     @brief implementation of class GammaFilterTool
     
-  $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/GammaFilterTool.cxx,v 1.21 2008/09/22 19:38:20 usher Exp $
+  $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/GammaFilterTool.cxx,v 1.22 2008/09/23 03:08:11 usher Exp $
 */
 
 #include "IFilterTool.h"
@@ -33,13 +33,12 @@
 #include "GFC_DB/GAMMA_DB_instance.h"
 
 #include "FSWHeaders/EFC.h"
-#include "LSE/LFR_key.h"
 
 // FSW include but made local do to keyword usage
 #include "FSWHeaders/EFC_sampler.h"
 
 // Contains all info for a particular filter's release
-#include "GammaFilterLibsB1-1-3.h"
+#include "GammaFilterLibsB3-0-0.h"
 
 // Useful stuff! 
 #include <map>
@@ -265,7 +264,7 @@ StatusCode GammaFilterTool::initialize()
         // Create the object which contains the release specific information for the Gamma Filter
         // This includes the library containing the filter code as well as the libraries which 
         // define the running configurations. 
-        m_filterLibs = new GammaFilterLibsB1_1_3();
+        m_filterLibs = new GammaFilterLibsB3_0_0();
 
         // Load the necessary libraries and obtain the master configuration file
         const EFC_DB_Schema& master = obf->loadFilterLibs(m_filterLibs, m_verbosity);

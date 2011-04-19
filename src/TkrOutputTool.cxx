@@ -1,7 +1,7 @@
 /**  @file TkrOutputTool.cxx
     @brief implementation of class TkrOutputTool
     
-  $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/TkrOutputTool.cxx,v 1.4 2008/05/16 20:18:57 usher Exp $  
+  $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/TkrOutputTool.cxx,v 1.5 2008/06/11 19:23:18 usher Exp $  
 */
 
 #include "IFilterTool.h"
@@ -34,7 +34,7 @@
 #include "EDS/EBF_tkr.h"
 #include "EDS/EDR_cal.h"
 #include "EDS/EDR_tkrUnpack.h"
-#include "EDS/FFS.h"
+#include <PBI/FFS.ih>
 #include "GFC_DB/GAMMA_DB_instance.h"
 #include "EFC_DB/EFC_DB_sampler.h"
 #include "EFC/../src/GFC_def.h"
@@ -290,7 +290,7 @@ void TkrOutputTool::extractFilterTkrInfo(OnboardFilterTds::FilterStatus* filterS
 
         while (twrMsk)
         {
-            int towerId = FFS (twrMsk);
+            int towerId = FFSL (twrMsk);
             const TFC_prjDir *dir = prjs->dir + towerId;
 
             xCnt[towerId]=dir->xCnt;
@@ -298,7 +298,7 @@ void TkrOutputTool::extractFilterTkrInfo(OnboardFilterTds::FilterStatus* filterS
             //        printf("towerid %d dir->idx %d dir->xCnt %d yCnt %d\n",
             //            towerId,dir->idx,dir->xCnt,dir->yCnt);
       
-            twrMsk = FFS_eliminate (twrMsk, towerId);
+            twrMsk = FFSL_eliminate (twrMsk, towerId);
         }
 
         //   printf("twrMsk %x ebftwrmsk %x \n",twrMsk,EBF_DIR_TEMS_TKR (dir->redux.ctids));
@@ -364,8 +364,8 @@ void TkrOutputTool::extractFilterTkrInfo(OnboardFilterTds::FilterStatus* filterS
             | Find the next tower with tracker hits and then eliminate it
             | from further consideration
             */
-            cid  = FFS (tids);
-            tids = FFS_eliminate (tids, cid);
+            cid  = FFSL (tids);
+            tids = FFSL_eliminate (tids, cid);
 
             /* Locate the TEM contributor and its tracker data */
             contributor = &contributors[cid];
@@ -486,7 +486,7 @@ void TkrOutputTool::extractTkrTwrHitInfo(OnboardFilterTds::TowerHits* towerHits,
     // Look over towers
     while (twrMsk)
     {
-        int towerId = FFS (twrMsk);
+        int towerId = FFSL (twrMsk);
 
         EDR_tkrTower *ttr = ttrs + towerId;
 
@@ -510,7 +510,7 @@ void TkrOutputTool::extractTkrTwrHitInfo(OnboardFilterTds::TowerHits* towerHits,
             }
         }
 
-        twrMsk = FFS_eliminate (twrMsk, towerId);
+        twrMsk = FFSL_eliminate (twrMsk, towerId);
     }
 
     return;
