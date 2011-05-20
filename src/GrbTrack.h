@@ -89,7 +89,7 @@ private:
     void         prjList_init (TFC_prjList lists[2][16]);
 
     // Find out the position of a strip 
-    HepPoint3D findStripPosition(int tower, int layer, int view, int stripHit);
+    HepGeom::Point3D<double> findStripPosition(int tower, int layer, int view, int stripHit);
     
     // data members
     unsigned int m_strip_pitch;  /*!< Tracker strip pitch, in mm            */
