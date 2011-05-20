@@ -12,7 +12,7 @@
 #include <cmath>
 
 #include "src/GEO_DB_data.h" // was GGF/.../src
-
+typedef HepGeom::Point3D<double> HepPoint3D;
 //____________________________________________________________________________
 trackProj::trackProj(GFC_cfg* cfg) 
 {

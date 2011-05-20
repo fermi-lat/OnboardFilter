@@ -12,6 +12,8 @@
 #define NULL ((void *)(0))
 #endif
 
+typedef HepGeom::Point3D<double> HepPoint3D;
+
 GrbFindTrack::GrbFindTrack(GFC_cfg* cfg)
 {
     const GammaCfgTkr&     tkrCfg = cfg->prms.tkr;
