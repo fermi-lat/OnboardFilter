@@ -2,6 +2,14 @@
 TAG
 Tag name: GlastRelease_Pass7-17-35-23-gr11, operation: add
 Package: OnboardFilter
+User: heather  Fri Aug  5 21:33:30 2011
+Files:
+
+    *
+------------------------------------------------------------
+TAG
+Tag name: GlastRelease_Pass7-17-35-23-gr11, operation: add
+Package: OnboardFilter
 User: heather  Fri Aug  5 21:33:25 2011
 Files:
   OnboardFilter/OnboardFilterLib.py  1.3
