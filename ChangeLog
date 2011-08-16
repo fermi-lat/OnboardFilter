@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: jrb  Mon Aug 15 19:44:41 PDT 2011
+OnboardFilter/src
+
+Modified Files:
+	FilterTrackTool.cxx GrbTrack.cxx trackProj.cxx 
+Log Message:
+re-instating previous head versions, compatible with new obf
+    *
+------------------------------------------------------------
 TAG
 Tag name: OnboardFilter-04-14-07, operation: add
 Package: OnboardFilter
