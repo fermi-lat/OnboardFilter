@@ -1,7 +1,7 @@
 /**  @file FilterTrackTool.cxx
     @brief implementation of class FilterTrackTool
     
-  $Header: /nfs/slac/g/glast/ground/cvs/GlastRelease-scons/OnboardFilter/src/FilterTrackTool.cxx,v 1.7 2008/07/23 18:52:41 usher Exp $  
+  $Header: /nfs/slac/g/glast/ground/cvs/GlastRelease-scons/OnboardFilter/src/FilterTrackTool.cxx,v 1.9 2011/05/20 15:51:11 heather Exp $  
 */
 
 #include "IFilterTool.h"
@@ -28,7 +28,7 @@
 #include "EDS/EBF_tkr.h"
 #include "EDS/EDR_cal.h"
 #include "EDS/EDR_tkrUnpack.h"
-#include "EDS/FFS.h"
+#include <PBI/FFS.ih>
 #include "GFC_DB/GAMMA_DB_instance.h"
 #include "EFC_DB/EFC_DB_sampler.h"
 #include "EFC/../src/GFC_def.h"
@@ -333,8 +333,8 @@ unsigned int FilterTrackTool::projections_classify(TFC_prjs  *projections)
         int                     beg;
         int                     end;
 
-        tower = FFS (tmsk);
-        tmsk  = FFS_eliminate (tmsk, tower);
+        tower = FFSL (tmsk);
+        tmsk  = FFSL_eliminate (tmsk, tower);
 
 
         /* Get the projection directory for this tower */
@@ -352,7 +352,7 @@ unsigned int FilterTrackTool::projections_classify(TFC_prjs  *projections)
             int top_layer = 17 - prj[idx].top.layer;
             TFC__prjListInsert (&projections->top[0][top_layer], 
                                 &prj[idx].topNode);
-            topLayerMsk |= FFS_mask (top_layer); 
+            topLayerMsk |= FFSL_mask (top_layer); 
         }
 
 
@@ -363,7 +363,7 @@ unsigned int FilterTrackTool::projections_classify(TFC_prjs  *projections)
             int top_layer = 17 - prj[idx].top.layer;
             TFC__prjListInsert (&projections->top[1][top_layer],
                                 &prj[idx].topNode);
-            topLayerMsk |= FFS_mask (top_layer) >> 16;
+            topLayerMsk |= FFSL_mask (top_layer) >> 16;
         }
 
     }
@@ -374,8 +374,8 @@ unsigned int FilterTrackTool::projections_classify(TFC_prjs  *projections)
         unsigned int tmp;
         int        layer;
         tmp   = topLayerMsk | (topLayerMsk << 16);
-        layer = FFS      (tmp);
-        layer = FFS_mask (layer);
+        layer = FFSL      (tmp);
+        layer = FFSL_mask (layer);
         tmp   = (layer) | (layer >> 1) | (layer >> 2);
         topLayerMsk &= (tmp | tmp >> 16);
     }
@@ -427,8 +427,8 @@ int FilterTrackTool::prjsSelect(GRBP_prjs     *grbp_prjs,
         const TFC_prjList *list;
         const TFC_prjNode *node;
 
-        layer   = FFS (lyrMsk);
-        lyrMsk  = FFS_eliminate (lyrMsk, layer);
+        layer   = FFSL (lyrMsk);
+        lyrMsk  = FFSL_eliminate (lyrMsk, layer);
         list    = lists + layer;
         node    = TFC__prjListFirst (list);
         //printf ("Layer = %u\n", layer + 2);

@@ -1,16 +1,18 @@
 #include "GrbTrack.h"
 
 #include "FSWHeaders/TFC_prjDef.h"
-#include "EDS/FFS.h"
+#include <PBI/FFS.ih>
 #include "EFC_DB/EFC_DB_sampler.h"
 #include "EFC/../src/GFC_def.h"
 #include "EFC/../src/TFC_geometryDef.h"
 #include "src/GEO_DB_data.h"  // was GGF/.../src
-typedef  HepGeom::Point3D<double> HepPoint3D;
+
 
 #ifndef NULL
 #define NULL ((void *)(0))
 #endif
+
+typedef HepGeom::Point3D<double> HepPoint3D;
 
 GrbFindTrack::GrbFindTrack(GFC_cfg* cfg)
 {
@@ -119,8 +121,8 @@ unsigned int GrbFindTrack::projections_classify(TFC_prjs  *projections)
         int                     beg;
         int                     end;
 
-        tower = FFS (tmsk);
-        tmsk  = FFS_eliminate (tmsk, tower);
+        tower = FFSL (tmsk);
+        tmsk  = FFSL_eliminate (tmsk, tower);
 
 
         /* Get the projection directory for this tower */
@@ -138,7 +140,7 @@ unsigned int GrbFindTrack::projections_classify(TFC_prjs  *projections)
             int top_layer = 17 - prj[idx].top.layer;
             TFC__prjListInsert (&projections->top[0][top_layer], 
                                 &prj[idx].topNode);
-            topLayerMsk |= FFS_mask (top_layer); 
+            topLayerMsk |= FFSL_mask (top_layer); 
         }
 
 
@@ -149,7 +151,7 @@ unsigned int GrbFindTrack::projections_classify(TFC_prjs  *projections)
             int top_layer = 17 - prj[idx].top.layer;
             TFC__prjListInsert (&projections->top[1][top_layer],
                                 &prj[idx].topNode);
-            topLayerMsk |= FFS_mask (top_layer) >> 16;
+            topLayerMsk |= FFSL_mask (top_layer) >> 16;
         }
 
     }
@@ -160,8 +162,8 @@ unsigned int GrbFindTrack::projections_classify(TFC_prjs  *projections)
         unsigned int tmp;
         int        layer;
         tmp   = topLayerMsk | (topLayerMsk << 16);
-        layer = FFS      (tmp);
-        layer = FFS_mask (layer);
+        layer = FFSL      (tmp);
+        layer = FFSL_mask (layer);
         tmp   = (layer) | (layer >> 1) | (layer >> 2);
         topLayerMsk &= (tmp | tmp >> 16);
     }
@@ -213,8 +215,8 @@ int GrbFindTrack::prjsSelect(GRBP_prjs     *grbp_prjs,
         const TFC_prjList *list;
         const TFC_prjNode *node;
 
-        layer   = FFS (lyrMsk);
-        lyrMsk  = FFS_eliminate (lyrMsk, layer);
+        layer   = FFSL (lyrMsk);
+        lyrMsk  = FFSL_eliminate (lyrMsk, layer);
         list    = lists + layer;
         node    = TFC__prjListFirst (list);
         //printf ("Layer = %u\n", layer + 2);
