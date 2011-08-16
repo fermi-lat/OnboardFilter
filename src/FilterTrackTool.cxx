@@ -1,7 +1,7 @@
 /**  @file FilterTrackTool.cxx
     @brief implementation of class FilterTrackTool
     
-  $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/FilterTrackTool.cxx,v 1.6 2008/06/11 19:23:18 usher Exp $  
+  $Header: /nfs/slac/g/glast/ground/cvs/GlastRelease-scons/OnboardFilter/src/FilterTrackTool.cxx,v 1.7 2008/07/23 18:52:41 usher Exp $  
 */
 
 #include "IFilterTool.h"
@@ -43,6 +43,7 @@
 
 // HepPoint3D
 #include "CLHEP/Geometry/Point3D.h"
+typedef HepGeom::Point3D<double> HepPoint3D;
 
 // Useful stuff! 
 #include <map>
