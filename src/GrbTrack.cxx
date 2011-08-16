@@ -6,7 +6,7 @@
 #include "EFC/../src/GFC_def.h"
 #include "EFC/../src/TFC_geometryDef.h"
 #include "src/GEO_DB_data.h"  // was GGF/.../src
-
+typedef  HepGeom::Point3D<double> HepPoint3D;
 
 #ifndef NULL
 #define NULL ((void *)(0))
