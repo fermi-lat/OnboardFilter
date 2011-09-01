@@ -2,6 +2,14 @@
 TAG
 Tag name: GlastRelease-19-03-06, operation: add
 Package: OnboardFilter
+User: heather  Thu Sep  1 11:42:19 2011
+Files:
+
+    *
+------------------------------------------------------------
+TAG
+Tag name: GlastRelease-19-03-06, operation: add
+Package: OnboardFilter
 User: heather  Thu Sep  1 11:42:13 2011
 Files:
   OnboardFilter/OnboardFilterLib.py  1.3
