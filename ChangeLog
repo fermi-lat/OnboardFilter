@@ -2,6 +2,14 @@
 TAG
 Tag name: GlastRelease-19-03-07, operation: del
 Package: OnboardFilter
+User: glastrm  Tue Sep  6 14:14:59 2011
+Files:
+
+    *
+------------------------------------------------------------
+TAG
+Tag name: GlastRelease-19-03-07, operation: del
+Package: OnboardFilter
 User: glastrm  Tue Sep  6 14:14:53 2011
 Files:
   OnboardFilter/OnboardFilterLib.py  1.3
