@@ -2,6 +2,14 @@
 TAG
 Tag name: GlastRelease-17-35-24-gr04, operation: add
 Package: OnboardFilter
+User: heather  Wed Sep  7 14:31:01 2011
+Files:
+
+    *
+------------------------------------------------------------
+TAG
+Tag name: GlastRelease-17-35-24-gr04, operation: add
+Package: OnboardFilter
 User: heather  Wed Sep  7 14:30:48 2011
 Files:
   OnboardFilter/OnboardFilter/FilterAlg.h  1.6
