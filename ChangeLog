@@ -1,4 +1,20 @@
 ------------------------------------------------------------
+User: jrb  Wed Oct  5 14:50:05 PDT 2011
+OnboardFilter/src
+
+Modified Files:
+	CalOutputTool.cxx DGNFilterLibsB1-1-3.cxx 
+	DGNFilterLibsB3-0-0.cxx DGNFilterTool.cxx FSWAuxLibsTool.cxx 
+	FilterTrackTool.cxx GammaFilterLibsB1-1-3.cxx 
+	GammaFilterLibsB3-0-0.cxx GammaFilterTool.cxx GrbTrack.cxx 
+	GrbTrack.h HIPFilterLibsB1-1-3.cxx HIPFilterLibsB3-0-0.cxx 
+	HIPFilterTool.cxx MIPFilterLibsB1-1-3.cxx 
+	MIPFilterLibsB3-0-0.cxx MIPFilterTool.cxx ObfInterface.cxx 
+	OnboardFilter.cxx TkrOutputTool.cxx trackProj.cxx trackProj.h 
+Log Message:
+most of what's needed for B3-0-0 (SCons build only to start)
+    *
+------------------------------------------------------------
 User: jrb  Wed Oct  5 14:50:04 PDT 2011
 OnboardFilter
 
