@@ -1,7 +1,7 @@
 /**  @file MIPFilterTool.cxx
     @brief implementation of class MIPFilterTool
     
-  $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/MIPFilterTool.cxx,v 1.18 2008/09/22 19:38:20 usher Exp $  
+  $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/MIPFilterTool.cxx,v 1.19 2011/04/19 17:32:02 usher Exp $  
 */
 
 #include "IFilterTool.h"
@@ -26,20 +26,36 @@
 #include "ObfInterface.h"
 
 // FSW includes go here
+#ifdef OBF_B3_0_0
+#include "CDM/CDM_pubdefs.h"
+#endif
+#ifdef OBF_B1_1_3
 #include "FSWHeaders/CDM_pubdefs.h"
+#endif
+
 #include "EFC_DB/EFC_DB_schema.h"
 #include "EFC_DB/EH_ids.h"
 #include "XFC_DB/MFC_DB_schema.h"
 #include "XFC_DB/MIP_DB_instance.h"
 #include "XFC/MFC_status.h"
 
-#include "FSWHeaders/EFC.h"
+//#include "FSWHeaders/EFC.h"
 
 // FSW include but made local do to keyword usage
-#include "FSWHeaders/EFC_sampler.h"
+//#include "FSWHeaders/EFC_sampler.h"
 
 // Contains all info for a particular filter's release
+#ifdef OBF_B3_0_0
+#include "EFC/EFC.h"
+//#include "EFC/../src/EFC_samplerDef.h"
 #include "MIPFilterLibsB3-0-0.h"
+#endif
+#ifdef OBF_B1_1_3
+#include "FSWHeaders/EFC.h"
+// FSW include but made local do to keyword usage
+//#include "FSWHeaders/EFC_sampler.h"
+#include "MIPFilterLibsB1-1-3.h"
+#endif
 
 // Useful stuff! 
 #include <map>
@@ -194,7 +210,12 @@ StatusCode MIPFilterTool::initialize()
         // Get ObfInterface pointer
         ObfInterface* obf = ObfInterface::instance();
 
+#ifdef OBF_B3_0_0
         m_filterLibs = new MIPFilterLibsB3_0_0();
+#endif
+#ifdef OBF_B1_1_3
+        m_filterLibs = new MIPFilterLibsB1_1_3();
+#endif
         const EFC_DB_Schema& master = obf->loadFilterLibs(m_filterLibs, m_verbosity);
 
         // Check to see what mode we want to run... (if a different one requested via JO parameter)

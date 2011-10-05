@@ -1,5 +1,5 @@
 # -*- python -*-
-# $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/SConscript,v 1.16 2010/09/23 22:59:26 jrb Exp $
+# $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/SConscript,v 1.17 2011/05/20 15:51:10 heather Exp $
 # Authors: Tracy Usher <usher@SLAC.Stanford.edu>
 # Version: OnboardFilter-04-14-07
 Import('baseEnv')
@@ -13,16 +13,42 @@ libEnv.Tool('addLinkDeps', package='OnboardFilter', toBuild='component')
 libEnv.AppendUnique(CPPDEFINES = ['GLEAM'])
 libEnv.AppendUnique(CPPDEFINES = ['__i386'])
 libEnv.AppendUnique(CPPDEFINES = ['EFC_FILTER'])
+if 'obfdynlddict' in libEnv:
+    for k in libEnv['obfdynlddict']:
+        defstring = k +'=' + '\\"' + libEnv['obfdynlddict'][k] + '\\"'
+        #print 'adding a DEFINE: ', defstring
+	libEnv.AppendUnique(CPPDEFINES = defstring)
 
-## should no longer necessary with new re-organized obf
-##libEnv.AppendUnique(CPPPATH = ['/afs/slac.stanford.edu/g/glast/ground/GLAST_EXT/rhel4_gcc34/obf/B1-1-3/PHY/source/EFC/V4-3-0',
-##				'/afs/slac/g/glast/ground/GLAST_EXT/redhat4-i686-32bit/../rhel4_gcc34/obf/B1-1-3/CDM/source/GGF_DB/V2-0-0'])
+#vstring = 'OBF_' + (str(baseEnv['obfversion'])).replace('-', '_')
+#while vstring.count('_') > 3:
+#    ix = vstring.rfind('_')
+#    vstring = vstring[:ix]
+    
+    
+#libEnv.AppendUnique(CPPDEFINES = vstring)
 
 if baseEnv['PLATFORM'] == 'win32':
 	libEnv.AppendUnique(CPPDEFINES = ['_WIN32'])
 
-OnboardFilter = libEnv.SharedLibrary('OnboardFilter', listFiles(['src/*.cxx',
-						'src/Dll/*.cxx']))
+cxx = listFiles(['src/*.cxx'])
+
+toRemove = listFiles(['src/*B1-0*.cxx', 'src/*B1-1-0*.cxx',
+                      'src/*B1-1-2*.cxx'])
+
+for r in toRemove :
+    #print "removing ", r
+    cxx.remove(r)
+
+if baseEnv['obfversion'][:6] == 'B1-1-3' :
+    for r in listFiles(['src/*B3-*.cxx']) :
+        #print " removing ", r
+        cxx.remove(r)
+
+OnboardFilter = libEnv.SharedLibrary('OnboardFilter',
+                                     cxx + listFiles(['src/Dll/*.cxx']))
+
+#print "list of files in cxx list: "
+#for f in cxx: print f
 
 progEnv.Tool('OnboardFilterLib')
 test_OnboardFilter = progEnv.GaudiProgram('test_OnboardFilter', listFiles(['src/test/*.cxx']), test=1, package='OnboardFilter')

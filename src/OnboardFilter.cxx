@@ -6,7 +6,7 @@
 
 \verbatim
 
-  CVS $Id: OnboardFilter.cxx,v 1.83 2008/06/18 00:37:45 usher Exp $
+  CVS $Id: OnboardFilter.cxx,v 1.84 2008/08/01 04:01:15 usher Exp $
 \endverbatim
                                                                           */
 /* ---------------------------------------------------------------------- */
@@ -31,6 +31,7 @@
 
 #include "GlastSvc/GlastDetSvc/IGlastDetSvc.h"
 #include "facilities/Util.h"
+#include "facilities/commonUtilities.h"
 
 #include "Event/TopLevel/EventModel.h"
 #include "EbfWriter/Ebf.h"
@@ -179,6 +180,90 @@ StatusCode OnboardFilter::initialize()
     // Get an instance of the filter interface
     m_obfInterface = ObfInterface::instance();
 
+#ifdef SCons
+    using facilities::commonUtilities;
+    std::string obfldpath("$(OBFLDPATH)");
+    std::string pname;
+    std::string pkgpath;
+
+    // Define environment variables needed to load dyn. libraries
+#ifdef OBFCOG_DB
+    pname = std::string("COG_DB");
+    pkgpath = commonUtilities::joinPath(pname, std::string(OBFCOG_DB));
+    commonUtilities::setEnvironment("OBFCOG_DBBINDIR",  
+                                    commonUtilities::joinPath(obfldpath, 
+                                                              pkgpath));
+#endif
+
+#ifdef OBFCGB_DB
+    pname = std::string("CGB_DB");
+    pkgpath = commonUtilities::joinPath(pname, std::string(OBFCGB_DB));
+    commonUtilities::setEnvironment("OBFCGB_DBBINDIR",  
+                                    commonUtilities::joinPath(obfldpath, 
+                                                              pkgpath));
+#endif
+
+#ifdef OBFCOP_DB
+    pname = std::string("COP_DB");
+    pkgpath = commonUtilities::joinPath(pname, std::string(OBFCOP_DB));
+    commonUtilities::setEnvironment("OBFCOP_DBBINDIR",  
+                                    commonUtilities::joinPath(obfldpath, 
+                                                              pkgpath));
+#endif
+
+#ifdef OBFCPP_DB
+    pname = std::string("CPP_DB");
+    pkgpath = commonUtilities::joinPath(pname, std::string(OBFCPP_DB));
+    commonUtilities::setEnvironment("OBFCPP_DBBINDIR",  
+                                    commonUtilities::joinPath(obfldpath, 
+                                                              pkgpath));
+#endif
+#ifdef OBFCPG_DB
+    pname = std::string("CPG_DB");
+    pkgpath = commonUtilities::joinPath(pname, std::string(OBFCPG_DB));
+    commonUtilities::setEnvironment("OBFCPG_DBBINDIR",  
+                                    commonUtilities::joinPath(obfldpath, 
+                                                              pkgpath));
+#endif
+#ifdef OBFGFC_DB
+    pname = std::string("GFC_DB");
+    pkgpath = commonUtilities::joinPath(pname, std::string(OBFGFC_DB));
+    commonUtilities::setEnvironment("OBFGFC_DBBINDIR",  
+                                    commonUtilities::joinPath(obfldpath, 
+                                                              pkgpath));
+#endif
+#ifdef OBFGGF_DB
+    pname = std::string("GGF_DB");
+    pkgpath = commonUtilities::joinPath(pname, std::string(OBFGGF_DB));
+    commonUtilities::setEnvironment("OBFGGF_DBBINDIR",  
+                                    commonUtilities::joinPath(obfldpath, 
+                                                              pkgpath));
+#endif
+#ifdef OBFXFC_DB
+    pname = std::string("XFC_DB");
+    pkgpath = commonUtilities::joinPath(pname, std::string(OBFXFC_DB));
+    commonUtilities::setEnvironment("OBFXFC_DBBINDIR",  
+                                    commonUtilities::joinPath(obfldpath, 
+                                                              pkgpath));
+#endif
+#ifdef OBFXFC
+    pname = std::string("XFC");
+    pkgpath = commonUtilities::joinPath(pname, std::string(OBFXFC));
+    commonUtilities::setEnvironment("OBFXFCBINDIR",  
+                                    commonUtilities::joinPath(obfldpath, 
+                                                              pkgpath));
+#endif
+#ifdef OBFEFC
+    pname = std::string("EFC");
+    pkgpath = commonUtilities::joinPath(pname, std::string(OBFEFC));
+    commonUtilities::setEnvironment("OBFEFCBINDIR",  
+                                    commonUtilities::joinPath(obfldpath, 
+                                                              pkgpath));
+#endif
+
+#endif
+
+
     // Retrieve (and initialize) the FSWAuxLibsTool which will load pedestal, gain and geometry libraries
     IFilterTool* toolPtr = 0;
     if (StatusCode scTool = toolSvc()->retrieveTool("FSWAuxLibsTool", toolPtr) == StatusCode::FAILURE)
@@ -209,9 +294,10 @@ StatusCode OnboardFilter::initialize()
         else                     m_mootConfig = true;
     }
 
+  
     // If we are not using Moot then go ahead and initialize now
     if (!m_mootConfig.value()) sc = initFilters();
-  
+
     return sc;
 }
 

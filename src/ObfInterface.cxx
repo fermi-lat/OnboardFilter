@@ -13,7 +13,7 @@
 #include "EbfWriter/Ebf.h"
 
 #include "EFC_DB/EFC_DB_schema.h"
-#include "GFC_DB/GFC_DB_V2_schema.h"
+//#include "GFC_DB/GFC_DB_V2_schema.h"
 #include "GFC_DB/GAMMA_DB_instance.h"
 #include "XFC_DB/MFC_DB_schema.h"
 #include "XFC_DB/MIP_DB_instance.h"
@@ -23,9 +23,17 @@
 #include "XFC_DB/DGN_DB_instance.h"
 
 #include "FSWHeaders/EFC.h"
-#include "EFC/EFR_key.h"
 
+#ifdef OBF_B3_0_0
+#include "EFC/EFR_key.h"
+#include "CDM/CDM_pubdefs.h"
+#endif
+
+#ifdef OBF_B1_1_3
+#include "LSE/LFR_key.h"
 #include "FSWHeaders/CDM_pubdefs.h"
+#endif
+
 #include "CAB/CAB_lookupPub.h"
 
 #include "EDS/io/EBF_evts.h"
@@ -158,7 +166,13 @@ int ObfInterface::setupFilter(const EFC_DB_Schema* schema,
 #endif
 
     // Retrieve the key to our filter
+#ifdef OBF_B3_0_0
     unsigned int key = EFR_keyGet (CDM_findDatabase (schema->filter.id, configIndex), 0);
+#endif
+#ifdef OBF_B1_1_3
+    unsigned int key = LFR_keyGet (CDM_findDatabase (schema->filter.id, configIndex), 0);
+#endif
+
 
     // Get a pointer to the "services" structure 
     const char*                            fnd      = schema->eds.get;
@@ -289,6 +303,8 @@ bool ObfInterface::setupPassThrough(void* prm)
 /* ---------------------------------------------------------------------- */
 bool ObfInterface::loadLibrary (std::string libraryName, std::string libraryPath, int verbosity)
 {
+  // For debugging, ignore input verbosity arg.  Always set to 1
+    verbosity = 1;   
     if (verbosity > 0) printf (" Loading: %s", libraryName.c_str());
 
     std::string fullFileName = libraryPath != "" ? libraryPath + "/" : "";
@@ -320,11 +336,8 @@ const EFC_DB_Schema& ObfInterface::loadFilterLibs(IFilterLibs* filterLibs, int v
     loadLibrary (filterLibs->FilterLibName(), filterLibs->FilterLibPath(), verbosity);
 
     // Locate the Gamma filter's master configuration file
-#ifndef SCons
     loadLibrary(filterLibs->MasterConfigName(), basePath + filterLibs->MasterConfigName(), m_verbosity);
-#else
-    loadLibrary(filterLibs->MasterConfigName(), filterLibs->FilterLibPath(), m_verbosity);
-#endif
+
     // Find the Master Schema for the desired filter and get it ready for action 
     const EFC_DB_Schema* masterSchema = EFC_lookup (filterLibs->FilterSchema(), filterLibs->MasterConfigInstance());
 
@@ -353,11 +366,11 @@ const EFC_DB_Schema& ObfInterface::loadFilterLibs(IFilterLibs* filterLibs, int v
         }
 
         const std::string& fileName = idIter->second;
-#ifndef SCons
+        //#ifndef SCons
         loadLibrary(fileName, basePath + fileName, verbosity);
-#else
-        loadLibrary(fileName, filterLibs->FilterLibPath(), verbosity);
-#endif
+        //#else
+        //loadLibrary(fileName, filterLibs->FilterLibPath(), verbosity);
+        //#endif
 
         // Look up the configruation
         const EFC_DB_Schema* thisSchema = EFC_lookup (filterLibs->FilterSchema(), pair.second);

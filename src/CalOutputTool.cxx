@@ -1,7 +1,7 @@
 /**  @file CalOutputTool.cxx
     @brief implementation of class CalOutputTool
     
-  $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/CalOutputTool.cxx,v 1.4 2008/06/11 19:23:18 usher Exp $  
+  $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/CalOutputTool.cxx,v 1.5 2011/04/19 17:32:02 usher Exp $  
 */
 
 #include "IFilterTool.h"
@@ -34,7 +34,9 @@
 #include "EDS/EDR_cal.h"
 #include "EDS/EBF_cal.h"
 #include "EDS/EDR_calUnpack.h"
-#include <PBI/FFS.ih>
+///#include <PBI/FFS.ih>
+// Go back to old style, using EDS/FFS.h
+#include "EDS/FFS.h"
 
 // Useful stuff! 
 #include <map>
@@ -180,7 +182,8 @@ void CalOutputTool::eoeProcessing(EDS_fwIxb* ixb)
 
     for (int tower=0; tower<16; tower++) 
     {
-        if ((twrMap    & FFSL_mask (tower)) > 0) 
+        //  if ((twrMap    & FFSL_mask (tower)) > 0) 
+        if ((twrMap    & FFS_mask (tower)) > 0) 
         {
             const EDR_calTower*      ctr        = &cal->twrs[tower];
             int                      layerMap   =  EDR_CAL_TOWER_LAYERMAP_JUSTIFY (ctr->layerMap);

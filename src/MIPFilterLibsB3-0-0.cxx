@@ -10,21 +10,18 @@
 MIPFilterLibsB3_0_0::MIPFilterLibsB3_0_0()
 {
     // Release for this setup 
-    m_release        = "B1-1-3";
+  //    m_release        = "B1-1-3";          ??? ask Tracy about this
+    m_release        = "B3-0-0";
 
     // The Filter library name
-    m_libName        = "mfc";
+    //    m_libName        = "mfc";
+    m_libName        = "gmfc";
 
-#ifndef SCons
     // Path to this library
-    m_libPath        = "$(OBFXFCBINDIR)/mfc";
+    m_libPath        = "$(OBFXFCBINDIR)/gmfc";
 
     // Path to the master configuration file
     m_configBasePath = "$(OBFXFC_DBBINDIR)";
-#else
-    m_libPath        = "$(OBFLDPATH)";
-    m_configBasePath = "$(OBFLDPATH)";
-#endif
 
     // Name of the master configuration file
     m_masterName     = "mip_master";

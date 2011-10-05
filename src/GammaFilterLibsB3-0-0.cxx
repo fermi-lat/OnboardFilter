@@ -13,18 +13,14 @@ GammaFilterLibsB3_0_0::GammaFilterLibsB3_0_0()
     m_release        = "B3-0-0";
 
     // The Filter library name
-    m_libName        = "gfc";
+    //    m_libName        = "gfc";
+    m_libName        = "ggfc";
 
-#ifndef SCons
     // Path to this library
-    m_libPath        = "$(OBFEFCBINDIR)/gfc";
+    m_libPath        = "$(OBFEFCBINDIR)/ggfc";
 
     // Path to the master configuration file
     m_configBasePath = "$(OBFGFC_DBBINDIR)";
-#else
-    m_libPath ="$(OBFLDPATH)";
-    m_configBasePath="$(OBFLDPATH)";
-#endif
 
     // Name of the master configuration file
     m_masterName     = "gamma_master";
@@ -50,7 +46,7 @@ GammaFilterLibsB3_0_0::GammaFilterLibsB3_0_0()
     m_idToFile[SchemaPair(GAMMA_DB_SCHEMA,GAMMA_DB_INSTANCE_K_EFF)]             = "gamma_eff";
     m_idToFile[SchemaPair(GAMMA_DB_SCHEMA,GAMMA_DB_INSTANCE_K_EFF_TAPER)]       = "gamma_eff_taper";
     m_idToFile[SchemaPair(GAMMA_DB_SCHEMA,GAMMA_DB_INSTANCE_K_NORMAL_LEAK_21A)] = "gamma_normal_leak21a";
-    m_idToFile[SchemaPair(GAMMA_DB_SCHEMA,GAMMA_DB_INSTANCE_K_NORMAL_10GEV)]    = "gamma_normal_10gev";
+    m_idToFile[SchemaPair(GAMMA_DB_SCHEMA,GAMMA_DB_INSTANCE_K_NORMAL_10GEV)]    = "gamma_normal_10GeV";
     m_idToFile[SchemaPair(GAMMA_DB_SCHEMA,GAMMA_DB_INSTANCE_K_LOWE_VETO)]       = "gamma_lowe_veto";
 
     m_dummy = "No valid id found";
