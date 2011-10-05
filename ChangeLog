@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: jrb  Wed Oct  5 14:50:04 PDT 2011
+OnboardFilter
+
+Modified Files:
+	SConscript 
+Log Message:
+most of what's needed for B3-0-0 (SCons build only to start)
+    *
+------------------------------------------------------------
 TAG
 Tag name: GlastRelease-17-35-24-gr07, operation: add
 Package: OnboardFilter
