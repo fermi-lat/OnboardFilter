@@ -15,16 +15,11 @@ MIPFilterLibsB1_1_3::MIPFilterLibsB1_1_3()
     // The Filter library name
     m_libName        = "mfc";
 
-#ifndef SCons
     // Path to this library
     m_libPath        = "$(OBFXFCBINDIR)/mfc";
 
     // Path to the master configuration file
     m_configBasePath = "$(OBFXFC_DBBINDIR)";
-#else
-    m_libPath        = "$(OBFLDPATH)";
-    m_configBasePath = "$(OBFLDPATH)";
-#endif
 
     // Name of the master configuration file
     m_masterName     = "mip_master";

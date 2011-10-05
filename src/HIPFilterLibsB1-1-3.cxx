@@ -15,16 +15,11 @@ HIPFilterLibsB1_1_3::HIPFilterLibsB1_1_3()
     // The Filter library name
     m_libName        = "hfc";
 
-#ifndef SCons
     // Path to this library
     m_libPath        = "$(OBFXFCBINDIR)/hfc";
 
     // Path to the master configuration file
     m_configBasePath = "$(OBFXFC_DBBINDIR)";
-#else
-    m_libPath        = "$(OBFLDPATH)";
-    m_configBasePath = "$(OBFLDPATH";
-#endif
 
     // Name of the master configuration file
     m_masterName     = "hip_master";
