@@ -45,7 +45,7 @@ private:
     * Find out the position of a strip after converting Filter's strip
     * numbering into numbering consistent with getStripPosition()
     */
-    HepPoint3D findStripPosition(int tower, int layer, int view, int max);
+    HepGeom::Point3D<double> findStripPosition(int tower, int layer, int view, int max);
 
     double m_ZLayerInterceptsX[18];
     double m_ZLayerInterceptsY[18];

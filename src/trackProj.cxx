@@ -10,6 +10,7 @@
 #include <iostream>
 #include <exception>
 #include <cmath>
+typedef HepGeom::Point3D<double> HepPoint3D;
 
 #include "src/GEO_DB_data.h" // was GGF/.../src
 
