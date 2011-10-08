@@ -1,7 +1,7 @@
 /**  @file DGNFilterTool.cxx
     @brief implementation of class DGNFilterTool
     
-  $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/DGNFilterTool.cxx,v 1.17 2011/04/19 17:32:02 usher Exp $  
+  $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/DGNFilterTool.cxx,v 1.18 2011/10/05 21:50:04 jrb Exp $  
 */
 
 #include "IFilterTool.h"
@@ -43,20 +43,14 @@
 
 #ifdef OBF_B3_0_0
 #include "EFC/EFC.h"
-////#include "EFC/../src/EFC_samplerDef.h"
-
 #include "DGNFilterLibsB3-0-0.h"
 #else
 #include "FSWHeaders/EFC.h"
-// FSW include but made local do to keyword usage
-//#include "FSWHeaders/EFC_sampler.h"
 #endif
 
 #ifdef OBF_B1_1_3
 #include "DGNFilterLibsB1-1-3.h"
 #endif
-
-//#include "FSWHeaders/EFC.h"
 
 // FSW include but made local do to keyword usage
 #include "FSWHeaders/EFC_sampler.h"

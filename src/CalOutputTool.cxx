@@ -1,7 +1,7 @@
 /**  @file CalOutputTool.cxx
     @brief implementation of class CalOutputTool
     
-  $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/CalOutputTool.cxx,v 1.5 2011/04/19 17:32:02 usher Exp $  
+  $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/CalOutputTool.cxx,v 1.6 2011/10/05 21:50:04 jrb Exp $  
 */
 
 #include "IFilterTool.h"
@@ -34,7 +34,7 @@
 #include "EDS/EDR_cal.h"
 #include "EDS/EBF_cal.h"
 #include "EDS/EDR_calUnpack.h"
-///#include <PBI/FFS.ih>
+
 // Go back to old style, using EDS/FFS.h
 #include "EDS/FFS.h"
 

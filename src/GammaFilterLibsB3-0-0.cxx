@@ -13,7 +13,6 @@ GammaFilterLibsB3_0_0::GammaFilterLibsB3_0_0()
     m_release        = "B3-0-0";
 
     // The Filter library name
-    //    m_libName        = "gfc";
     m_libName        = "ggfc";
 
     // Path to this library

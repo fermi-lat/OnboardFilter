@@ -1,7 +1,7 @@
 /**  @file FilterTrackTool.cxx
     @brief implementation of class FilterTrackTool
     
-  $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/FilterTrackTool.cxx,v 1.11 2011/08/16 02:44:40 jrb Exp $  
+  $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/FilterTrackTool.cxx,v 1.12 2011/10/05 21:50:05 jrb Exp $  
 */
 
 #include "IFilterTool.h"
@@ -28,14 +28,18 @@
 #include "EDS/EBF_tkr.h"
 #include "EDS/EDR_cal.h"
 #include "EDS/EDR_tkrUnpack.h"
-/// #include <PBI/FFS.ih>
+
 #include "EDS/FFS.h"
 
 #include "GFC_DB/GAMMA_DB_instance.h"
 #include "EFC_DB/EFC_DB_sampler.h"
 #include "EFC/../src/GFC_def.h"
 #include "EFC/../src/TFC_geometryDef.h"
-//#include "EFC/../src/GEO_DB_data.h"
+#include "EFC/../src/GEO_DB_data.h"
+//  Alternative to above include:  define these two macros
+// #define TKR_STRIP_PITCH_MM    0.228
+// #define TKR_LADDER_GAP_MM  (2*.974 +.2)
+
 //#include "GEO_DB/GEO_DB_schema.h"
 //#include "GEO_DB/TFC_DB_geometry.h"
 #include "GEO_DB/GEO_DB_macros.h"
@@ -494,9 +498,6 @@ void FilterTrackTool::prjList_init (TFC_prjList lists[2][16])
     return;
 }
 
-//  Temporary!
-#define TKR_STRIP_PITCH_MM    0.228
-#define TKR_LADDER_GAP_MM  (2*.974 +.2)
 
 
 HepPoint3D FilterTrackTool::findStripPosition(int tower, int layer, int view, int stripHit)

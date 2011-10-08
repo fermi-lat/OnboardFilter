@@ -13,7 +13,6 @@ HIPFilterLibsB3_0_0::HIPFilterLibsB3_0_0()
     m_release        = "B3-0-0";
 
     // The Filter library name
-    //    m_libName        = "hfc";
     m_libName        = "ghfc";
 
     // Path to this library

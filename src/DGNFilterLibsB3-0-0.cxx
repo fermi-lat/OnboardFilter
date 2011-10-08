@@ -13,7 +13,6 @@ DGNFilterLibsB3_0_0::DGNFilterLibsB3_0_0()
     m_release        = "B3-0-0";
 
     // The Filter library name
-    //    m_libName        = "dfc";
     m_libName        = "gdfc";
 
     m_libPath        = "$(OBFXFCBINDIR)/gdfc";

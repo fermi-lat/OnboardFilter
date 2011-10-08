@@ -1,5 +1,5 @@
 # -*- python -*-
-# $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/SConscript,v 1.17 2011/05/20 15:51:10 heather Exp $
+# $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/SConscript,v 1.18 2011/10/05 21:50:03 jrb Exp $
 # Authors: Tracy Usher <usher@SLAC.Stanford.edu>
 # Version: OnboardFilter-04-14-07
 Import('baseEnv')
@@ -19,11 +19,11 @@ if 'obfdynlddict' in libEnv:
         #print 'adding a DEFINE: ', defstring
 	libEnv.AppendUnique(CPPDEFINES = defstring)
 
+# CPPDEFINE of obf version has been moved to containerSettings/package.scons
 #vstring = 'OBF_' + (str(baseEnv['obfversion'])).replace('-', '_')
 #while vstring.count('_') > 3:
 #    ix = vstring.rfind('_')
 #    vstring = vstring[:ix]
-    
     
 #libEnv.AppendUnique(CPPDEFINES = vstring)
 
@@ -36,19 +36,14 @@ toRemove = listFiles(['src/*B1-0*.cxx', 'src/*B1-1-0*.cxx',
                       'src/*B1-1-2*.cxx'])
 
 for r in toRemove :
-    #print "removing ", r
     cxx.remove(r)
 
 if baseEnv['obfversion'][:6] == 'B1-1-3' :
     for r in listFiles(['src/*B3-*.cxx']) :
-        #print " removing ", r
         cxx.remove(r)
 
 OnboardFilter = libEnv.SharedLibrary('OnboardFilter',
                                      cxx + listFiles(['src/Dll/*.cxx']))
-
-#print "list of files in cxx list: "
-#for f in cxx: print f
 
 progEnv.Tool('OnboardFilterLib')
 test_OnboardFilter = progEnv.GaudiProgram('test_OnboardFilter', listFiles(['src/test/*.cxx']), test=1, package='OnboardFilter')
