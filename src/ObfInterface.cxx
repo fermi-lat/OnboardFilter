@@ -13,7 +13,6 @@
 #include "EbfWriter/Ebf.h"
 
 #include "EFC_DB/EFC_DB_schema.h"
-//#include "GFC_DB/GFC_DB_V2_schema.h"
 #include "GFC_DB/GAMMA_DB_instance.h"
 #include "XFC_DB/MFC_DB_schema.h"
 #include "XFC_DB/MIP_DB_instance.h"

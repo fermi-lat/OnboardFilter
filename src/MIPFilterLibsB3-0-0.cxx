@@ -10,11 +10,9 @@
 MIPFilterLibsB3_0_0::MIPFilterLibsB3_0_0()
 {
     // Release for this setup 
-  //    m_release        = "B1-1-3";          ??? ask Tracy about this
     m_release        = "B3-0-0";
 
     // The Filter library name
-    //    m_libName        = "mfc";
     m_libName        = "gmfc";
 
     // Path to this library

@@ -1,7 +1,7 @@
 /**  @file TkrOutputTool.cxx
     @brief implementation of class TkrOutputTool
     
-  $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/TkrOutputTool.cxx,v 1.6 2011/04/19 17:32:02 usher Exp $  
+  $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/TkrOutputTool.cxx,v 1.7 2011/10/05 21:50:05 jrb Exp $  
 */
 
 #include "IFilterTool.h"
@@ -34,7 +34,7 @@
 #include "EDS/EBF_tkr.h"
 #include "EDS/EDR_cal.h"
 #include "EDS/EDR_tkrUnpack.h"
-// #include <PBI/FFS.ih>
+
 #include "EDS/FFS.h"
 #include "GFC_DB/GAMMA_DB_instance.h"
 #include "EFC_DB/EFC_DB_sampler.h"

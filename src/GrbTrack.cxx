@@ -6,16 +6,16 @@
 #ifdef OBF_B3_0_0
 #include "EFC/TFC_prjDef.h"
 #endif
-//#include <PBI/FFS.ih>
+
 #include "EDS/FFS.h"
 #include "EFC_DB/EFC_DB_sampler.h"
 #include "EFC/../src/GFC_def.h"
 #include "EFC/../src/TFC_geometryDef.h"
 // stick in the EFC/..  below to get us in obf include area
-//#include "EFC/../src/GEO_DB_data.h"  // was GGF/.../src
+#include "EFC/../src/GEO_DB_data.h"  // was GGF/.../src
 //  Temporary!  Instead of include of GEO_DB_data.h
-#define TKR_STRIP_PITCH_MM    0.228
-#define TKR_LADDER_GAP_MM  (2*.974 +.2)
+//#define TKR_STRIP_PITCH_MM    0.228
+//#define TKR_LADDER_GAP_MM  (2*.974 +.2)
 
 #include "GEO_DB/GEO_DB_macros.h"
 

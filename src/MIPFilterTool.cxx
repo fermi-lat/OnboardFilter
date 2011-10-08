@@ -1,7 +1,7 @@
 /**  @file MIPFilterTool.cxx
     @brief implementation of class MIPFilterTool
     
-  $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/MIPFilterTool.cxx,v 1.19 2011/04/19 17:32:02 usher Exp $  
+  $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/MIPFilterTool.cxx,v 1.20 2011/10/05 21:50:05 jrb Exp $  
 */
 
 #include "IFilterTool.h"
@@ -39,21 +39,14 @@
 #include "XFC_DB/MIP_DB_instance.h"
 #include "XFC/MFC_status.h"
 
-//#include "FSWHeaders/EFC.h"
-
-// FSW include but made local do to keyword usage
-//#include "FSWHeaders/EFC_sampler.h"
 
 // Contains all info for a particular filter's release
 #ifdef OBF_B3_0_0
 #include "EFC/EFC.h"
-//#include "EFC/../src/EFC_samplerDef.h"
 #include "MIPFilterLibsB3-0-0.h"
 #endif
 #ifdef OBF_B1_1_3
 #include "FSWHeaders/EFC.h"
-// FSW include but made local do to keyword usage
-//#include "FSWHeaders/EFC_sampler.h"
 #include "MIPFilterLibsB1-1-3.h"
 #endif
 

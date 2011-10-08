@@ -3,7 +3,7 @@
 //_____________________________________________________________________________
 
 #include "trackProj.h"
-//#include <PBI/FFS.ih>
+
 #include "EDS/FFS.h"
 #include "EFC_DB/EFC_DB_sampler.h"
 #include "EFC/../src/GFC_def.h"
@@ -12,10 +12,10 @@
 #include <exception>
 #include <cmath>
 
-//#include "src/GEO_DB_data.h" // was GGF/.../src
+#include "EFC/../src/GEO_DB_data.h" // was GGF/.../src
 //  Temporary!   Instead of above include
-#define TKR_STRIP_PITCH_MM    0.228
-#define TKR_LADDER_GAP_MM  (2*.974 +.2)
+//#define TKR_STRIP_PITCH_MM    0.228
+//#define TKR_LADDER_GAP_MM  (2*.974 +.2)
 #include "GEO_DB/GEO_DB_macros.h"
 #include "EFC/TFC_prjDef.h"
 
