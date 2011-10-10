@@ -1,7 +1,7 @@
 /**  @file FilterTrackTool.cxx
     @brief implementation of class FilterTrackTool
     
-  $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/FilterTrackTool.cxx,v 1.12 2011/10/05 21:50:05 jrb Exp $  
+  $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/FilterTrackTool.cxx,v 1.13 2011/10/08 00:18:35 jrb Exp $  
 */
 
 #include "IFilterTool.h"
@@ -35,7 +35,12 @@
 #include "EFC_DB/EFC_DB_sampler.h"
 #include "EFC/../src/GFC_def.h"
 #include "EFC/../src/TFC_geometryDef.h"
+#ifdef SCons
 #include "EFC/../src/GEO_DB_data.h"
+#else
+#include "src/GEO_DB_data.h"
+#endif
+
 //  Alternative to above include:  define these two macros
 // #define TKR_STRIP_PITCH_MM    0.228
 // #define TKR_LADDER_GAP_MM  (2*.974 +.2)

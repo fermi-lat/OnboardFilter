@@ -12,7 +12,12 @@
 #include <exception>
 #include <cmath>
 
+#ifdef SCons
 #include "EFC/../src/GEO_DB_data.h" // was GGF/.../src
+#else
+#include "src/GEO_DB_data.h"
+#endif
+
 //  Temporary!   Instead of above include
 //#define TKR_STRIP_PITCH_MM    0.228
 //#define TKR_LADDER_GAP_MM  (2*.974 +.2)
