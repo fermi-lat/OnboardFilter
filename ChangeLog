@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: jrb  Mon Oct 10 15:14:20 PDT 2011
+OnboardFilter/src
+
+Modified Files:
+	FilterTrackTool.cxx GrbTrack.cxx trackProj.cxx 
+Log Message:
+fix so that compile succeeds with CMT-style or SCons-style obf external
+    *
+------------------------------------------------------------
 TAG
 Tag name: OnboardFilter-04-15-00, operation: add
 Package: OnboardFilter
