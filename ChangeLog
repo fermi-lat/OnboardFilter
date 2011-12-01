@@ -2,6 +2,14 @@
 TAG
 Tag name: GlastRelease-17-35-24-gr14, operation: add
 Package: OnboardFilter
+User: heather  Wed Nov 30 21:37:42 2011
+Files:
+
+    *
+------------------------------------------------------------
+TAG
+Tag name: GlastRelease-17-35-24-gr14, operation: add
+Package: OnboardFilter
 User: heather  Wed Nov 30 21:37:37 2011
 Files:
   OnboardFilter/OnboardFilterLib.py  1.3
