@@ -1,7 +1,7 @@
 /**  @file TkrOutputTool.cxx
     @brief implementation of class TkrOutputTool
     
-  $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/TkrOutputTool.cxx,v 1.7 2011/10/05 21:50:05 jrb Exp $  
+  $Header: /nfs/slac/g/glast/ground/cvs/GlastRelease-scons/OnboardFilter/src/TkrOutputTool.cxx,v 1.8 2011/10/08 00:18:36 jrb Exp $  
 */
 
 #include "IFilterTool.h"
@@ -107,8 +107,10 @@ private:
     IDataProviderSvc* m_dataSvc;
 };
 
-static ToolFactory<TkrOutputTool> s_factory;
-const IToolFactory& TkrOutputToolFactory = s_factory;
+//static ToolFactory<TkrOutputTool> s_factory;
+//const IToolFactory& TkrOutputToolFactory = s_factory;
+DECLARE_TOOL_FACTORY(TkrOutputTool);
+
 //------------------------------------------------------------------------
 
 TkrOutputTool::TkrOutputTool(const std::string& type, 

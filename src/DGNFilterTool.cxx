@@ -1,7 +1,7 @@
 /**  @file DGNFilterTool.cxx
     @brief implementation of class DGNFilterTool
     
-  $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/DGNFilterTool.cxx,v 1.18 2011/10/05 21:50:04 jrb Exp $  
+  $Header: /nfs/slac/g/glast/ground/cvs/GlastRelease-scons/OnboardFilter/src/DGNFilterTool.cxx,v 1.19 2011/10/08 00:18:35 jrb Exp $  
 */
 
 #include "IFilterTool.h"
@@ -139,8 +139,9 @@ private:
     IMootSvc*         m_mootSvc;
 };
 
-static ToolFactory<DGNFilterTool> s_factory;
-const IToolFactory& DGNFilterToolFactory = s_factory;
+//static ToolFactory<DGNFilterTool> s_factory;
+//const IToolFactory& DGNFilterToolFactory = s_factory;
+DECLARE_TOOL_FACTORY(DGNFilterTool);
 //------------------------------------------------------------------------
 
 DGNFilterTool::DGNFilterTool(const std::string& type, 

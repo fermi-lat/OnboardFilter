@@ -1,7 +1,7 @@
 /**  @file GammaFilterTool.cxx
     @brief implementation of class GammaFilterTool
     
-  $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/GammaFilterTool.cxx,v 1.23 2011/04/19 17:32:02 usher Exp $
+  $Header: /nfs/slac/g/glast/ground/cvs/GlastRelease-scons/OnboardFilter/src/GammaFilterTool.cxx,v 1.24 2011/10/05 21:50:05 jrb Exp $
 */
 
 #include "IFilterTool.h"
@@ -163,8 +163,9 @@ private:
     IMootSvc*         m_mootSvc;
 };
 
-static ToolFactory<GammaFilterTool> s_factory;
-const IToolFactory& GammaFilterToolFactory = s_factory;
+//static ToolFactory<GammaFilterTool> s_factory;
+//const IToolFactory& GammaFilterToolFactory = s_factory;
+DECLARE_TOOL_FACTORY(GammaFilterTool);
 //------------------------------------------------------------------------
 
 GammaFilterTool::GammaFilterTool(const std::string& type, 

@@ -1,7 +1,7 @@
 /**  @file GemOutputTool.cxx
     @brief implementation of class GemOutputTool
     
-  $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/GemOutputTool.cxx,v 1.3 2008/05/16 20:18:57 usher Exp $  
+  $Header: /nfs/slac/g/glast/ground/cvs/GlastRelease-scons/OnboardFilter/src/GemOutputTool.cxx,v 1.4.302.1 2010/10/08 16:39:13 heather Exp $  
 */
 
 #include "IFilterTool.h"
@@ -81,8 +81,9 @@ private:
     IDataProviderSvc* m_dataSvc;
 };
 
-static ToolFactory<GemOutputTool> s_factory;
-const IToolFactory& GemOutputToolFactory = s_factory;
+//static ToolFactory<GemOutputTool> s_factory;
+//const IToolFactory& GemOutputToolFactory = s_factory;
+DECLARE_TOOL_FACTORY(GemOutputTool);
 //------------------------------------------------------------------------
 
 GemOutputTool::GemOutputTool(const std::string& type, 

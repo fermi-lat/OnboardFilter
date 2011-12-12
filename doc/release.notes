@@ -4,11 +4,13 @@
  * @verbatim
  * EOH *
 
+ OnboardFilter-04-16-00 08-Dec-2011    hmk Merge in Gaudi v21r7
  OnboardFilter-04-15-01 10-Oct-2011    jrb adjust some include statements for compilation against CMT-style obf
  OnboardFilter-04-15-00 10-Oct-2011    jrb First tag supporting B3-0-0
  OnboardFilter-04-14-07 20-May-2011    hmk CLHEP 2.1.0.1
  OnboardFilter-04-14-06 23-Sep-2010    jrb For SCons builds, look in a different place for libs to be dynamically loaded
  OnboardFilter-04-14-05 08-Sep-2010    jrb fix a couple minor problems concerning test program
+ OnboardFilter-04-14-04-gr01 06-Oct-2010 hmk Upgrade Gaudi v2r17 along branch
  OnboardFilter-04-14-04 31-Aug-2010    jrb For SCons build only can eliminate env. variable refs in FSWAuxLibsTool
  OnboardFilter-04-14-03 12-Jun-2010    jrb upgrades for SCons builds
  * v4r14p2 15-Sep-2009 HMK  : Modification to test JO, to use string in 

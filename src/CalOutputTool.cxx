@@ -1,7 +1,7 @@
 /**  @file CalOutputTool.cxx
     @brief implementation of class CalOutputTool
     
-  $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/CalOutputTool.cxx,v 1.6 2011/10/05 21:50:04 jrb Exp $  
+  $Header: /nfs/slac/g/glast/ground/cvs/GlastRelease-scons/OnboardFilter/src/CalOutputTool.cxx,v 1.7 2011/10/08 00:18:35 jrb Exp $  
 */
 
 #include "IFilterTool.h"
@@ -86,8 +86,9 @@ private:
     IDataProviderSvc* m_dataSvc;
 };
 
-static ToolFactory<CalOutputTool> s_factory;
-const IToolFactory& CalOutputToolFactory = s_factory;
+//static ToolFactory<CalOutputTool> s_factory;
+//const IToolFactory& CalOutputToolFactory = s_factory;
+DECLARE_TOOL_FACTORY(CalOutputTool);
 //------------------------------------------------------------------------
 
 CalOutputTool::CalOutputTool(const std::string& type, 

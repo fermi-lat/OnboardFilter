@@ -1,7 +1,7 @@
 /**  @file HIPFilterTool.cxx
     @brief implementation of class HIPFilterTool
     
-  $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/HIPFilterTool.cxx,v 1.20 2011/10/05 21:50:05 jrb Exp $  
+  $Header: /nfs/slac/g/glast/ground/cvs/GlastRelease-scons/OnboardFilter/src/HIPFilterTool.cxx,v 1.21 2011/10/08 00:18:35 jrb Exp $  
 */
 
 #include "IFilterTool.h"
@@ -123,8 +123,9 @@ private:
     IMootSvc*         m_mootSvc;
 };
 
-static ToolFactory<HIPFilterTool> s_factory;
-const IToolFactory& HIPFilterToolFactory = s_factory;
+//static ToolFactory<HIPFilterTool> s_factory;
+//const IToolFactory& HIPFilterToolFactory = s_factory;
+DECLARE_TOOL_FACTORY(HIPFilterTool);
 //------------------------------------------------------------------------
 
 HIPFilterTool::HIPFilterTool(const std::string& type, 
