@@ -1,4 +1,16 @@
 ------------------------------------------------------------
+User: heather  Mon Dec 12 12:54:03 PST 2011
+GlastRelease-scons/OnboardFilter/src
+
+Modified Files:
+	CalOutputTool.cxx DGNFilterTool.cxx FSWAuxLibsTool.cxx 
+	FilterTrackTool.cxx GammaFilterTool.cxx GemOutputTool.cxx 
+	HIPFilterTool.cxx MIPFilterTool.cxx OnboardFilter.cxx 
+	TkrOutputTool.cxx 
+Log Message:
+merge Gaudi v21r7
+    *
+------------------------------------------------------------
 User: heather  Mon Dec 12 12:54:02 PST 2011
 GlastRelease-scons/OnboardFilter/doc
 
