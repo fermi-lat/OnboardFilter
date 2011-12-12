@@ -1,7 +1,7 @@
 /**  @file FSWAuxLibsTool.cxx
     @brief implementation of class FSWAuxLibsTool
     
-  $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/FSWAuxLibsTool.cxx,v 1.11 2011/10/05 21:50:05 jrb Exp $  
+  $Header: /nfs/slac/g/glast/ground/cvs/GlastRelease-scons/OnboardFilter/src/FSWAuxLibsTool.cxx,v 1.12 2011/10/08 00:18:35 jrb Exp $  
 */
 
 #include "IFilterTool.h"
@@ -76,8 +76,9 @@ private:
     //****** This section contains various useful member variables
 };
 
-static ToolFactory<FSWAuxLibsTool> s_factory;
-const IToolFactory& FSWAuxLibsToolFactory = s_factory;
+//static ToolFactory<FSWAuxLibsTool> s_factory;
+//const IToolFactory& FSWAuxLibsToolFactory = s_factory;
+DECLARE_TOOL_FACTORY(FSWAuxLibsTool);
 //------------------------------------------------------------------------
 
 FSWAuxLibsTool::FSWAuxLibsTool(const std::string& type, 

@@ -1,7 +1,7 @@
 /**  @file MIPFilterTool.cxx
     @brief implementation of class MIPFilterTool
     
-  $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/MIPFilterTool.cxx,v 1.20 2011/10/05 21:50:05 jrb Exp $  
+  $Header: /nfs/slac/g/glast/ground/cvs/GlastRelease-scons/OnboardFilter/src/MIPFilterTool.cxx,v 1.21 2011/10/08 00:18:36 jrb Exp $  
 */
 
 #include "IFilterTool.h"
@@ -124,8 +124,9 @@ private:
     IMootSvc*         m_mootSvc;
 };
 
-static ToolFactory<MIPFilterTool> s_factory;
-const IToolFactory& MIPFilterToolFactory = s_factory;
+//static ToolFactory<MIPFilterTool> s_factory;
+//const IToolFactory& MIPFilterToolFactory = s_factory;
+DECLARE_TOOL_FACTORY(MIPFilterTool);
 //------------------------------------------------------------------------
 
 MIPFilterTool::MIPFilterTool(const std::string& type, 
