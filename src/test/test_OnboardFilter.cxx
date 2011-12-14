@@ -1,4 +1,4 @@
-// $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/test/test_OnboardFilter.cxx,v 1.2 2008/06/25 15:18:51 usher Exp $
+// $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/test/test_OnboardFilter.cxx,v 1.3.290.1 2010/10/08 16:39:13 heather Exp $
 // Include files
 // Gaudi system includes
 #include "GaudiKernel/MsgStream.h"
@@ -22,7 +22,7 @@
 *
 * @author Tracy Usher
 *
-* $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/test/test_OnboardFilter.cxx,v 1.2 2008/06/25 15:18:51 usher Exp $
+* $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/test/test_OnboardFilter.cxx,v 1.3.290.1 2010/10/08 16:39:13 heather Exp $
 */
 
 class test_OnboardFilter : public Algorithm {
@@ -43,9 +43,9 @@ private:
 // expect that the xxx_load.cxx file contains a call     
 //     DLL_DECL_ALGORITHM( test_OnboardFilter );
 
-static const AlgFactory<test_OnboardFilter>  Factory;
-const IAlgFactory& test_OnboardFilterFactory = Factory;
-
+//static const AlgFactory<test_OnboardFilter>  Factory;
+//const IAlgFactory& test_OnboardFilterFactory = Factory;
+DECLARE_ALGORITHM_FACTORY(test_OnboardFilter);
 //------------------------------------------------------------------------
 //! ctor
 test_OnboardFilter::test_OnboardFilter(const std::string& name, 

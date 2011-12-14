@@ -1,7 +1,8 @@
 # -*- python -*-
-# $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/SConscript,v 1.16 2010/09/23 22:59:26 jrb Exp $
+# $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/SConscript,v 1.17 2011/05/20 15:51:10 heather Exp $
 # Authors: Tracy Usher <usher@SLAC.Stanford.edu>
-# Version: OnboardFilter-04-14-07
+# Version: OnboardFilter-04-14-07-gr01
+
 Import('baseEnv')
 Import('listFiles')
 Import('packages')
@@ -21,8 +22,8 @@ libEnv.AppendUnique(CPPDEFINES = ['EFC_FILTER'])
 if baseEnv['PLATFORM'] == 'win32':
 	libEnv.AppendUnique(CPPDEFINES = ['_WIN32'])
 
-OnboardFilter = libEnv.SharedLibrary('OnboardFilter', listFiles(['src/*.cxx',
-						'src/Dll/*.cxx']))
+OnboardFilter = libEnv.ComponentLibrary('OnboardFilter',
+					listFiles(['src/*.cxx']))
 
 progEnv.Tool('OnboardFilterLib')
 test_OnboardFilter = progEnv.GaudiProgram('test_OnboardFilter', listFiles(['src/test/*.cxx']), test=1, package='OnboardFilter')

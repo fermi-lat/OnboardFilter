@@ -1,6 +1,5 @@
 package OnboardFilter
-version v4r14p7
-# $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/cmt/requirements,v 1.118 2010/09/23 22:59:27 jrb Exp $
+version v4r14p7gr01
 
 author Tracy Usher <usher@SLAC.Stanford.edu>
 
@@ -19,6 +18,7 @@ use CRflux v*
 use TkrDigi v*
 use AcdDigi v*
 use CalDigi v*
+use RootmapPolicy * GlastPolicy
 use gr_app v*
 
 macro OnboardFilter_cppflags "" \
@@ -36,8 +36,9 @@ macro headers "" WIN32 "*.h"
 
 library OnboardFilter \
  -s=../OnboardFilter $(headers)\
- -s=../src *.cxx *.h \
- -s=Dll *.cxx 
+ -s=../src *.cxx *.h 
+
+apply_pattern generate_rootmap library=OnboardFilter
  
 
 # use this only for the test. TODO: make it cleaner
