@@ -1,4 +1,14 @@
 ------------------------------------------------------------
+User: heather  Tue Dec 13 18:10:12 PST 2011
+OnboardFilter
+
+Modified Files:
+      Tag: GlastReleasev19r4p0
+	SConscript 
+Log Message:
+merge in Gaudi v21r7 mods into GlastReleasev19r4p0 branch for now
+    *
+------------------------------------------------------------
 TAG
 Tag name: OnboardFilter-04-16-00, operation: add
 Package: OnboardFilter
