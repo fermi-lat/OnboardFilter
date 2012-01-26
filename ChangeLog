@@ -1,4 +1,17 @@
 ------------------------------------------------------------
+User: heather  Thu Jan 26 07:21:40 PST 2012
+OnboardFilter/src
+
+Modified Files:
+      Tag: GlastRelease-17-35-24-br01
+	CalOutputTool.cxx DGNFilterTool.cxx FSWAuxLibsTool.cxx 
+	FilterTrackTool.cxx GammaFilterTool.cxx GemOutputTool.cxx 
+	HIPFilterTool.cxx MIPFilterTool.cxx OnboardFilter.cxx 
+	TkrOutputTool.cxx 
+Log Message:
+Gaudi v21r7
+    *
+------------------------------------------------------------
 User: heather  Thu Jan 26 07:21:39 PST 2012
 OnboardFilter/doc
 
