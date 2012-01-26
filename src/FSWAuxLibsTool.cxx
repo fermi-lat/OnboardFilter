@@ -1,7 +1,7 @@
 /**  @file FSWAuxLibsTool.cxx
     @brief implementation of class FSWAuxLibsTool
     
-  $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/FSWAuxLibsTool.cxx,v 1.9 2010/06/16 00:36:31 jrb Exp $  
+  $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/FSWAuxLibsTool.cxx,v 1.13 2011/12/12 20:54:03 heather Exp $  
 */
 
 #include "IFilterTool.h"
@@ -17,7 +17,13 @@
 #include "ObfInterface.h"
 
 // FSW includes go here
+#ifdef OBF_1_1_3
 #include "FSWHeaders/CDM_pubdefs.h"
+#endif
+
+#ifdef OBF_3_0_0
+#include "CDM/CDM_pubdefs.h"
+#endif
 
 // Useful stuff! 
 #include <stdexcept>
@@ -70,8 +76,9 @@ private:
     //****** This section contains various useful member variables
 };
 
-static ToolFactory<FSWAuxLibsTool> s_factory;
-const IToolFactory& FSWAuxLibsToolFactory = s_factory;
+//static ToolFactory<FSWAuxLibsTool> s_factory;
+//const IToolFactory& FSWAuxLibsToolFactory = s_factory;
+DECLARE_TOOL_FACTORY(FSWAuxLibsTool);
 //------------------------------------------------------------------------
 
 FSWAuxLibsTool::FSWAuxLibsTool(const std::string& type, 
@@ -88,18 +95,14 @@ FSWAuxLibsTool::FSWAuxLibsTool(const std::string& type,
     // declare properties with setProperties calls
     // See the file EFC/src/GFC_def.h for the definition of these variables
     // ****DO NOT CHANGE unless you know what you are doing ! *****
-#ifndef SCons
+    //#ifndef SCons
     declareProperty("PathNamePeds",     m_PathName_Pedestals = "$(OBFCOP_DBBINDIR)/cal_db_pedestals");
-#else
-    declareProperty("PathNamePeds",     m_PathName_Pedestals = "$(OBFLDPATH)");
-#endif
+    //#else
+    //    declareProperty("PathNamePeds",     m_PathName_Pedestals = "$(OBFLDPATH)");
+    //#endif
 
     declareProperty("FileNamePeds",     m_FileName_Pedestals = "cal_db_pedestals");
-#ifndef SCons
     declareProperty("PathNameGains",    m_PathName_Gains     = "$(OBFCOG_DBBINDIR)/cal_db_gains");
-#else
-    declareProperty("PathNameGains",    m_PathName_Gains     = "$(OBFLDPATH)");
-#endif
 
     declareProperty("FileNameGains",    m_FileName_Gains     = "cal_db_gains");
 
@@ -139,11 +142,7 @@ StatusCode FSWAuxLibsTool::initialize()
         obf->loadLibrary(calGainFile, calGainPath);
 
         // Load the Gleam geometry for fsw
-#ifndef SCons
         obf->loadLibrary ("geo_db_data", "$(OBFGGF_DBBINDIR)/geo_db_data");
-#else
-        obf->loadLibrary ("geo_db_data", "$(OBFLDPATH)");
-#endif
     }
     catch(ObfInterface::ObfException& obfException)
     {
