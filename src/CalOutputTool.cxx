@@ -1,7 +1,7 @@
 /**  @file CalOutputTool.cxx
     @brief implementation of class CalOutputTool
     
-  $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/CalOutputTool.cxx,v 1.3 2008/05/16 20:18:57 usher Exp $  
+  $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/CalOutputTool.cxx,v 1.8 2011/12/12 20:54:02 heather Exp $  
 */
 
 #include "IFilterTool.h"
@@ -34,6 +34,8 @@
 #include "EDS/EDR_cal.h"
 #include "EDS/EBF_cal.h"
 #include "EDS/EDR_calUnpack.h"
+
+// Go back to old style, using EDS/FFS.h
 #include "EDS/FFS.h"
 
 // Useful stuff! 
@@ -84,8 +86,9 @@ private:
     IDataProviderSvc* m_dataSvc;
 };
 
-static ToolFactory<CalOutputTool> s_factory;
-const IToolFactory& CalOutputToolFactory = s_factory;
+//static ToolFactory<CalOutputTool> s_factory;
+//const IToolFactory& CalOutputToolFactory = s_factory;
+DECLARE_TOOL_FACTORY(CalOutputTool);
 //------------------------------------------------------------------------
 
 CalOutputTool::CalOutputTool(const std::string& type, 
@@ -180,6 +183,7 @@ void CalOutputTool::eoeProcessing(EDS_fwIxb* ixb)
 
     for (int tower=0; tower<16; tower++) 
     {
+        //  if ((twrMap    & FFSL_mask (tower)) > 0) 
         if ((twrMap    & FFS_mask (tower)) > 0) 
         {
             const EDR_calTower*      ctr        = &cal->twrs[tower];

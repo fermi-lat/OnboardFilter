@@ -1,7 +1,7 @@
 /**  @file DGNFilterTool.cxx
     @brief implementation of class DGNFilterTool
     
-  $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/DGNFilterTool.cxx,v 1.15 2008/09/20 18:14:22 usher Exp $  
+  $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/DGNFilterTool.cxx,v 1.20 2011/12/12 20:54:02 heather Exp $  
 */
 
 #include "IFilterTool.h"
@@ -26,21 +26,44 @@
 #include "ObfInterface.h"
 
 // FSW includes go here
+#ifdef OBF_B3_0_0
+#include "CDM/CDM_pubdefs.h"
+#endif
+#ifdef OBF_B1_1_3
 #include "FSWHeaders/CDM_pubdefs.h"
+#endif
+
 #include "EFC_DB/EFC_DB_schema.h"
 #include "EFC_DB/EH_ids.h"
 #include "XFC_DB/DFC_DB_schema.h"
 #include "XFC_DB/DGN_DB_instance.h"
 #include "XFC/DFC_status.h"
 
+
+
+#ifdef OBF_B3_0_0
+#include "EFC/EFC.h"
+#include "DGNFilterLibsB3-0-0.h"
+#else
 #include "FSWHeaders/EFC.h"
-#include "LSE/LFR_key.h"
+#endif
+
+#ifdef OBF_B1_1_3
+#include "DGNFilterLibsB1-1-3.h"
+#endif
 
 // FSW include but made local do to keyword usage
 #include "FSWHeaders/EFC_sampler.h"
 
 // Contains all info for a particular filter's release
-#include "DGNFilterLibsB1-1-2.h"
+#ifdef OBF_B3_0_0
+#include "DGNFilterLibsB3-0-0.h"
+#endif
+
+#ifdef OBF_B1_1_3
+#include "DGNFilterLibsB1-1-3.h"
+#endif
+
 
 // Useful stuff! 
 #include <map>
@@ -116,8 +139,9 @@ private:
     IMootSvc*         m_mootSvc;
 };
 
-static ToolFactory<DGNFilterTool> s_factory;
-const IToolFactory& DGNFilterToolFactory = s_factory;
+//static ToolFactory<DGNFilterTool> s_factory;
+//const IToolFactory& DGNFilterToolFactory = s_factory;
+DECLARE_TOOL_FACTORY(DGNFilterTool);
 //------------------------------------------------------------------------
 
 DGNFilterTool::DGNFilterTool(const std::string& type, 
@@ -196,7 +220,12 @@ StatusCode DGNFilterTool::initialize()
         // Get ObfInterface pointer
         ObfInterface* obf = ObfInterface::instance();
 
-        m_filterLibs = new DGNFilterLibsB1_1_2();
+#ifdef OBF_B3_0_0
+        m_filterLibs = new DGNFilterLibsB3_0_0();
+#endif
+#ifdef OBF_B1_1_3
+        m_filterLibs = new DGNFilterLibsB1_1_3();
+#endif
         const EFC_DB_Schema& master = obf->loadFilterLibs(m_filterLibs, m_verbosity);
 
         // Check to see what mode we want to run... (if a different one requested via JO parameter)
