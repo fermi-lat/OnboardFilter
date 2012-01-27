@@ -417,7 +417,7 @@ unsigned int ObfInterface::filterEvent(EbfWriterTds::Ebf* ebfData)
     pktsu.ps.pkt  = (EBF_pkt*)(dataPtr);
 
     // Now convert to a EBF_pkts struct
-    EBF_pkts      pkts = pktsu.ll;
+    EBF_pkts      pkts = pktsu.p;
 
     // Get a warm and fuzzy feeling by doing a simple check...
     /*********************************************************************
