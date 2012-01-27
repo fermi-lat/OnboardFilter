@@ -2,6 +2,77 @@
 TAG
 Tag name: GlastRelease-17-35-24-br02, operation: add
 Package: OnboardFilter
+User: heather  Fri Jan 27 14:03:24 2012
+Files:
+  OnboardFilter/src/HIPFilterLibsB1-1-3.h  1.3
+  OnboardFilter/src/GrbTrack.cxx  1.6
+  OnboardFilter/src/HIPFilterLibsB1-0-8.h  1.2
+  OnboardFilter/src/MIPFilterLibsB1-1-3.cxx  1.4
+  OnboardFilter/src/MIPFilterLibsB1-1-2.h  1.1
+  OnboardFilter/src/IFilterTool.h  1.3
+  OnboardFilter/src/CalOutputTool.cxx  1.4
+  OnboardFilter/src/MIPFilterLibsB1-1-0.cxx  1.2
+  OnboardFilter/src/GammaFilterCfgPrms.h  1.2
+  OnboardFilter/src/FSWAuxLibsTool.cxx  1.10
+  OnboardFilter/src/ObfInterface.h  1.10
+  OnboardFilter/src/MIPFilterLibsB1-1-3.h  1.3
+  OnboardFilter/src/DGNFilterLibsB1-1-2.h  1.1
+  OnboardFilter/src/MIPFilterLibsB1-0-8.h  1.2
+  OnboardFilter/src/GammaFilterLibsB1-1-0.cxx  1.2
+  OnboardFilter/src/OutputRtn.h  1.3
+  OnboardFilter/src/MIPFilterTool.cxx  1.18
+  OnboardFilter/src/DGNFilterLibsB1-1-3.h  1.3
+  OnboardFilter/src/trackProj.h  1.5
+  OnboardFilter/src/HIPFilterLibsB1-1-2.h  1.1
+  OnboardFilter/src/MIPFilterLibsB1-1-0.h  1.2
+  OnboardFilter/src/HIPFilterTool.cxx  1.18
+  OnboardFilter/src/HIPFilterLibsB1-1-3.cxx  1.4
+  OnboardFilter/src/GammaFilterLibsB1-1-2.cxx  1.2
+  OnboardFilter/src/DGNFilterLibsB1-1-2.cxx  1.2
+  OnboardFilter/src/OnboardFilter.cxx  1.84
+  OnboardFilter/src/GammaFilterLibsB1-1-3.h  1.3
+  OnboardFilter/src/GammaFilterCfgPrms.cxx  1.3
+  OnboardFilter/src/GammaFilterTool.cxx  1.22
+  OnboardFilter/src/ObfInterface.cxx  1.27
+  OnboardFilter/src/DGNFilterLibsB1-0-8.cxx  1.2
+  OnboardFilter/src/DGNFilterLibsB1-1-0.h  1.2
+  OnboardFilter/src/HIPFilterLibsB1-0-8.cxx  1.2
+  OnboardFilter/src/IFilterLibs.h  1.2
+  OnboardFilter/src/HIPFilterLibsB1-1-0.cxx  1.2
+  OnboardFilter/src/GammaFilterLibsB1-0-8.h  1.2
+  OnboardFilter/src/IFilterCfgPrms.h  1.1
+  OnboardFilter/src/GammaFilterLibsB1-1-0.h  1.2
+  OnboardFilter/src/GammaFilterLibsB1-1-2.h  1.1
+  OnboardFilter/src/TkrOutputTool.cxx  1.5
+  OnboardFilter/src/DGNFilterLibsB1-1-3.cxx  1.4
+  OnboardFilter/src/GammaFilterLibsB1-0-8.cxx  1.3
+  OnboardFilter/src/DGNFilterLibsB1-1-0.cxx  1.2
+  OnboardFilter/src/trackProj.cxx  1.7
+  OnboardFilter/src/GammaFilterLibsB1-1-3.cxx  1.5
+  OnboardFilter/src/GemOutputTool.cxx  1.4
+  OnboardFilter/src/HIPFilterLibsB1-1-2.cxx  1.2
+  OnboardFilter/src/FilterTrackTool.cxx  1.7
+  OnboardFilter/src/DGNFilterLibsB1-0-8.h  1.2
+  OnboardFilter/src/.cvsignore  1.1
+  OnboardFilter/src/MIPFilterLibsB1-1-2.cxx  1.2
+  OnboardFilter/src/DGNFilterTool.cxx  1.16
+  OnboardFilter/src/MIPFilterLibsB1-0-8.cxx  1.2
+  OnboardFilter/src/GrbTrack.h  1.3
+  OnboardFilter/src/HIPFilterLibsB1-1-0.h  1.2
+  OnboardFilter/src/Dll/OnboardFilter_dll.cxx  1.5
+  OnboardFilter/src/Dll/OnboardFilter_load.cxx  1.9
+  OnboardFilter/src/FSWHeaders/TFC_prjDef.h  1.1
+  OnboardFilter/src/FSWHeaders/EFC_sampler.h  1.2
+  OnboardFilter/src/FSWHeaders/CDM_pubdefs.h  1.2
+  OnboardFilter/src/FSWHeaders/EFC.h  1.1
+  OnboardFilter/src/test/jobOptions.txt  1.25
+  OnboardFilter/src/test/test_OnboardFilter.cxx  1.3
+
+    *
+------------------------------------------------------------
+TAG
+Tag name: GlastRelease-17-35-24-br02, operation: add
+Package: OnboardFilter
 User: heather  Fri Jan 27 14:03:14 2012
 Files:
 
