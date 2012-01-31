@@ -2,7 +2,13 @@
 #define GrbFindTrack_h
 
 // obf Track definitions
+#ifdef OBF_B1_1_3
 #include "FSWHeaders/TFC_prjDef.h"
+#endif
+#ifdef OBF_B3_0_0
+#include "EFC/TFC_prjDef.h"
+#endif
+
 #include "EFC/EFC_edsFw.h"
 
 // HepPoint3D
@@ -89,7 +95,7 @@ private:
     void         prjList_init (TFC_prjList lists[2][16]);
 
     // Find out the position of a strip 
-    HepPoint3D findStripPosition(int tower, int layer, int view, int stripHit);
+    HepGeom::Point3D<double> findStripPosition(int tower, int layer, int view, int stripHit);
     
     // data members
     unsigned int m_strip_pitch;  /*!< Tracker strip pitch, in mm            */
