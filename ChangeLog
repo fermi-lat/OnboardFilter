@@ -1,4 +1,22 @@
 ------------------------------------------------------------
+User: heather  Tue Jan 31 13:41:17 PST 2012
+OnboardFilter/src
+
+Modified Files:
+      Tag: GlastRelease-17-35-24-br01
+	DGNFilterLibsB1-1-3.cxx GammaFilterLibsB1-1-3.cxx GrbTrack.cxx 
+	GrbTrack.h HIPFilterLibsB1-1-3.cxx MIPFilterLibsB1-1-3.cxx 
+	ObfInterface.cxx trackProj.cxx trackProj.h 
+Added Files:
+      Tag: GlastRelease-17-35-24-br01
+	DGNFilterLibsB3-0-0.cxx DGNFilterLibsB3-0-0.h 
+	GammaFilterLibsB3-0-0.cxx GammaFilterLibsB3-0-0.h 
+	HIPFilterLibsB3-0-0.cxx HIPFilterLibsB3-0-0.h 
+	MIPFilterLibsB3-0-0.cxx MIPFilterLibsB3-0-0.h 
+Log Message:
+merge in the updates for B3-0-0
+    *
+------------------------------------------------------------
 User: heather  Tue Jan 31 13:41:16 PST 2012
 OnboardFilter/cmt
 
