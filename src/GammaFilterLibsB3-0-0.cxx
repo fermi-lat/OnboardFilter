@@ -2,21 +2,21 @@
 #include <stdio.h>
 #include <errno.h>
 
-#include "GammaFilterLibsB1-1-3.h"
+#include "GammaFilterLibsB3-0-0.h"
 
 #include "GFC_DB/GFC_DB_V3_schema.h"
 #include "GFC_DB/GAMMA_DB_instance.h"
 
-GammaFilterLibsB1_1_3::GammaFilterLibsB1_1_3()
+GammaFilterLibsB3_0_0::GammaFilterLibsB3_0_0()
 {
     // Release for this setup 
-    m_release        = "B1-1-3";
+    m_release        = "B3-0-0";
 
     // The Filter library name
-    m_libName        = "gfc";
+    m_libName        = "ggfc";
 
     // Path to this library
-    m_libPath        = "$(OBFEFCBINDIR)/gfc";
+    m_libPath        = "$(OBFEFCBINDIR)/ggfc";
 
     // Path to the master configuration file
     m_configBasePath = "$(OBFGFC_DBBINDIR)";
@@ -44,7 +44,8 @@ GammaFilterLibsB1_1_3::GammaFilterLibsB1_1_3()
     m_idToFile[SchemaPair(GAMMA_DB_SCHEMA,GAMMA_DB_INSTANCE_K_CALIB_A_LEAK)]    = "gamma_calib_a_leak";
     m_idToFile[SchemaPair(GAMMA_DB_SCHEMA,GAMMA_DB_INSTANCE_K_EFF)]             = "gamma_eff";
     m_idToFile[SchemaPair(GAMMA_DB_SCHEMA,GAMMA_DB_INSTANCE_K_EFF_TAPER)]       = "gamma_eff_taper";
-    m_idToFile[SchemaPair(GAMMA_DB_SCHEMA,GAMMA_DB_INSTANCE_K_NORMAL_LEAK_21A)] = "gamma_normal_leak_21a";
+    m_idToFile[SchemaPair(GAMMA_DB_SCHEMA,GAMMA_DB_INSTANCE_K_NORMAL_LEAK_21A)] = "gamma_normal_leak21a";
+    m_idToFile[SchemaPair(GAMMA_DB_SCHEMA,GAMMA_DB_INSTANCE_K_NORMAL_10GEV)]    = "gamma_normal_10GeV";
     m_idToFile[SchemaPair(GAMMA_DB_SCHEMA,GAMMA_DB_INSTANCE_K_LOWE_VETO)]       = "gamma_lowe_veto";
 
     m_dummy = "No valid id found";
@@ -61,6 +62,7 @@ GammaFilterLibsB1_1_3::GammaFilterLibsB1_1_3()
     m_instanceIdToStringMap[GAMMA_DB_INSTANCE_K_CALIB_A_LEAK]    = "GAMMA_DB_INSTANCE_K_CALIB_A_LEAK";
     m_instanceIdToStringMap[GAMMA_DB_INSTANCE_K_EFF]             = "GAMMA_DB_INSTANCE_K_EFF";
     m_instanceIdToStringMap[GAMMA_DB_INSTANCE_K_EFF_TAPER]       = "GAMMA_DB_INSTANCE_K_EFF_TAPER";
+    m_instanceIdToStringMap[GAMMA_DB_INSTANCE_K_NORMAL_10GEV]    = "GAMMA_DB_INSTANCE_K_NORMAL_10GEV";
     m_instanceIdToStringMap[GAMMA_DB_INSTANCE_K_NORMAL_LEAK_21A] = "GAMMA_DB_INSTANCE_K_NORMAL_LEAK_21A";
     m_instanceIdToStringMap[GAMMA_DB_INSTANCE_K_NORMAL_LEAK_17A] = "GAMMA_DB_INSTANCE_K_NORMAL_LEAK_17A";
     m_instanceIdToStringMap[GAMMA_DB_INSTANCE_K_LOWE_VETO]       = "GAMMA_DB_INSTANCE_K_LOWE_VETO";
@@ -77,6 +79,7 @@ GammaFilterLibsB1_1_3::GammaFilterLibsB1_1_3()
     m_instanceStringToIdMap["GAMMA_DB_INSTANCE_K_CALIB_A_LEAK"]    = GAMMA_DB_INSTANCE_K_CALIB_A_LEAK;
     m_instanceStringToIdMap["GAMMA_DB_INSTANCE_K_EFF"]             = GAMMA_DB_INSTANCE_K_EFF;
     m_instanceStringToIdMap["GAMMA_DB_INSTANCE_K_EFF_TAPER"]       = GAMMA_DB_INSTANCE_K_EFF_TAPER;
+    m_instanceStringToIdMap["GAMMA_DB_INSTANCE_K_NORMAL_10GEV"]    = GAMMA_DB_INSTANCE_K_NORMAL_10GEV;
     m_instanceStringToIdMap["GAMMA_DB_INSTANCE_K_NORMAL_LEAK_21A"] = GAMMA_DB_INSTANCE_K_NORMAL_LEAK_21A;
     m_instanceStringToIdMap["GAMMA_DB_INSTANCE_K_NORMAL_LEAK_17A"] = GAMMA_DB_INSTANCE_K_NORMAL_LEAK_17A;
     m_instanceStringToIdMap["GAMMA_DB_INSTANCE_K_LOWE_VETO"]       = GAMMA_DB_INSTANCE_K_LOWE_VETO;
@@ -123,12 +126,12 @@ GammaFilterLibsB1_1_3::GammaFilterLibsB1_1_3()
 
 }
 
-GammaFilterLibsB1_1_3::~GammaFilterLibsB1_1_3()
+GammaFilterLibsB3_0_0::~GammaFilterLibsB3_0_0()
 {
 }
 
 // Given instance id typedef, return the string version of it
-const std::string& GammaFilterLibsB1_1_3::getInstanceIdString(unsigned short int id) const
+const std::string& GammaFilterLibsB3_0_0::getInstanceIdString(unsigned short int id) const
 {
     std::map<unsigned short int, std::string>::const_iterator idIter = m_instanceIdToStringMap.find(id);
 
@@ -138,7 +141,7 @@ const std::string& GammaFilterLibsB1_1_3::getInstanceIdString(unsigned short int
 }
 
 // Other way, given instance id string, return the typedef
-const unsigned short int GammaFilterLibsB1_1_3::getInstanceId(const std::string& id) const
+const unsigned short int GammaFilterLibsB3_0_0::getInstanceId(const std::string& id) const
 {
     unsigned short int typeId = -1;
 
@@ -150,7 +153,7 @@ const unsigned short int GammaFilterLibsB1_1_3::getInstanceId(const std::string&
 }
 
 // Return string description of a given bit in status word
-const std::string& GammaFilterLibsB1_1_3::getStatWordDesc(int idx) const
+const std::string& GammaFilterLibsB3_0_0::getStatWordDesc(int idx) const
 {
     if (idx < 0 || idx >= m_statusWordStringVec.size()) return "";
 

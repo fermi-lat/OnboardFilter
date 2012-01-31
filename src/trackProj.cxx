@@ -3,6 +3,7 @@
 //_____________________________________________________________________________
 
 #include "trackProj.h"
+
 #include "EDS/FFS.h"
 #include "EFC_DB/EFC_DB_sampler.h"
 #include "EFC/../src/GFC_def.h"
@@ -11,8 +12,19 @@
 #include <exception>
 #include <cmath>
 
-#include "src/GEO_DB_data.h" // was GGF/.../src
+#ifdef SCons
+#include "EFC/../src/GEO_DB_data.h" // was GGF/.../src
+#else
+#include "src/GEO_DB_data.h"
+#endif
 
+//  Temporary!   Instead of above include
+//#define TKR_STRIP_PITCH_MM    0.228
+//#define TKR_LADDER_GAP_MM  (2*.974 +.2)
+#include "GEO_DB/GEO_DB_macros.h"
+#include "EFC/TFC_prjDef.h"
+
+typedef HepGeom::Point3D<double> HepPoint3D;
 //____________________________________________________________________________
 trackProj::trackProj(GFC_cfg* cfg) 
 {
@@ -47,13 +59,14 @@ void trackProj::execute(const TFC_prjs* prjs,
 
     while (tmsk) 
     {
-        int               tower = FFS(tmsk);
+      int               tower = FFS(tmsk);  // tower = FFSL(tmsk);
         const TFC_prjDir* dir   = prjs->dir + tower;
         const TFC_prj*    prj   = prjs->prjs + dir->idx;
         int               xCnt  = dir->xCnt;
         int               yCnt  = dir->yCnt;
 
-        tmsk  = FFS_eliminate (tmsk, tower);  // eliminate bit corresponding to tower
+        // eliminate bit corresponding to tower
+        tmsk  = FFS_eliminate (tmsk, tower);  // FFSL_eliminate (tmsk, tower);
 
         /* Form the projection directory for this tower */
         if (xCnt > 0 && yCnt > 0)

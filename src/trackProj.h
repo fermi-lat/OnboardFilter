@@ -1,7 +1,12 @@
 #ifndef TRACKPROJ
 #define TRACKPROJ
 
+#ifdef OBF_B1_1_3
 #include "FSWHeaders/TFC_prjDef.h"
+#endif
+#ifdef BOF_B3_0_0
+#include "EFC/TFC_prjDef.h"
+#endif
 
 #include "CLHEP/Geometry/Transform3D.h"
 #include "CLHEP/Vector/Rotation.h"
@@ -16,6 +21,7 @@
 
 typedef struct _GFC_cfg         GFC_cfg;
 typedef struct _TFC_geometryTkr TFC_geometryTkr;
+typedef struct _TFC_prjs        TFC_prjs;
 
 class trackProj 
 { 
@@ -45,7 +51,7 @@ private:
     * Find out the position of a strip after converting Filter's strip
     * numbering into numbering consistent with getStripPosition()
     */
-    HepPoint3D findStripPosition(int tower, int layer, int view, int max);
+    HepGeom::Point3D<double> findStripPosition(int tower, int layer, int view, int max);
 
     double m_ZLayerInterceptsX[18];
     double m_ZLayerInterceptsY[18];

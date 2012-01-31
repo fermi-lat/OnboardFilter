@@ -2,21 +2,21 @@
 #include <stdio.h>
 #include <errno.h>
 
-#include "HIPFilterLibsB1-1-3.h"
+#include "HIPFilterLibsB3-0-0.h"
 
 #include "XFC_DB/HFC_DB_schema.h"
 #include "XFC_DB/HIP_DB_instance.h"
 
-HIPFilterLibsB1_1_3::HIPFilterLibsB1_1_3()
+HIPFilterLibsB3_0_0::HIPFilterLibsB3_0_0()
 {
     // Release for this setup 
-    m_release        = "B1-1-3";
+    m_release        = "B3-0-0";
 
     // The Filter library name
-    m_libName        = "hfc";
+    m_libName        = "ghfc";
 
     // Path to this library
-    m_libPath        = "$(OBFXFCBINDIR)/hfc";
+    m_libPath        = "$(OBFXFCBINDIR)/ghfc";
 
     // Path to the master configuration file
     m_configBasePath = "$(OBFXFC_DBBINDIR)";
@@ -100,12 +100,12 @@ HIPFilterLibsB1_1_3::HIPFilterLibsB1_1_3()
     m_statusWordStringVec.push_back("HFC_STATUS_M_VETOED             ");
 }
 
-HIPFilterLibsB1_1_3::~HIPFilterLibsB1_1_3()
+HIPFilterLibsB3_0_0::~HIPFilterLibsB3_0_0()
 {
 }
 
 // Given instance id typedef, return the string version of it
-const std::string& HIPFilterLibsB1_1_3::getInstanceIdString(unsigned short int id) const
+const std::string& HIPFilterLibsB3_0_0::getInstanceIdString(unsigned short int id) const
 {
     std::map<unsigned short int, std::string>::const_iterator idIter = m_instanceIdToStringMap.find(id);
 
@@ -115,7 +115,7 @@ const std::string& HIPFilterLibsB1_1_3::getInstanceIdString(unsigned short int i
 }
 
 // Other way, given instance id string, return the typedef
-const unsigned short int HIPFilterLibsB1_1_3::getInstanceId(const std::string& id) const
+const unsigned short int HIPFilterLibsB3_0_0::getInstanceId(const std::string& id) const
 {
     unsigned short int typeId = -1;
 
@@ -127,7 +127,7 @@ const unsigned short int HIPFilterLibsB1_1_3::getInstanceId(const std::string& i
 }
 
 // Return string description of a given bit in status word
-const std::string& HIPFilterLibsB1_1_3::getStatWordDesc(int idx) const
+const std::string& HIPFilterLibsB3_0_0::getStatWordDesc(int idx) const
 {
     if (idx < 0 || idx >= m_statusWordStringVec.size()) return "";
 

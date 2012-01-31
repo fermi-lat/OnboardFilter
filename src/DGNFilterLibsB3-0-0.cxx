@@ -2,24 +2,23 @@
 #include <stdio.h>
 #include <errno.h>
 
-#include "DGNFilterLibsB1-1-3.h"
+#include "DGNFilterLibsB3-0-0.h"
 
 #include "XFC_DB/DFC_DB_schema.h"
 #include "XFC_DB/DGN_DB_instance.h"
 
-DGNFilterLibsB1_1_3::DGNFilterLibsB1_1_3()
+DGNFilterLibsB3_0_0::DGNFilterLibsB3_0_0()
 {
     // Release for this setup 
-    m_release        = "B1-1-3";
+    m_release        = "B3-0-0";
 
     // The Filter library name
-    m_libName        = "dfc";
+    m_libName        = "gdfc";
 
-    // Path to this library
-    m_libPath        = "$(OBFXFCBINDIR)/dfc";
-
-    // Path to the master configuration file
+    m_libPath        = "$(OBFXFCBINDIR)/gdfc";
     m_configBasePath = "$(OBFXFC_DBBINDIR)";
+
+
 
     // Name of the master configuration file
     m_masterName     = "dgn_master";
@@ -72,12 +71,12 @@ DGNFilterLibsB1_1_3::DGNFilterLibsB1_1_3()
     m_schema.filter.cnt = 0;
 }
 
-DGNFilterLibsB1_1_3::~DGNFilterLibsB1_1_3()
+DGNFilterLibsB3_0_0::~DGNFilterLibsB3_0_0()
 {
 }
 
 // Given instance id typedef, return the string version of it
-const std::string& DGNFilterLibsB1_1_3::getInstanceIdString(unsigned short int id) const
+const std::string& DGNFilterLibsB3_0_0::getInstanceIdString(unsigned short int id) const
 {
     std::map<unsigned short int, std::string>::const_iterator idIter = m_instanceIdToStringMap.find(id);
 
@@ -87,7 +86,7 @@ const std::string& DGNFilterLibsB1_1_3::getInstanceIdString(unsigned short int i
 }
 
 // Other way, given instance id string, return the typedef
-const unsigned short int DGNFilterLibsB1_1_3::getInstanceId(const std::string& id) const
+const unsigned short int DGNFilterLibsB3_0_0::getInstanceId(const std::string& id) const
 {
     unsigned short int typeId = -1;
 
@@ -99,7 +98,7 @@ const unsigned short int DGNFilterLibsB1_1_3::getInstanceId(const std::string& i
 }
 
 // Return string description of a given bit in status word
-const std::string& DGNFilterLibsB1_1_3::getStatWordDesc(int idx) const
+const std::string& DGNFilterLibsB3_0_0::getStatWordDesc(int idx) const
 {
     if (idx < 0 || idx >= m_statusWordStringVec.size()) return "";
 
