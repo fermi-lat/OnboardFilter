@@ -1,4 +1,14 @@
 ------------------------------------------------------------
+User: heather  Tue Jan 31 13:41:15 PST 2012
+OnboardFilter
+
+Modified Files:
+      Tag: GlastRelease-17-35-24-br01
+	SConscript 
+Log Message:
+merge in the updates for B3-0-0
+    *
+------------------------------------------------------------
 TAG
 Tag name: GlastRelease-17-35-24-gr19, operation: add
 Package: OnboardFilter
