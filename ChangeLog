@@ -1,4 +1,14 @@
 ------------------------------------------------------------
+User: heather  Wed Feb  1 14:19:48 PST 2012
+OnboardFilter
+
+Modified Files:
+      Tag: GlastRelease-17-35-24-br01
+	OnboardFilterLib.py SConscript 
+Log Message:
+pick up patch from HEAD OnboardFilterLib.py
+    *
+------------------------------------------------------------
 TAG
 Tag name: GlastRelease-17-35-24-gr20, operation: add
 Package: OnboardFilter
