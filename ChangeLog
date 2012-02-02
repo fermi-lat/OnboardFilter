@@ -1,5 +1,27 @@
 ------------------------------------------------------------
 TAG
+Tag name: GlastRelease-17-35-24-gr21, operation: add
+Package: OnboardFilter
+User: heather  Thu Feb  2 05:21:23 2012
+Files:
+  OnboardFilter/OnboardFilterLib.py  1.4
+  OnboardFilter/.cvsignore  1.3
+  OnboardFilter/ChangeLog  1.1233
+  OnboardFilter/SConscript  1.23
+  OnboardFilter/OnboardFilter/FilterAlg.h  1.6
+  OnboardFilter/OnboardFilter/FilterTracks.h  1.12
+  OnboardFilter/OnboardFilter/filter_rto.h  1.1
+  OnboardFilter/OnboardFilter/OnboardFilterTDS.h  1.3
+  OnboardFilter/OnboardFilter/FilterDisplay.h  1.6
+  OnboardFilter/cmt/.cvsignore  1.2
+  OnboardFilter/cmt/requirements  1.123
+  OnboardFilter/cmt/Makefile  1.4
+  OnboardFilter/doc/release.notes  1.103
+  OnboardFilter/doc/OnboardFilter.jpg  1.3
+
+    *
+------------------------------------------------------------
+TAG
 Tag name: OnboardFilter-04-14-06-gr04, operation: add
 Package: OnboardFilter
 User: heather  Wed Feb  1 14:20:10 2012
