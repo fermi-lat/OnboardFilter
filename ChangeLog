@@ -2,6 +2,14 @@
 TAG
 Tag name: GlastRelease-19-04-01-gr08, operation: add
 Package: OnboardFilter
+User: heather  Thu Feb  9 16:06:22 2012
+Files:
+
+    *
+------------------------------------------------------------
+TAG
+Tag name: GlastRelease-19-04-01-gr08, operation: add
+Package: OnboardFilter
 User: heather  Thu Feb  9 12:31:26 2012
 Files:
   OnboardFilter/src/HIPFilterLibsB1-1-3.h  1.3
