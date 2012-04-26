@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: jrb  Thu Apr 26 14:46:06 PDT 2012
+GlastRelease-scons/OnboardFilter/OnboardFilter
+
+Removed Files:
+	filter_rto.h 
+Log Message:
+filter_rto.h appears to be entirely unused
+    *
+------------------------------------------------------------
 User: jrb  Thu Apr 26 14:36:14 PDT 2012
 GlastRelease-scons/OnboardFilter/src
 
