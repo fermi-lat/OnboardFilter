@@ -1,7 +1,7 @@
 /**  @file DGNFilterTool.cxx
     @brief implementation of class DGNFilterTool
     
-  $Header: /nfs/slac/g/glast/ground/cvs/GlastRelease-scons/OnboardFilter/src/DGNFilterTool.cxx,v 1.19 2011/10/08 00:18:35 jrb Exp $  
+  $Header: /nfs/slac/g/glast/ground/cvs/GlastRelease-scons/OnboardFilter/src/DGNFilterTool.cxx,v 1.20 2011/12/12 20:54:02 heather Exp $  
 */
 
 #include "IFilterTool.h"
@@ -50,14 +50,15 @@
 
 #ifdef OBF_B1_1_3
 #include "DGNFilterLibsB1-1-3.h"
-#endif
 
 // FSW include but made local do to keyword usage
 #include "FSWHeaders/EFC_sampler.h"
+#endif
 
 // Contains all info for a particular filter's release
 #ifdef OBF_B3_0_0
 #include "DGNFilterLibsB3-0-0.h"
+#include "EFC/EFC_samplerDef.h"
 #endif
 
 #ifdef OBF_B1_1_3

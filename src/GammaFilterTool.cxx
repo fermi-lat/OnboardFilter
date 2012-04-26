@@ -1,7 +1,7 @@
 /**  @file GammaFilterTool.cxx
     @brief implementation of class GammaFilterTool
     
-  $Header: /nfs/slac/g/glast/ground/cvs/GlastRelease-scons/OnboardFilter/src/GammaFilterTool.cxx,v 1.24 2011/10/05 21:50:05 jrb Exp $
+  $Header: /nfs/slac/g/glast/ground/cvs/GlastRelease-scons/OnboardFilter/src/GammaFilterTool.cxx,v 1.25 2011/12/12 20:54:03 heather Exp $
 */
 
 #include "IFilterTool.h"
@@ -45,7 +45,8 @@
 #endif
 #ifdef OBF_B3_0_0
 #include "EFC/EFC.h"
-#include "src/EFC_samplerDef.h"
+//#include "src/EFC_samplerDef.h"
+#include "EFC/EFC_samplerDef.h"
 #endif
 
 // Contains all info for a particular filter's release

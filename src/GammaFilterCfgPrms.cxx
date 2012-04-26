@@ -12,7 +12,11 @@
 //#include "EDS/EDR_tkrUnpack.h"
 //#include "EDS/FFS.h"
 #include "EFC_DB/EFC_DB_sampler.h"
+#ifdef OBF_B3_0_0
+#include "EFC/GFC_def.h"
+#else
 #include "EFC/../src/GFC_def.h"
+#endif
 
 
 void GammaFilterCfgPrms::setCfgPrms(void* cfgPrms)
