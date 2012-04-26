@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: jrb  Thu Apr 26 14:47:24 PDT 2012
+GlastRelease-scons/OnboardFilter
+
+Modified Files:
+	SConscript OnboardFilterLib.py 
+Log Message:
+library is a component, not a simple shared lib
+    *
+------------------------------------------------------------
 User: jrb  Thu Apr 26 14:46:06 PDT 2012
 GlastRelease-scons/OnboardFilter/OnboardFilter
 
