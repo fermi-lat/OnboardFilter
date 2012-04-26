@@ -4,18 +4,35 @@
 
 #include "trackProj.h"
 
-#include "EDS/FFS.h"
+#ifdef OBF_B1_3_3
+# include "EDS/FFS.h"
+#else 
+# include "PBI/FFS.ih"
+# define  FFS_mask  FFSL_mask
+# define  FFS_eliminate FFSL_eliminate
+# define  FFS       FFSL
+#endif
+
 #include "EFC_DB/EFC_DB_sampler.h"
+#ifdef  OBF_B3_0_0
+#include "EFC/GFC_def.h"
+#include "EFC/TFC_geometryDef.h"
+#else
 #include "EFC/../src/GFC_def.h"
 #include "EFC/../src/TFC_geometryDef.h"
+#endif
 #include <iostream>
 #include <exception>
 #include <cmath>
 
-#ifdef SCons
-#include "EFC/../src/GEO_DB_data.h" // was GGF/.../src
+#ifdef OBF_B3_0_0
+#  include "GGF_DB/GGF_DB_data.h"
 #else
-#include "src/GEO_DB_data.h"
+#  ifdef SCons
+#    include "EFC/../src/GEO_DB_data.h" // was GGF/.../src
+#  else
+#    include "src/GEO_DB_data.h"
+#  endif
 #endif
 
 //  Temporary!   Instead of above include

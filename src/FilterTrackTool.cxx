@@ -1,7 +1,7 @@
 /**  @file FilterTrackTool.cxx
     @brief implementation of class FilterTrackTool
     
-  $Header: /nfs/slac/g/glast/ground/cvs/GlastRelease-scons/OnboardFilter/src/FilterTrackTool.cxx,v 1.14 2011/10/10 22:14:20 jrb Exp $  
+  $Header: /nfs/slac/g/glast/ground/cvs/GlastRelease-scons/OnboardFilter/src/FilterTrackTool.cxx,v 1.15 2011/12/12 20:54:03 heather Exp $  
 */
 
 #include "IFilterTool.h"
@@ -29,10 +29,22 @@
 #include "EDS/EDR_cal.h"
 #include "EDS/EDR_tkrUnpack.h"
 
-#include "EDS/FFS.h"
+#ifdef OBF_B1_1_3
+# include "EDS/FFS.h"
+#else
+# include "PBI/FFS.ih"
+# define  FFS_mask  FFSL_mask
+# define  FFS_eliminate FFSL_eliminate
+# define  FFS  FFSL
+#endif
 
 #include "GFC_DB/GAMMA_DB_instance.h"
 #include "EFC_DB/EFC_DB_sampler.h"
+#ifdef OBF_B3_0_0
+#include "EFC/GFC_def.h"
+#include "EFC/TFC_geometryDef.h"
+#include "GGF_DB/GGF_DB_data.h"
+#else
 #include "EFC/../src/GFC_def.h"
 #include "EFC/../src/TFC_geometryDef.h"
 #ifdef SCons
@@ -40,7 +52,7 @@
 #else
 #include "src/GEO_DB_data.h"
 #endif
-
+#endif
 //  Alternative to above include:  define these two macros
 // #define TKR_STRIP_PITCH_MM    0.228
 // #define TKR_LADDER_GAP_MM  (2*.974 +.2)

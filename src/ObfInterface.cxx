@@ -21,9 +21,11 @@
 #include "XFC_DB/DFC_DB_schema.h"
 #include "XFC_DB/DGN_DB_instance.h"
 
+#ifdef OBF_B1_1_3
 #include "FSWHeaders/EFC.h"
-
+#endif
 #ifdef OBF_B3_0_0
+#include "EFC/EFC.h"
 #include "EFC/EFR_key.h"
 #include "CDM/CDM_pubdefs.h"
 #endif
