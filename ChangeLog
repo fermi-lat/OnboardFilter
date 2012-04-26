@@ -1,4 +1,15 @@
 ------------------------------------------------------------
+User: jrb  Thu Apr 26 14:36:14 PDT 2012
+GlastRelease-scons/OnboardFilter/src
+
+Modified Files:
+	CalOutputTool.cxx DGNFilterTool.cxx FilterTrackTool.cxx 
+	GammaFilterCfgPrms.cxx GammaFilterTool.cxx GrbTrack.cxx 
+	ObfInterface.cxx TkrOutputTool.cxx trackProj.cxx 
+Log Message:
+For slightly revamped OBF B3-0-0 (-gl1)
+    *
+------------------------------------------------------------
 User: heather  Thu Apr 26 13:49:24 PDT 2012
 OnboardFilter/doc
 
