@@ -1,5 +1,14 @@
 ------------------------------------------------------------
 User: heather  Thu Apr 26 13:49:23 PDT 2012
+OnboardFilter/cmt
+
+Modified Files:
+	requirements 
+Log Message:
+patch up cmt build to exclude B3 source
+    *
+------------------------------------------------------------
+User: heather  Thu Apr 26 13:49:23 PDT 2012
 OnboardFilter
 
 Modified Files:
