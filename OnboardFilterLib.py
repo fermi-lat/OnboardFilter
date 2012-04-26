@@ -1,7 +1,7 @@
-# $Header: /nfs/slac/g/glast/ground/cvs/GlastRelease-scons/OnboardFilter/OnboardFilterLib.py,v 1.3 2010/09/23 21:40:59 jrb Exp $
+# $Header: /nfs/slac/g/glast/ground/cvs/GlastRelease-scons/OnboardFilter/OnboardFilterLib.py,v 1.4 2010/10/01 23:35:33 jrb Exp $
 def generate(env, **kw):
-    if not kw.get('depsOnly', 0):
-        env.Tool('addLibrary', library = ['OnboardFilter'])
+    #if not kw.get('depsOnly', 0):
+    #    env.Tool('addLibrary', library = ['OnboardFilter'])
     if not env['PLATFORM']  == 'win32':
         env.Tool('addLibrary', library = ['dl'])
         env.Tool('addLibrary', library = ['pthread'])

@@ -1,5 +1,5 @@
 # -*- python -*-
-# $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/SConscript,v 1.23 2012/01/27 02:09:29 jrb Exp $
+# $Header: /nfs/slac/g/glast/ground/cvs/GlastRelease-scons/OnboardFilter/SConscript,v 1.24 2012/04/26 20:49:23 heather Exp $
 # Authors: Tracy Usher <usher@SLAC.Stanford.edu>
 # Version: OnboardFilter-04-16-02
 
@@ -43,7 +43,7 @@ if baseEnv['obfversion'][:6] == 'B1-1-3' :
     for r in listFiles(['src/*B3-*.cxx']) :
         cxx.remove(r)
 
-OnboardFilter = libEnv.SharedLibrary('OnboardFilter', cxx  )
+OnboardFilter = libEnv.ComponentLibrary('OnboardFilter', cxx  )
 
 progEnv.Tool('OnboardFilterLib')
 test_OnboardFilter = progEnv.GaudiProgram('test_OnboardFilter', listFiles(['src/test/*.cxx']), test=1, package='OnboardFilter')
