@@ -17,7 +17,7 @@
 #include "EFC/../src/TFC_geometryDef.h"
 #endif
 
-#ifdef OBF_B1_3_3
+#ifdef OBF_B1_1_3
 # include "EDS/FFS.h"
 #else 
 # include "PBI/FFS.ih"
