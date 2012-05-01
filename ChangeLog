@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: heather  Tue May  1 10:24:57 PDT 2012
+OnboardFilter
+
+Modified Files:
+	SConscript 
+Log Message:
+add use of G4Gen for unit test in requirements
+    *
+------------------------------------------------------------
 User: jrb  Mon Apr 30 11:45:38 PDT 2012
 OnboardFilter/cmt
 
