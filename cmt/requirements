@@ -1,6 +1,6 @@
 package OnboardFilter
-version v4r16p4
-# $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/cmt/requirements,v 1.125 2012/04/26 22:09:23 jrb Exp $
+version v4r16p5
+# $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/cmt/requirements,v 1.126 2012/04/30 18:45:38 jrb Exp $
 
 author Tracy Usher <usher@SLAC.Stanford.edu>
 
@@ -20,6 +20,7 @@ use TkrDigi v*
 use AcdDigi v*
 use CalDigi v*
 use RootmapPolicy * GlastPolicy
+use G4Generator *
 use gr_app v*
 
 macro OnboardFilter_cppflags "" \
