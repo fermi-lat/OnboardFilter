@@ -1,13 +1,4 @@
 ------------------------------------------------------------
-User: heather  Fri May 11 13:34:48 PDT 2012
-OnboardFilter
-
-Modified Files:
-	SConscript 
-Log Message:
-fix unit test on windows
-    *
-------------------------------------------------------------
 User: heather  Tue May  1 10:24:58 PDT 2012
 OnboardFilter/doc
 
