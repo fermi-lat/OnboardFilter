@@ -1,6 +1,6 @@
 package OnboardFilter
 version v4r16p5
-# $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/cmt/requirements,v 1.126 2012/04/30 18:45:38 jrb Exp $
+# $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/cmt/requirements,v 1.127 2012/05/01 17:24:58 heather Exp $
 
 author Tracy Usher <usher@SLAC.Stanford.edu>
 
@@ -59,6 +59,6 @@ public
 set JOBOPTIONS ${ONBOARDFILTERROOT}/src/test/jobOptions.txt
 
 private
-application test_OnboardFilter ${GuiMain} test/*.cxx ${Win32Resource}
+application test_OnboardFilter ${GuiMain} test/*.cxx ${WinMain} ${Win32Resource}
 
 
