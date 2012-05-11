@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: heather  Fri May 11 13:34:49 PDT 2012
+OnboardFilter/doc
+
+Modified Files:
+	release.notes 
+Log Message:
+fix unit test on windows
+    *
+------------------------------------------------------------
 User: heather  Fri May 11 13:34:48 PDT 2012
 OnboardFilter/cmt
 
