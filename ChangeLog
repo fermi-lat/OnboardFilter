@@ -1,5 +1,14 @@
 ------------------------------------------------------------
 User: heather  Wed May 16 08:57:13 PDT 2012
+OnboardFilter/cmt
+
+Modified Files:
+	requirements 
+Log Message:
+drop unit test on CMT
+    *
+------------------------------------------------------------
+User: heather  Wed May 16 08:57:13 PDT 2012
 OnboardFilter
 
 Modified Files:
