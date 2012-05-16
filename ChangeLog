@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: heather  Wed May 16 08:57:13 PDT 2012
+OnboardFilter
+
+Modified Files:
+	SConscript 
+Log Message:
+drop unit test on CMT
+    *
+------------------------------------------------------------
 User: heather  Fri May 11 13:34:49 PDT 2012
 OnboardFilter/doc
 
