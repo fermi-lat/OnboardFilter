@@ -1,4 +1,14 @@
 ------------------------------------------------------------
+User: heather  Sat May 19 21:36:55 PDT 2012
+OnboardFilter
+
+Modified Files:
+      Tag: GlastRelease-17-35-24-br06
+	SConscript 
+Log Message:
+fix typo
+    *
+------------------------------------------------------------
 User: heather  Sat May 19 19:49:17 PDT 2012
 OnboardFilter/cmt
 
