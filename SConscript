@@ -1,7 +1,7 @@
 # -*- python -*-
-# $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/SConscript,v 1.27.2.1 2012/05/20 02:46:31 heather Exp $
+# $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/SConscript,v 1.27.2.2 2012/05/20 02:47:32 heather Exp $
 # Authors: Tracy Usher <usher@SLAC.Stanford.edu>
-# Version: OnboardFilter-04-16-04-lp01
+# Version: OnboardFilter-04-16-04-lp02
 
 Import('baseEnv')
 Import('listFiles')
@@ -45,7 +45,7 @@ if baseEnv['obfversion'][:6] == 'B1-1-3' :
 
 #OnboardFilter = libEnv.ComponentLibrary('OnboardFilter', cxx  )
 libsrc = cxx + listFiles(['src/Dll/*.cxx'])
-OnboardFilter = libEnv.ComponentLibrary('OnboardFitler', libsrc)
+OnboardFilter = libEnv.ComponentLibrary('OnboardFilter', libsrc)
 
 
 progEnv.Tool('OnboardFilterLib')
