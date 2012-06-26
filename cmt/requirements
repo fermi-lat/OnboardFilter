@@ -1,6 +1,6 @@
 package OnboardFilter
-version v4r16p4lp02
-# $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/cmt/requirements,v 1.126.2.3 2012/05/20 02:49:17 heather Exp $
+version v4r16p4bt01
+# $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/cmt/requirements,v 1.126.2.4 2012/05/20 04:36:56 heather Exp $
 
 author Tracy Usher <usher@SLAC.Stanford.edu>
 
@@ -34,11 +34,27 @@ macro_append cpplinkflags "" Linux " -ldl -lpthread " WIN32 ""
 
 macro headers "" WIN32 "*.h"
 
+# Code that is not tied to any specific OBF
+macro generic-src " CalOutputTool.cxx DGNFilterTool.cxx FilterTrackTool.cxx \      
+         FSWAuxLibsTool.cxx GammaFilterCfgPrms.h GammaFilterCfgPrms.cxx GammaFilterTool.cxx GemOutputTool.cxx \
+         GrbTrack.h GrbTrack.cxx HIPFilterTool.cxx IFilterCgfPrms.h IFilterLibs.h IFilterTool.h \
+         MIPFilterTool.cxx ObfInterface.h ObfInterface.cxx OnboardFilter.cxx OutputRtn.h TkrOutputTool.cxx \
+         trackProj.* "
+
+# Use B3-0-0 for RHEl4 and B1-1-3 for VC71
+macro B1-1-3-src "DGNFilterLibsB3-0-0.h DGNFilterLibsB3-0-0.cxx GammaFilterLibsB3-0-0.h GammaFilterLibsB3-0-0.cxx \
+      MIPFilterLibsB3-0-0.h MIPFilterLibsB3-0-0.cxx \
+      HIPFilterLibsB3-0-0.h HIPFilterLibsB3-0-0.cxx" \
+  WIN32 " DGNFilterLibsB1-1-3.h DGNFilterLibsB1-1-3.cxx GammaFilterLibsB1-1-3.h GammaFilterLibsB1-1-3.cxx \
+      MIPFilterLibsB1-1-3.h MIPFilterLibsB1-1-3.cxx \
+      HIPFilterLibsB1-1-3.h HIPFilterLibsB1-1-3.cxx "
+
 library OnboardFilter \
  -s=../OnboardFilter $(headers)\
- -s=../src *.cxx *.h \
+ -s=../src $(generic-src) $(B1-1-3-src) \
  -s=Dll *.cxx 
  
+
 
 # use this only for the test. TODO: make it cleaner
 apply_pattern package_Cshlibflags

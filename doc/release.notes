@@ -4,6 +4,7 @@
  * @verbatim
  * EOH *
 
+ OnboardFilter-04-16-04-bt01 26-Jun-2012 hmk Patch for windows CMT builds to use B1-1-3
  OnboardFilter-04-16-04-lp02 19-May-2012 hmk Fix type in SConscript 
  OnboardFilter-04-16-04-lp01 19-May-2012 hmk Merge for L1proc
  OnboardFilter-04-16-04 30-Apr-2012    jrb fix typo for builds against obf B1-1-3
