@@ -6,7 +6,7 @@
 
 \verbatim
 
-  CVS $Id: OnboardFilter.cxx,v 1.85 2011/10/05 21:50:05 jrb Exp $
+  CVS $Id: OnboardFilter.cxx,v 1.86 2011/12/12 20:54:03 heather Exp $
 \endverbatim
                                                                           */
 /* ---------------------------------------------------------------------- */
@@ -377,6 +377,21 @@ StatusCode OnboardFilter::execute()
     }
 
     // Recover the meta data in order to check the run mode
+    // Since that is our output here, we should delete any copies that already exist
+    // Retrieve the output status TDS container object
+    SmartDataPtr<OnboardFilterTds::ObfFilterStatus> obfFilterStatus(eventSvc(),"/Event/Filter/ObfFilterStatus");
+
+    if (obfFilterStatus)
+    {
+        if ((eventSvc()->unregisterObject("/Event/Filter/ObfFilterStatus")).isFailure())
+        {
+            log << MSG::ERROR << "Cannot unregister existing ObfFilterStatus object!" << endreq;
+        }
+
+        obfFilterStatus->release();
+    }
+
+    // Recover the meta data in order to check the run mode
     SmartDataPtr<LsfEvent::MetaEvent> metaEventTds(eventSvc(), "/Event/MetaEvent");
 
     // If running pipeline then we'll have metaEvent data. If we have that then need to check
@@ -481,7 +496,11 @@ StatusCode OnboardFilter::execute()
 
     //  Make the tds objects
     OnboardFilterTds::ObfFilterStatus *obfStatus = new OnboardFilterTds::ObfFilterStatus;
-    eventSvc()->registerObject("/Event/Filter/ObfFilterStatus",obfStatus);
+
+    if ((eventSvc()->registerObject("/Event/Filter/ObfFilterStatus",obfStatus).isFailure()))
+    {
+        log << MSG::ERROR << "Could not register new ObfFilterStatus object in TDS" << endreq;
+    }
 
     try
     {
