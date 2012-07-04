@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: usher  Wed Jul  4 09:18:07 PDT 2012
+OnboardFilter/src
+
+Modified Files:
+	OnboardFilter.cxx 
+Log Message:
+Fix a memory leak that occurs when running jobs which use digi files for input
+    *
+------------------------------------------------------------
 User: heather  Tue Jun 26 07:39:13 PDT 2012
 OnboardFilter/doc
 
