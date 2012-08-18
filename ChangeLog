@@ -1,4 +1,13 @@
 ------------------------------------------------------------
+User: jrb  Fri Aug 17 17:32:39 PDT 2012
+GlastRelease-scons/OnboardFilter
+
+Modified Files:
+	OnboardFilterLib.py 
+Log Message:
+support no-install headers on Windows
+    *
+------------------------------------------------------------
 User: usher  Wed Jul  4 09:19:58 PDT 2012
 OnboardFilter/doc
 
