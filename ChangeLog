@@ -1,4 +1,20 @@
 ------------------------------------------------------------
+User: jrb  Tue Oct 16 15:24:15 PDT 2012
+GlastRelease-scons/OnboardFilter/src
+
+Modified Files:
+	DGNFilterLibsB3-0-0.cxx DGNFilterLibsB3-0-0.h 
+	DGNFilterTool.cxx FSWAuxLibsTool.cxx FilterTrackTool.cxx 
+	GammaFilterCfgPrms.cxx GammaFilterLibsB3-0-0.cxx 
+	GammaFilterLibsB3-0-0.h GammaFilterTool.cxx GrbTrack.cxx 
+	GrbTrack.h HIPFilterLibsB3-0-0.cxx HIPFilterLibsB3-0-0.h 
+	HIPFilterTool.cxx MIPFilterLibsB3-0-0.cxx 
+	MIPFilterLibsB3-0-0.h MIPFilterTool.cxx ObfInterface.cxx 
+	TkrOutputTool.cxx trackProj.cxx trackProj.h 
+Log Message:
+support for obf B3-1-0
+    *
+------------------------------------------------------------
 User: jrb  Mon Aug 20 12:08:09 PDT 2012
 OnboardFilter/cmt
 
