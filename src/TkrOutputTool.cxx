@@ -1,7 +1,7 @@
 /**  @file TkrOutputTool.cxx
     @brief implementation of class TkrOutputTool
     
-  $Header: /nfs/slac/g/glast/ground/cvs/GlastRelease-scons/OnboardFilter/src/TkrOutputTool.cxx,v 1.10 2012/04/26 21:36:14 jrb Exp $  
+  $Header: /nfs/slac/g/glast/ground/cvs/GlastRelease-scons/OnboardFilter/src/TkrOutputTool.cxx,v 1.11 2012/04/30 18:44:18 jrb Exp $  
 */
 
 #include "IFilterTool.h"
@@ -46,7 +46,7 @@
 
 #include "GFC_DB/GAMMA_DB_instance.h"
 #include "EFC_DB/EFC_DB_sampler.h"
-#ifdef OBF_B3_0_0
+#if defined(OBF_B3_0_0) || defined(OBF_B3_1_0)
 #include "EFC/GFC_def.h"
 #else
 #include "EFC/../src/GFC_def.h"
@@ -55,7 +55,7 @@
 #ifdef OBF_B1_1_3
 #include "FSWHeaders/EFC.h"
 #endif
-#ifdef OBF_B3_0_0
+#if defined(OBF_B3_0_0) || defined(OBF_B3_1_0)
 #include "EFC/EFC.h"
 #endif
 

@@ -1,7 +1,7 @@
 /**  @file GammaFilterTool.cxx
     @brief implementation of class GammaFilterTool
     
-  $Header: /nfs/slac/g/glast/ground/cvs/GlastRelease-scons/OnboardFilter/src/GammaFilterTool.cxx,v 1.25 2011/12/12 20:54:03 heather Exp $
+  $Header: /nfs/slac/g/glast/ground/cvs/GlastRelease-scons/OnboardFilter/src/GammaFilterTool.cxx,v 1.26 2012/04/26 21:36:14 jrb Exp $
 */
 
 #include "IFilterTool.h"
@@ -30,7 +30,7 @@
 #ifdef OBF_B1_1_3
 #include "FSWHeaders/CDM_pubdefs.h"
 #endif
-#ifdef OBF_B3_0_0
+#if defined(OBF_B3_0_0) || defined(OBF_B3_1_0)
 #include "CDM/CDM_pubdefs.h"
 #endif
 #include "EFC_DB/EFC_DB_schema.h"
@@ -43,14 +43,14 @@
 // FSW include but made local do to keyword usage
 #include "FSWHeaders/EFC_sampler.h"
 #endif
-#ifdef OBF_B3_0_0
+#if defined(OBF_B3_0_0) || defined(OBF_B3_1_0)
 #include "EFC/EFC.h"
 //#include "src/EFC_samplerDef.h"
 #include "EFC/EFC_samplerDef.h"
 #endif
 
 // Contains all info for a particular filter's release
-#ifdef OBF_B3_0_0
+#if defined(OBF_B3_0_0) || defined(OBF_B3_1_0)
 #include "GammaFilterLibsB3-0-0.h"
 #endif
 
@@ -284,8 +284,10 @@ StatusCode GammaFilterTool::initialize()
         // Create the object which contains the release specific information for the Gamma Filter
         // This includes the library containing the filter code as well as the libraries which 
         // define the running configurations.
-#ifdef OBF_B3_0_0 
+#if defined(OBF_B3_0_0 ) 
         m_filterLibs = new GammaFilterLibsB3_0_0();
+#elif  defined(OBF_B3_1_0)
+        m_filterLibs = new GammaFilterLibsB3_0_0("B3-1-0");
 #endif
 
 #ifdef OBF_B1_1_3 

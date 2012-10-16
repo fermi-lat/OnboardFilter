@@ -1,7 +1,7 @@
 /**  @file MIPFilterTool.cxx
     @brief implementation of class MIPFilterTool
     
-  $Header: /nfs/slac/g/glast/ground/cvs/GlastRelease-scons/OnboardFilter/src/MIPFilterTool.cxx,v 1.21 2011/10/08 00:18:36 jrb Exp $  
+  $Header: /nfs/slac/g/glast/ground/cvs/GlastRelease-scons/OnboardFilter/src/MIPFilterTool.cxx,v 1.22 2011/12/12 20:54:03 heather Exp $  
 */
 
 #include "IFilterTool.h"
@@ -26,7 +26,7 @@
 #include "ObfInterface.h"
 
 // FSW includes go here
-#ifdef OBF_B3_0_0
+#if defined(OBF_B3_0_0) || defined(OBF_B3_1_0)
 #include "CDM/CDM_pubdefs.h"
 #endif
 #ifdef OBF_B1_1_3
@@ -41,7 +41,7 @@
 
 
 // Contains all info for a particular filter's release
-#ifdef OBF_B3_0_0
+#if defined(OBF_B3_0_0) || defined(OBF_B3_1_0)
 #include "EFC/EFC.h"
 #include "MIPFilterLibsB3-0-0.h"
 #endif
@@ -204,8 +204,10 @@ StatusCode MIPFilterTool::initialize()
         // Get ObfInterface pointer
         ObfInterface* obf = ObfInterface::instance();
 
-#ifdef OBF_B3_0_0
+#if defined(OBF_B3_0_0)
         m_filterLibs = new MIPFilterLibsB3_0_0();
+#elif   defined(OBF_B3_1_0)
+        m_filterLibs = new MIPFilterLibsB3_0_0("B3-1-0");
 #endif
 #ifdef OBF_B1_1_3
         m_filterLibs = new MIPFilterLibsB1_1_3();

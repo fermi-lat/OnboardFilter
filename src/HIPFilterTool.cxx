@@ -1,7 +1,7 @@
 /**  @file HIPFilterTool.cxx
     @brief implementation of class HIPFilterTool
     
-  $Header: /nfs/slac/g/glast/ground/cvs/GlastRelease-scons/OnboardFilter/src/HIPFilterTool.cxx,v 1.21 2011/10/08 00:18:35 jrb Exp $  
+  $Header: /nfs/slac/g/glast/ground/cvs/GlastRelease-scons/OnboardFilter/src/HIPFilterTool.cxx,v 1.22 2011/12/12 20:54:03 heather Exp $  
 */
 
 #include "IFilterTool.h"
@@ -29,7 +29,7 @@
 #ifdef OBF_B1_1_3
 #include "FSWHeaders/CDM_pubdefs.h"
 #endif
-#ifdef OBF_B3_0_0
+#if defined(OBF_B3_0_0) || defined(OBF_B3_1_0)
 #include "CDM/CDM_pubdefs.h"
 #endif
 
@@ -40,7 +40,7 @@
 #include "XFC/MFC_status.h"
 
 // Contains all info for a particular filter's release
-#ifdef OBF_B3_0_0
+#if defined(OBF_B3_0_0) || defined(OBF_B3_1_0)
 #include "EFC/EFC.h"
 #include "HIPFilterLibsB3-0-0.h"
 #endif
@@ -202,8 +202,10 @@ StatusCode HIPFilterTool::initialize()
     {
         // Get ObfInterface pointer
         ObfInterface* obf = ObfInterface::instance();
-#ifdef OBF_B3_0_0
+#if defined(OBF_B3_0_0) 
         m_filterLibs = new HIPFilterLibsB3_0_0();
+#elif  defined(OBF_B3_1_0)
+        m_filterLibs = new HIPFilterLibsB3_0_0("B3-1-0");
 #endif
 #ifdef OBF_B1_1_3
         m_filterLibs = new HIPFilterLibsB1_1_3();

@@ -7,10 +7,10 @@
 #include "XFC_DB/HFC_DB_schema.h"
 #include "XFC_DB/HIP_DB_instance.h"
 
-HIPFilterLibsB3_0_0::HIPFilterLibsB3_0_0()
+HIPFilterLibsB3_0_0::HIPFilterLibsB3_0_0(const std::string& release)
 {
     // Release for this setup 
-    m_release        = "B3-0-0";
+    m_release        = release;
 
     // The Filter library name
     m_libName        = "ghfc";
