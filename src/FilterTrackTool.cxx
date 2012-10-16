@@ -1,7 +1,7 @@
 /**  @file FilterTrackTool.cxx
     @brief implementation of class FilterTrackTool
     
-  $Header: /nfs/slac/g/glast/ground/cvs/GlastRelease-scons/OnboardFilter/src/FilterTrackTool.cxx,v 1.15 2011/12/12 20:54:03 heather Exp $  
+  $Header: /nfs/slac/g/glast/ground/cvs/GlastRelease-scons/OnboardFilter/src/FilterTrackTool.cxx,v 1.16 2012/04/26 21:36:14 jrb Exp $  
 */
 
 #include "IFilterTool.h"
@@ -40,7 +40,7 @@
 
 #include "GFC_DB/GAMMA_DB_instance.h"
 #include "EFC_DB/EFC_DB_sampler.h"
-#ifdef OBF_B3_0_0
+#if defined(OBF_B3_0_0) || defined(OBF_B3_1_0)
 #include "EFC/GFC_def.h"
 #include "EFC/TFC_geometryDef.h"
 #include "GGF_DB/GGF_DB_data.h"
@@ -66,7 +66,7 @@
 #include "FSWHeaders/TFC_prjDef.h"
 #include "FSWHeaders/EFC.h"
 #endif
-#ifdef OBF_B3_0_0
+#if defined(OBF_B3_0_0) || defined(OBF_B3_1_0)
 #include "EFC/TFC_prjDef.h"
 #include "EFC/EFC.h"
 #endif

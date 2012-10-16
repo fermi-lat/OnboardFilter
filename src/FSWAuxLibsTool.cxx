@@ -1,7 +1,7 @@
 /**  @file FSWAuxLibsTool.cxx
     @brief implementation of class FSWAuxLibsTool
     
-  $Header: /nfs/slac/g/glast/ground/cvs/GlastRelease-scons/OnboardFilter/src/FSWAuxLibsTool.cxx,v 1.12 2011/10/08 00:18:35 jrb Exp $  
+  $Header: /nfs/slac/g/glast/ground/cvs/GlastRelease-scons/OnboardFilter/src/FSWAuxLibsTool.cxx,v 1.13 2011/12/12 20:54:03 heather Exp $  
 */
 
 #include "IFilterTool.h"
@@ -21,7 +21,7 @@
 #include "FSWHeaders/CDM_pubdefs.h"
 #endif
 
-#ifdef OBF_3_0_0
+#if defined(OBF_3_0_0) || defined(OBF_3_1_0)
 #include "CDM/CDM_pubdefs.h"
 #endif
 

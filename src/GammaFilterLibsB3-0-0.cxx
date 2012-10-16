@@ -7,10 +7,10 @@
 #include "GFC_DB/GFC_DB_V3_schema.h"
 #include "GFC_DB/GAMMA_DB_instance.h"
 
-GammaFilterLibsB3_0_0::GammaFilterLibsB3_0_0()
+GammaFilterLibsB3_0_0::GammaFilterLibsB3_0_0(const std::string& release)
 {
     // Release for this setup 
-    m_release        = "B3-0-0";
+    m_release        = release;
 
     // The Filter library name
     m_libName        = "ggfc";

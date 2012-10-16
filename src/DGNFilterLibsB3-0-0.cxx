@@ -7,10 +7,10 @@
 #include "XFC_DB/DFC_DB_schema.h"
 #include "XFC_DB/DGN_DB_instance.h"
 
-DGNFilterLibsB3_0_0::DGNFilterLibsB3_0_0()
+DGNFilterLibsB3_0_0::DGNFilterLibsB3_0_0(const std::string& release)
 {
     // Release for this setup 
-    m_release        = "B3-0-0";
+    m_release        = release;
 
     // The Filter library name
     m_libName        = "gdfc";

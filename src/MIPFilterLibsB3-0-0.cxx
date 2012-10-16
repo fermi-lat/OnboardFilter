@@ -7,10 +7,10 @@
 #include "XFC_DB/MFC_DB_schema.h"
 #include "XFC_DB/MIP_DB_instance.h"
 
-MIPFilterLibsB3_0_0::MIPFilterLibsB3_0_0()
+MIPFilterLibsB3_0_0::MIPFilterLibsB3_0_0(const std::string& release)
 {
     // Release for this setup 
-    m_release        = "B3-0-0";
+    m_release        = release;
 
     // The Filter library name
     m_libName        = "gmfc";

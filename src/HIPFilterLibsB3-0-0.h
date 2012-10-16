@@ -6,7 +6,7 @@
 *
 * @authors T. Usher
 *
-* $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/HIPFilterLibsB1-1-3.h,v 1.3 2008/09/23 03:08:11 usher Exp $
+* $Header: /nfs/slac/g/glast/ground/cvs/GlastRelease-scons/OnboardFilter/src/HIPFilterLibsB3-0-0.h,v 1.1 2011/04/19 17:32:02 usher Exp $
 */
 
 #ifndef __HIPFilterLibsB3_0_0_H
@@ -18,7 +18,7 @@
 class HIPFilterLibsB3_0_0 : virtual public IFilterLibs
 {
 public:
-    HIPFilterLibsB3_0_0();
+  HIPFilterLibsB3_0_0(const std::string& release="B3-0-0");
     virtual ~HIPFilterLibsB3_0_0();
 
     // Flight Software Release associated with these libraries
