@@ -14,7 +14,7 @@
 #endif
 
 #include "EFC_DB/EFC_DB_sampler.h"
-#if defined(OBF_B3_0_0) || defined(OBF_B3_1_0)
+#if defined(OBF_B3_0_0) || defined(OBF_B3_1_0) || defined(OBF_B3_1_1)
 #include "EFC/GFC_def.h"
 #include "EFC/TFC_geometryDef.h"
 #else
@@ -25,7 +25,7 @@
 #include <exception>
 #include <cmath>
 
-#if defined(OBF_B3_0_0) || defined(OBF_B3_1_0)
+#if defined(OBF_B3_0_0) || defined(OBF_B3_1_0) || defined(OBF_B3_1_1)
 #  include "GGF_DB/GGF_DB_data.h"
 #else
 #  ifdef SCons
