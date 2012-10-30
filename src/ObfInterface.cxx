@@ -24,7 +24,7 @@
 #ifdef OBF_B1_1_3
 #include "FSWHeaders/EFC.h"
 #endif
-#if defined(OBF_B3_0_0) || defined(OBF_B3_1_0)
+#if defined(OBF_B3_0_0) || defined(OBF_B3_1_0)  || defined(OBF_B3_1_1)
 #include "EFC/EFC.h"
 #include "EFC/EFR_key.h"
 #include "CDM/CDM_pubdefs.h"
@@ -167,7 +167,7 @@ int ObfInterface::setupFilter(const EFC_DB_Schema* schema,
 #endif
 
     // Retrieve the key to our filter
-#if defined(OBF_B3_0_0) || defined(OBF_B3_1_0)
+#if defined(OBF_B3_0_0) || defined(OBF_B3_1_0) || defined(OBF_B3_1_1)
     unsigned int key = EFR_keyGet (CDM_findDatabase (schema->filter.id, configIndex), 0);
 #endif
 #ifdef OBF_B1_1_3
