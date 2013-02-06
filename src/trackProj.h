@@ -4,7 +4,7 @@
 #ifdef OBF_B1_1_3
 #include "FSWHeaders/TFC_prjDef.h"
 #endif
-#if defined(OBF_B3_0_0) || defined(OBF_B3_1_0) || defined(OBF_B3_1_1)
+#if defined(OBF_B3_0_0) || defined(OBF_B3_1_0) || defined(OBF_B3_1_1) || defined(OBF_B3_1_3)
 #include "EFC/TFC_prjDef.h"
 #endif
 

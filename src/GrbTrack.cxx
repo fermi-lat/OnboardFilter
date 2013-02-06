@@ -3,13 +3,13 @@
 #ifdef OBF_B1_1_3
 #include "FSWHeaders/TFC_prjDef.h"
 #endif
-#if defined(OBF_B3_0_0) || defined(OBF_B3_1_0) || defined(OBF_B3_1_1)
+#if defined(OBF_B3_0_0) || defined(OBF_B3_1_0) || defined(OBF_B3_1_1) || defined(OBF_B3_1_3)
 #include "EFC/TFC_prjDef.h"
 #endif
 
 #include "EFC_DB/EFC_DB_sampler.h"
 
-#if defined(OBF_B3_0_0) || defined(OBF_B3_1_0) || defined(OBF_B3_1_1)
+#if defined(OBF_B3_0_0) || defined(OBF_B3_1_0) || defined(OBF_B3_1_1) || defined(OBF_B3_1_3)
 #include "EFC/GFC_def.h"
 #include "EFC/TFC_geometryDef.h"
 #else
@@ -26,7 +26,7 @@
 # define  FFS       FFSL
 #endif
 
-#if defined(OBF_B3_0_0) || defined(OBF_B3_1_0) || defined(OBF_B3_1_1)
+#if defined(OBF_B3_0_0) || defined(OBF_B3_1_0) || defined(OBF_B3_1_1) || defined(OBF_B3_1_3)
 #include "GGF_DB/GGF_DB_data.h"
 #else
 #  ifdef SCons

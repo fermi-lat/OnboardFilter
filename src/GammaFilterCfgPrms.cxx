@@ -12,7 +12,7 @@
 //#include "EDS/EDR_tkrUnpack.h"
 //#include "EDS/FFS.h"
 #include "EFC_DB/EFC_DB_sampler.h"
-#if defined(OBF_B3_0_0) || defined(OBF_B3_1_0) || defined(OBF_B3_1_1)
+#if defined(OBF_B3_0_0) || defined(OBF_B3_1_0) || defined(OBF_B3_1_1) || defined(OBF_B3_1_3)
 #include "EFC/GFC_def.h"
 #else
 #include "EFC/../src/GFC_def.h"
