@@ -1,7 +1,7 @@
 //##############################################################
 //
 // basic Job options file for a Gleam execution
-// $Header: /nfs/slac/g/glast/ground/cvs/GlastRelease-scons/OnboardFilter/src/test/jobOptions.txt,v 1.25 2010/09/08 06:47:53 jrb Exp $
+// $Header: /nfs/slac/g/glast/ground/cvs/OnboardFilter/src/test/jobOptions.txt,v 1.26 2011/12/12 20:54:03 heather Exp $
 
 // primary DLLs, including auditor 
 
@@ -18,6 +18,9 @@ EventPersistencySvc.CnvServices = {"EventCnvSvc"};
 //EventSelector.Input = "SVC='DbEvtSelector'";
 //EventSelector.PrintFreq = -1;
 ApplicationMgr.HistogramPersistency = "NONE";
+
+// To avoid need for Overlays during unit test March 5, 2014
+AcdDigiAlg.applyCoherentNoise = false;
 
 
 // ----------------------------
