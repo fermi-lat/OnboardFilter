@@ -1,13 +1,4 @@
 ------------------------------------------------------------
-User: heather  Wed Apr  2 23:26:25 PDT 2014
-OnboardFilter
-
-Modified Files:
-	SConscript 
-Log Message:
-remove unit test JO update for AcdDigi
-    *
-------------------------------------------------------------
 User: heather  Wed Mar  5 13:49:05 PST 2014
 OnboardFilter/src/test
 
